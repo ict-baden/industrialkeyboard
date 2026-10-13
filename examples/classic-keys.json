@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "appearance": { "theme": "light", "numberRow": true },
+  "layout": { "alphabet": "azerty", "navigation": "keys", "numericOrder": "phone" },
+  "scanner": { "trigger": "datawedge", "scanKey": true, "input": { "enabled": false } }
+}

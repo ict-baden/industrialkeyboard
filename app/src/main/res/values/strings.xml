@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Industrial Keyboard</string>
+    <string name="ime_name">Industrial Keyboard</string>
+    <string name="settings_title">Keyboard settings</string>
+
+    <string name="mc_config_json_title">Configuration (JSON)</string>
+    <string name="mc_config_json_description">Complete configuration in the Industrial Keyboard JSON format. Takes precedence over the single options below.</string>
+    <string name="mc_theme_title">Theme</string>
+    <string name="mc_theme_description">Colors of the keyboard.</string>
+    <string name="mc_alphabet_title">Letter layout</string>
+    <string name="mc_alphabet_description">Arrangement of the letter keys.</string>
+    <string name="mc_numeric_order_title">Numeric keypad</string>
+    <string name="mc_numeric_order_description">Telephone order (1-2-3 at the top) or calculator order (7-8-9 at the top).</string>
+    <string name="mc_scan_tab_title">Scan tab</string>
+    <string name="mc_scan_tab_description">Show the tab with the large scan button.</string>
+    <string name="mc_function_tab_title">Function key tab</string>
+    <string name="mc_function_tab_description">Show the tab with F1–F12 (Shift: F13–F24), Esc, arrows and navigation keys.</string>
+    <string name="mc_sound_title">Sound on keypress</string>
+    <string name="mc_sound_description">Play a click on every key press.</string>
+    <string name="mc_vibrate_title">Vibrate on keypress</string>
+    <string name="mc_vibrate_description">Short vibration on every key press.</string>
+    <string name="mc_admin_password_title">Admin password</string>
+    <string name="mc_admin_password_description">Protects the keyboard settings and configuration imports.</string>
+
+    <string-array name="mc_theme_entries">
+        <item>Follow the system</item>
+        <item>Light</item>
+        <item>Dark</item>
+        <item>High contrast</item>
+    </string-array>
+    <string-array name="mc_theme_values">
+        <item>system</item>
+        <item>light</item>
+        <item>dark</item>
+        <item>contrast</item>
+    </string-array>
+    <string-array name="mc_alphabet_entries">
+        <item>QWERTY (English)</item>
+        <item>QWERTZ (German)</item>
+        <item>AZERTY (French)</item>
+        <item>Nordic</item>
+        <item>Spanish</item>
+    </string-array>
+    <string-array name="mc_alphabet_values">
+        <item>qwerty</item>
+        <item>qwertz</item>
+        <item>azerty</item>
+        <item>nordic</item>
+        <item>spanish</item>
+    </string-array>
+    <string-array name="mc_numeric_order_entries">
+        <item>Telephone (1-2-3 at the top)</item>
+        <item>Calculator (7-8-9 at the top)</item>
+    </string-array>
+    <string-array name="mc_numeric_order_values">
+        <item>phone</item>
+        <item>calculator</item>
+    </string-array>
+</resources>

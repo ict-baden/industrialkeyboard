@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "adminPassword": "CHANGE-ME",
+  "appearance": { "theme": "contrast", "keyHeight": 135, "keyHints": true },
+  "layout": { "alphabet": "qwertz", "navigation": "tabs", "numericOrder": "calculator" },
+  "tabs": { "alpha": true, "numeric": true, "symbols": true, "function": false, "scan": true, "preferred": "auto" },
+  "keys": {
+    "alpha.p1": "{TAB}",
+    "numeric.p1": "-",
+    "numeric.p2": ",",
+    "numeric.p3": "{TAB}",
+    "numeric.p4": "{SCAN}"
+  },
+  "typing": { "autoCapitalize": false, "doubleSpacePeriod": false, "longPressDelay": 600 },
+  "feedback": { "keyPopup": true, "sound": true, "soundVolume": 80, "vibrate": true, "vibrationMs": 35 },
+  "scanner": { "trigger": "auto", "scanKey": true, "input": { "enabled": true, "suffix": "enter" } }
+}
