@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Managed configuration schema shown by EMMs (SOTI, Intune, Workspace ONE …). -->
+<restrictions xmlns:android="http://schemas.android.com/apk/res/android">
+    <restriction
+        android:defaultValue=""
+        android:description="@string/mc_config_json_description"
+        android:key="config_json"
+        android:restrictionType="string"
+        android:title="@string/mc_config_json_title" />
+    <restriction
+        android:defaultValue="system"
+        android:description="@string/mc_theme_description"
+        android:entries="@array/mc_theme_entries"
+        android:entryValues="@array/mc_theme_values"
+        android:key="theme"
+        android:restrictionType="choice"
+        android:title="@string/mc_theme_title" />
+    <restriction
+        android:defaultValue="qwerty"
+        android:description="@string/mc_alphabet_description"
+        android:entries="@array/mc_alphabet_entries"
+        android:entryValues="@array/mc_alphabet_values"
+        android:key="alphabet"
+        android:restrictionType="choice"
+        android:title="@string/mc_alphabet_title" />
+    <restriction
+        android:defaultValue="phone"
+        android:description="@string/mc_numeric_order_description"
+        android:entries="@array/mc_numeric_order_entries"
+        android:entryValues="@array/mc_numeric_order_values"
+        android:key="numeric_order"
+        android:restrictionType="choice"
+        android:title="@string/mc_numeric_order_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_scan_tab_description"
+        android:key="scan_tab"
+        android:restrictionType="bool"
+        android:title="@string/mc_scan_tab_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_function_tab_description"
+        android:key="function_tab"
+        android:restrictionType="bool"
+        android:title="@string/mc_function_tab_title" />
+    <restriction
+        android:defaultValue="false"
+        android:description="@string/mc_sound_description"
+        android:key="sound"
+        android:restrictionType="bool"
+        android:title="@string/mc_sound_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_vibrate_description"
+        android:key="vibrate"
+        android:restrictionType="bool"
+        android:title="@string/mc_vibrate_title" />
+    <restriction
+        android:defaultValue=""
+        android:description="@string/mc_admin_password_description"
+        android:key="admin_password"
+        android:restrictionType="string"
+        android:title="@string/mc_admin_password_title" />
+</restrictions>

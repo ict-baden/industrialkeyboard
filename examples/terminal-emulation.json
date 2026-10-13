@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "appearance": { "theme": "dark", "functionRow": true },
+  "layout": { "alphabet": "qwerty", "navigation": "tabs" },
+  "tabs": { "alpha": true, "numeric": true, "symbols": true, "function": true, "scan": true },
+  "keys": { "alpha.p1": "{ESC}", "numeric.p4": "{TAB}" },
+  "typing": { "autoCapitalize": false, "doubleSpacePeriod": false },
+  "customLayouts": [
+    {
+      "id": "host",
+      "label": "Host",
+      "rows": [
+        [ { "label": "Field exit", "output": "{TAB}", "width": 1.5, "style": "function" }, "{F13}", "{F14}", "{F15}", "{F16}" ],
+        [ { "label": "Reset", "output": "{ESC}", "width": 1.5, "style": "function" }, "{F17}", "{F18}", "{F19}", "{F20}" ],
+        [ { "label": "PgUp", "output": "{PGUP}", "width": 1.5 }, "{F21}", "{F22}", "{F23}", "{F24}" ],
+        [ { "label": "PgDn", "output": "{PGDN}", "width": 1.5 }, { "label": "Send", "output": "{ENTER}", "width": 4, "style": "accent" } ]
+      ]
+    }
+  ]
+}

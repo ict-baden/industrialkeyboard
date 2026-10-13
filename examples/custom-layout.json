@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "appearance": { "accentColor": "#00796B" },
+  "tabs": { "preferred": "auto" },
+  "customLayouts": [
+    {
+      "id": "picking",
+      "label": "Pick",
+      "rows": [
+        [ { "label": "OK", "output": "OK{ENTER}", "width": 2, "style": "accent" }, { "label": "Skip", "output": "SKIP{ENTER}", "width": 2 } ],
+        [ { "label": "Short", "output": "SHORT{ENTER}", "width": 2 }, { "label": "Damaged", "output": "DMG{ENTER}", "width": 2 } ],
+        [ { "label": "Scan", "output": "{SCAN}", "width": 2, "style": "function" }, { "label": "Numbers", "output": "{SHOW:numeric}", "width": 2, "style": "function" } ]
+      ]
+    }
+  ]
+}
