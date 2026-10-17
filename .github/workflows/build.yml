@@ -78,7 +78,8 @@ jobs:
           ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/release.jks
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          # PKCS12-Keystores haben ein gemeinsames Passwort für Store und Schlüssel; eigenes Secret nur, falls abweichend
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD || secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           ./gradlew assembleRelease --console=plain -PversionName=${{ steps.version.outputs.version }} -PversionCode=${{ steps.version.outputs.code }}
           mkdir -p dist
