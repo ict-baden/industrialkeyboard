@@ -105,7 +105,7 @@ object ConfigJson {
                                         put(JSONObject().apply {
                                             put("label", key.label)
                                             if (key.output != key.label) put("output", key.output)
-                                            if (key.width != 1f) put("width", key.width.toDouble())
+                                            if (key.width != 1f) put("width", key.width.toString().toDouble()) // 1.2, not 1.2000000476837158
                                             if (key.style != KeyStyle.NORMAL) put("style", key.style.key)
                                         })
                                     }

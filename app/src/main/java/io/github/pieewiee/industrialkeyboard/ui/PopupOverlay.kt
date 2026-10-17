@@ -48,10 +48,11 @@ class PopupOverlay(context: Context) : View(context), PopupHost {
 
     override fun showPreview(source: View, key: RectF, label: String) {
         val r = toLocal(source, key)
-        val width = max(r.width() * 1.3f, dp(52f))
+        // Wide custom keys: never wider than the overlay.
+        val width = min(max(r.width() * 1.3f, dp(52f)), this.width - dp(4f))
         val height = r.height() * 1.45f
         val bottom = r.top + r.height() * 0.32f
-        val left = (r.centerX() - width / 2).coerceIn(dp(2f), this.width - width - dp(2f))
+        val left = clampLeft(r.centerX() - width / 2, width)
         previewRect.set(left, bottom - height, left + width, bottom)
         if (previewLabel == null) previewShownAt = SystemClock.uptimeMillis()
         previewLabel = label
@@ -75,7 +76,7 @@ class PopupOverlay(context: Context) : View(context), PopupHost {
         val pad = dp(6f)
         val width = perRow * cellW + pad * 2
         val height = rows * cellH + pad * 2
-        val left = (r.centerX() - cellW / 2 - pad).coerceIn(dp(2f), this.width - width - dp(2f))
+        val left = clampLeft(r.centerX() - cellW / 2 - pad, width)
         val top = max(r.top - height - dp(4f), dp(2f))
         panel.set(left, top, left + width, top + height)
         cells.clear()
@@ -156,6 +157,10 @@ class PopupOverlay(context: Context) : View(context), PopupHost {
             canvas.drawText(option, cell.centerX(), cell.centerY() - (text.descent() + text.ascent()) / 2, text)
         }
     }
+
+    /** Keeps a popup of [popupWidth] inside the overlay; left-aligned when it is wider (no coerceIn crash). */
+    private fun clampLeft(left: Float, popupWidth: Float): Float =
+        left.coerceAtMost(this.width - popupWidth - dp(2f)).coerceAtLeast(dp(2f))
 
     private fun toLocal(source: View, r: RectF): RectF {
         source.getLocationInWindow(origin)

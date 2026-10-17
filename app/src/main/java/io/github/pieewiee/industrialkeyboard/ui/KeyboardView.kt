@@ -164,9 +164,13 @@ class KeyboardView(context: Context) : View(context) {
                 }
                 x += keyWidth
             }
-            // Words in one row share a size (F1 … F12, Esc / Home / PgUp), so the row looks even.
-            val words = rowBoxes.filter { it.key.icon == null && (it.key.label?.length ?: 0) > 1 && it.key.output != KeyOutput.Space }
-            words.minOfOrNull { fitLabel(it.key, it.key.label!!, it.rect) }?.let { size -> words.forEach { it.labelSize = size } }
+            // Words in one row share a size (F1 … F12, Esc / Home / PgUp), and so do single characters
+            // (narrow keys would otherwise shrink W and M but not I), so the row looks even.
+            rowBoxes.filter { it.key.icon == null && !it.key.label.isNullOrEmpty() && it.key.output != KeyOutput.Space }
+                .groupBy { it.key.label!!.length == 1 }.values.forEach { group ->
+                    val size = group.minOf { fitLabel(it.key, measureLabel(it.key), it.rect) }
+                    group.forEach { it.labelSize = size }
+                }
             boxes += rowBoxes
         }
     }
@@ -297,6 +301,9 @@ class KeyboardView(context: Context) : View(context) {
         canvas.drawText(hint, r.right - dp(5f), r.top + dp(3f) - text.ascent(), text)
         text.textAlign = Paint.Align.CENTER
     }
+
+    /** Letters are measured in capitals, so the size also fits while Shift is on. */
+    private fun measureLabel(key: Key): String = if (key.letter) key.label!!.uppercase(Locale.getDefault()) else key.label!!
 
     private fun displayLabel(key: Key): String {
         val label = key.label.orEmpty()

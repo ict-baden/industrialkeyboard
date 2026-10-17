@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+Fixes, all found and verified on a Zebra HC20 (Android 15):
+
+- The keyboard crashed on every key press when a custom layout had a key wider than about
+  three quarters of the keyboard (key preview / alternatives larger than the screen).
+- The admin password could be skipped by rotating the device while the password dialog was open.
+- Double tap on Shift at the start of a field or sentence (automatic capital) now turns on caps
+  lock, as documented, instead of a single capital.
+- The scan page was 4 dp lower than the other pages, so the tab bar jumped when switching to it.
+- Letters in one row now share one text size on narrow keys (W and M were smaller than I).
+- Export writes key widths as configured (`1.2` instead of `1.2000000476837158`).
+
 ## 1.0.0
 
 First release.

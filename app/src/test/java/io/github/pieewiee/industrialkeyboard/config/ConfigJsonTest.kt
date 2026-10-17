@@ -38,6 +38,13 @@ class ConfigJsonTest {
     }
 
     @Test
+    fun `key widths are exported as written`() {
+        val config = KeyboardConfig(customLayouts = listOf(CustomLayout("a", "A", listOf(listOf(CustomKey("x", width = 1.2f))))))
+        val json = ConfigJson.write(config)
+        assertTrue(json, json.contains("\"width\": 1.2") && !json.contains("1.20000"))
+    }
+
+    @Test
     fun `plain admin password is hashed`() {
         val config = ConfigJson.parse("""{"adminPassword":"1234"}""")
         assertTrue(PasswordHasher.verify("1234", config.adminPasswordHash))
