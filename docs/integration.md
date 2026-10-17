@@ -39,7 +39,7 @@ The scanner sends the barcode as a broadcast, the keyboard commits it to the foc
 one step and adds **Enter** (default), **Tab** or nothing
 ([`scanner.input`](configuration.md#scanner)).
 
-- Action: `io.github.pieewiee.industrialkeyboard.action.SCAN_INPUT` (or your own
+- Action: `de.ictbaden.industrialkeyboard.action.SCAN_INPUT` (or your own
   `scanner.input.action`)
 - Data: string extra `data` (or `scanner.input.extra`); `com.symbol.datawedge.data_string`,
   `barcode_string`, `decode_string` and `com.honeywell.aidc.extra.EXTRA_DATA` are understood
@@ -52,14 +52,14 @@ one step and adds **Enter** (default), **Tab** or nothing
 |---|---|
 | Keystroke output | off |
 | Intent output | on |
-| Intent action | `io.github.pieewiee.industrialkeyboard.action.SCAN_INPUT` |
+| Intent action | `de.ictbaden.industrialkeyboard.action.SCAN_INPUT` |
 | Intent category | empty |
 | Intent delivery | Broadcast intent |
 
 **Test without a scanner:**
 
 ```bash
-adb shell am broadcast -a io.github.pieewiee.industrialkeyboard.action.SCAN_INPUT --es data 4006381333931
+adb shell am broadcast -a de.ictbaden.industrialkeyboard.action.SCAN_INPUT --es data 4006381333931
 ```
 
 The number appears in the focused field, followed by Enter.
@@ -77,22 +77,22 @@ a confirmation step:
 
 | | |
 |---|---|
-| Action | `io.github.pieewiee.industrialkeyboard.action.SHOW_TAB` |
+| Action | `de.ictbaden.industrialkeyboard.action.SHOW_TAB` |
 | Extra `tab` | `alpha`, `numeric`, `symbols`, `function`, `scan` or the id of a custom layout |
 
 When the keyboard is hidden, the request applies the next time it opens.
 
 ```kotlin
 sendBroadcast(
-    Intent("io.github.pieewiee.industrialkeyboard.action.SHOW_TAB")
-        .setClassName("io.github.pieewiee.industrialkeyboard", "io.github.pieewiee.industrialkeyboard.api.ApiReceiver")
+    Intent("de.ictbaden.industrialkeyboard.action.SHOW_TAB")
+        .setClassName("de.ictbaden.industrialkeyboard", "de.ictbaden.industrialkeyboard.api.ApiReceiver")
         .putExtra("tab", "numeric"),
 )
 ```
 
 ```bash
-adb shell am broadcast -a io.github.pieewiee.industrialkeyboard.action.SHOW_TAB \
-  -n io.github.pieewiee.industrialkeyboard/.api.ApiReceiver --es tab numeric
+adb shell am broadcast -a de.ictbaden.industrialkeyboard.action.SHOW_TAB \
+  -n de.ictbaden.industrialkeyboard/.api.ApiReceiver --es tab numeric
 ```
 
 Apps targeting Android 11 or later should declare the keyboard in their manifest so that it is
@@ -100,7 +100,7 @@ visible to them:
 
 ```xml
 <queries>
-    <package android:name="io.github.pieewiee.industrialkeyboard" />
+    <package android:name="de.ictbaden.industrialkeyboard" />
 </queries>
 ```
 

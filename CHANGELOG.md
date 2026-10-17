@@ -1,19 +1,31 @@
-# Changelog
+# Änderungen
 
-## Unreleased
+Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [Semantic Versioning](https://semver.org/lang/de/).
 
-Fixes, all found and verified on a Zebra HC20 (Android 15):
+## [Unveröffentlicht]
 
-- The keyboard crashed on every key press when a custom layout had a key wider than about
-  three quarters of the keyboard (key preview / alternatives larger than the screen).
-- The admin password could be skipped by rotating the device while the password dialog was open.
-- Double tap on Shift at the start of a field or sentence (automatic capital) now turns on caps
-  lock, as documented, instead of a single capital.
-- The scan page was 4 dp lower than the other pages, so the tab bar jumped when switching to it.
-- Letters in one row now share one text size on narrow keys (W and M were smaller than I).
-- Export writes key widths as configured (`1.2` instead of `1.2000000476837158`).
+### Geändert
+- **Neuer Paketname `de.ictbaden.industrialkeyboard`** (vorher `io.github.pieewiee.industrialkeyboard`), nach den Richtlinien von ICT-Baden. Android und das MDM sehen eine neue App: alte App deinstallieren, neue verteilen, Konfiguration neu ausrollen. Die Eingabemethode heißt jetzt `de.ictbaden.industrialkeyboard/.ime.KeyboardService`.
+- Die Intent-Actions heißen entsprechend `de.ictbaden.industrialkeyboard.action.SCAN_INPUT`, `…SHOW_TAB` und `…INSTALL_CONFIG`. DataWedge-Profile mit Intent-Ausgabe und StageNow-Profile anpassen.
+- Debug-Builds heißen `de.ictbaden.industrialkeyboard.debug` und lassen sich neben dem Release installieren.
+- Lizenz: MIT, © ICT-Baden.
 
-## 1.0.0
+### Neu
+- Info-Bereich in den Einstellungen: Version mit Commit, Lizenz, Drittanbieter-Lizenzen, Datenschutz, Quellcode, Hilfe & Support, Webseite, Impressum.
+- Doku-Seite [Data and privacy](docs/data-and-privacy.md).
+- CI: Build, Tests und Lint bei jedem Push; mit dem Release-Schlüssel aus den Secrets signierte APK im Release `latest` (main) bzw. `vX.Y.Z` (Tag), mit `SHA256SUMS.txt`.
+- `LICENSE`, `THIRD-PARTY-NOTICES.txt`, `SECURITY.md`, `SUPPORT.md`, `CONTRIBUTING.md`, Issue-Formulare, Dependabot.
+
+### Behoben
+Alle auf einem Zebra HC20 (Android 15) gefunden und nachgeprüft:
+- Die Tastatur stürzte bei jedem Tastendruck ab, wenn ein eigenes Layout eine Taste breiter als etwa drei Viertel der Tastatur hatte.
+- Das Admin-Passwort der Einstellungen ließ sich umgehen, indem man das Gerät bei offenem Passwortdialog drehte.
+- Doppeltipp auf Shift am Anfang eines Felds oder Satzes (automatischer Großbuchstabe) schaltet jetzt wie beschrieben die Feststelltaste ein.
+- Die Scan-Seite war 4 dp niedriger als die anderen Seiten, die Tab-Leiste sprang beim Wechsel.
+- Buchstaben einer Reihe haben auf schmalen Tasten jetzt dieselbe Größe (W und M waren kleiner als I).
+- Der Export schreibt Tastenbreiten wie eingegeben (`1.2` statt `1.2000000476837158`).
+
+## [1.0.0]
 
 First release.
 

@@ -62,7 +62,7 @@ as managed configuration (`config_json`), as a file, as a broadcast, or imported
     "scanKey": false,
     "input": {
       "enabled": true,
-      "action": "io.github.pieewiee.industrialkeyboard.action.SCAN_INPUT",
+      "action": "de.ictbaden.industrialkeyboard.action.SCAN_INPUT",
       "extra": "data",
       "suffix": "enter"
     }
@@ -155,7 +155,7 @@ keyboards, double tap on Shift for caps lock, long press on the hide button for 
 | `intentPackage` | text | – | Package that receives it (optional, recommended) |
 | `scanKey` | `true` / `false` | `false` | Scan key in the bottom row of the letters, next to Enter |
 | `input.enabled` | `true` / `false` | `true` | Type barcodes that a scanner app sends as broadcast |
-| `input.action` | text | `io.github.pieewiee.industrialkeyboard.action.SCAN_INPUT` | Broadcast action the keyboard listens to |
+| `input.action` | text | `de.ictbaden.industrialkeyboard.action.SCAN_INPUT` | Broadcast action the keyboard listens to |
 | `input.extra` | text | `data` | String extra with the barcode. Also checked: `com.symbol.datawedge.data_string`, `barcode_string`, `decode_string`, `com.honeywell.aidc.extra.EXTRA_DATA` |
 | `input.suffix` | `none`, `enter`, `tab` | `enter` | Key after the barcode |
 
