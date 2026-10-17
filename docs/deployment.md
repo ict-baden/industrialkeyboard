@@ -13,9 +13,9 @@ transport differs.
 
 |  |  |
 |---|---|
-| Package | **`io.github.pieewiee.industrialkeyboard`** |
-| Input method (class) | **`io.github.pieewiee.industrialkeyboard.ime.KeyboardService`** |
-| Input method id (adb) | `io.github.pieewiee.industrialkeyboard/.ime.KeyboardService` |
+| Package | **`de.ictbaden.industrialkeyboard`** |
+| Input method (class) | **`de.ictbaden.industrialkeyboard.ime.KeyboardService`** |
+| Input method id (adb) | `de.ictbaden.industrialkeyboard/.ime.KeyboardService` |
 
 ## Install the app
 
@@ -39,8 +39,8 @@ opens the keyboard picker. The status at the top turns green: *Active keyboard*.
 **Over USB:**
 
 ```bash
-adb shell ime enable io.github.pieewiee.industrialkeyboard/.ime.KeyboardService
-adb shell ime set io.github.pieewiee.industrialkeyboard/.ime.KeyboardService
+adb shell ime enable de.ictbaden.industrialkeyboard/.ime.KeyboardService
+adb shell ime set de.ictbaden.industrialkeyboard/.ime.KeyboardService
 adb shell settings get secure default_input_method   # check
 ```
 
@@ -50,8 +50,8 @@ adb shell settings get secure default_input_method   # check
 |---|---|
 | Set Default Input Method? | Change Current Input Method |
 | Select a Default Input Method Option | User defined Input Method |
-| Package name of input Method | `io.github.pieewiee.industrialkeyboard` |
-| Class name of input Method | `io.github.pieewiee.industrialkeyboard.ime.KeyboardService` |
+| Package name of input Method | `de.ictbaden.industrialkeyboard` |
+| Class name of input Method | `de.ictbaden.industrialkeyboard.ime.KeyboardService` |
 
 ```xml
 <wap-provisioningdoc>
@@ -59,15 +59,15 @@ adb shell settings get secure default_input_method   # check
     <parm name="InputMethodAction" value="1" />
     <characteristic type="InputMethodDetails">
       <parm name="InputMethodOption" value="4" />
-      <parm name="InputMethodPackageName" value="io.github.pieewiee.industrialkeyboard" />
-      <parm name="InputMethodClassName" value="io.github.pieewiee.industrialkeyboard.ime.KeyboardService" />
+      <parm name="InputMethodPackageName" value="de.ictbaden.industrialkeyboard" />
+      <parm name="InputMethodClassName" value="de.ictbaden.industrialkeyboard.ime.KeyboardService" />
     </characteristic>
   </characteristic>
 </wap-provisioningdoc>
 ```
 
 **Android Enterprise policies** – if your EMM restricts the *permitted input methods*, add
-`io.github.pieewiee.industrialkeyboard` to the list. Some EMMs can also set the default
+`de.ictbaden.industrialkeyboard` to the list. Some EMMs can also set the default
 keyboard on fully managed devices; otherwise select it once on the device as described above.
 
 ## Managed configuration (all EMMs)
@@ -137,14 +137,14 @@ shows the schema automatically.
 | Install the app | AppMgr | Install, APK path |
 | Make it the keyboard | UiMgr | see [above](#make-it-the-keyboard) |
 | Configuration as a file | FileMgr | target `/enterprise/usr/industrialkeyboard.json` |
-| Configuration via intent | Intent | Mode *Immediate*, Action *Broadcast*, Android Action Name `io.github.pieewiee.industrialkeyboard.action.INSTALL_CONFIG`, Package Name `io.github.pieewiee.industrialkeyboard`, Class Name `io.github.pieewiee.industrialkeyboard.api.ApiReceiver`, Extra 0: name `config`, type String, value = the JSON. With an admin password also Extra 1: name `password`, type String |
+| Configuration via intent | Intent | Mode *Immediate*, Action *Broadcast*, Android Action Name `de.ictbaden.industrialkeyboard.action.INSTALL_CONFIG`, Package Name `de.ictbaden.industrialkeyboard`, Class Name `de.ictbaden.industrialkeyboard.api.ApiReceiver`, Extra 0: name `config`, type String, value = the JSON. With an admin password also Extra 1: name `password`, type String |
 | Barcodes as keystrokes | DataWedge (or the DataWedge app) | a profile for your apps with keystroke output – see [Scanner & app integration](integration.md) |
 
 ## Configuration file
 
 The keyboard reads `industrialkeyboard.json` from
 
-1. `Android/data/io.github.pieewiee.industrialkeyboard/files/` (app folder; exists after the
+1. `Android/data/de.ictbaden.industrialkeyboard/files/` (app folder; exists after the
    app or the keyboard has run once)
 2. `/enterprise/usr/` (Zebra, persistent)
 
@@ -152,7 +152,7 @@ A file is applied when the keyboard opens, once per change of its timestamp or s
 
 ```bash
 adb push examples/warehouse-gloves.json \
-  /sdcard/Android/data/io.github.pieewiee.industrialkeyboard/files/industrialkeyboard.json
+  /sdcard/Android/data/de.ictbaden.industrialkeyboard/files/industrialkeyboard.json
 ```
 
 ## Broadcast intent (StageNow, adb)
@@ -162,7 +162,7 @@ An explicit broadcast with the JSON in the string extra `config` (and the admin 
 
 ```bash
 adb push examples/warehouse-gloves.json /data/local/tmp/keyboard.json
-adb shell 'am broadcast -a io.github.pieewiee.industrialkeyboard.action.INSTALL_CONFIG -n io.github.pieewiee.industrialkeyboard/.api.ApiReceiver --es config "$(cat /data/local/tmp/keyboard.json)"'
+adb shell 'am broadcast -a de.ictbaden.industrialkeyboard.action.INSTALL_CONFIG -n de.ictbaden.industrialkeyboard/.api.ApiReceiver --es config "$(cat /data/local/tmp/keyboard.json)"'
 adb shell rm /data/local/tmp/keyboard.json
 ```
 

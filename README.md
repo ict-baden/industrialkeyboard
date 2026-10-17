@@ -3,12 +3,17 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/ict-baden/industrialkeyboard/releases/tag/latest"><img alt="Download: latest" src="https://img.shields.io/badge/Download-latest-2ea44f?logo=github&amp;logoColor=white"></a>
   <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&amp;logoColor=white" alt="Android 8.0+">
   <img src="https://img.shields.io/badge/Version-1.0.0-4338CA" alt="Version 1.0.0">
   <img src="https://img.shields.io/badge/Zebra-DataWedge-000000" alt="Zebra DataWedge">
   <img src="https://img.shields.io/badge/Honeywell-Scanner-E4002B" alt="Honeywell">
   <img src="https://img.shields.io/badge/MDM-Managed%20Config-0891B2" alt="Managed configuration">
   <img src="https://img.shields.io/badge/Kotlin-Input%20method-7F52FF?logo=kotlin&amp;logoColor=white" alt="Kotlin">
+  <img src="https://img.shields.io/badge/Data-stays%20local-2E7D32" alt="Data stays local">
+  <img src="https://img.shields.io/badge/UI-English-6B7280" alt="User interface in English">
+  <img src="https://img.shields.io/badge/Licence-MIT-blue" alt="Licence: MIT">
+  <a href="https://github.com/ict-baden/industrialkeyboard/actions/workflows/build.yml"><img alt="Build" src="https://github.com/ict-baden/industrialkeyboard/actions/workflows/build.yml/badge.svg"></a>
 </p>
 
 <p align="center">
@@ -21,8 +26,12 @@
   <a href="#-up-and-running-in-5-minutes">Quick start</a> ·
   <a href="docs/configuration.md">Configuration</a> ·
   <a href="docs/deployment.md">Deployment (SOTI, Intune, StageNow)</a> ·
-  <a href="docs/integration.md">Scanner &amp; app integration</a>
+  <a href="docs/integration.md">Scanner &amp; app integration</a> ·
+  <a href="#limits-honestly">Limits</a>
 </p>
+
+> [!NOTE]
+> **Deutsch:** Industrial Keyboard ist eine Bildschirmtastatur für robuste Android-Geräte (Zebra, Honeywell): große Tasten für Handschuhe, Scan-Taste, F1–F24 für Terminal-Emulation, zentral per MDM konfigurierbar. Kostenlos und Open Source (MIT), ohne Internetzugriff. Download: [IndustrialKeyboard.apk](https://github.com/ict-baden/industrialkeyboard/releases/download/latest/IndustrialKeyboard.apk). Die Oberfläche ist englisch.
 
 ---
 
@@ -69,8 +78,8 @@ adb install -r IndustrialKeyboard-1.0.0.apk
 **2. Switch it on** – open *Industrial Keyboard* on the device, tap **Enable** and **Select**. Over USB:
 
 ```bash
-adb shell ime enable io.github.pieewiee.industrialkeyboard/.ime.KeyboardService
-adb shell ime set io.github.pieewiee.industrialkeyboard/.ime.KeyboardService
+adb shell ime enable de.ictbaden.industrialkeyboard/.ime.KeyboardService
+adb shell ime set de.ictbaden.industrialkeyboard/.ime.KeyboardService
 ```
 
 For a whole fleet (Zebra MX, Android Enterprise policies) see [Deployment](docs/deployment.md#make-it-the-keyboard).
@@ -92,7 +101,7 @@ Deploy it as managed configuration (key `config_json`), as a file or as a broadc
 
 ```bash
 adb push examples/warehouse-gloves.json /data/local/tmp/keyboard.json
-adb shell 'am broadcast -a io.github.pieewiee.industrialkeyboard.action.INSTALL_CONFIG -n io.github.pieewiee.industrialkeyboard/.api.ApiReceiver --es config "$(cat /data/local/tmp/keyboard.json)"'
+adb shell 'am broadcast -a de.ictbaden.industrialkeyboard.action.INSTALL_CONFIG -n de.ictbaden.industrialkeyboard/.api.ApiReceiver --es config "$(cat /data/local/tmp/keyboard.json)"'
 ```
 
 All options, including step by step for **SOTI MobiControl**: [Deployment](docs/deployment.md).
@@ -157,7 +166,11 @@ Requirements: JDK 17–21 and the Android SDK (compile SDK 36).
 ./gradlew testDebugUnitTest assembleDebug lintDebug
 ```
 
-The APK lands in `app/build/outputs/apk/debug/`. The images in `docs/images` are rendered from
+The APK lands in `app/build/outputs/apk/debug/`. Debug builds have the package
+`de.ictbaden.industrialkeyboard.debug`, so they install next to the release build. Releases are
+built and signed by the [CI](.github/workflows/build.yml): every push to `main` updates the
+release [`latest`](https://github.com/ict-baden/industrialkeyboard/releases/tag/latest), a tag
+`vX.Y.Z` creates a versioned release with `SHA256SUMS.txt`. The images in `docs/images` are rendered from
 the real keyboard code – see [tools/screenshots](tools/screenshots/README.md).
 
 ## 📚 Documentation
@@ -165,4 +178,24 @@ the real keyboard code – see [tools/screenshots](tools/screenshots/README.md).
 - [Configuration](docs/configuration.md) – every option of the JSON format, macros, custom layouts
 - [Deployment](docs/deployment.md) – install, make it the keyboard, managed configuration, files, StageNow
 - [Scanner & app integration](docs/integration.md) – soft trigger, scan broadcasts, intent API
+- [Data and privacy](docs/data-and-privacy.md) – what is stored where, which broadcasts the keyboard sends and receives
 - [Changelog](CHANGELOG.md)
+
+## Limits, honestly
+
+- Tested on Zebra devices with DataWedge (HC20, Android 15). The **Honeywell** soft trigger is implemented after the vendor documentation but not yet tested on a Honeywell device.
+- The keys are drawn on a canvas: **TalkBack** cannot read them.
+- User interface in **English** only.
+- No word prediction, no dictionary, no voice input – on purpose (nothing typed is stored).
+- **Package changed** from `io.github.pieewiee.industrialkeyboard` to `de.ictbaden.industrialkeyboard`: Android treats it as a new app, see the [changelog](CHANGELOG.md).
+
+---
+
+<sub>
+Industrial Keyboard is free and open source software by <b>ICT-Baden</b>. &nbsp;·&nbsp;
+Licence: <a href="LICENSE">MIT</a> &nbsp;·&nbsp;
+Third-party licences: <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a> &nbsp;·&nbsp;
+Support: free via GitHub, guaranteed with a <a href="SUPPORT.md">support contract</a> &nbsp;·&nbsp;
+<a href="SECURITY.md">Security</a> &nbsp;·&nbsp;
+<a href="https://ict-baden.de/impressum">Impressum</a>
+</sub>

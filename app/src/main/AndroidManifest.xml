@@ -59,8 +59,8 @@
             android:name=".api.ApiReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="io.github.pieewiee.industrialkeyboard.action.INSTALL_CONFIG" />
-                <action android:name="io.github.pieewiee.industrialkeyboard.action.SHOW_TAB" />
+                <action android:name="de.ictbaden.industrialkeyboard.action.INSTALL_CONFIG" />
+                <action android:name="de.ictbaden.industrialkeyboard.action.SHOW_TAB" />
             </intent-filter>
         </receiver>
     </application>
