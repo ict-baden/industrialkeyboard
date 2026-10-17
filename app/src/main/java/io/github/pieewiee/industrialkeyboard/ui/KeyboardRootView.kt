@@ -124,7 +124,9 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         scanPad.palette = p
         scanPad.scannerName = state.scannerName
         scanPad.scanning = state.scanning
-        (scanPad.layoutParams as LinearLayout.LayoutParams).height = state.rowHeight * (state.heightRows - 1)
+        // Same total height as the key pages (incl. their padding), so the tab bar does not jump.
+        (scanPad.layoutParams as LinearLayout.LayoutParams).height = state.rowHeight * (state.heightRows - 1) +
+            keyboard.paddingTop + keyboard.paddingBottom - scanRow.paddingTop - scanRow.paddingBottom
         scanPad.requestLayout()
         if (previous?.widthPercent != state.widthPercent) post { requestLayout() }
     }

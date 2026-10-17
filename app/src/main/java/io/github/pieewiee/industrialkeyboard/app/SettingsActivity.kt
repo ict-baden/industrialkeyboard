@@ -60,6 +60,7 @@ class SettingsActivity : AppCompatActivity() {
     private val field = Field(AlphaVariant.TEXT, null)
     private var previewPage: Page = Page.Alpha(AlphaVariant.TEXT)
     private var previewShift = ShiftState.OFF
+    private var unlocked = false
     private val listener: (KeyboardConfig) -> Unit = { render() }
 
     private val importFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -121,12 +122,26 @@ class SettingsActivity : AppCompatActivity() {
         toolbar.setBackgroundColor(ui.color(com.google.android.material.R.attr.colorSurfaceContainer))
         toolbar.navigationIcon?.setTint(ui.color(com.google.android.material.R.attr.colorOnSurface))
         store.addListener(listener)
+        // Only a successful unlock survives a rotation; a recreated activity must not skip the password.
+        unlocked = savedInstanceState?.getBoolean(KEY_UNLOCKED) == true
         val hash = store.config.adminPasswordHash
-        if (hash != null && savedInstanceState == null) {
+        if (hash != null && !unlocked) {
             content.visibility = View.INVISIBLE
-            dialogs.requirePassword(hash) { ok -> if (ok) content.visibility = View.VISIBLE else finish() }
+            dialogs.requirePassword(hash) { ok ->
+                if (ok) {
+                    unlocked = true
+                    content.visibility = View.VISIBLE
+                } else {
+                    finish()
+                }
+            }
         }
         render()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_UNLOCKED, unlocked)
     }
 
     override fun onDestroy() {
@@ -465,5 +480,9 @@ class SettingsActivity : AppCompatActivity() {
             store.import(imported)
             dialogs.toast("Configuration imported")
         }
+    }
+
+    private companion object {
+        const val KEY_UNLOCKED = "unlocked"
     }
 }

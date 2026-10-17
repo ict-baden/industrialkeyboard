@@ -50,6 +50,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private var shift = ShiftState.OFF
     private var autoShifted = false
     private var lastShiftTap = 0L
+    private var autoReleasedByTap = false
     private var lastSpace = 0L
     private var scanning = false
     private var receiverAction: String? = null
@@ -261,11 +262,15 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     private fun toggleShift() {
         val now = SystemClock.uptimeMillis()
+        val doubleTap = now - lastShiftTap < DOUBLE_TAP_MS
+        // At a sentence start the first tap releases the automatic shift; the second still locks.
+        val releasesAuto = shift == ShiftState.ONCE && autoShifted
         shift = when (shift) {
-            ShiftState.OFF -> ShiftState.ONCE
-            ShiftState.ONCE -> if (now - lastShiftTap < DOUBLE_TAP_MS && !autoShifted) ShiftState.LOCKED else ShiftState.OFF
+            ShiftState.OFF -> if (doubleTap && autoReleasedByTap) ShiftState.LOCKED else ShiftState.ONCE
+            ShiftState.ONCE -> if (doubleTap && !autoShifted) ShiftState.LOCKED else ShiftState.OFF
             ShiftState.LOCKED -> ShiftState.OFF
         }
+        autoReleasedByTap = releasesAuto
         autoShifted = false
         lastShiftTap = now
         render()
