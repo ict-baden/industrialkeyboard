@@ -2,7 +2,7 @@
 
 Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [Semantic Versioning](https://semver.org/lang/de/).
 
-## [Unveröffentlicht]
+## [2.0.0] – 2026-10-17
 
 ### Geändert
 - **Neuer Paketname `de.ictbaden.industrialkeyboard`** (vorher `io.github.pieewiee.industrialkeyboard`), nach den Richtlinien von ICT-Baden. Android und das MDM sehen eine neue App: alte App deinstallieren, neue verteilen, Konfiguration neu ausrollen. Die Eingabemethode heißt jetzt `de.ictbaden.industrialkeyboard/.ime.KeyboardService`.

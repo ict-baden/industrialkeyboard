@@ -23,7 +23,7 @@ Add the APK from the [releases](../../../releases/latest) to your EMM's app cata
 or install it over USB:
 
 ```bash
-adb install -r IndustrialKeyboard-1.0.0.apk
+adb install -r IndustrialKeyboard-2.0.0.apk
 ```
 
 The app needs no permissions apart from vibration – in particular **no internet access**.
