@@ -5,7 +5,7 @@
 <p align="center">
   <a href="https://github.com/ict-baden/industrialkeyboard/releases/tag/latest"><img alt="Download: latest" src="https://img.shields.io/badge/Download-latest-2ea44f?logo=github&amp;logoColor=white"></a>
   <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&amp;logoColor=white" alt="Android 8.0+">
-  <img src="https://img.shields.io/badge/Version-1.0.0-4338CA" alt="Version 1.0.0">
+  <img src="https://img.shields.io/badge/Version-2.0.0-4338CA" alt="Version 2.0.0">
   <img src="https://img.shields.io/badge/Zebra-DataWedge-000000" alt="Zebra DataWedge">
   <img src="https://img.shields.io/badge/Honeywell-Scanner-E4002B" alt="Honeywell">
   <img src="https://img.shields.io/badge/MDM-Managed%20Config-0891B2" alt="Managed configuration">
@@ -72,7 +72,7 @@
 **1. Install the app** – download the APK from the [releases](../../releases/latest) and distribute it with your MDM, or install it over USB:
 
 ```bash
-adb install -r IndustrialKeyboard-1.0.0.apk
+adb install -r IndustrialKeyboard-2.0.0.apk
 ```
 
 **2. Switch it on** – open *Industrial Keyboard* on the device, tap **Enable** and **Select**. Over USB:
