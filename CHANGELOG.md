@@ -2,6 +2,11 @@
 
 Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unveröffentlicht]
+
+### Neu
+- Vorbereitet für Google Play: Die CI baut zusätzlich ein signiertes App Bundle (`.aab`), Store-Texte in fünf Sprachen und Store-Grafiken liegen in `fastlane/`, die Antworten für die Play Console in [docs/play-store.md](docs/play-store.md).
+
 ## [2.0.0] – 2026-10-17
 
 ### Geändert
