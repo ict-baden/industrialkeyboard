@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.util.Log
+import de.ictbaden.industrialkeyboard.AppLanguage
+import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.config.ScanTriggerType
 import de.ictbaden.industrialkeyboard.config.ScannerSettings
 
@@ -31,7 +33,7 @@ class ScanTrigger(private val context: Context) {
         get() = when (type) {
             ScanTriggerType.DATAWEDGE -> "Zebra DataWedge"
             ScanTriggerType.HONEYWELL -> "Honeywell"
-            ScanTriggerType.INTENT -> "Scanner app"
+            ScanTriggerType.INTENT -> AppLanguage.localized(context).getString(R.string.scanner_app)
             else -> null
         }
 

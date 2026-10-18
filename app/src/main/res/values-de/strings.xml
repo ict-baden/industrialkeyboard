@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Tastatur-Einstellungen</string>
+    <string name="message_with_code">%1$s (%2$s)</string>
+    <string name="value_percent">%1$d %%</string>
+    <string name="value_ms">%1$d ms</string>
+    <string name="back">Zurück</string>
+
+    <string name="button_cancel">Abbrechen</string>
+    <string name="button_save">Speichern</string>
+    <string name="button_ok">OK</string>
+    <string name="button_apply">Übernehmen</string>
+    <string name="button_import">Importieren</string>
+    <string name="button_reset">Zurücksetzen</string>
+    <string name="button_unlock">Entsperren</string>
+    <string name="button_default">Standard (%1$s)</string>
+
+    <string name="section_look">Aussehen</string>
+    <string name="theme">Design</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Hell</string>
+    <string name="theme_dark">Dunkel</string>
+    <string name="theme_contrast">Hoher Kontrast</string>
+    <string name="accent_color">Akzentfarbe</string>
+    <string name="theme_default">Standard des Designs</string>
+    <string name="key_height">Tastenhöhe</string>
+    <string name="keyboard_width">Tastaturbreite</string>
+    <string name="number_row">Ziffernreihe</string>
+    <string name="number_row_summary">Ziffern über den Buchstaben</string>
+    <string name="function_row">Funktionstastenreihe</string>
+    <string name="function_row_summary">F1–F12 über den Buchstaben</string>
+    <string name="key_hints">Tastenhinweise</string>
+    <string name="key_hints_summary">Kleine Ziffern für langes Drücken in der oberen Reihe</string>
+    <string name="language">Sprache</string>
+    <string name="language_system">Systemsprache</string>
+
+    <string name="section_layout">Layout</string>
+    <string name="letters">Buchstaben</string>
+    <string name="navigation">Navigation</string>
+    <string name="navigation_tabs">Tab-Leiste</string>
+    <string name="navigation_keys">Klassische ?123-Taste</string>
+    <string name="numeric_pad">Ziffernblock</string>
+    <string name="numeric_phone">1-2-3 oben</string>
+    <string name="numeric_calculator">7-8-9 oben</string>
+    <string name="tabs">Tabs</string>
+    <string name="tabs_summary">In der Tab-Leiste angezeigt</string>
+    <string name="tab_scan">Scan</string>
+    <string name="start_tab">Start-Tab für Textfelder</string>
+    <string name="automatic">Automatisch</string>
+
+    <string name="section_programmable_keys">Programmierbare Tasten</string>
+    <string name="key_alpha_p1">Buchstaben, untere Reihe links</string>
+    <string name="key_numeric_p1">Ziffernblock, linke Spalte, Reihe 1</string>
+    <string name="key_numeric_p2">Ziffernblock, linke Spalte, Reihe 2</string>
+    <string name="key_numeric_p3">Ziffernblock, linke Spalte, Reihe 3</string>
+    <string name="key_numeric_p4">Ziffernblock, linke Spalte, Reihe 4</string>
+    <string name="macro_hint">Text oder Tokens</string>
+    <string name="macro_helper">Beispiele: -   {TAB}   OK{ENTER}   {F1}   {SCAN}   {U+00E4}</string>
+    <string name="macro_empty">Ein Zeichen oder ein Token eingeben</string>
+    <string name="macro_invalid">Ungültig: %1$s</string>
+
+    <string name="section_typing">Eingabe</string>
+    <string name="auto_capitalization">Automatische Großschreibung</string>
+    <string name="auto_capitalization_summary">Großbuchstabe am Satzanfang (wenn das Feld es verlangt)</string>
+    <string name="double_space_period">Punkt durch doppeltes Leerzeichen</string>
+    <string name="double_space_period_summary">Zwei Leerzeichen setzen einen Punkt</string>
+    <string name="long_press_delay">Verzögerung für langes Drücken</string>
+    <string name="section_feedback">Rückmeldung</string>
+    <string name="key_popup">Tasten-Popup</string>
+    <string name="key_popup_summary">Vergrößertes Zeichen über der gedrückten Taste</string>
+    <string name="vibration">Vibration</string>
+    <string name="vibration_length">Vibrationsdauer</string>
+    <string name="sound">Ton</string>
+    <string name="volume">Lautstärke</string>
+
+    <string name="section_scanner">Scanner</string>
+    <string name="scan_trigger">Scan-Auslöser</string>
+    <string name="scan_trigger_off">Aus</string>
+    <string name="trigger_broadcast">Auslöser-Broadcast</string>
+    <string name="broadcast_action">Broadcast-Action</string>
+    <string name="broadcast_action_helper">Wird zum Starten eines Scans gesendet, z. B. com.example.scanner.START</string>
+    <string name="scanner_in_use">Verwendeter Scanner</string>
+    <string name="scanner_none_found">Keiner gefunden</string>
+    <string name="scan_key">Scan-Taste</string>
+    <string name="scan_key_summary">Neben der Leertaste auf den Buchstabentasten</string>
+    <string name="scan_from_broadcasts">Scans aus Broadcasts eingeben</string>
+    <string name="after_scan">Nach einem Scan</string>
+    <string name="after_scan_nothing">Nichts</string>
+    <string name="after_scan_enter">Enter</string>
+    <string name="after_scan_tab">Tab</string>
+    <string name="scanner_app">Scanner-App</string>
+
+    <string name="section_configuration">Konfiguration</string>
+    <string name="import_file">Aus Datei importieren</string>
+    <string name="import_file_summary">JSON-Konfiguration laden</string>
+    <string name="export_file">In Datei exportieren</string>
+    <string name="export_file_summary">Aktuelle Konfiguration speichern</string>
+    <string name="reset_defaults">Auf Standard zurücksetzen</string>
+    <string name="reset_defaults_summary">Das Admin-Passwort bleibt erhalten</string>
+    <string name="reset_confirm_title">Alle Einstellungen zurücksetzen?</string>
+    <string name="reset_confirm_message">Layouts, Aussehen, Tasten und Scanner-Einstellungen werden auf den Standard zurückgesetzt.</string>
+    <string name="admin_password">Admin-Passwort</string>
+    <string name="password_not_set">Nicht gesetzt</string>
+    <string name="password_set">Gesetzt – schützt diese Einstellungen</string>
+    <string name="last_provisioning_error">Letzter Fehler bei der Verteilung</string>
+    <string name="config_file_for_emm">Konfigurationsdatei für das EMM</string>
+    <string name="config_exported">Konfiguration exportiert</string>
+    <string name="export_failed">Export fehlgeschlagen: %1$s</string>
+    <string name="file_unreadable">Datei konnte nicht gelesen werden: %1$s</string>
+    <string name="import_failed">Import fehlgeschlagen</string>
+    <string name="import_confirm_title">Konfiguration importieren?</string>
+    <string name="import_confirm_message">Die aktuellen Einstellungen werden ersetzt.</string>
+    <string name="config_imported">Konfiguration importiert</string>
+
+    <string name="section_info">Info</string>
+    <string name="version">Version</string>
+    <string name="status">Status</string>
+    <string name="status_active">Aktive Tastatur</string>
+    <string name="status_enabled">Aktiviert, nicht ausgewählt</string>
+    <string name="status_not_enabled">Nicht aktiviert</string>
+    <string name="about_privacy">Daten und Datenschutz</string>
+    <string name="about_privacy_summary">Diese Software sendet keine Daten an ICT-Baden. Sie hat keine Internet-Berechtigung.</string>
+    <string name="about_licence">Lizenz</string>
+    <string name="about_third_party">Drittanbieter-Lizenzen</string>
+    <string name="about_source">Quellcode</string>
+    <string name="about_support">Hilfe und Support</string>
+    <string name="about_support_summary">Kostenlos über GitHub, verbindlich mit Supportvertrag</string>
+    <string name="about_website">Webseite</string>
+    <string name="about_impressum">Impressum</string>
+    <string name="about_impressum_summary">Impressum von ICT-Baden</string>
+    <string name="no_browser">Kein Browser verfügbar</string>
+
+    <string name="settings_protected">Einstellungen sind geschützt</string>
+    <string name="wrong_password">Falsches Passwort</string>
+    <string name="new_password">Neues Passwort</string>
+    <string name="new_password_summary">Leer lassen, um das Passwort zu entfernen</string>
+    <string name="repeat_password">Wiederholen</string>
+    <string name="passwords_do_not_match">Die Passwörter stimmen nicht überein</string>
+    <string name="password_saved">Admin-Passwort gespeichert</string>
+    <string name="password_removed">Admin-Passwort entfernt</string>
+    <string name="color_hint">Farbe (#RRGGBB)</string>
+    <string name="color_helper">Leer = Standard des Designs</string>
+    <string name="use_theme_default">Standard des Designs verwenden</string>
+    <string name="invalid_color">Ungültige Farbe: %1$s</string>
+
+    <string name="setup_tagline">Schnelle Dateneingabe mit Scanner, Handschuhen und Formularen</string>
+    <string name="setup_status_active">●  Aktive Tastatur</string>
+    <string name="setup_status_enabled">●  Aktiviert – zum Verwenden auswählen</string>
+    <string name="setup_status_not_set_up">●  Noch nicht eingerichtet</string>
+    <string name="section_setup">Einrichtung</string>
+    <string name="section_try_it">Ausprobieren</string>
+    <string name="section_more">Mehr</string>
+    <string name="step_enable">Tastatur aktivieren</string>
+    <string name="step_enable_summary">Industrial Keyboard in den Systemeinstellungen einschalten</string>
+    <string name="step_enable_button">Aktivieren</string>
+    <string name="step_select">Auswählen</string>
+    <string name="step_select_summary">Als Tastatur festlegen, die sich in jeder App öffnet</string>
+    <string name="step_select_button">Auswählen</string>
+    <string name="step_done">Erledigt</string>
+    <string name="settings_summary">Layouts, Scanner, Aussehen und Rückmeldung</string>
+    <string name="switch_keyboard">Tastatur wechseln</string>
+    <string name="switch_keyboard_summary">Zwischen installierten Tastaturen wählen</string>
+    <string name="sample_intro">Jedes Feld öffnet die passenden Tasten.</string>
+    <string name="sample_item">Artikelnummer</string>
+    <string name="sample_item_helper">Buchstaben, Scan oder die Fn-Tasten</string>
+    <string name="sample_quantity">Menge</string>
+    <string name="sample_quantity_helper">Ziffernblock</string>
+    <string name="sample_weight">Gewicht (kg)</string>
+    <string name="sample_weight_helper">Ziffernblock mit , und .</string>
+    <string name="sample_phone">Telefon</string>
+    <string name="sample_phone_helper">Wähltastatur mit + * #</string>
+    <string name="sample_date">Mindestens haltbar bis</string>
+    <string name="sample_date_helper">Datumstasten mit / - .</string>
+    <string name="sample_pin">PIN</string>
+    <string name="sample_pin_helper">PIN-Block</string>
+    <string name="sample_email">E-Mail</string>
+    <string name="sample_email_helper">@ neben der Leertaste</string>
+
+    <string name="scan_pad_description">Scannen</string>
+    <string name="scan_pad_no_scanner">Kein Scanner gefunden</string>
+    <string name="scan_pad_scanning">Scannt …</string>
+    <string name="scan_pad_tap">Zum Scannen tippen</string>
+    <string name="scan_pad_hint">Halten für Dauerscan · %1$s</string>
+    <string name="scan_pad_configure">Scanner in den Tastatur-Einstellungen einrichten</string>
+
+    <string name="mc_config_json_title">Konfiguration (JSON)</string>
+    <string name="mc_config_json_description">Vollständige Konfiguration im JSON-Format von Industrial Keyboard. Hat Vorrang vor den einzelnen Optionen darunter.</string>
+    <string name="mc_language_title">Sprache</string>
+    <string name="mc_language_description">Sprache der Einstellungsseiten. Automatisch folgt dem Gerät.</string>
+    <string name="mc_theme_title">Design</string>
+    <string name="mc_theme_description">Farben der Tastatur.</string>
+    <string name="mc_alphabet_title">Buchstabenlayout</string>
+    <string name="mc_alphabet_description">Anordnung der Buchstabentasten.</string>
+    <string name="mc_numeric_order_title">Ziffernblock</string>
+    <string name="mc_numeric_order_description">Telefon-Anordnung (1-2-3 oben) oder Taschenrechner-Anordnung (7-8-9 oben).</string>
+    <string name="mc_scan_tab_title">Scan-Tab</string>
+    <string name="mc_scan_tab_description">Tab mit der großen Scan-Schaltfläche anzeigen.</string>
+    <string name="mc_function_tab_title">Funktionstasten-Tab</string>
+    <string name="mc_function_tab_description">Tab mit F1–F12 (Umschalt: F13–F24), Esc, Pfeil- und Navigationstasten anzeigen.</string>
+    <string name="mc_sound_title">Ton bei Tastendruck</string>
+    <string name="mc_sound_description">Bei jedem Tastendruck klicken.</string>
+    <string name="mc_vibrate_title">Vibration bei Tastendruck</string>
+    <string name="mc_vibrate_description">Kurze Vibration bei jedem Tastendruck.</string>
+    <string name="mc_admin_password_title">Admin-Passwort</string>
+    <string name="mc_admin_password_description">Schützt die Tastatur-Einstellungen und Konfigurationsimporte.</string>
+
+    <string-array name="mc_language_entries">
+        <item>Automatisch (Gerätesprache)</item>
+        <item>English</item>
+        <item>Deutsch</item>
+        <item>Español</item>
+        <item>Français</item>
+        <item>简体中文</item>
+    </string-array>
+    <string-array name="mc_theme_entries">
+        <item>System folgen</item>
+        <item>Hell</item>
+        <item>Dunkel</item>
+        <item>Hoher Kontrast</item>
+    </string-array>
+    <string-array name="mc_alphabet_entries">
+        <item>QWERTY (Englisch)</item>
+        <item>QWERTZ (Deutsch)</item>
+        <item>AZERTY (Französisch)</item>
+        <item>Nordisch</item>
+        <item>Spanisch</item>
+    </string-array>
+    <string-array name="mc_numeric_order_entries">
+        <item>Telefon (1-2-3 oben)</item>
+        <item>Taschenrechner (7-8-9 oben)</item>
+    </string-array>
+</resources>

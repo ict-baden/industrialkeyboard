@@ -19,6 +19,7 @@ as managed configuration (`config_json`), as a file, as a broadcast, or imported
 ```json
 {
   "version": 1,
+  "language": "auto",
   "appearance": {
     "theme": "system",
     "keyHeight": 100,
@@ -72,6 +73,24 @@ as managed configuration (`config_json`), as a file, as a broadcast, or imported
 
 `version` is `1`. A configuration with a higher version is rejected, so an old app never
 misreads a newer file.
+
+## `language`
+
+Language of the setup and settings screens and of the scan pad:
+
+| Value | Language |
+|---|---|
+| `auto` (default) | Follows the device; English if the device language is not one of the five |
+| `en` | English |
+| `de` | German |
+| `es` | Spanish |
+| `fr` | French |
+| `zh-Hans` | Chinese (simplified) |
+
+Also selectable on the device under **Settings → Look → Language**, and as the single option
+`language` of the managed configuration. The letter layout is a separate option
+([`layout.alphabet`](#layout)). Error messages carry a code (`IK-0101` …) that is the same in
+every language: [Error codes](error-codes.md).
 
 ## `appearance`
 
