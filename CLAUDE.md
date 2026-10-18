@@ -13,7 +13,7 @@ adb shell ime enable de.ictbaden.industrialkeyboard.debug/de.ictbaden.industrial
 adb shell ime set de.ictbaden.industrialkeyboard.debug/de.ictbaden.industrialkeyboard.ime.KeyboardService
 ```
 
-JDK 17–21, Android SDK mit Compile-SDK 36. Unter Windows `sdk.dir` in `local.properties` mit `C\:/…` schreiben, sonst schlägt Lint fehl.
+JDK 17–21, Android SDK mit Compile-SDK 37. Unter Windows `sdk.dir` in `local.properties` mit `C\:/…` schreiben, sonst schlägt Lint fehl.
 
 ## Aufbau
 
