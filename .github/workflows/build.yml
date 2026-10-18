@@ -58,7 +58,7 @@ jobs:
 
       - name: Testergebnisse
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Testergebnisse
           path: |
@@ -97,7 +97,7 @@ jobs:
         working-directory: dist
         run: sha256sum *.apk | tee SHA256SUMS.txt
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: env.SIGN == 'true'
         with:
           name: ${{ env.APP }}-${{ steps.version.outputs.version }}
