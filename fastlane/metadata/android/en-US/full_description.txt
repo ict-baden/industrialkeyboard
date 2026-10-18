@@ -1,0 +1,33 @@
+Industrial Keyboard is an on-screen keyboard for rugged Android devices in warehouses, production and logistics. Big keys for gloves, a scanner trigger right on the keyboard, F1–F24 for terminal emulation – and the whole keyboard configurable from your MDM.
+
+MADE FOR GLOVES
+• Key height from 70 to 160 %, forgiving touch targets and a preview above the finger
+• Light, dark and high-contrast themes, custom accent color
+
+THE RIGHT KEYS FOR EVERY FIELD
+• Number fields open the numeric pad (phone or calculator order, PIN, date, time)
+• E-mail and web address fields get @, / and .com
+• The Enter key shows the field's action: next, search, send, done
+
+SCANNER BUILT IN
+• Scan tab with a large trigger area: tap to scan, hold for continuous scanning
+• Optional scan key, soft trigger for Zebra DataWedge, Honeywell or any scanner app via intent
+
+FUNCTION KEYS
+• F1–F12, Shift for F13–F24, Esc, Ins, Del, Home, End, page and arrow keys
+• Optional F1–F12 row above the letters
+
+YOUR OWN KEYS
+• Programmable keys and custom layouts (for example OK / Skip / Damaged) as extra tabs
+• Macros such as {TAB}, {F13}, OK{ENTER} or {SCAN}
+• QWERTY, QWERTZ, AZERTY, Nordic and Spanish, accents on long press
+
+CENTRAL CONFIGURATION
+• Managed configuration from your MDM (for example SOTI MobiControl, Microsoft Intune, Workspace ONE)
+• Configuration file or broadcast intent (StageNow), settings protected by an admin password
+
+PRIVATE BY DESIGN
+• No internet permission, no dictionary, no word prediction: nothing you type is stored or learned
+• No account, no ads, no tracking. Industrial Keyboard sends no data to ICT-Baden.
+
+User interface in English, German, Spanish, French and Chinese. Free and open source (MIT licence), made by ICT-Baden. Paid support contracts are available.

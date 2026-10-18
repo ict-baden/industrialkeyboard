@@ -26,8 +26,7 @@
   <a href="#-up-and-running-in-5-minutes">Quick start</a> ·
   <a href="docs/configuration.md">Configuration</a> ·
   <a href="docs/deployment.md">Deployment (SOTI, Intune, StageNow)</a> ·
-  <a href="docs/integration.md">Scanner &amp; app integration</a> ·
-  <a href="#limits-honestly">Limits</a>
+  <a href="docs/integration.md">Scanner &amp; app integration</a>
 </p>
 
 > [!NOTE]
@@ -180,15 +179,8 @@ the real keyboard code – see [tools/screenshots](tools/screenshots/README.md).
 - [Scanner & app integration](docs/integration.md) – soft trigger, scan broadcasts, intent API
 - [Data and privacy](docs/data-and-privacy.md) – what is stored where, which broadcasts the keyboard sends and receives
 - [Error codes](docs/error-codes.md) – codes shown next to error messages, the same in every language
+- [Google Play](docs/play-store.md) – store texts, graphics, Play Console answers
 - [Changelog](CHANGELOG.md)
-
-## Limits, honestly
-
-- Tested on Zebra devices with DataWedge (HC20, Android 15). The **Honeywell** soft trigger is implemented after the vendor documentation but not yet tested on a Honeywell device.
-- The keys are drawn on a canvas: **TalkBack** cannot read them.
-- User interface in **English** only.
-- No word prediction, no dictionary, no voice input – on purpose (nothing typed is stored).
-- **Package changed** from `io.github.pieewiee.industrialkeyboard` to `de.ictbaden.industrialkeyboard`: Android treats it as a new app, see the [changelog](CHANGELOG.md).
 
 ---
 
