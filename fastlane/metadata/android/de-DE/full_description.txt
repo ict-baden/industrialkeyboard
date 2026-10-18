@@ -1,0 +1,33 @@
+Industrial Keyboard ist eine Bildschirmtastatur für robuste Android-Geräte in Lager, Produktion und Logistik. Große Tasten für Handschuhe, ein Scan-Auslöser direkt auf der Tastatur, F1–F24 für Terminal-Emulation – und die ganze Tastatur zentral per MDM konfigurierbar.
+
+FÜR HANDSCHUHE GEMACHT
+• Tastenhöhe von 70 bis 160 %, großzügige Trefferflächen und eine Vorschau über dem Finger
+• Helles, dunkles und kontrastreiches Design, eigene Akzentfarbe
+
+DIE RICHTIGEN TASTEN FÜR JEDES FELD
+• Zahlenfelder öffnen den Ziffernblock (Telefon- oder Rechnerreihenfolge, PIN, Datum, Uhrzeit)
+• E-Mail- und Webadressfelder bekommen @, / und .com
+• Die Enter-Taste zeigt die Aktion des Feldes: weiter, suchen, senden, fertig
+
+SCANNER EINGEBAUT
+• Scan-Register mit großer Auslösefläche: tippen zum Scannen, halten für Dauerscan
+• Optionale Scan-Taste, Soft-Trigger für Zebra DataWedge, Honeywell oder jede Scanner-App per Intent
+
+FUNKTIONSTASTEN
+• F1–F12, Umschalt für F13–F24, Esc, Einfg, Entf, Pos1, Ende, Bild- und Pfeiltasten
+• Optionale F1–F12-Zeile über den Buchstaben
+
+EIGENE TASTEN
+• Programmierbare Tasten und eigene Layouts (zum Beispiel OK / Überspringen / Beschädigt) als zusätzliche Register
+• Makros wie {TAB}, {F13}, OK{ENTER} oder {SCAN}
+• QWERTY, QWERTZ, AZERTY, Nordisch und Spanisch, Akzente per langem Druck
+
+ZENTRALE KONFIGURATION
+• Managed Configuration aus Ihrem MDM (zum Beispiel SOTI MobiControl, Microsoft Intune, Workspace ONE)
+• Konfigurationsdatei oder Broadcast-Intent (StageNow), Einstellungen durch ein Admin-Passwort geschützt
+
+DATENSCHUTZ VON ANFANG AN
+• Keine Internetberechtigung, kein Wörterbuch, keine Wortvorschläge: Nichts, was Sie tippen, wird gespeichert oder gelernt
+• Kein Konto, keine Werbung, kein Tracking. Industrial Keyboard sendet keine Daten an ICT-Baden.
+
+Oberfläche auf Englisch, Deutsch, Spanisch, Französisch und Chinesisch. Kostenlos und Open Source (MIT-Lizenz), von ICT-Baden. Supportverträge sind erhältlich.
