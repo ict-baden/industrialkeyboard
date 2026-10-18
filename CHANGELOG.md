@@ -5,7 +5,12 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 ## [Unveröffentlicht]
 
 ### Neu
+- **Oberfläche in fünf Sprachen:** Englisch, Deutsch, Spanisch, Französisch und Chinesisch (vereinfacht), nach Richtlinie 13 von ICT-Baden. Einrichtung, Einstellungen, Dialoge, Scan-Pad und das Schema der Managed Configuration sind übersetzt; die Tastenbeschriftungen bleiben, wie sie sind.
+- Sprache wählbar unter **Einstellungen → Aussehen → Sprache**, per Konfiguration (`"language": "de"`) oder als Einzeloption `language` der Managed Configuration. Standard `auto` folgt dem Gerät.
+- Fehlermeldungen zeigen einen Code (`IK-0100` …), damit der Support sie in jeder Sprache zuordnen kann: [Error codes](docs/error-codes.md).
 - Vorbereitet für Google Play: Die CI baut zusätzlich ein signiertes App Bundle (`.aab`), Store-Texte in fünf Sprachen und Store-Grafiken liegen in `fastlane/`, die Antworten für die Play Console in [docs/play-store.md](docs/play-store.md).
+
+Die Übersetzungen sind maschinell vorübersetzt und müssen vor dem ersten öffentlichen Release von Muttersprachlern gegengelesen werden.
 
 ## [2.0.0] – 2026-10-17
 

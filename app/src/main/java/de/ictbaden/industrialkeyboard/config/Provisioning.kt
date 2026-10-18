@@ -57,6 +57,7 @@ object Provisioning {
             values.getString(key)?.let { v -> entries.firstOrNull { it.key == v } } ?: current
         fun bool(key: String, current: Boolean) = if (values.containsKey(key)) values.getBoolean(key, current) else current
         return config.copy(
+            language = values.getString("language")?.let { v -> (listOf(Languages.AUTO) + Languages.SUPPORTED).firstOrNull { it == v } } ?: config.language,
             appearance = config.appearance.copy(theme = choice("theme", ThemeMode.entries.toTypedArray(), config.appearance.theme)),
             layout = config.layout.copy(
                 alphabet = choice("alphabet", Alphabet.entries.toTypedArray(), config.layout.alphabet),

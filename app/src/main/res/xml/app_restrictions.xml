@@ -8,6 +8,14 @@
         android:restrictionType="string"
         android:title="@string/mc_config_json_title" />
     <restriction
+        android:defaultValue="auto"
+        android:description="@string/mc_language_description"
+        android:entries="@array/mc_language_entries"
+        android:entryValues="@array/mc_language_values"
+        android:key="language"
+        android:restrictionType="choice"
+        android:title="@string/mc_language_title" />
+    <restriction
         android:defaultValue="system"
         android:description="@string/mc_theme_description"
         android:entries="@array/mc_theme_entries"

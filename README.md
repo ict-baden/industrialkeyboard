@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/MDM-Managed%20Config-0891B2" alt="Managed configuration">
   <img src="https://img.shields.io/badge/Kotlin-Input%20method-7F52FF?logo=kotlin&amp;logoColor=white" alt="Kotlin">
   <img src="https://img.shields.io/badge/Data-stays%20local-2E7D32" alt="Data stays local">
-  <img src="https://img.shields.io/badge/UI-English-6B7280" alt="User interface in English">
+  <img src="https://img.shields.io/badge/UI-en%20%C2%B7%20de%20%C2%B7%20es%20%C2%B7%20fr%20%C2%B7%20zh-6B7280" alt="User interface in English, German, Spanish, French and Chinese">
   <img src="https://img.shields.io/badge/Licence-MIT-blue" alt="Licence: MIT">
   <a href="https://github.com/ict-baden/industrialkeyboard/actions/workflows/build.yml"><img alt="Build" src="https://github.com/ict-baden/industrialkeyboard/actions/workflows/build.yml/badge.svg"></a>
 </p>
@@ -30,7 +30,7 @@
 </p>
 
 > [!NOTE]
-> **Deutsch:** Industrial Keyboard ist eine Bildschirmtastatur für robuste Android-Geräte (Zebra, Honeywell): große Tasten für Handschuhe, Scan-Taste, F1–F24 für Terminal-Emulation, zentral per MDM konfigurierbar. Kostenlos und Open Source (MIT), ohne Internetzugriff. Download: [IndustrialKeyboard.apk](https://github.com/ict-baden/industrialkeyboard/releases/download/latest/IndustrialKeyboard.apk). Die Oberfläche ist englisch.
+> **Deutsch:** Industrial Keyboard ist eine Bildschirmtastatur für robuste Android-Geräte (Zebra, Honeywell): große Tasten für Handschuhe, Scan-Taste, F1–F24 für Terminal-Emulation, zentral per MDM konfigurierbar. Kostenlos und Open Source (MIT), ohne Internetzugriff. Download: [IndustrialKeyboard.apk](https://github.com/ict-baden/industrialkeyboard/releases/download/latest/IndustrialKeyboard.apk). Die Oberfläche gibt es auf Englisch, Deutsch, Spanisch, Französisch und Chinesisch.
 
 ---
 
@@ -178,6 +178,7 @@ the real keyboard code – see [tools/screenshots](tools/screenshots/README.md).
 - [Deployment](docs/deployment.md) – install, make it the keyboard, managed configuration, files, StageNow
 - [Scanner & app integration](docs/integration.md) – soft trigger, scan broadcasts, intent API
 - [Data and privacy](docs/data-and-privacy.md) – what is stored where, which broadcasts the keyboard sends and receives
+- [Error codes](docs/error-codes.md) – codes shown next to error messages, the same in every language
 - [Google Play](docs/play-store.md) – store texts, graphics, Play Console answers
 - [Changelog](CHANGELOG.md)
 
