@@ -160,7 +160,7 @@ Reference: [Configuration](docs/configuration.md#custom-layouts).
 
 ## 🛠️ Building
 
-Requirements: JDK 17–21 and the Android SDK (compile SDK 36).
+Requirements: JDK 17–21 and the Android SDK (compile SDK 37).
 
 ```bash
 ./gradlew testDebugUnitTest assembleDebug lintDebug
