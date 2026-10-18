@@ -21,13 +21,13 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
 
     /** Asks for the admin password; [onResult] receives true after a correct entry. */
     fun requirePassword(hash: String, onResult: (Boolean) -> Unit) {
-        val field = ui.textField("Admin password", password = true)
+        val field = ui.textField(s(R.string.admin_password), password = true)
         val dialog = MaterialAlertDialogBuilder(activity)
             .setIcon(ui.icon(R.drawable.ic_lock))
-            .setTitle("Settings are protected")
+            .setTitle(R.string.settings_protected)
             .setView(ui.form(field))
-            .setPositiveButton("Unlock", null)
-            .setNegativeButton("Cancel") { _, _ -> onResult(false) }
+            .setPositiveButton(R.string.button_unlock, null)
+            .setNegativeButton(R.string.button_cancel) { _, _ -> onResult(false) }
             .setOnCancelListener { onResult(false) }
             .show()
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
@@ -35,28 +35,28 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
                 dialog.dismiss()
                 onResult(true)
             } else {
-                field.error = "Wrong password"
+                field.error = s(R.string.wrong_password)
             }
         }
     }
 
     fun changePassword(onSave: (String?) -> Unit) {
-        val first = ui.textField("New password", password = true, helper = "Leave empty to remove the password")
-        val second = ui.textField("Repeat", password = true)
+        val first = ui.textField(s(R.string.new_password), password = true, helper = s(R.string.new_password_summary))
+        val second = ui.textField(s(R.string.repeat_password), password = true)
         val dialog = MaterialAlertDialogBuilder(activity)
             .setIcon(ui.icon(R.drawable.ic_key))
-            .setTitle("Admin password")
+            .setTitle(R.string.admin_password)
             .setView(ui.form(first, second))
-            .setPositiveButton("Save", null)
-            .setNegativeButton("Cancel", null)
+            .setPositiveButton(R.string.button_save, null)
+            .setNegativeButton(R.string.button_cancel, null)
             .show()
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             when {
-                first.value != second.value -> second.error = "Passwords do not match"
+                first.value != second.value -> second.error = s(R.string.passwords_do_not_match)
                 else -> {
                     dialog.dismiss()
                     onSave(first.value.ifEmpty { null }?.let(PasswordHasher::hash))
-                    toast(if (first.value.isEmpty()) "Admin password removed" else "Admin password saved")
+                    toast(s(if (first.value.isEmpty()) R.string.password_removed else R.string.password_saved))
                 }
             }
         }
@@ -64,24 +64,23 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
 
     /** Edits a programmable key macro; [onSave] receives the macro or `null` for the default. */
     fun editMacro(title: String, current: String, default: String, onSave: (String?) -> Unit) {
-        val field = ui.textField(
-            "Text or tokens",
-            current,
-            helper = "Examples: -   {TAB}   OK{ENTER}   {F1}   {SCAN}   {U+00E4}",
-        )
+        val field = ui.textField(s(R.string.macro_hint), current, helper = s(R.string.macro_helper))
         val dialog = MaterialAlertDialogBuilder(activity)
             .setIcon(ui.icon(R.drawable.ic_key))
             .setTitle(title)
             .setView(ui.form(field))
-            .setPositiveButton("Save", null)
-            .setNeutralButton("Default ($default)") { _, _ -> onSave(null) }
-            .setNegativeButton("Cancel", null)
+            .setPositiveButton(R.string.button_save, null)
+            .setNeutralButton(activity.getString(R.string.button_default, default)) { _, _ -> onSave(null) }
+            .setNegativeButton(R.string.button_cancel, null)
             .show()
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             val macro = field.value
             val error = when {
-                macro.isEmpty() -> "Enter a character or a token"
-                else -> runCatching { Macro.parse(macro) }.exceptionOrNull()?.message
+                macro.isEmpty() -> s(R.string.macro_empty)
+                // The parser names the token in English; the code identifies the message in any language.
+                else -> runCatching { Macro.parse(macro) }.exceptionOrNull()?.let {
+                    withCode(activity.getString(R.string.macro_invalid, it.message), ErrorCodes.INVALID_MACRO)
+                }
             }
             if (error != null) {
                 field.error = error
@@ -94,7 +93,7 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
 
     /** Palette plus hex input; [onPicked] receives `null` for the theme default. */
     fun pickColor(title: String, current: String?, onPicked: (String?) -> Unit) {
-        val hex = ui.textField("Color (#RRGGBB)", current.orEmpty(), helper = "Empty = theme default")
+        val hex = ui.textField(s(R.string.color_hint), current.orEmpty(), helper = s(R.string.color_helper))
         val marks = mutableMapOf<String, ImageView>()
         fun select(color: String?) {
             marks.forEach { (key, mark) -> mark.visibility = if (key.equals(color, ignoreCase = true)) View.VISIBLE else View.INVISIBLE }
@@ -130,7 +129,7 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
         }
         select(current)
         val reset = MaterialButton(activity, null, androidx.appcompat.R.attr.borderlessButtonStyle).apply {
-            text = "Use theme default"
+            text = s(R.string.use_theme_default)
             setOnClickListener {
                 hex.editText?.setText("")
                 select(null)
@@ -140,15 +139,15 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
             .setIcon(ui.icon(R.drawable.ic_palette))
             .setTitle(title)
             .setView(ui.form(grid, hex, reset))
-            .setPositiveButton("Apply") { _, _ ->
+            .setPositiveButton(R.string.button_apply) { _, _ ->
                 val value = hex.value.trim().uppercase()
                 when {
                     value.isEmpty() -> onPicked(null)
                     value.matches(Regex("#[0-9A-F]{6}")) -> onPicked(value)
-                    else -> toast("Invalid color: $value")
+                    else -> toast(withCode(activity.getString(R.string.invalid_color, value), ErrorCodes.INVALID_COLOR))
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.button_cancel, null)
             .show()
     }
 
@@ -157,7 +156,7 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton(action) { _, _ -> onConfirm() }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.button_cancel, null)
             .show()
     }
 
@@ -166,11 +165,16 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
             .setIcon(ui.icon(R.drawable.ic_info))
             .setTitle(title)
             .setMessage(message)
-            .setPositiveButton("OK", null)
+            .setPositiveButton(R.string.button_ok, null)
             .show()
     }
 
     fun toast(text: String) = Toast.makeText(activity, text, Toast.LENGTH_SHORT).show()
+
+    /** Translated message plus a language-independent code for support (richtlinien/13-sprachen.md). */
+    fun withCode(message: String, code: String): String = activity.getString(R.string.message_with_code, message, code)
+
+    private fun s(id: Int): String = activity.getString(id)
 
     private companion object {
         val PALETTE = listOf(

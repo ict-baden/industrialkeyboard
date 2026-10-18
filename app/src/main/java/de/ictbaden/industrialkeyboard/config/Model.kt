@@ -92,12 +92,13 @@ data class TabSettings(
 /** Programmable keys: key id (see [ProgrammableKey]) → macro. */
 data class KeySettings(val programmable: Map<String, String> = ProgrammableKey.DEFAULTS)
 
-enum class ProgrammableKey(val id: String, val default: String, val description: String) {
-    ALPHA_P1("alpha.p1", "{TAB}", "Letters, bottom row left"),
-    NUMERIC_P1("numeric.p1", "-", "Numeric pad, left column, row 1"),
-    NUMERIC_P2("numeric.p2", "/", "Numeric pad, left column, row 2"),
-    NUMERIC_P3("numeric.p3", ":", "Numeric pad, left column, row 3"),
-    NUMERIC_P4("numeric.p4", "+", "Numeric pad, left column, row 4"),
+/** Descriptions for the settings are string resources (`key_alpha_p1` …). */
+enum class ProgrammableKey(val id: String, val default: String) {
+    ALPHA_P1("alpha.p1", "{TAB}"),
+    NUMERIC_P1("numeric.p1", "-"),
+    NUMERIC_P2("numeric.p2", "/"),
+    NUMERIC_P3("numeric.p3", ":"),
+    NUMERIC_P4("numeric.p4", "+"),
     ;
 
     companion object {
@@ -171,10 +172,17 @@ data class KeyboardConfig(
     val scanner: ScannerSettings = ScannerSettings(),
     val customLayouts: List<CustomLayout> = emptyList(),
     val adminPasswordHash: String? = null,
+    /** `auto` (device language) or one of [Languages.SUPPORTED] (richtlinien/13-sprachen.md). */
+    val language: String = Languages.AUTO,
 ) {
     fun programmable(key: ProgrammableKey): String = keys.programmable[key.id] ?: key.default
 
     fun customLayout(id: String): CustomLayout? = customLayouts.firstOrNull { it.id == id }
+}
+
+object Languages {
+    const val AUTO = "auto"
+    val SUPPORTED = listOf("en", "de", "es", "fr", "zh-Hans")
 }
 
 /** Tab keys; custom layouts use their own id. */

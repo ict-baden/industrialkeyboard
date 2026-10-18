@@ -34,6 +34,7 @@ object ConfigJson {
             scanner = parseScanner(root.optJSONObject("scanner"), defaults.scanner),
             customLayouts = custom,
             adminPasswordHash = passwordHash(root),
+            language = language(root.optNonBlank("language")),
         )
     }
 
@@ -41,6 +42,7 @@ object ConfigJson {
         val root = JSONObject()
         root.put("version", VERSION)
         root.putOpt("adminPasswordHash", config.adminPasswordHash)
+        root.put("language", config.language)
         root.put("appearance", JSONObject().apply {
             val a = config.appearance
             put("theme", a.theme.key)
@@ -282,6 +284,13 @@ object ConfigJson {
         val value = json.optNonBlank(name) ?: return default
         return enumValues<T>().firstOrNull { it.key.equals(value, ignoreCase = true) }
             ?: throw ConfigException("$where.$name: unknown value \"$value\" (${enumValues<T>().joinToString { it.key }})")
+    }
+
+    /** `auto` or a supported language tag, matched case-insensitively (`zh-hans` → `zh-Hans`). */
+    private fun language(value: String?): String {
+        value ?: return Languages.AUTO
+        return (listOf(Languages.AUTO) + Languages.SUPPORTED).firstOrNull { it.equals(value, ignoreCase = true) }
+            ?: throw ConfigException("language: unknown language \"$value\" (${Languages.AUTO}, ${Languages.SUPPORTED.joinToString()})")
     }
 
     private fun JSONObject.optNonBlank(name: String): String? =

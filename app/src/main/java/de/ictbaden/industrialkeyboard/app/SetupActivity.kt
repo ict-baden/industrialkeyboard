@@ -50,23 +50,23 @@ class SetupActivity : AppCompatActivity() {
             setPadding(ui.dp(16), 0, ui.dp(16), ui.dp(32))
         }
         steps = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        content.addView(ui.section("Setup"))
+        content.addView(ui.section(getString(R.string.section_setup)))
         content.addView(steps)
-        content.addView(ui.section("Try it"))
+        content.addView(ui.section(getString(R.string.section_try_it)))
         content.addView(ui.card(sampleForm(), padded = true))
-        content.addView(ui.section("More"))
+        content.addView(ui.section(getString(R.string.section_more)))
         content.addView(
             ui.card(
                 listOf(
-                    ui.row(R.drawable.ic_settings, "Keyboard settings", "Layouts, scanner, look and feedback") {
+                    ui.row(R.drawable.ic_settings, getString(R.string.settings_title), getString(R.string.settings_summary)) {
                         startActivity(Intent(this, SettingsActivity::class.java))
                     },
-                    ui.row(R.drawable.ic_globe, "Switch keyboard", "Choose between installed keyboards") { showPicker() },
+                    ui.row(R.drawable.ic_globe, getString(R.string.switch_keyboard), getString(R.string.switch_keyboard_summary)) { showPicker() },
                 ),
             ),
         )
         content.addView(TextView(this).apply {
-            text = "Industrial Keyboard ${BuildConfig.VERSION_NAME}"
+            text = getString(R.string.footer, BuildConfig.VERSION_NAME)
             gravity = Gravity.CENTER
             setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelMedium)
             setTextColor(ui.color(com.google.android.material.R.attr.colorOnSurfaceVariant))
@@ -119,7 +119,7 @@ class SetupActivity : AppCompatActivity() {
             setPadding(0, ui.dp(16), 0, 0)
         })
         addView(TextView(context).apply {
-            text = "Fast data entry with scanner, gloves and forms"
+            text = getString(R.string.setup_tagline)
             setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
             setTextColor(0xD9FFFFFF.toInt())
         })
@@ -134,11 +134,13 @@ class SetupActivity : AppCompatActivity() {
     private fun refresh() {
         val enabled = isEnabled()
         val active = enabled && isActive()
-        status.text = when {
-            active -> "●  Active keyboard"
-            enabled -> "●  Enabled – select it to use it"
-            else -> "●  Not set up yet"
-        }
+        status.text = getString(
+            when {
+                active -> R.string.setup_status_active
+                enabled -> R.string.setup_status_enabled
+                else -> R.string.setup_status_not_set_up
+            },
+        )
         status.setTextColor(if (active) 0xFF1B5E20.toInt() else 0xFF5D4037.toInt())
         status.background = GradientDrawable().apply {
             cornerRadius = ui.dp(100).toFloat()
@@ -148,10 +150,10 @@ class SetupActivity : AppCompatActivity() {
         steps.addView(
             ui.card(
                 listOf(
-                    step(1, "Enable the keyboard", "Turn on Industrial Keyboard in the system settings", enabled, "Enable") {
+                    step(1, getString(R.string.step_enable), getString(R.string.step_enable_summary), enabled, getString(R.string.step_enable_button)) {
                         startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
                     },
-                    step(2, "Select it", "Make it the keyboard that opens in every app", active, "Select") { showPicker() },
+                    step(2, getString(R.string.step_select), getString(R.string.step_select_summary), active, getString(R.string.step_select_button)) { showPicker() },
                 ),
             ),
         )
@@ -174,24 +176,24 @@ class SetupActivity : AppCompatActivity() {
             setBackgroundResource(R.drawable.bg_tile_icon)
             backgroundTintList = ColorStateList.valueOf(if (done) 0xFF2E7D32.toInt() else (ui.accent and 0x00FFFFFF) or 0x1F000000)
         }
-        return ui.row(R.drawable.ic_keyboard, title, if (done) "Done" else subtitle, trailing, leading = badge, onClick = if (done) null else onClick)
+        return ui.row(R.drawable.ic_keyboard, title, if (done) getString(R.string.step_done) else subtitle, trailing, leading = badge, onClick = if (done) null else onClick)
     }
 
     private fun sampleForm(): List<View> {
-        fun field(hint: String, type: Int, helper: String) = ui.textField(hint, inputType = type, helper = helper).also { fields += it }
+        fun field(hint: Int, type: Int, helper: Int) = ui.textField(getString(hint), inputType = type, helper = getString(helper)).also { fields += it }
         return listOf(
             TextView(this).apply {
-                text = "Every field opens the matching keys."
+                text = getString(R.string.sample_intro)
                 setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
                 setTextColor(ui.color(com.google.android.material.R.attr.colorOnSurfaceVariant))
             },
-            field("Item number", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS, "Letters, scan or the Fn keys"),
-            field("Quantity", InputType.TYPE_CLASS_NUMBER, "Numeric pad"),
-            field("Weight (kg)", InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL, "Numeric pad with , and ."),
-            field("Phone", InputType.TYPE_CLASS_PHONE, "Dial pad with + * #"),
-            field("Best before", InputType.TYPE_CLASS_DATETIME or InputType.TYPE_DATETIME_VARIATION_DATE, "Date pad with / - ."),
-            field("PIN", InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD, "PIN pad"),
-            field("E-mail", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, "@ next to the space bar"),
+            field(R.string.sample_item, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS, R.string.sample_item_helper),
+            field(R.string.sample_quantity, InputType.TYPE_CLASS_NUMBER, R.string.sample_quantity_helper),
+            field(R.string.sample_weight, InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL, R.string.sample_weight_helper),
+            field(R.string.sample_phone, InputType.TYPE_CLASS_PHONE, R.string.sample_phone_helper),
+            field(R.string.sample_date, InputType.TYPE_CLASS_DATETIME or InputType.TYPE_DATETIME_VARIATION_DATE, R.string.sample_date_helper),
+            field(R.string.sample_pin, InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD, R.string.sample_pin_helper),
+            field(R.string.sample_email, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, R.string.sample_email_helper),
         ).onEach { view ->
             view.layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { topMargin = ui.dp(10) }
         }

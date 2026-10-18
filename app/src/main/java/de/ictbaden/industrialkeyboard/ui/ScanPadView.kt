@@ -15,6 +15,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
 import kotlin.math.PI
 import kotlin.math.min
@@ -72,7 +73,7 @@ class ScanPadView(context: Context) : View(context) {
     init {
         // Blur mask filters need software rendering.
         setLayerType(LAYER_TYPE_SOFTWARE, null)
-        contentDescription = "Scan"
+        contentDescription = text(R.string.scan_pad_description)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -116,19 +117,21 @@ class ScanPadView(context: Context) : View(context) {
         title.color = foreground
         title.textSize = min(sp(19f), pad.height() * 0.11f)
         val label = when {
-            !available -> "No scanner found"
-            scanning -> "Scanning…"
-            else -> "Tap to scan"
+            !available -> text(R.string.scan_pad_no_scanner)
+            scanning -> text(R.string.scan_pad_scanning)
+            else -> text(R.string.scan_pad_tap)
         }
         val titleY = iconTop + iconSize + dp(10f) - title.ascent()
         canvas.drawText(label, pad.centerX(), titleY, title)
         subtitle.color = ColorUtils.setAlphaComponent(foreground, 190)
         subtitle.textSize = min(sp(12.5f), pad.height() * 0.075f)
-        val hint = if (available) "Hold for continuous scanning · $scannerName" else "Configure a scanner in the keyboard settings"
+        val hint = if (available) text(R.string.scan_pad_hint, scannerName) else text(R.string.scan_pad_configure)
         canvas.drawText(hint, pad.centerX(), titleY + dp(6f) - subtitle.ascent() + subtitle.descent(), subtitle)
         canvas.restore()
         if (scanning) postInvalidateOnAnimation()
     }
+
+    private fun text(id: Int, vararg args: Any?): String = AppLanguage.localized(context).getString(id, *args)
 
     private fun drawLaser(canvas: Canvas) {
         val t = (SystemClock.uptimeMillis() - scanStarted) / 1000.0

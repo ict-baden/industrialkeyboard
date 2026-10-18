@@ -51,6 +51,19 @@ android {
         buildConfig = true
     }
 
+    // The language can be switched in the app and by the MDM (richtlinien/13): an app bundle from
+    // Play must therefore contain every language, not only the one of the device.
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
+    lint {
+        // Covered by the bundle setting above; Play Core on-demand languages are not needed.
+        disable += "AppBundleLocaleChanges"
+    }
+
     testOptions {
         unitTests {
             isIncludeAndroidResources = true

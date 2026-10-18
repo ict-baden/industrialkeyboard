@@ -71,6 +71,15 @@ class ConfigJsonTest {
     }
 
     @Test
+    fun `language follows the device unless configured`() {
+        assertEquals(Languages.AUTO, ConfigJson.parse("{}").language)
+        val chinese = ConfigJson.parse("""{"language":"zh-hans"}""")
+        assertEquals("zh-Hans", chinese.language)
+        assertEquals("zh-Hans", ConfigJson.parse(ConfigJson.write(chinese)).language)
+        rejected("""{"language":"tlh"}""", "language")
+    }
+
+    @Test
     fun `invalid configurations are rejected with a path`() {
         rejected("""{"appearance":{"accentColor":"blue"}}""", "appearance.accentColor")
         rejected("""{"layout":{"alphabet":"qwertzz"}}""", "layout.alphabet")

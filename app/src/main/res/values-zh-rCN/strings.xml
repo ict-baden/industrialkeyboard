@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">键盘设置</string>
+    <string name="message_with_code">%1$s（%2$s）</string>
+    <string name="value_percent">%1$d%%</string>
+    <string name="value_ms">%1$d 毫秒</string>
+    <string name="back">返回</string>
+
+    <string name="button_cancel">取消</string>
+    <string name="button_save">保存</string>
+    <string name="button_ok">确定</string>
+    <string name="button_apply">应用</string>
+    <string name="button_import">导入</string>
+    <string name="button_reset">重置</string>
+    <string name="button_unlock">解锁</string>
+    <string name="button_default">默认（%1$s）</string>
+
+    <string name="section_look">外观</string>
+    <string name="theme">主题</string>
+    <string name="theme_system">跟随系统</string>
+    <string name="theme_light">浅色</string>
+    <string name="theme_dark">深色</string>
+    <string name="theme_contrast">高对比度</string>
+    <string name="accent_color">强调色</string>
+    <string name="theme_default">主题默认</string>
+    <string name="key_height">按键高度</string>
+    <string name="keyboard_width">键盘宽度</string>
+    <string name="number_row">数字行</string>
+    <string name="number_row_summary">字母上方显示数字</string>
+    <string name="function_row">功能键行</string>
+    <string name="function_row_summary">字母上方显示 F1–F12</string>
+    <string name="key_hints">按键提示</string>
+    <string name="key_hints_summary">在第一行显示长按对应的小数字</string>
+    <string name="language">语言</string>
+    <string name="language_system">系统语言</string>
+
+    <string name="section_layout">布局</string>
+    <string name="letters">字母</string>
+    <string name="navigation">导航</string>
+    <string name="navigation_tabs">标签栏</string>
+    <string name="navigation_keys">经典 ?123 键</string>
+    <string name="numeric_pad">数字键盘</string>
+    <string name="numeric_phone">1-2-3 在上</string>
+    <string name="numeric_calculator">7-8-9 在上</string>
+    <string name="tabs">标签页</string>
+    <string name="tabs_summary">在标签栏中显示</string>
+    <string name="tab_scan">扫描</string>
+    <string name="start_tab">文本框的起始标签页</string>
+    <string name="automatic">自动</string>
+
+    <string name="section_programmable_keys">可编程按键</string>
+    <string name="key_alpha_p1">字母键盘，最下一行左侧</string>
+    <string name="key_numeric_p1">数字键盘，左列第 1 行</string>
+    <string name="key_numeric_p2">数字键盘，左列第 2 行</string>
+    <string name="key_numeric_p3">数字键盘，左列第 3 行</string>
+    <string name="key_numeric_p4">数字键盘，左列第 4 行</string>
+    <string name="macro_hint">文本或令牌</string>
+    <string name="macro_helper">示例：-   {TAB}   OK{ENTER}   {F1}   {SCAN}   {U+00E4}</string>
+    <string name="macro_empty">请输入一个字符或令牌</string>
+    <string name="macro_invalid">无效：%1$s</string>
+
+    <string name="section_typing">输入</string>
+    <string name="auto_capitalization">自动大写</string>
+    <string name="auto_capitalization_summary">句首字母大写（如果输入框要求）</string>
+    <string name="double_space_period">双空格输入句号</string>
+    <string name="double_space_period_summary">连按两次空格插入句点</string>
+    <string name="long_press_delay">长按延迟</string>
+    <string name="section_feedback">反馈</string>
+    <string name="key_popup">按键弹出</string>
+    <string name="key_popup_summary">在按下的键上方显示放大的字符</string>
+    <string name="vibration">振动</string>
+    <string name="vibration_length">振动时长</string>
+    <string name="sound">声音</string>
+    <string name="volume">音量</string>
+
+    <string name="section_scanner">扫描器</string>
+    <string name="scan_trigger">扫描触发</string>
+    <string name="scan_trigger_off">关闭</string>
+    <string name="trigger_broadcast">触发广播</string>
+    <string name="broadcast_action">广播 Action</string>
+    <string name="broadcast_action_helper">发送以开始扫描，例如 com.example.scanner.START</string>
+    <string name="scanner_in_use">当前扫描器</string>
+    <string name="scanner_none_found">未找到</string>
+    <string name="scan_key">扫描键</string>
+    <string name="scan_key_summary">位于字母键盘的空格键旁边</string>
+    <string name="scan_from_broadcasts">输入通过广播收到的扫描结果</string>
+    <string name="after_scan">扫描后</string>
+    <string name="after_scan_nothing">无</string>
+    <string name="after_scan_enter">回车</string>
+    <string name="after_scan_tab">Tab</string>
+    <string name="scanner_app">扫描应用</string>
+
+    <string name="section_configuration">配置</string>
+    <string name="import_file">从文件导入</string>
+    <string name="import_file_summary">加载 JSON 配置</string>
+    <string name="export_file">导出到文件</string>
+    <string name="export_file_summary">保存当前配置</string>
+    <string name="reset_defaults">恢复默认设置</string>
+    <string name="reset_defaults_summary">保留管理员密码</string>
+    <string name="reset_confirm_title">要重置所有设置吗？</string>
+    <string name="reset_confirm_message">布局、外观、按键和扫描器设置将恢复为默认值。</string>
+    <string name="admin_password">管理员密码</string>
+    <string name="password_not_set">未设置</string>
+    <string name="password_set">已设置，用于保护这些设置</string>
+    <string name="last_provisioning_error">上次部署错误</string>
+    <string name="config_file_for_emm">用于 EMM 的配置文件</string>
+    <string name="config_exported">配置已导出</string>
+    <string name="export_failed">导出失败：%1$s</string>
+    <string name="file_unreadable">无法读取文件：%1$s</string>
+    <string name="import_failed">导入失败</string>
+    <string name="import_confirm_title">要导入配置吗？</string>
+    <string name="import_confirm_message">当前设置将被替换。</string>
+    <string name="config_imported">配置已导入</string>
+
+    <string name="section_info">信息</string>
+    <string name="version">版本</string>
+    <string name="status">状态</string>
+    <string name="status_active">当前键盘</string>
+    <string name="status_enabled">已启用，未选择</string>
+    <string name="status_not_enabled">未启用</string>
+    <string name="about_privacy">数据与隐私</string>
+    <string name="about_privacy_summary">本软件不会向 ICT-Baden 发送任何数据。它没有联网权限。</string>
+    <string name="about_licence">许可证</string>
+    <string name="about_third_party">第三方许可证</string>
+    <string name="about_source">源代码</string>
+    <string name="about_support">帮助与支持</string>
+    <string name="about_support_summary">通过 GitHub 免费获取，签订支持合同可获得保障</string>
+    <string name="about_website">网站</string>
+    <string name="about_impressum">法律声明</string>
+    <string name="about_impressum_summary">ICT-Baden 的法律声明</string>
+    <string name="no_browser">没有可用的浏览器</string>
+
+    <string name="settings_protected">设置受保护</string>
+    <string name="wrong_password">密码错误</string>
+    <string name="new_password">新密码</string>
+    <string name="new_password_summary">留空即可移除密码</string>
+    <string name="repeat_password">再次输入</string>
+    <string name="passwords_do_not_match">两次输入的密码不一致</string>
+    <string name="password_saved">管理员密码已保存</string>
+    <string name="password_removed">管理员密码已移除</string>
+    <string name="color_hint">颜色（#RRGGBB）</string>
+    <string name="color_helper">留空 = 主题默认</string>
+    <string name="use_theme_default">使用主题默认</string>
+    <string name="invalid_color">无效颜色：%1$s</string>
+
+    <string name="setup_tagline">配合扫描器、手套和表单快速录入数据</string>
+    <string name="setup_status_active">●  当前键盘</string>
+    <string name="setup_status_enabled">●  已启用，请选择后使用</string>
+    <string name="setup_status_not_set_up">●  尚未设置</string>
+    <string name="section_setup">设置</string>
+    <string name="section_try_it">试一试</string>
+    <string name="section_more">更多</string>
+    <string name="step_enable">启用键盘</string>
+    <string name="step_enable_summary">在系统设置中开启 Industrial Keyboard</string>
+    <string name="step_enable_button">启用</string>
+    <string name="step_select">选择键盘</string>
+    <string name="step_select_summary">将其设为在所有应用中打开的键盘</string>
+    <string name="step_select_button">选择</string>
+    <string name="step_done">已完成</string>
+    <string name="settings_summary">布局、扫描器、外观和反馈</string>
+    <string name="switch_keyboard">切换键盘</string>
+    <string name="switch_keyboard_summary">在已安装的键盘之间选择</string>
+    <string name="sample_intro">每个输入框都会打开相应的按键。</string>
+    <string name="sample_item">物料编号</string>
+    <string name="sample_item_helper">字母、扫描或 Fn 键</string>
+    <string name="sample_quantity">数量</string>
+    <string name="sample_quantity_helper">数字键盘</string>
+    <string name="sample_weight">重量（kg）</string>
+    <string name="sample_weight_helper">带 , 和 . 的数字键盘</string>
+    <string name="sample_phone">电话</string>
+    <string name="sample_phone_helper">带 + * # 的拨号键盘</string>
+    <string name="sample_date">保质期至</string>
+    <string name="sample_date_helper">带 / - . 的日期键盘</string>
+    <string name="sample_pin">PIN 码</string>
+    <string name="sample_pin_helper">PIN 键盘</string>
+    <string name="sample_email">电子邮件</string>
+    <string name="sample_email_helper">@ 在空格键旁边</string>
+
+    <string name="scan_pad_description">扫描</string>
+    <string name="scan_pad_no_scanner">未找到扫描器</string>
+    <string name="scan_pad_scanning">正在扫描…</string>
+    <string name="scan_pad_tap">点按扫描</string>
+    <string name="scan_pad_hint">按住可连续扫描 · %1$s</string>
+    <string name="scan_pad_configure">请在键盘设置中配置扫描器</string>
+
+    <string name="mc_config_json_title">配置（JSON）</string>
+    <string name="mc_config_json_description">Industrial Keyboard JSON 格式的完整配置。优先于下面的单项设置。</string>
+    <string name="mc_language_title">语言</string>
+    <string name="mc_language_description">设置页面的语言。自动表示跟随设备。</string>
+    <string name="mc_theme_title">主题</string>
+    <string name="mc_theme_description">键盘的颜色。</string>
+    <string name="mc_alphabet_title">字母布局</string>
+    <string name="mc_alphabet_description">字母键的排列方式。</string>
+    <string name="mc_numeric_order_title">数字键盘</string>
+    <string name="mc_numeric_order_description">电话顺序（1-2-3 在上）或计算器顺序（7-8-9 在上）。</string>
+    <string name="mc_scan_tab_title">扫描标签页</string>
+    <string name="mc_scan_tab_description">显示带有大扫描按钮的标签页。</string>
+    <string name="mc_function_tab_title">功能键标签页</string>
+    <string name="mc_function_tab_description">显示包含 F1–F12（Shift：F13–F24）、Esc、方向键和导航键的标签页。</string>
+    <string name="mc_sound_title">按键音</string>
+    <string name="mc_sound_description">每次按键时发出咔嗒声。</string>
+    <string name="mc_vibrate_title">按键振动</string>
+    <string name="mc_vibrate_description">每次按键时短暂振动。</string>
+    <string name="mc_admin_password_title">管理员密码</string>
+    <string name="mc_admin_password_description">保护键盘设置和配置导入。</string>
+
+    <string-array name="mc_language_entries">
+        <item>自动（设备语言）</item>
+        <item>English</item>
+        <item>Deutsch</item>
+        <item>Español</item>
+        <item>Français</item>
+        <item>简体中文</item>
+    </string-array>
+    <string-array name="mc_theme_entries">
+        <item>跟随系统</item>
+        <item>浅色</item>
+        <item>深色</item>
+        <item>高对比度</item>
+    </string-array>
+    <string-array name="mc_alphabet_entries">
+        <item>QWERTY（英语）</item>
+        <item>QWERTZ（德语）</item>
+        <item>AZERTY（法语）</item>
+        <item>北欧</item>
+        <item>西班牙语</item>
+    </string-array>
+    <string-array name="mc_numeric_order_entries">
+        <item>电话（1-2-3 在上）</item>
+        <item>计算器（7-8-9 在上）</item>
+    </string-array>
+</resources>

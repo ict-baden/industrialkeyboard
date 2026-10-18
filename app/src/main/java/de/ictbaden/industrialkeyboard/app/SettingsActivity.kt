@@ -22,6 +22,7 @@ import androidx.core.view.updatePadding
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
+import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.BuildConfig
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.config.Alphabet
@@ -29,6 +30,7 @@ import de.ictbaden.industrialkeyboard.config.ConfigException
 import de.ictbaden.industrialkeyboard.config.ConfigJson
 import de.ictbaden.industrialkeyboard.config.ConfigStore
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
+import de.ictbaden.industrialkeyboard.config.Languages
 import de.ictbaden.industrialkeyboard.config.Navigation
 import de.ictbaden.industrialkeyboard.config.NumericOrder
 import de.ictbaden.industrialkeyboard.config.ProgrammableKey
@@ -73,7 +75,8 @@ class SettingsActivity : AppCompatActivity() {
         uri ?: return@registerForActivityResult
         runCatching {
             contentResolver.openOutputStream(uri, "wt")!!.bufferedWriter().use { it.write(ConfigJson.write(store.config)) }
-        }.onSuccess { dialogs.toast("Configuration exported") }.onFailure { dialogs.toast("Export failed: ${it.message}") }
+        }.onSuccess { dialogs.toast(getString(R.string.config_exported)) }
+            .onFailure { dialogs.toast(dialogs.withCode(getString(R.string.export_failed, it.message.orEmpty()), ErrorCodes.EXPORT_FAILED)) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,7 +88,7 @@ class SettingsActivity : AppCompatActivity() {
         val toolbar = MaterialToolbar(this).apply {
             title = getString(R.string.settings_title)
             navigationIcon = ContextCompat.getDrawable(this@SettingsActivity, R.drawable.ic_back)
-            setNavigationContentDescription("Back")
+            setNavigationContentDescription(R.string.back)
             setNavigationOnClickListener { finish() }
         }
         preview = KeyboardRootView(this, headroomDp = 0f).apply {
@@ -196,69 +199,75 @@ class SettingsActivity : AppCompatActivity() {
         val c = store.config
         content.removeAllViews()
 
-        content.addView(ui.section("Look"))
+        content.addView(ui.section(getString(R.string.section_look)))
         content.addView(
             ui.card(
                 listOf(
+                    ui.row(R.drawable.ic_globe, getString(R.string.language), languageName(c.language)) { pickLanguage() },
                     ui.choiceRow(
                         R.drawable.ic_palette,
-                        "Theme",
-                        listOf(ThemeMode.SYSTEM to "System", ThemeMode.LIGHT to "Light", ThemeMode.DARK to "Dark", ThemeMode.CONTRAST to "High contrast"),
+                        getString(R.string.theme),
+                        listOf(
+                            ThemeMode.SYSTEM to getString(R.string.theme_system),
+                            ThemeMode.LIGHT to getString(R.string.theme_light),
+                            ThemeMode.DARK to getString(R.string.theme_dark),
+                            ThemeMode.CONTRAST to getString(R.string.theme_contrast),
+                        ),
                         c.appearance.theme,
                     ) { theme -> update { it.copy(appearance = it.appearance.copy(theme = theme)) } },
-                    ui.row(R.drawable.ic_palette, "Accent color", c.appearance.accentColor ?: "Theme default", trailing = swatch(c)) {
-                        dialogs.pickColor("Accent color", c.appearance.accentColor) { color ->
+                    ui.row(R.drawable.ic_palette, getString(R.string.accent_color), c.appearance.accentColor ?: getString(R.string.theme_default), trailing = swatch(c)) {
+                        dialogs.pickColor(getString(R.string.accent_color), c.appearance.accentColor) { color ->
                             update { it.copy(appearance = it.appearance.copy(accentColor = color)) }
                         }
                     },
-                    ui.sliderRow(R.drawable.ic_keyboard, "Key height", 70, 160, 5, c.appearance.keyHeight, format = { "$it %" }) { value ->
+                    ui.sliderRow(R.drawable.ic_keyboard, getString(R.string.key_height), 70, 160, 5, c.appearance.keyHeight, format = ::percent) { value ->
                         update { it.copy(appearance = it.appearance.copy(keyHeight = value)) }
                     },
-                    ui.sliderRow(R.drawable.ic_keyboard, "Keyboard width", 50, 100, 5, c.appearance.width, format = { "$it %" }) { value ->
+                    ui.sliderRow(R.drawable.ic_keyboard, getString(R.string.keyboard_width), 50, 100, 5, c.appearance.width, format = ::percent) { value ->
                         update { it.copy(appearance = it.appearance.copy(width = value)) }
                     },
-                    ui.switchRow(R.drawable.ic_keyboard, "Number row", "Digits above the letters", c.appearance.numberRow) { on ->
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.number_row), getString(R.string.number_row_summary), c.appearance.numberRow) { on ->
                         update { it.copy(appearance = it.appearance.copy(numberRow = on)) }
                     },
-                    ui.switchRow(R.drawable.ic_keyboard, "Function key row", "F1–F12 above the letters", c.appearance.functionRow) { on ->
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.function_row), getString(R.string.function_row_summary), c.appearance.functionRow) { on ->
                         update { it.copy(appearance = it.appearance.copy(functionRow = on)) }
                     },
-                    ui.switchRow(R.drawable.ic_info, "Key hints", "Small digits for long press on the top row", c.appearance.keyHints) { on ->
+                    ui.switchRow(R.drawable.ic_info, getString(R.string.key_hints), getString(R.string.key_hints_summary), c.appearance.keyHints) { on ->
                         update { it.copy(appearance = it.appearance.copy(keyHints = on)) }
                     },
                 ),
             ),
         )
 
-        content.addView(ui.section("Layout"))
+        content.addView(ui.section(getString(R.string.section_layout)))
         content.addView(
             ui.card(
                 listOf(
-                    ui.choiceRow(R.drawable.ic_keyboard, "Letters", Alphabet.entries.map { it to it.label }, c.layout.alphabet) { alphabet ->
+                    ui.choiceRow(R.drawable.ic_keyboard, getString(R.string.letters), Alphabet.entries.map { it to it.label }, c.layout.alphabet) { alphabet ->
                         update { it.copy(layout = it.layout.copy(alphabet = alphabet)) }
                     },
                     ui.choiceRow(
                         R.drawable.ic_keyboard,
-                        "Navigation",
-                        listOf(Navigation.TABS to "Tab bar", Navigation.KEYS to "Classic ?123 key"),
+                        getString(R.string.navigation),
+                        listOf(Navigation.TABS to getString(R.string.navigation_tabs), Navigation.KEYS to getString(R.string.navigation_keys)),
                         c.layout.navigation,
                     ) { navigation -> update { it.copy(layout = it.layout.copy(navigation = navigation)) } },
                     ui.choiceRow(
                         R.drawable.ic_keyboard,
-                        "Numeric pad",
-                        listOf(NumericOrder.PHONE to "1-2-3 on top", NumericOrder.CALCULATOR to "7-8-9 on top"),
+                        getString(R.string.numeric_pad),
+                        listOf(NumericOrder.PHONE to getString(R.string.numeric_phone), NumericOrder.CALCULATOR to getString(R.string.numeric_calculator)),
                         c.layout.numericOrder,
                     ) { order -> update { it.copy(layout = it.layout.copy(numericOrder = order)) } },
                     ui.multiChoiceRow(
                         R.drawable.ic_keyboard,
-                        "Tabs",
-                        "Shown in the tab bar",
+                        getString(R.string.tabs),
+                        getString(R.string.tabs_summary),
                         listOf(
                             Triple(Tabs.ALPHA, "ABC", c.tabs.alpha),
                             Triple(Tabs.NUMERIC, "123", c.tabs.numeric),
                             Triple(Tabs.SYMBOLS, "#+=", c.tabs.symbols),
                             Triple(Tabs.FUNCTION, "Fn", c.tabs.function),
-                            Triple(Tabs.SCAN, "Scan", c.tabs.scan),
+                            Triple(Tabs.SCAN, getString(R.string.tab_scan), c.tabs.scan),
                         ),
                         enabled = c.layout.navigation == Navigation.TABS,
                     ) { tab, on ->
@@ -276,8 +285,15 @@ class SettingsActivity : AppCompatActivity() {
                     },
                     ui.choiceRow(
                         R.drawable.ic_keyboard,
-                        "Start tab for text fields",
-                        listOf(Tabs.AUTO to "Automatic", Tabs.ALPHA to "ABC", Tabs.NUMERIC to "123", Tabs.SYMBOLS to "#+=", Tabs.FUNCTION to "Fn", Tabs.SCAN to "Scan") +
+                        getString(R.string.start_tab),
+                        listOf(
+                            Tabs.AUTO to getString(R.string.automatic),
+                            Tabs.ALPHA to "ABC",
+                            Tabs.NUMERIC to "123",
+                            Tabs.SYMBOLS to "#+=",
+                            Tabs.FUNCTION to "Fn",
+                            Tabs.SCAN to getString(R.string.tab_scan),
+                        ) +
                             c.customLayouts.map { it.id to it.label },
                         c.tabs.preferred,
                     ) { tab -> update { it.copy(tabs = it.tabs.copy(preferred = tab)) } },
@@ -285,13 +301,14 @@ class SettingsActivity : AppCompatActivity() {
             ),
         )
 
-        content.addView(ui.section("Programmable keys"))
+        content.addView(ui.section(getString(R.string.section_programmable_keys)))
         content.addView(
             ui.card(
                 ProgrammableKey.entries.map { key ->
                     val value = c.programmable(key)
-                    ui.row(R.drawable.ic_key, key.id.uppercase(), "$value  ·  ${key.description}") {
-                        dialogs.editMacro(key.description, value, key.default) { macro ->
+                    val description = getString(keyDescription(key))
+                    ui.row(R.drawable.ic_key, key.id.uppercase(), "$value  ·  $description") {
+                        dialogs.editMacro(description, value, key.default) { macro ->
                             update { it.copy(keys = it.keys.copy(programmable = it.keys.programmable + (key.id to (macro ?: key.default)))) }
                         }
                     }
@@ -299,45 +316,45 @@ class SettingsActivity : AppCompatActivity() {
             ),
         )
 
-        content.addView(ui.section("Typing"))
+        content.addView(ui.section(getString(R.string.section_typing)))
         content.addView(
             ui.card(
                 listOf(
-                    ui.switchRow(R.drawable.ic_keyboard, "Auto-capitalization", "Capital letter at the start of a sentence (if the field asks for it)", c.typing.autoCapitalize) { on ->
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.auto_capitalization), getString(R.string.auto_capitalization_summary), c.typing.autoCapitalize) { on ->
                         update { it.copy(typing = it.typing.copy(autoCapitalize = on)) }
                     },
-                    ui.switchRow(R.drawable.ic_keyboard, "Double-space period", "Two spaces insert a period", c.typing.doubleSpacePeriod) { on ->
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.double_space_period), getString(R.string.double_space_period_summary), c.typing.doubleSpacePeriod) { on ->
                         update { it.copy(typing = it.typing.copy(doubleSpacePeriod = on)) }
                     },
-                    ui.sliderRow(R.drawable.ic_timer, "Long-press delay", 200, 1500, 50, c.typing.longPressDelay, format = { "$it ms" }) { value ->
+                    ui.sliderRow(R.drawable.ic_timer, getString(R.string.long_press_delay), 200, 1500, 50, c.typing.longPressDelay, format = ::millis) { value ->
                         update { it.copy(typing = it.typing.copy(longPressDelay = value)) }
                     },
                 ),
             ),
         )
 
-        content.addView(ui.section("Feedback"))
+        content.addView(ui.section(getString(R.string.section_feedback)))
         content.addView(
             ui.card(
                 listOfNotNull(
-                    ui.switchRow(R.drawable.ic_keyboard, "Key popup", "Enlarged character above the pressed key", c.feedback.keyPopup) { on ->
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.key_popup), getString(R.string.key_popup_summary), c.feedback.keyPopup) { on ->
                         update { it.copy(feedback = it.feedback.copy(keyPopup = on)) }
                     },
-                    ui.switchRow(R.drawable.ic_keyboard, "Vibration", null, c.feedback.vibrate) { on ->
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.vibration), null, c.feedback.vibrate) { on ->
                         update { it.copy(feedback = it.feedback.copy(vibrate = on)) }
                     },
                     if (c.feedback.vibrate) {
-                        ui.sliderRow(R.drawable.ic_timer, "Vibration length", 5, 100, 5, c.feedback.vibrationMs ?: 20, format = { "$it ms" }) { value ->
+                        ui.sliderRow(R.drawable.ic_timer, getString(R.string.vibration_length), 5, 100, 5, c.feedback.vibrationMs ?: 20, format = ::millis) { value ->
                             update { it.copy(feedback = it.feedback.copy(vibrationMs = value)) }
                         }
                     } else {
                         null
                     },
-                    ui.switchRow(R.drawable.ic_keyboard, "Sound", null, c.feedback.sound) { on ->
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.sound), null, c.feedback.sound) { on ->
                         update { it.copy(feedback = it.feedback.copy(sound = on)) }
                     },
                     if (c.feedback.sound) {
-                        ui.sliderRow(R.drawable.ic_keyboard, "Volume", 0, 100, 5, c.feedback.soundVolume ?: 50, format = { "$it %" }) { value ->
+                        ui.sliderRow(R.drawable.ic_keyboard, getString(R.string.volume), 0, 100, 5, c.feedback.soundVolume ?: 50, format = ::percent) { value ->
                             update { it.copy(feedback = it.feedback.copy(soundVolume = value)) }
                         }
                     } else {
@@ -347,20 +364,20 @@ class SettingsActivity : AppCompatActivity() {
             ),
         )
 
-        content.addView(ui.section("Scanner"))
+        content.addView(ui.section(getString(R.string.section_scanner)))
         scanner.settings = c.scanner
         content.addView(
             ui.card(
                 listOfNotNull(
                     ui.choiceRow(
                         R.drawable.ic_scan,
-                        "Scan trigger",
+                        getString(R.string.scan_trigger),
                         listOf(
-                            ScanTriggerType.AUTO to "Automatic",
+                            ScanTriggerType.AUTO to getString(R.string.automatic),
                             ScanTriggerType.DATAWEDGE to "DataWedge",
                             ScanTriggerType.HONEYWELL to "Honeywell",
                             ScanTriggerType.INTENT to "Intent",
-                            ScanTriggerType.NONE to "Off",
+                            ScanTriggerType.NONE to getString(R.string.scan_trigger_off),
                         ),
                         c.scanner.trigger,
                     ) { trigger ->
@@ -371,24 +388,28 @@ class SettingsActivity : AppCompatActivity() {
                         }
                     },
                     if (c.scanner.trigger == ScanTriggerType.INTENT) {
-                        ui.row(R.drawable.ic_scan, "Trigger broadcast", c.scanner.intentAction) { editIntentAction(c) }
+                        ui.row(R.drawable.ic_scan, getString(R.string.trigger_broadcast), c.scanner.intentAction) { editIntentAction(c) }
                     } else {
                         null
                     },
-                    ui.row(R.drawable.ic_scan, "Scanner in use", scanner.name ?: "None found", onClick = null),
-                    ui.switchRow(R.drawable.ic_scan, "Scan key", "Next to the space bar on the letter keys", c.scanner.scanKey) { on ->
+                    ui.row(R.drawable.ic_scan, getString(R.string.scanner_in_use), scanner.name ?: getString(R.string.scanner_none_found), onClick = null),
+                    ui.switchRow(R.drawable.ic_scan, getString(R.string.scan_key), getString(R.string.scan_key_summary), c.scanner.scanKey) { on ->
                         update { it.copy(scanner = it.scanner.copy(scanKey = on)) }
                     },
                     ui.switchRow(
                         R.drawable.ic_scan,
-                        "Type scans from broadcasts",
+                        getString(R.string.scan_from_broadcasts),
                         c.scanner.input.action,
                         c.scanner.input.enabled,
                     ) { on -> update { it.copy(scanner = it.scanner.copy(input = it.scanner.input.copy(enabled = on))) } },
                     ui.choiceRow(
                         R.drawable.ic_scan,
-                        "After a scan",
-                        listOf(ScanSuffix.NONE to "Nothing", ScanSuffix.ENTER to "Enter", ScanSuffix.TAB to "Tab"),
+                        getString(R.string.after_scan),
+                        listOf(
+                            ScanSuffix.NONE to getString(R.string.after_scan_nothing),
+                            ScanSuffix.ENTER to getString(R.string.after_scan_enter),
+                            ScanSuffix.TAB to getString(R.string.after_scan_tab),
+                        ),
                         c.scanner.input.suffix,
                         enabled = c.scanner.input.enabled,
                     ) { suffix -> update { it.copy(scanner = it.scanner.copy(input = it.scanner.input.copy(suffix = suffix))) } },
@@ -396,28 +417,28 @@ class SettingsActivity : AppCompatActivity() {
             ),
         )
 
-        content.addView(ui.section("Configuration"))
+        content.addView(ui.section(getString(R.string.section_configuration)))
         content.addView(
             ui.card(
                 listOfNotNull(
-                    ui.row(R.drawable.ic_upload, "Import from file", "Load a JSON configuration") {
+                    ui.row(R.drawable.ic_upload, getString(R.string.import_file), getString(R.string.import_file_summary)) {
                         importFile.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
                     },
-                    ui.row(R.drawable.ic_download, "Export to file", "Save the current configuration") {
+                    ui.row(R.drawable.ic_download, getString(R.string.export_file), getString(R.string.export_file_summary)) {
                         exportFile.launch(Provisioning.CONFIG_FILE_NAME)
                     },
-                    ui.row(R.drawable.ic_restart, "Reset to defaults", "Keeps the admin password") {
-                        dialogs.confirm("Reset all settings?", "Layouts, look, keys and scanner settings go back to their defaults.", "Reset") {
+                    ui.row(R.drawable.ic_restart, getString(R.string.reset_defaults), getString(R.string.reset_defaults_summary)) {
+                        dialogs.confirm(getString(R.string.reset_confirm_title), getString(R.string.reset_confirm_message), getString(R.string.button_reset)) {
                             update { KeyboardConfig(adminPasswordHash = it.adminPasswordHash) }
                         }
                     },
-                    ui.row(R.drawable.ic_key, "Admin password", if (c.adminPasswordHash == null) "Not set" else "Set – protects these settings") {
+                    ui.row(R.drawable.ic_key, getString(R.string.admin_password), getString(if (c.adminPasswordHash == null) R.string.password_not_set else R.string.password_set)) {
                         dialogs.changePassword { hash -> update { it.copy(adminPasswordHash = hash) } }
                     },
-                    Provisioning.lastError(this)?.let { ui.row(R.drawable.ic_info, "Last provisioning error", it, onClick = null) },
+                    Provisioning.lastError(this)?.let { ui.row(R.drawable.ic_info, getString(R.string.last_provisioning_error), dialogs.withCode(it, ErrorCodes.PROVISIONING), onClick = null) },
                     ui.row(
                         R.drawable.ic_download,
-                        "Configuration file for EMM",
+                        getString(R.string.config_file_for_emm),
                         "Android/data/$packageName/files/${Provisioning.CONFIG_FILE_NAME}",
                         onClick = null,
                     ),
@@ -425,40 +446,73 @@ class SettingsActivity : AppCompatActivity() {
             ),
         )
 
-        content.addView(ui.section("Info"))
+        content.addView(ui.section(getString(R.string.section_info)))
         val imm = getSystemService(InputMethodManager::class.java)
         val enabled = imm?.enabledInputMethodList?.any { it.packageName == packageName } == true
         val active = Settings.Secure.getString(contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD)?.substringBefore('/') == packageName
         content.addView(
             ui.card(
                 listOf(
-                    ui.row(R.drawable.ic_info, "Version", "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) · ${BuildConfig.COMMIT}", onClick = null),
+                    ui.row(R.drawable.ic_info, getString(R.string.version), "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) · ${BuildConfig.COMMIT}", onClick = null),
                     ui.row(
                         R.drawable.ic_keyboard,
-                        "Status",
-                        when {
-                            active -> "Active keyboard"
-                            enabled -> "Enabled, not selected"
-                            else -> "Not enabled"
-                        },
+                        getString(R.string.status),
+                        getString(
+                            when {
+                                active -> R.string.status_active
+                                enabled -> R.string.status_enabled
+                                else -> R.string.status_not_enabled
+                            },
+                        ),
                     ) { imm?.showInputMethodPicker() },
                     // About block required by ict-baden/richtlinien 07.
-                    ui.row(R.drawable.ic_lock, "Data and privacy", "This software sends no data to ICT-Baden. It has no internet permission.") {
+                    ui.row(R.drawable.ic_lock, getString(R.string.about_privacy), getString(R.string.about_privacy_summary)) {
                         openLink("$SOURCE/blob/main/docs/data-and-privacy.md")
                     },
-                    ui.row(R.drawable.ic_info, "Licence", "MIT · © 2026 ICT-Baden") { dialogs.message("Licence", asset("LICENSE")) },
-                    ui.row(R.drawable.ic_info, "Third-party licences", "AndroidX, Material Components, Kotlin") {
-                        dialogs.message("Third-party licences", asset("THIRD-PARTY-NOTICES.txt"))
+                    ui.row(R.drawable.ic_info, getString(R.string.about_licence), getString(R.string.about_licence_summary)) {
+                        dialogs.message(getString(R.string.about_licence), asset("LICENSE"))
                     },
-                    ui.row(R.drawable.ic_globe, "Source code", SOURCE) { openLink(SOURCE) },
-                    ui.row(R.drawable.ic_info, "Help & support", "Free via GitHub, guaranteed with a support contract") {
+                    ui.row(R.drawable.ic_info, getString(R.string.about_third_party), getString(R.string.about_third_party_summary)) {
+                        dialogs.message(getString(R.string.about_third_party), asset("THIRD-PARTY-NOTICES.txt"))
+                    },
+                    ui.row(R.drawable.ic_globe, getString(R.string.about_source), SOURCE) { openLink(SOURCE) },
+                    ui.row(R.drawable.ic_info, getString(R.string.about_support), getString(R.string.about_support_summary)) {
                         openLink("$SOURCE/blob/main/SUPPORT.md")
                     },
-                    ui.row(R.drawable.ic_globe, "Website", WEBSITE) { openLink(WEBSITE) },
-                    ui.row(R.drawable.ic_globe, "Impressum", "Legal notice of ICT-Baden") { openLink(IMPRESSUM) },
+                    ui.row(R.drawable.ic_globe, getString(R.string.about_website), WEBSITE) { openLink(WEBSITE) },
+                    ui.row(R.drawable.ic_globe, getString(R.string.about_impressum), getString(R.string.about_impressum_summary)) { openLink(IMPRESSUM) },
                 ),
             ),
         )
+    }
+
+    private fun percent(value: Int) = getString(R.string.value_percent, value)
+
+    private fun millis(value: Int) = getString(R.string.value_ms, value)
+
+    private fun keyDescription(key: ProgrammableKey) = when (key) {
+        ProgrammableKey.ALPHA_P1 -> R.string.key_alpha_p1
+        ProgrammableKey.NUMERIC_P1 -> R.string.key_numeric_p1
+        ProgrammableKey.NUMERIC_P2 -> R.string.key_numeric_p2
+        ProgrammableKey.NUMERIC_P3 -> R.string.key_numeric_p3
+        ProgrammableKey.NUMERIC_P4 -> R.string.key_numeric_p4
+    }
+
+    private fun languageName(language: String) = AppLanguage.NAMES[language] ?: getString(R.string.language_system)
+
+    /** Stored in `language` like every other setting; KeyboardApp applies it on every change. */
+    private fun pickLanguage() {
+        val options = listOf(Languages.AUTO) + Languages.SUPPORTED
+        val current = options.indexOf(store.config.language).coerceAtLeast(0)
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setIcon(ui.icon(R.drawable.ic_globe))
+            .setTitle(R.string.language)
+            .setSingleChoiceItems(options.map(::languageName).toTypedArray(), current) { dialog, which ->
+                dialog.dismiss()
+                update { it.copy(language = options[which]) }
+            }
+            .setNegativeButton(R.string.button_cancel, null)
+            .show()
     }
 
     private fun asset(name: String): String = assets.open(name).bufferedReader().use { it.readText() }
@@ -468,7 +522,7 @@ class SettingsActivity : AppCompatActivity() {
         try {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         } catch (_: ActivityNotFoundException) {
-            dialogs.message("No browser", url)
+            dialogs.message(getString(R.string.no_browser), url)
         }
     }
 
@@ -479,33 +533,33 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun editIntentAction(config: KeyboardConfig) {
-        val field = ui.textField("Broadcast action", config.scanner.intentAction.orEmpty(), helper = "Sent to start a scan, e.g. com.example.scanner.START")
+        val field = ui.textField(getString(R.string.broadcast_action), config.scanner.intentAction.orEmpty(), helper = getString(R.string.broadcast_action_helper))
         com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setIcon(ui.icon(R.drawable.ic_scan))
-            .setTitle("Trigger broadcast")
+            .setTitle(R.string.trigger_broadcast)
             .setView(ui.form(field))
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton(R.string.button_save) { _, _ ->
                 val action = field.value.trim()
                 if (action.isNotEmpty()) update { it.copy(scanner = it.scanner.copy(trigger = ScanTriggerType.INTENT, intentAction = action)) }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.button_cancel, null)
             .show()
     }
 
     private fun readText(uri: Uri): String? = runCatching {
         contentResolver.openInputStream(uri)!!.bufferedReader().use { it.readText() }
-    }.onFailure { dialogs.toast("Could not read the file: ${it.message}") }.getOrNull()
+    }.onFailure { dialogs.toast(dialogs.withCode(getString(R.string.file_unreadable, it.message.orEmpty()), ErrorCodes.FILE_UNREADABLE)) }.getOrNull()
 
     private fun confirmImport(text: String) {
         val imported = try {
             ConfigJson.parse(text)
         } catch (e: ConfigException) {
-            dialogs.message("Import failed", e.message.orEmpty())
+            dialogs.message(getString(R.string.import_failed), dialogs.withCode(e.message.orEmpty(), ErrorCodes.IMPORT_INVALID))
             return
         }
-        dialogs.confirm("Import configuration?", "The current settings will be replaced.", "Import") {
+        dialogs.confirm(getString(R.string.import_confirm_title), getString(R.string.import_confirm_message), getString(R.string.button_import)) {
             store.import(imported)
-            dialogs.toast("Configuration imported")
+            dialogs.toast(getString(R.string.config_imported))
         }
     }
 

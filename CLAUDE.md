@@ -35,7 +35,7 @@ JDK 17–21, Android SDK mit Compile-SDK 37. Unter Windows `sdk.dir` in `local.p
 - Release-APKs signiert nur die CI mit dem Schlüssel aus den Secrets `ANDROID_KEYSTORE` (Base64), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`. Ohne Schlüssel baut und testet die CI nur.
 - `LICENSE` und `THIRD-PARTY-NOTICES.txt` werden beim Bauen als Assets in die APK kopiert (Info-Bereich). Neue Abhängigkeit → `THIRD-PARTY-NOTICES.txt` ergänzen.
 - Honeywell-Trigger ist nur nach Herstellerdoku gebaut, nicht an einem Gerät getestet. Getestet an Zebra HC20 (Android 15) mit DataWedge.
-- Die Oberfläche ist Englisch (Richtlinie 02 sieht Deutsch vor; offen, siehe `ict-baden-projekte/offen.md`).
+- Oberfläche mehrsprachig nach Richtlinie 13: `res/values/strings.xml` (Englisch) plus `values-de`, `-es`, `-fr`, `-zh-rCN`. Kein Text fest im Code; neue Texte in allen fünf Dateien anlegen (Lint meldet fehlende). Französisch mit geschütztem Leerzeichen (U+00A0) vor `: ? ! ;`. Sprache per `language` in der Konfiguration, `AppLanguage` wendet sie an. Fehlermeldungen mit Code `IK-xxxx` (`app/ErrorCodes.kt`, `docs/error-codes.md`).
 - Google Play: Store-Texte und -Grafiken in `fastlane/metadata/android/`, Anleitung und Console-Antworten in `docs/play-store.md`. Die CI legt bei Tags zusätzlich das signierte `.aab` ins Release.
 
 ## Regeln

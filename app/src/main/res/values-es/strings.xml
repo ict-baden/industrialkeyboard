@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Configuración del teclado</string>
+    <string name="message_with_code">%1$s (%2$s)</string>
+    <string name="value_percent">%1$d %%</string>
+    <string name="value_ms">%1$d ms</string>
+    <string name="back">Atrás</string>
+
+    <string name="button_cancel">Cancelar</string>
+    <string name="button_save">Guardar</string>
+    <string name="button_ok">Aceptar</string>
+    <string name="button_apply">Aplicar</string>
+    <string name="button_import">Importar</string>
+    <string name="button_reset">Restablecer</string>
+    <string name="button_unlock">Desbloquear</string>
+    <string name="button_default">Predeterminado (%1$s)</string>
+
+    <string name="section_look">Aspecto</string>
+    <string name="theme">Tema</string>
+    <string name="theme_system">Sistema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_contrast">Alto contraste</string>
+    <string name="accent_color">Color de acento</string>
+    <string name="theme_default">Predeterminado del tema</string>
+    <string name="key_height">Altura de las teclas</string>
+    <string name="keyboard_width">Ancho del teclado</string>
+    <string name="number_row">Fila de números</string>
+    <string name="number_row_summary">Números encima de las letras</string>
+    <string name="function_row">Fila de teclas de función</string>
+    <string name="function_row_summary">F1–F12 encima de las letras</string>
+    <string name="key_hints">Indicaciones en las teclas</string>
+    <string name="key_hints_summary">Números pequeños para la pulsación larga en la fila superior</string>
+    <string name="language">Idioma</string>
+    <string name="language_system">Idioma del sistema</string>
+
+    <string name="section_layout">Distribución</string>
+    <string name="letters">Letras</string>
+    <string name="navigation">Navegación</string>
+    <string name="navigation_tabs">Barra de pestañas</string>
+    <string name="navigation_keys">Tecla ?123 clásica</string>
+    <string name="numeric_pad">Teclado numérico</string>
+    <string name="numeric_phone">1-2-3 arriba</string>
+    <string name="numeric_calculator">7-8-9 arriba</string>
+    <string name="tabs">Pestañas</string>
+    <string name="tabs_summary">Se muestran en la barra de pestañas</string>
+    <string name="tab_scan">Escanear</string>
+    <string name="start_tab">Pestaña inicial para campos de texto</string>
+    <string name="automatic">Automático</string>
+
+    <string name="section_programmable_keys">Teclas programables</string>
+    <string name="key_alpha_p1">Letras, fila inferior a la izquierda</string>
+    <string name="key_numeric_p1">Teclado numérico, columna izquierda, fila 1</string>
+    <string name="key_numeric_p2">Teclado numérico, columna izquierda, fila 2</string>
+    <string name="key_numeric_p3">Teclado numérico, columna izquierda, fila 3</string>
+    <string name="key_numeric_p4">Teclado numérico, columna izquierda, fila 4</string>
+    <string name="macro_hint">Texto o tokens</string>
+    <string name="macro_helper">Ejemplos: -   {TAB}   OK{ENTER}   {F1}   {SCAN}   {U+00E4}</string>
+    <string name="macro_empty">Introduzca un carácter o un token</string>
+    <string name="macro_invalid">No válido: %1$s</string>
+
+    <string name="section_typing">Escritura</string>
+    <string name="auto_capitalization">Mayúsculas automáticas</string>
+    <string name="auto_capitalization_summary">Mayúscula al inicio de una frase (si el campo lo solicita)</string>
+    <string name="double_space_period">Punto con doble espacio</string>
+    <string name="double_space_period_summary">Dos espacios insertan un punto</string>
+    <string name="long_press_delay">Retardo de pulsación larga</string>
+    <string name="section_feedback">Respuesta</string>
+    <string name="key_popup">Ventana emergente de tecla</string>
+    <string name="key_popup_summary">Carácter ampliado encima de la tecla pulsada</string>
+    <string name="vibration">Vibración</string>
+    <string name="vibration_length">Duración de la vibración</string>
+    <string name="sound">Sonido</string>
+    <string name="volume">Volumen</string>
+
+    <string name="section_scanner">Escáner</string>
+    <string name="scan_trigger">Disparador de escaneo</string>
+    <string name="scan_trigger_off">Desactivado</string>
+    <string name="trigger_broadcast">Broadcast de disparo</string>
+    <string name="broadcast_action">Acción del broadcast</string>
+    <string name="broadcast_action_helper">Se envía para iniciar un escaneo, p. ej., com.example.scanner.START</string>
+    <string name="scanner_in_use">Escáner en uso</string>
+    <string name="scanner_none_found">No se encontró ninguno</string>
+    <string name="scan_key">Tecla de escaneo</string>
+    <string name="scan_key_summary">Junto a la barra espaciadora en las teclas de letras</string>
+    <string name="scan_from_broadcasts">Escribir los escaneos recibidos por broadcast</string>
+    <string name="after_scan">Después de un escaneo</string>
+    <string name="after_scan_nothing">Nada</string>
+    <string name="after_scan_enter">Intro</string>
+    <string name="after_scan_tab">Tabulador</string>
+    <string name="scanner_app">App de escáner</string>
+
+    <string name="section_configuration">Configuración</string>
+    <string name="import_file">Importar desde archivo</string>
+    <string name="import_file_summary">Cargar una configuración JSON</string>
+    <string name="export_file">Exportar a archivo</string>
+    <string name="export_file_summary">Guardar la configuración actual</string>
+    <string name="reset_defaults">Restablecer valores predeterminados</string>
+    <string name="reset_defaults_summary">Conserva la contraseña de administrador</string>
+    <string name="reset_confirm_title">¿Restablecer toda la configuración?</string>
+    <string name="reset_confirm_message">Las distribuciones, el aspecto, las teclas y la configuración del escáner vuelven a sus valores predeterminados.</string>
+    <string name="admin_password">Contraseña de administrador</string>
+    <string name="password_not_set">Sin definir</string>
+    <string name="password_set">Definida: protege esta configuración</string>
+    <string name="last_provisioning_error">Último error de aprovisionamiento</string>
+    <string name="config_file_for_emm">Archivo de configuración para el EMM</string>
+    <string name="config_exported">Configuración exportada</string>
+    <string name="export_failed">Error en la exportación: %1$s</string>
+    <string name="file_unreadable">No se pudo leer el archivo: %1$s</string>
+    <string name="import_failed">Error en la importación</string>
+    <string name="import_confirm_title">¿Importar la configuración?</string>
+    <string name="import_confirm_message">Se reemplazará la configuración actual.</string>
+    <string name="config_imported">Configuración importada</string>
+
+    <string name="section_info">Información</string>
+    <string name="version">Versión</string>
+    <string name="status">Estado</string>
+    <string name="status_active">Teclado activo</string>
+    <string name="status_enabled">Habilitado, no seleccionado</string>
+    <string name="status_not_enabled">No habilitado</string>
+    <string name="about_privacy">Datos y privacidad</string>
+    <string name="about_privacy_summary">Este software no envía datos a ICT-Baden. No tiene permiso de acceso a Internet.</string>
+    <string name="about_licence">Licencia</string>
+    <string name="about_third_party">Licencias de terceros</string>
+    <string name="about_source">Código fuente</string>
+    <string name="about_support">Ayuda y soporte</string>
+    <string name="about_support_summary">Gratis a través de GitHub, garantizado con un contrato de soporte</string>
+    <string name="about_website">Sitio web</string>
+    <string name="about_impressum">Aviso legal</string>
+    <string name="about_impressum_summary">Aviso legal de ICT-Baden</string>
+    <string name="no_browser">No hay ningún navegador disponible</string>
+
+    <string name="settings_protected">La configuración está protegida</string>
+    <string name="wrong_password">Contraseña incorrecta</string>
+    <string name="new_password">Nueva contraseña</string>
+    <string name="new_password_summary">Déjela vacía para quitar la contraseña</string>
+    <string name="repeat_password">Repetir</string>
+    <string name="passwords_do_not_match">Las contraseñas no coinciden</string>
+    <string name="password_saved">Contraseña de administrador guardada</string>
+    <string name="password_removed">Contraseña de administrador quitada</string>
+    <string name="color_hint">Color (#RRGGBB)</string>
+    <string name="color_helper">Vacío = predeterminado del tema</string>
+    <string name="use_theme_default">Usar el predeterminado del tema</string>
+    <string name="invalid_color">Color no válido: %1$s</string>
+
+    <string name="setup_tagline">Introducción rápida de datos con escáner, guantes y formularios</string>
+    <string name="setup_status_active">●  Teclado activo</string>
+    <string name="setup_status_enabled">●  Habilitado: selecciónelo para usarlo</string>
+    <string name="setup_status_not_set_up">●  Aún no configurado</string>
+    <string name="section_setup">Configuración inicial</string>
+    <string name="section_try_it">Pruébelo</string>
+    <string name="section_more">Más</string>
+    <string name="step_enable">Habilitar el teclado</string>
+    <string name="step_enable_summary">Active Industrial Keyboard en la configuración del sistema</string>
+    <string name="step_enable_button">Habilitar</string>
+    <string name="step_select">Seleccionarlo</string>
+    <string name="step_select_summary">Conviértalo en el teclado que se abre en todas las apps</string>
+    <string name="step_select_button">Seleccionar</string>
+    <string name="step_done">Hecho</string>
+    <string name="settings_summary">Distribuciones, escáner, aspecto y respuesta</string>
+    <string name="switch_keyboard">Cambiar de teclado</string>
+    <string name="switch_keyboard_summary">Elegir entre los teclados instalados</string>
+    <string name="sample_intro">Cada campo abre las teclas adecuadas.</string>
+    <string name="sample_item">Número de artículo</string>
+    <string name="sample_item_helper">Letras, escaneo o las teclas Fn</string>
+    <string name="sample_quantity">Cantidad</string>
+    <string name="sample_quantity_helper">Teclado numérico</string>
+    <string name="sample_weight">Peso (kg)</string>
+    <string name="sample_weight_helper">Teclado numérico con , y .</string>
+    <string name="sample_phone">Teléfono</string>
+    <string name="sample_phone_helper">Teclado de marcación con + * #</string>
+    <string name="sample_date">Consumir preferentemente antes del</string>
+    <string name="sample_date_helper">Teclado de fecha con / - .</string>
+    <string name="sample_pin">PIN</string>
+    <string name="sample_pin_helper">Teclado de PIN</string>
+    <string name="sample_email">Correo electrónico</string>
+    <string name="sample_email_helper">@ junto a la barra espaciadora</string>
+
+    <string name="scan_pad_description">Escanear</string>
+    <string name="scan_pad_no_scanner">No se encontró ningún escáner</string>
+    <string name="scan_pad_scanning">Escaneando…</string>
+    <string name="scan_pad_tap">Toque para escanear</string>
+    <string name="scan_pad_hint">Mantenga pulsado para escanear de forma continua · %1$s</string>
+    <string name="scan_pad_configure">Configure un escáner en la configuración del teclado</string>
+
+    <string name="mc_config_json_title">Configuración (JSON)</string>
+    <string name="mc_config_json_description">Configuración completa en el formato JSON de Industrial Keyboard. Tiene prioridad sobre las opciones individuales de abajo.</string>
+    <string name="mc_language_title">Idioma</string>
+    <string name="mc_language_description">Idioma de las pantallas de configuración. Automático sigue al dispositivo.</string>
+    <string name="mc_theme_title">Tema</string>
+    <string name="mc_theme_description">Colores del teclado.</string>
+    <string name="mc_alphabet_title">Distribución de letras</string>
+    <string name="mc_alphabet_description">Disposición de las teclas de letras.</string>
+    <string name="mc_numeric_order_title">Teclado numérico</string>
+    <string name="mc_numeric_order_description">Orden de teléfono (1-2-3 arriba) u orden de calculadora (7-8-9 arriba).</string>
+    <string name="mc_scan_tab_title">Pestaña de escaneo</string>
+    <string name="mc_scan_tab_description">Mostrar la pestaña con el botón grande de escaneo.</string>
+    <string name="mc_function_tab_title">Pestaña de teclas de función</string>
+    <string name="mc_function_tab_description">Mostrar la pestaña con F1–F12 (Mayús: F13–F24), Esc, flechas y teclas de navegación.</string>
+    <string name="mc_sound_title">Sonido al pulsar</string>
+    <string name="mc_sound_description">Reproducir un clic en cada pulsación.</string>
+    <string name="mc_vibrate_title">Vibrar al pulsar</string>
+    <string name="mc_vibrate_description">Vibración corta en cada pulsación.</string>
+    <string name="mc_admin_password_title">Contraseña de administrador</string>
+    <string name="mc_admin_password_description">Protege la configuración del teclado y la importación de configuraciones.</string>
+
+    <string-array name="mc_language_entries">
+        <item>Automático (idioma del dispositivo)</item>
+        <item>English</item>
+        <item>Deutsch</item>
+        <item>Español</item>
+        <item>Français</item>
+        <item>简体中文</item>
+    </string-array>
+    <string-array name="mc_theme_entries">
+        <item>Seguir al sistema</item>
+        <item>Claro</item>
+        <item>Oscuro</item>
+        <item>Alto contraste</item>
+    </string-array>
+    <string-array name="mc_alphabet_entries">
+        <item>QWERTY (inglés)</item>
+        <item>QWERTZ (alemán)</item>
+        <item>AZERTY (francés)</item>
+        <item>Nórdico</item>
+        <item>Español</item>
+    </string-array>
+    <string-array name="mc_numeric_order_entries">
+        <item>Teléfono (1-2-3 arriba)</item>
+        <item>Calculadora (7-8-9 arriba)</item>
+    </string-array>
+</resources>
