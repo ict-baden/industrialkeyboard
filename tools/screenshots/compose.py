@@ -234,3 +234,37 @@ x = 112
 for label in ["DataWedge", "F1–F24", "Managed config", "Custom layouts"]:
     x = chip(hero, (x, 588), label, font("Roboto-Medium.ttf", 27))
 save(hero.convert("RGB"), "hero.png", width=1400)
+
+
+# --------------------------------------------------------------------------- Google Play listing
+# Graphics for the store listing (fastlane layout, also read by the Play Console upload):
+# feature graphic 1024 x 500 and phone screenshots 1080 x 1920 (Play rejects sides more than 2:1).
+PLAY_GRADIENT = [(30, 27, 75), (55, 48, 163), (8, 145, 178)]
+PLAY_GLOW = (129, 140, 248)
+PLAY_SCREENS = [
+    ("alpha", "Big keys,\nmade for gloves"),
+    ("scan", "Scan button\nright on the keyboard"),
+    ("function", "F1–F24 for\nterminal emulation"),
+    ("numeric", "The right keys\nfor every field"),
+    ("custom", "Your own layouts,\nrolled out via MDM"),
+    ("settings", "Themes and settings\non the device or via MDM"),
+]
+
+play = repo / "fastlane" / "metadata" / "android" / "en-US" / "images"
+(play / "phoneScreenshots").mkdir(parents=True, exist_ok=True)
+crop_h = round(W * 500 / 1024)
+feature = hero.crop((0, (H - crop_h) // 2, W, (H - crop_h) // 2 + crop_h)).convert("RGB")
+feature.resize((1024, 500), Image.LANCZOS).save(play / "featureGraphic.png", optimize=True)
+
+for old in (play / "phoneScreenshots").glob("*.png"):
+    old.unlink()
+for i, (name, caption) in enumerate(PLAY_SCREENS, 1):
+    shot = gradient((1080, 1920), PLAY_GRADIENT).convert("RGBA")
+    glow(shot, (900, 300), 500, PLAY_GLOW, 60)
+    draw = ImageDraw.Draw(shot)
+    draw.multiline_text((540, 190), caption, font=font("Roboto-Bold.ttf", 68), fill=(255, 255, 255, 255),
+                        anchor="mm", align="center", spacing=14)
+    dev = phone(name, 1600)
+    shot.alpha_composite(dev, ((1080 - dev.width) // 2, 340))
+    shot.convert("RGB").save(play / "phoneScreenshots" / f"{i}_{name}.png", optimize=True)
+print("play store graphics written")

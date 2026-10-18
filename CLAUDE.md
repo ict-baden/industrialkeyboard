@@ -36,6 +36,7 @@ JDK 17–21, Android SDK mit Compile-SDK 37. Unter Windows `sdk.dir` in `local.p
 - `LICENSE` und `THIRD-PARTY-NOTICES.txt` werden beim Bauen als Assets in die APK kopiert (Info-Bereich). Neue Abhängigkeit → `THIRD-PARTY-NOTICES.txt` ergänzen.
 - Honeywell-Trigger ist nur nach Herstellerdoku gebaut, nicht an einem Gerät getestet. Getestet an Zebra HC20 (Android 15) mit DataWedge.
 - Die Oberfläche ist Englisch (Richtlinie 02 sieht Deutsch vor; offen, siehe `ict-baden-projekte/offen.md`).
+- Google Play: Store-Texte und -Grafiken in `fastlane/metadata/android/`, Anleitung und Console-Antworten in `docs/play-store.md`. Die CI legt bei Tags zusätzlich das signierte `.aab` ins Release.
 
 ## Regeln
 

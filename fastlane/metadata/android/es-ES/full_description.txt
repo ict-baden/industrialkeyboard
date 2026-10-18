@@ -1,0 +1,33 @@
+Industrial Keyboard es un teclado en pantalla para dispositivos Android robustos en almacenes, producción y logística. Teclas grandes para usar con guantes, un disparador de escáner en el propio teclado, F1–F24 para emulación de terminal, y todo el teclado configurable desde su MDM.
+
+PENSADO PARA GUANTES
+• Altura de las teclas del 70 al 160 %, zonas táctiles amplias y vista previa sobre el dedo
+• Temas claro, oscuro y de alto contraste, color de acento personalizable
+
+LAS TECLAS ADECUADAS PARA CADA CAMPO
+• Los campos numéricos abren el teclado numérico (orden de teléfono o calculadora, PIN, fecha, hora)
+• Los campos de correo y dirección web incluyen @, / y .com
+• La tecla Intro muestra la acción del campo: siguiente, buscar, enviar, listo
+
+ESCÁNER INTEGRADO
+• Pestaña de escaneo con una gran zona de disparo: toque para escanear, mantenga para escaneo continuo
+• Tecla de escaneo opcional, disparador por software para Zebra DataWedge, Honeywell o cualquier aplicación de escaneo mediante intent
+
+TECLAS DE FUNCIÓN
+• F1–F12, Mayús para F13–F24, Esc, Insert, Supr, Inicio, Fin, teclas de página y flechas
+• Fila opcional F1–F12 sobre las letras
+
+SUS PROPIAS TECLAS
+• Teclas programables y diseños propios (por ejemplo OK / Omitir / Dañado) como pestañas adicionales
+• Macros como {TAB}, {F13}, OK{ENTER} o {SCAN}
+• QWERTY, QWERTZ, AZERTY, nórdico y español, acentos con pulsación larga
+
+CONFIGURACIÓN CENTRAL
+• Configuración gestionada desde su MDM (por ejemplo SOTI MobiControl, Microsoft Intune, Workspace ONE)
+• Archivo de configuración o intent de difusión (StageNow), ajustes protegidos con contraseña de administrador
+
+PRIVACIDAD DESDE EL DISEÑO
+• Sin permiso de Internet, sin diccionario, sin predicción de palabras: nada de lo que escribe se guarda ni se aprende
+• Sin cuenta, sin publicidad, sin seguimiento. Industrial Keyboard no envía datos a ICT-Baden.
+
+Interfaz en inglés, alemán, español, francés y chino. Gratuito y de código abierto (licencia MIT), de ICT-Baden. Hay contratos de soporte disponibles.

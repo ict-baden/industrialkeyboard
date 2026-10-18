@@ -1,0 +1,33 @@
+Industrial Keyboard est un clavier à l’écran pour appareils Android durcis en entrepôt, en production et en logistique. De grandes touches pour les gants, un déclencheur de scan directement sur le clavier, F1–F24 pour l’émulation de terminal, et tout le clavier configurable depuis votre MDM.
+
+CONÇU POUR LES GANTS
+• Hauteur des touches de 70 à 160 %, zones tactiles généreuses et aperçu au-dessus du doigt
+• Thèmes clair, sombre et contraste élevé, couleur d’accent personnalisable
+
+LES BONNES TOUCHES POUR CHAQUE CHAMP
+• Les champs numériques ouvrent le pavé numérique (ordre téléphone ou calculatrice, PIN, date, heure)
+• Les champs e-mail et adresse web proposent @, / et .com
+• La touche Entrée affiche l’action du champ  suivant, rechercher, envoyer, terminé
+
+SCANNER INTÉGRÉ
+• Onglet de scan avec une grande zone de déclenchement  appuyer pour scanner, maintenir pour un scan continu
+• Touche de scan en option, déclencheur logiciel pour Zebra DataWedge, Honeywell ou toute application de scan via intent
+
+TOUCHES DE FONCTION
+• F1–F12, Maj pour F13–F24, Échap, Inser, Suppr, Début, Fin, touches de page et flèches
+• Rangée F1–F12 en option au-dessus des lettres
+
+VOS PROPRES TOUCHES
+• Touches programmables et dispositions personnalisées (par exemple OK / Passer / Endommagé) en onglets supplémentaires
+• Macros comme {TAB}, {F13}, OK{ENTER} ou {SCAN}
+• QWERTY, QWERTZ, AZERTY, nordique et espagnol, accents par appui long
+
+CONFIGURATION CENTRALISÉE
+• Configuration gérée depuis votre MDM (par exemple SOTI MobiControl, Microsoft Intune, Workspace ONE)
+• Fichier de configuration ou intent de diffusion (StageNow), réglages protégés par un mot de passe administrateur
+
+CONFIDENTIALITÉ DÈS LA CONCEPTION
+• Pas d’autorisation Internet, pas de dictionnaire, pas de prédiction de mots  rien de ce que vous tapez n’est enregistré ni appris
+• Pas de compte, pas de publicité, pas de suivi. Industrial Keyboard n’envoie aucune donnée à ICT-Baden.
+
+Interface en anglais, allemand, espagnol, français et chinois. Gratuit et open source (licence MIT), par ICT-Baden. Des contrats de support sont disponibles.
