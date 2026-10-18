@@ -12,6 +12,9 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 Die Übersetzungen sind maschinell vorübersetzt und müssen vor dem ersten öffentlichen Release von Muttersprachlern gegengelesen werden.
 
+### Sicherheit
+- **Konfigurations-Broadcasts (`INSTALL_CONFIG`) werden nur noch mit Admin-Passwort angenommen oder – solange keins gesetzt ist – auf Geräten, die ein EMM verwaltet** (Managed Configuration, Device oder Profile Owner). Bisher konnte auf einem nicht verwalteten Gerät jede App die Tastatur umkonfigurieren. **Handlungsbedarf**, wer nicht verwaltete Geräte per Broadcast konfiguriert (StageNow ohne EMM, adb): vorher ein Admin-Passwort setzen und als `password` mitsenden oder die Konfigurationsdatei nutzen (`/enterprise/usr/industrialkeyboard.json`). Abgelehnte Broadcasts stehen in den Einstellungen unter Konfiguration.
+
 ## [2.0.0] – 2026-10-17
 
 ### Geändert

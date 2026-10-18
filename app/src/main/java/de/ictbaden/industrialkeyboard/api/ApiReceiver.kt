@@ -30,6 +30,13 @@ class ApiReceiver : BroadcastReceiver() {
             finish(context, KeyboardApi.RESULT_PASSWORD, "Admin password missing or wrong")
             return
         }
+        // Any app can send this broadcast and Android does not tell us which one did: without a
+        // password only an EMM-managed device may be configured this way, otherwise any app could
+        // reconfigure the keyboard of a store install.
+        if (hash == null && !Provisioning.isManaged(context)) {
+            finish(context, KeyboardApi.RESULT_PASSWORD, "Refused: no admin password set and the device is not managed by an EMM. Set an admin password or use a configuration file or managed configuration.")
+            return
+        }
         val json = intent.getStringExtra(KeyboardApi.EXTRA_CONFIG)
         if (json.isNullOrBlank()) {
             finish(context, KeyboardApi.RESULT_INVALID, "Extra \"config\" is missing")

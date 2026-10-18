@@ -51,7 +51,7 @@ apps – see [Scanner & app integration](integration.md):
 | sends | Soft scan trigger to DataWedge (Zebra), the Honeywell scanner service or the app in `scanner.intentAction` | Scan pad, scan key, `{SCAN}` |
 | receives | `…action.SCAN_INPUT` with a barcode | Types the barcode into the focused field. Any app on the device can send it – switch it off with `scanner.input.enabled: false` if you do not need it. |
 | receives | `…action.SHOW_TAB` | Switches the keyboard page |
-| receives | `…action.INSTALL_CONFIG` | Installs a configuration; requires the admin password if one is set |
+| receives | `…action.INSTALL_CONFIG` | Installs a configuration; only with the admin password, or on an EMM-managed device while no password is set |
 
 The links in *Settings → Info* (source code, support, website) open in the browser only when you
 tap them.

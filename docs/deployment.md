@@ -138,7 +138,7 @@ shows the schema automatically.
 | Install the app | AppMgr | Install, APK path |
 | Make it the keyboard | UiMgr | see [above](#make-it-the-keyboard) |
 | Configuration as a file | FileMgr | target `/enterprise/usr/industrialkeyboard.json` |
-| Configuration via intent | Intent | Mode *Immediate*, Action *Broadcast*, Android Action Name `de.ictbaden.industrialkeyboard.action.INSTALL_CONFIG`, Package Name `de.ictbaden.industrialkeyboard`, Class Name `de.ictbaden.industrialkeyboard.api.ApiReceiver`, Extra 0: name `config`, type String, value = the JSON. With an admin password also Extra 1: name `password`, type String |
+| Configuration via intent | Intent | Mode *Immediate*, Action *Broadcast*, Android Action Name `de.ictbaden.industrialkeyboard.action.INSTALL_CONFIG`, Package Name `de.ictbaden.industrialkeyboard`, Class Name `de.ictbaden.industrialkeyboard.api.ApiReceiver`, Extra 0: name `config`, type String, value = the JSON. Extra 1: name `password`, type String – required unless the device is managed by an EMM ([details](#broadcast-intent-stagenow-adb)) |
 | Barcodes as keystrokes | DataWedge (or the DataWedge app) | a profile for your apps with keystroke output – see [Scanner & app integration](integration.md) |
 
 ## Configuration file
@@ -158,16 +158,28 @@ adb push examples/warehouse-gloves.json \
 
 ## Broadcast intent (StageNow, adb)
 
-An explicit broadcast with the JSON in the string extra `config` (and the admin password in
-`password`, if one is set):
+An explicit broadcast with the JSON in the string extra `config` and the admin password in
+`password`.
+
+Any app on the device can send this broadcast, and Android does not tell the keyboard which one
+did. So it is only accepted
+
+- with the admin password, once a password is set, or
+- while no admin password is set: only on a device managed by an EMM (the app has a managed
+  configuration, or the device or work profile has an owner, i.e. Android Enterprise).
+
+On an unmanaged device without a password the broadcast is refused. Set an admin password first
+(in the settings, in a configuration file or with the managed configuration key `admin_password`)
+or use the [configuration file](#configuration-file).
 
 ```bash
 adb push examples/warehouse-gloves.json /data/local/tmp/keyboard.json
-adb shell 'am broadcast -a de.ictbaden.industrialkeyboard.action.INSTALL_CONFIG -n de.ictbaden.industrialkeyboard/.api.ApiReceiver --es config "$(cat /data/local/tmp/keyboard.json)"'
+adb shell 'am broadcast -a de.ictbaden.industrialkeyboard.action.INSTALL_CONFIG -n de.ictbaden.industrialkeyboard/.api.ApiReceiver --es config "$(cat /data/local/tmp/keyboard.json)" --es password change-me'
 adb shell rm /data/local/tmp/keyboard.json
 ```
 
-Result code: `-1` = installed, `2` = admin password missing or wrong, `3` = invalid
+Result code: `-1` = installed, `2` = refused (admin password missing or wrong, or unmanaged
+device without a password), `3` = invalid
 configuration (the message names the problem). Failures are also shown in the keyboard
 settings under **Configuration → Last provisioning error**.
 

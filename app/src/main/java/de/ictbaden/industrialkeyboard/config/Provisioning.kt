@@ -1,5 +1,6 @@
 package de.ictbaden.industrialkeyboard.config
 
+import android.app.admin.DevicePolicyManager
 import android.content.Context
 import android.content.RestrictionsManager
 import android.os.Bundle
@@ -21,6 +22,18 @@ object Provisioning {
     fun applyAll(context: Context) {
         applyManagedConfig(context)
         configFiles(context).forEach { applyConfigFile(context, it) }
+    }
+
+    /**
+     * True when an EMM manages this app: it has a managed configuration, or the device or work
+     * profile has an owner (Android Enterprise). Only then may other apps configure it without the
+     * admin password, see `ApiReceiver`.
+     */
+    fun isManaged(context: Context): Boolean {
+        val restrictions = context.getSystemService(RestrictionsManager::class.java)?.applicationRestrictions
+        if (restrictions != null && !restrictions.isEmpty) return true
+        val dpm = context.getSystemService(DevicePolicyManager::class.java) ?: return false
+        return dpm.activeAdmins.orEmpty().any { dpm.isDeviceOwnerApp(it.packageName) || dpm.isProfileOwnerApp(it.packageName) }
     }
 
     fun lastError(context: Context): String? = prefs(context).getString(KEY_LAST_ERROR, null)

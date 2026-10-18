@@ -63,7 +63,7 @@
 | 🗂️ **Custom layouts** | Your own keyboards (e.g. *OK / Skip / Damaged*) as extra tabs – defined in JSON, no app update needed |
 | 🌍 **Alphabets** | QWERTY, QWERTZ, AZERTY, Nordic and Spanish, accents on long press, optional number row |
 | 🎨 **Looks good** | Light, dark, high contrast or follow the system; custom accent color; smooth animations |
-| 📡 **Central configuration** | Managed configuration (SOTI, Intune, Workspace ONE …), configuration file (also Zebra `/enterprise/usr`), broadcast intent (StageNow), admin password |
+| 📡 **Central configuration** | Managed configuration (SOTI, Intune, Workspace ONE …), configuration file (also Zebra `/enterprise/usr`), broadcast intent (StageNow, only with the admin password or on EMM-managed devices), admin password |
 | 🔒 **Private by design** | No internet permission, no dictionary, nothing you type is stored or learned; configuration excluded from backups |
 
 ## ⚡ Up and running in 5 minutes
@@ -96,12 +96,15 @@ best-before date, PIN and e-mail. Every field opens the matching keys.
 | [`custom-layout.json`](examples/custom-layout.json) | A *Pick* tab with OK / Skip / Short / Damaged / Scan / Numbers |
 | [`classic-keys.json`](examples/classic-keys.json) | No tab bar: `?123` / `ABC` keys, AZERTY with number row, DataWedge trigger |
 
-Deploy it as managed configuration (key `config_json`), as a file or as a broadcast – over USB:
+Deploy it as managed configuration (key `config_json`) or as a file – over USB (open the app once so
+the folder exists; the keyboard picks the file up the next time it opens):
 
 ```bash
-adb push examples/warehouse-gloves.json /data/local/tmp/keyboard.json
-adb shell 'am broadcast -a de.ictbaden.industrialkeyboard.action.INSTALL_CONFIG -n de.ictbaden.industrialkeyboard/.api.ApiReceiver --es config "$(cat /data/local/tmp/keyboard.json)"'
+adb push examples/warehouse-gloves.json /sdcard/Android/data/de.ictbaden.industrialkeyboard/files/industrialkeyboard.json
 ```
+
+Configuration broadcasts (StageNow) are only accepted with the admin password or on devices managed by an EMM –
+see [Deployment](docs/deployment.md#broadcast-intent-stagenow-adb).
 
 All options, including step by step for **SOTI MobiControl**: [Deployment](docs/deployment.md).
 
