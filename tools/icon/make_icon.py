@@ -94,4 +94,8 @@ masked(art, False).resize((256, 256), Image.LANCZOS).save(nodpi / "logo.png", op
 docs = repo / "docs" / "images"
 docs.mkdir(parents=True, exist_ok=True)
 masked(art, False).resize((256, 256), Image.LANCZOS).save(docs / "logo.png", optimize=True)
+play = repo / "fastlane" / "metadata" / "android" / "en-US" / "images"
+play.mkdir(parents=True, exist_ok=True)
+# Google Play hi-res icon: full square, Play rounds the corners itself
+art.convert("RGB").resize((512, 512), Image.LANCZOS).save(play / "icon.png", optimize=True)
 print("icons written")
