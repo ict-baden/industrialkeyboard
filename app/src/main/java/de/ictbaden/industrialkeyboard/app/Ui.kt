@@ -208,14 +208,21 @@ class Ui(private val context: Context) {
         addView(TextView(context).apply {
             text = title
             setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
+            hyphenate()
         })
         subtitle?.let {
             addView(TextView(context).apply {
                 text = it
                 setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
                 setTextColor(color(com.google.android.material.R.attr.colorOnSurfaceVariant))
+                hyphenate()
             })
         }
+    }
+
+    /** Long words (German compounds) break with a hyphen instead of overflowing narrow screens. */
+    private fun TextView.hyphenate() {
+        hyphenationFrequency = android.text.Layout.HYPHENATION_FREQUENCY_NORMAL
     }
 
     fun iconCircle(@DrawableRes icon: Int) = android.widget.ImageView(context).apply {
