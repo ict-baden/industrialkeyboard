@@ -52,6 +52,7 @@ class ApiReceiverTest {
     @Test
     fun `accepts the broadcast with the admin password only`() {
         store.import(KeyboardConfig(adminPasswordHash = PasswordHasher.hash("secret")))
+        send()
         send(password = "wrong")
         assertEquals("auto", store.config.language)
         send(password = "secret")
