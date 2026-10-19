@@ -245,7 +245,7 @@ Examples: `OK{ENTER}` · `{F13}` · `{TAB}{TAB}` · `{U+00E4}` · `{SHOW:picking
 ```
 
 - Protects the keyboard settings (asked when they are opened) and configuration broadcasts
-  (`INSTALL_CONFIG` needs the extra `password`).
+  (`INSTALL_CONFIG` needs the extra `password`; without a password broadcasts are only accepted on EMM-managed devices).
 - Stored only as a salted PBKDF2 hash; an export contains `adminPasswordHash` instead of the
   password, and importing that export keeps the same password.
 - A configuration without `adminPassword` keeps the current password. Change or remove it in
