@@ -4,6 +4,19 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ## [Unveröffentlicht]
 
+## [2.1.1] – 2026-10-21
+
+### Sicherheit
+- **Konfigurationsdatei im App-Ordner auf verwalteten Geräten:** Sie braucht jetzt wie der `INSTALL_CONFIG`-Broadcast das aktuelle Admin-Passwort (`"password"` in der Datei), sobald eins gesetzt ist. Bisher wurde sie auf EMM-verwalteten Geräten ohne Prüfung angenommen – auch unter Android 8–10, wo jede App mit Speicherberechtigung in den Ordner schreiben kann; so ließen sich Konfiguration und Passwort ohne Passwort ersetzen. `/enterprise/usr` und die Managed Configuration bleiben ohne Passwort. **Handlungsbedarf**, wer auf verwalteten Geräten mit Admin-Passwort Dateien in den App-Ordner legt: `"password"` ergänzen oder auf `/enterprise/usr` bzw. die Managed Configuration umstellen.
+- **Sichtbare Passwortfelder (`textVisiblePassword`) gelten jetzt als Passwortfelder:** keine Scans per Broadcast, keine vergrößerte Tastenvorschau. Apps schalten bei „Passwort anzeigen“ auf diesen Typ um. Wer ihn nur gegen Vorschläge nutzt (Barcode-Felder), nimmt `textNoSuggestions` oder die Tastatur-Ausgabe (Keystroke) von DataWedge.
+- Lässt sich die gespeicherte Konfiguration wegen eines Lesefehlers gar nicht lesen, bleiben die Einstellungen gesperrt (unbekanntes Passwort), statt offen zu stehen. Die Datei bleibt unverändert und wird beim nächsten Start wieder gelesen; ein neues Admin-Passwort vom EMM hebt die Sperre auf.
+
+### Doku
+- [Deployment](docs/deployment.md): Regeln für die Datei im App-Ordner; ausdrücklicher Hinweis, dass jede App mit 5 falschen Passwörtern Broadcast und App-Ordner immer wieder 5 Minuten sperren kann (DoS) und was dann hilft; Abschnitt zur Signatur auf den Stand gebracht (Releases seit 2.0.0 mit dem Release-Schlüssel signiert).
+- [Data and privacy](docs/data-and-privacy.md): alle gespeicherten Dateien, auch die Sicherungskopie einer kaputten Konfiguration und die Zähler der Passwortsperre.
+- `SUPPORT.md`: Fragen per Issue (Discussions sind nicht eingeschaltet).
+- Release-Texte auf Englisch, ohne automatische Liste der Pull Requests.
+
 ## [2.1.0] – 2026-10-21
 
 ### Neu
