@@ -145,6 +145,6 @@ jobs:
           $built = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd HH:mm')
           $notes = "Automatic build of main ($($env:GITHUB_SHA.Substring(0,7))), version ${{ steps.version.outputs.version }}, built $built UTC, signed. For testing – for production use the newest tagged release.`n`n" +
                    "The links stay the same and always point to the newest build:`n`n" +
-                   "- **[$env:APP.apk]($base/$env:APP.apk)**: to distribute with your MDM (SOTI, Intune, StageNow) or to install with adb`n" +
+                   "- **[$env:APP.apk]($base/$env:APP.apk)**: to distribute with your MDM (SOTI, Intune, Workspace ONE, StageNow) or to install with adb`n" +
                    "- [SHA256SUMS.txt]($base/SHA256SUMS.txt): checksums"
           ./.github/scripts/release-latest.ps1 -Notes $notes -Title "Latest Build (main) – ${{ steps.version.outputs.version }}"

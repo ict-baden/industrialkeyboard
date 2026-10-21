@@ -103,8 +103,10 @@ enables the keyboard). No sensitive permissions that need a declaration form.
 
 ## Publishing a version
 
-1. Update `CHANGELOG.md`, push the tag `vX.Y.Z`.
-2. The CI builds and signs APK and App Bundle and attaches both to the GitHub release.
+1. Update `CHANGELOG.md`, then push an annotated tag whose message is the changelog section in
+   English: `git tag -a vX.Y.Z -F notes.md --cleanup=verbatim`.
+2. The CI builds and signs APK and App Bundle and attaches both to the GitHub release, with the
+   tag message as release text.
 3. Play Console → *Testing → Internal testing* → create a release → upload the `.aab`
    → release notes from the changelog → roll out to the internal testers.
 4. Check the pre-launch report, then promote the release to *Production*.

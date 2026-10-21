@@ -23,7 +23,7 @@ Add the APK from the [releases](../../../releases/latest) to your EMM's app cata
 or install it over USB:
 
 ```bash
-adb install -r IndustrialKeyboard-2.1.0.apk
+adb install -r IndustrialKeyboard-2.1.1.apk
 ```
 
 The app needs no permissions apart from vibration – in particular **no internet access**.
@@ -117,10 +117,12 @@ Android+). The flow:
 
 ## Microsoft Intune
 
-1. On Android Enterprise devices the app has to come through **managed Google Play**
-   (private app, or the public listing once it is published). Use the signed
-   `IndustrialKeyboard-X.Y.Z.apk` from the release; the Play Console takes the App Bundle
-   `IndustrialKeyboard-X.Y.Z.aab`.
+1. On Android Enterprise devices the app has to come through **managed Google Play**. Use
+   the listing of ICT-Baden once the app is published there. **Do not upload the APK as your own
+   private app:** package names are unique in all of Google Play, so your upload would take
+   `de.ictbaden.industrialkeyboard` for your developer account, and the official app could not
+   use it any more. Until it is published, ask ICT-Baden: the Play Console can also publish an
+   app privately to the managed Google Play of your organisation.
 2. Create an **app configuration policy** (managed devices), use the configuration designer
    and set `config_json` or the single keys.
 3. Allow the keyboard in the device restrictions if you limit input methods, and select it on
@@ -139,7 +141,7 @@ shows the schema automatically.
 | Install the app | AppMgr | Install, APK path |
 | Make it the keyboard | UiMgr | see [above](#make-it-the-keyboard) |
 | Configuration as a file | FileMgr | target `/enterprise/usr/industrialkeyboard.json` |
-| Configuration via intent | Intent | Mode *Immediate*, Action *Broadcast*, Android Action Name `de.ictbaden.industrialkeyboard.action.INSTALL_CONFIG`, Package Name `de.ictbaden.industrialkeyboard`, Class Name `de.ictbaden.industrialkeyboard.api.ApiReceiver`, Extra 0: name `config`, type String, value = the JSON. Extra 1: name `password`, type String – required unless the device is managed by an EMM ([details](#broadcast-intent-stagenow-adb)) |
+| Configuration via intent | Intent | Mode *Immediate*, Action *Broadcast*, Android Action Name `de.ictbaden.industrialkeyboard.action.INSTALL_CONFIG`, Package Name `de.ictbaden.industrialkeyboard`, Class Name `de.ictbaden.industrialkeyboard.api.ApiReceiver`, Extra 0: name `config`, type String, value = the JSON. Extra 1: name `password`, type String – required once an admin password is set; without one, only managed devices accept the broadcast ([details](#broadcast-intent-stagenow-adb)) |
 | Barcodes as keystrokes | DataWedge (or the DataWedge app) | a profile for your apps with keystroke output – see [Scanner & app integration](integration.md) |
 
 ## Configuration file
@@ -155,17 +157,18 @@ A file is applied when the keyboard opens, once per change of its timestamp or s
 Who may write the file decides whether it is trusted:
 
 - `/enterprise/usr/` – always (written by Zebra's MX: StageNow, EMM).
-- the app folder – like the [broadcast](#broadcast-intent-stagenow-adb): it can be reached over
-  USB, and before Android 11 any app with storage permission can read and write it, on managed
-  devices too. So once an admin password is set, the file must contain it as top-level
-  `"password"` (the current password, not a new one):
+- the app folder – it can be reached over USB, and before Android 11 any app with storage
+  permission can read and write it, on managed devices too. So, like the
+  [broadcast](#broadcast-intent-stagenow-adb), once an admin password is set the file must
+  contain it as top-level `"password"` (the current password, not a new one):
   `{ "password": "change-me", "appearance": { … } }`. Before Android 11 the app folder is
   refused on unmanaged devices; on managed ones other apps could read that password until the
   keyboard deletes the file – use `/enterprise/usr` or the managed configuration there.
 
-A file in the app folder that contains `"password"` or `"adminPassword"` is **deleted after it
-has been applied**, so the password does not stay there in plain text. A refused file is shown
-under **Configuration → Last provisioning error**; change the file (or touch it) to try again.
+A file in the app folder that contains `"password"` or `"adminPassword"` is **deleted once the
+keyboard has read it** – applied or refused – so the password does not stay there in plain text.
+A refused file is shown under **Configuration → Last provisioning error**; put a corrected file
+there (or change or touch a file without password) to try again.
 Five wrong passwords lock files in the app folder and broadcasts for 5 minutes; a file arriving
 during the lock is tried again afterwards. Any app can cause that lock, see
 [below](#broadcast-intent-stagenow-adb).

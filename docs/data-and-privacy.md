@@ -28,7 +28,7 @@ read it):
 | File | Content |
 |---|---|
 | `files/config.json` | The [configuration](configuration.md). The admin password only as a salted PBKDF2 hash. |
-| `files/config.json.invalid-<time>` | Only if the stored configuration could not be read once: a copy of the broken file for support, password hash included. Delete it with *Clear storage* (below). |
+| `files/config.json.invalid-<time>` | Only if the stored configuration was invalid once: a copy of the broken file for support, password hash included. Delete it with *Clear storage* (below). |
 | `shared_prefs/provisioning.xml` | Which configuration sources were applied already (time stamp and size of the file, a hash of the managed configuration) and the last provisioning error. |
 | `shared_prefs/password_guard_settings.xml`, `password_guard_remote.xml` | Number of wrong admin passwords in a row and the end of the 5-minute lock – one file for the settings screen, one for broadcasts and files. No passwords. |
 | `shared_prefs/migrations.xml` | Which one-time changes after an update were done. |
