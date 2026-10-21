@@ -36,7 +36,8 @@ Please report results on other devices in the
   broadcast. That is why typing scan broadcasts is off by default; when switched on, restrict the
   senders with `permission` or `allowedPackages` where your scanner app allows it
   ([details](integration.md#option-b--the-keyboard-types-it)). Barcodes are never typed into
-  password fields.
+  password fields, visible ones (`textVisiblePassword`) included – use keystroke output for barcode
+  fields of that type.
 - **`INSTALL_CONFIG` on a managed device without admin password:** every app on the device can
   reconfigure the keyboard. Set an admin password ([Deployment](deployment.md#broadcast-intent-stagenow-adb)).
 - The admin password protects the settings screen and remote configuration. It is not a device
