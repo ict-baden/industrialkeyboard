@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.ictbaden.industrialkeyboard.R
+import de.ictbaden.industrialkeyboard.config.PasswordGuard
 import de.ictbaden.industrialkeyboard.config.PasswordHasher
 import de.ictbaden.industrialkeyboard.layout.Macro
 import de.ictbaden.industrialkeyboard.ui.Palette
@@ -30,12 +31,18 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
             .setNegativeButton(R.string.button_cancel) { _, _ -> onResult(false) }
             .setOnCancelListener { onResult(false) }
             .show()
+        val guard = PasswordGuard.settings(activity)
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            if (PasswordHasher.verify(field.value, hash)) {
-                dialog.dismiss()
-                onResult(true)
-            } else {
-                field.error = s(R.string.wrong_password)
+            when (guard.check(field.value, hash)) {
+                PasswordGuard.Result.OK -> {
+                    dialog.dismiss()
+                    onResult(true)
+                }
+                // The attempt that starts the lock already says so.
+                PasswordGuard.Result.WRONG, PasswordGuard.Result.LOCKED -> {
+                    val lockedMs = guard.lockedForMs()
+                    field.error = if (lockedMs > 0) activity.getString(R.string.password_locked, ((lockedMs + 59_999) / 60_000).toInt()) else s(R.string.wrong_password)
+                }
             }
         }
     }

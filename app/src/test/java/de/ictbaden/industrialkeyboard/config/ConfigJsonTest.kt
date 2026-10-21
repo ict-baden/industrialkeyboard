@@ -27,10 +27,17 @@ class ConfigJsonTest {
                 intentAction = "com.example.SCAN",
                 intentPackage = "com.example.scanner",
                 scanKey = true,
-                input = ScanInputSettings(enabled = false, action = "com.example.DATA", extra = "barcode", suffix = ScanSuffix.TAB),
+                input = ScanInputSettings(
+                    enabled = true,
+                    action = "com.example.DATA",
+                    extra = "barcode",
+                    suffix = ScanSuffix.TAB,
+                    permission = "com.example.permission.SCAN",
+                    allowedPackages = listOf("com.symbol.datawedge", "com.example.scanner"),
+                ),
             ),
             customLayouts = listOf(
-                CustomLayout("wms", "WMS", listOf(listOf(CustomKey("OK", "OK{ENTER}", 2f, KeyStyle.ACCENT), CustomKey("", "{TAB}")))),
+                CustomLayout("wms", "WMS", listOf(listOf(CustomKey("OK", "OK{ENTER}", 2f, KeyStyle.ACCENT), CustomKey("", "{TAB}"), CustomKey("", " ", 3f), CustomKey(" ", " "), CustomKey("Sp", " ")))),
             ),
             adminPasswordHash = PasswordHasher.hash("secret"),
         )
@@ -71,6 +78,39 @@ class ConfigJsonTest {
     }
 
     @Test
+    fun `space keys survive saving and loading`() {
+        // Up to 2.0.0 a " " key was saved as {"label":"","output":" "} and then refused on load,
+        // which reset the whole configuration including the admin password.
+        val config = ConfigJson.parse("""{"customLayouts":[{"id":"te","rows":[[" ", {"label":"","output":" "}, {"label":" "}]]}]}""")
+        assertEquals(listOf(" ", " ", " "), config.customLayouts.single().rows[0].map { it.output })
+        assertEquals(config, ConfigJson.parse(ConfigJson.write(config)))
+        val saved = KeyboardConfig(customLayouts = listOf(CustomLayout("a", "A", listOf(listOf(CustomKey("", " "))))))
+        assertEquals(saved, ConfigJson.parse(ConfigJson.write(saved)))
+    }
+
+    @Test
+    fun `scan input is off by default`() {
+        assertEquals(false, ConfigJson.parse("{}").scanner.input.enabled)
+        assertEquals(false, ConfigJson.parse("""{"scanner":{"input":{}}}""").scanner.input.enabled)
+        assertEquals(true, ConfigJson.parse("""{"scanner":{"input":{"enabled":true}}}""").scanner.input.enabled)
+    }
+
+    @Test
+    fun `json errors do not repeat the input`() {
+        val e = runCatching { ConfigJson.parse("""{"adminPassword":"geheim123", "appearance": }""") }.exceptionOrNull()
+        assertTrue(e is ConfigException)
+        assertTrue(e!!.message, e.message!!.startsWith("Invalid JSON"))
+        assertTrue(e.message, !e.message!!.contains("geheim123"))
+    }
+
+    @Test
+    fun `password hashes with absurd iteration counts are refused`() {
+        rejected("""{"adminPasswordHash":"pbkdf2-sha256${'$'}2000000000${'$'}AAAA${'$'}AAAA"}""", "adminPasswordHash")
+        rejected("""{"adminPasswordHash":"pbkdf2-sha256${'$'}x${'$'}AAAA${'$'}AAAA"}""", "adminPasswordHash")
+        assertTrue(!PasswordHasher.verify("x", "pbkdf2-sha256${'$'}2000000000${'$'}AAAA${'$'}AAAA"))
+    }
+
+    @Test
     fun `language follows the device unless configured`() {
         assertEquals(Languages.AUTO, ConfigJson.parse("{}").language)
         val chinese = ConfigJson.parse("""{"language":"zh-hans"}""")
@@ -93,6 +133,9 @@ class ConfigJsonTest {
         rejected("""{"customLayouts":[{"id":"a","rows":[[{"label":"x","width":20}]]}]}""", "width")
         rejected("""{"version":99}""", "version")
         rejected("""not json""", "Invalid JSON")
+        rejected("""{"customLayouts":[{"id":"a","rows":[[""]]}]}""", "customLayouts[0].rows[0][0]")
+        rejected("""{"customLayouts":[{"id":"a","rows":[[{"label":"","output":""}]]}]}""", "label or output")
+        rejected("""{"scanner":{"input":{"allowedPackages":["not a package"]}}}""", "scanner.input.allowedPackages[0]")
     }
 
     private fun rejected(json: String, expected: String) {

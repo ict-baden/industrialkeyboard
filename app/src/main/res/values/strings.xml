@@ -37,6 +37,7 @@
     <string name="key_hints_summary">Small digits for long press on the top row</string>
     <string name="language">Language</string>
     <string name="language_system">System default</string>
+    <string name="language_machine_translated">%1$s (machine translation)</string>
 
     <!-- Settings: layout -->
     <string name="section_layout">Layout</string>
@@ -92,6 +93,7 @@
     <string name="scan_key">Scan key</string>
     <string name="scan_key_summary">Next to the space bar on the letter keys</string>
     <string name="scan_from_broadcasts">Type scans from broadcasts</string>
+    <string name="scan_from_broadcasts_open">%1$s · any app on the device can send it</string>
     <string name="after_scan">After a scan</string>
     <string name="after_scan_nothing">Nothing</string>
     <string name="after_scan_enter">Enter</string>
@@ -145,6 +147,7 @@
     <!-- Dialogs -->
     <string name="settings_protected">Settings are protected</string>
     <string name="wrong_password">Wrong password</string>
+    <string name="password_locked">Too many wrong passwords. Try again in %1$d min.</string>
     <string name="new_password">New password</string>
     <string name="new_password_summary">Leave empty to remove the password</string>
     <string name="repeat_password">Repeat</string>

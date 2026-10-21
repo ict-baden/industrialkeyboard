@@ -1,8 +1,10 @@
 package de.ictbaden.industrialkeyboard
 
+import android.app.LocaleManager
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
+import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import de.ictbaden.industrialkeyboard.config.Languages
@@ -15,7 +17,15 @@ import de.ictbaden.industrialkeyboard.config.Languages
 object AppLanguage {
 
     /** Changes the app language; open settings screens are recreated only when it actually changes. */
-    fun apply(language: String) {
+    fun apply(context: Context, language: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Directly: AppCompat forwards to the LocaleManager only once an activity exists, but the
+            // keyboard service and the MDM often change the language without one.
+            val manager = context.getSystemService(LocaleManager::class.java) ?: return
+            val wanted = if (language == Languages.AUTO) LocaleList.getEmptyLocaleList() else LocaleList.forLanguageTags(language)
+            if (manager.applicationLocales.toLanguageTags() != wanted.toLanguageTags()) manager.applicationLocales = wanted
+            return
+        }
         val wanted = if (language == Languages.AUTO) LocaleListCompat.getEmptyLocaleList() else LocaleListCompat.forLanguageTags(language)
         if (AppCompatDelegate.getApplicationLocales().toLanguageTags() != wanted.toLanguageTags()) {
             AppCompatDelegate.setApplicationLocales(wanted)
@@ -38,6 +48,9 @@ object AppLanguage {
 
     @Volatile
     private var cached: Triple<Context, String, Context>? = null
+
+    /** Translated by machine, marked as such until native speakers have proofread them. */
+    val MACHINE_TRANSLATED = setOf("es", "fr", "zh-Hans")
 
     /** Language names in their own language, so everyone finds theirs. */
     val NAMES = mapOf("en" to "English", "de" to "Deutsch", "es" to "Español", "fr" to "Français", "zh-Hans" to "简体中文")

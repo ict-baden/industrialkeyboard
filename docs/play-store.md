@@ -33,7 +33,7 @@ Done once, by a person with access to the company accounts:
    organisation account does not need the 14-day closed test with 12 testers that new personal
    accounts need.
 2. **Package name** is final once the app exists in Play: `de.ictbaden.industrialkeyboard`.
-   The domain `ict-baden.de` belongs to us (Till, 2026-10-19).
+   The domain `ict-baden.de` belongs to ICT-Baden.
 3. **Privacy policy URL:** `https://ict-baden.de/datenschutz/industrialkeyboard/` (German and English,
    source in `ict-baden/website`, `src/pages/datenschutz/[app].astro`). It must be online before
    the app is submitted.
@@ -45,7 +45,7 @@ Done once, by a person with access to the company accounts:
 Play signs the apps it delivers with its *app signing key*; we upload with an *upload key*.
 The CI signs the App Bundle with our release key (secret `ANDROID_KEYSTORE`).
 
-Decided (Till, 2026-10-19): **our release key is also the app signing key**, so Play and
+Decision: **our release key is also the app signing key**, so Play and
 MDM/GitHub APKs carry the same signature and devices can switch between both sources.
 
 At the first upload, in *Setup → App signing* (or when creating the first release):
