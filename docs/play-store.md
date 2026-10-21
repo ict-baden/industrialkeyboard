@@ -34,11 +34,12 @@ Done once, by a person with access to the company accounts:
    accounts need.
 2. **Package name** is final once the app exists in Play: `de.ictbaden.industrialkeyboard`.
    The domain `ict-baden.de` belongs to ICT-Baden.
-3. **Privacy policy URL:** `https://ict-baden.de/datenschutz/industrialkeyboard/` (German and English,
-   source in `ict-baden/website`, `src/pages/datenschutz/[app].astro`). It must be online before
-   the app is submitted.
+3. **Privacy policy URL:** `https://ict-baden.de/datenschutz/industrialkeyboard/` (German and
+   English, matching [Data and privacy](data-and-privacy.md)). It must be online before the app
+   is submitted.
 4. **Contact details** for the store listing: e-mail (e.g. `support@ict-baden.de`), website.
-5. **Translations** of the app and of the store texts read by native speakers (richtlinien/13).
+5. **Translations** of the app and of the store texts read by native speakers (Spanish, French
+   and Chinese are machine translations so far).
 
 ## App signing
 

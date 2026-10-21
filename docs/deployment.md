@@ -118,8 +118,9 @@ Android+). The flow:
 ## Microsoft Intune
 
 1. On Android Enterprise devices the app has to come through **managed Google Play**
-   (private app). Google Play only accepts release-signed APKs – the current debug-signed APK
-   is not suitable for that yet.
+   (private app, or the public listing once it is published). Use the signed
+   `IndustrialKeyboard-X.Y.Z.apk` from the release; the Play Console takes the App Bundle
+   `IndustrialKeyboard-X.Y.Z.aab`.
 2. Create an **app configuration policy** (managed devices), use the configuration designer
    and set `config_json` or the single keys.
 3. Allow the keyboard in the device restrictions if you limit input methods, and select it on
@@ -154,17 +155,20 @@ A file is applied when the keyboard opens, once per change of its timestamp or s
 Who may write the file decides whether it is trusted:
 
 - `/enterprise/usr/` – always (written by Zebra's MX: StageNow, EMM).
-- the app folder on a device managed by an EMM – always.
-- the app folder on an unmanaged device – Android 11 and later only (before, any app with
-  storage permission can read and write the folder). The folder can still be reached over USB, so
-  once an admin password is set the file must contain it as top-level `"password"` (the current
-  password, not a new one): `{ "password": "change-me", "appearance": { … } }`.
+- the app folder – like the [broadcast](#broadcast-intent-stagenow-adb): it can be reached over
+  USB, and before Android 11 any app with storage permission can read and write it, on managed
+  devices too. So once an admin password is set, the file must contain it as top-level
+  `"password"` (the current password, not a new one):
+  `{ "password": "change-me", "appearance": { … } }`. Before Android 11 the app folder is
+  refused on unmanaged devices; on managed ones other apps could read that password until the
+  keyboard deletes the file – use `/enterprise/usr` or the managed configuration there.
 
 A file in the app folder that contains `"password"` or `"adminPassword"` is **deleted after it
 has been applied**, so the password does not stay there in plain text. A refused file is shown
 under **Configuration → Last provisioning error**; change the file (or touch it) to try again.
-Five wrong passwords lock files and broadcasts for 5 minutes; a file arriving during the lock is
-tried again afterwards.
+Five wrong passwords lock files in the app folder and broadcasts for 5 minutes; a file arriving
+during the lock is tried again afterwards. Any app can cause that lock, see
+[below](#broadcast-intent-stagenow-adb).
 
 ```bash
 adb push examples/warehouse-gloves.json \
@@ -192,10 +196,16 @@ or use the [configuration file](#configuration-file).
 > admin password). Set an admin password with your EMM (`admin_password`) unless you trust every
 > app on the device.
 
-After 5 wrong passwords, broadcasts and configuration files are refused for 5 minutes (result
-code `2`). The settings screen counts its own attempts, so an app cannot lock the administrator
-out of it – but an app sending wrong passwords can keep the broadcast channel locked; use the
-managed configuration or `/enterprise/usr` in that case.
+After 5 wrong passwords, broadcasts and configuration files in the app folder are refused for
+5 minutes (result code `2`). The settings screen counts its own attempts, so an app cannot lock
+the administrator out of it.
+
+> **Denial of service:** any app on the device can send 5 broadcasts with wrong passwords, and
+> repeat that every 5 minutes, to keep the broadcast and the app folder locked. It learns nothing
+> and changes nothing, but your own broadcasts and files are refused meanwhile. This is the price
+> of the lock against password guessing. The managed configuration, `/enterprise/usr` and the
+> settings screen are not affected – use them if that happens; refusals show up under
+> **Configuration → Last provisioning error**.
 
 ```bash
 adb push examples/warehouse-gloves.json /data/local/tmp/keyboard.json
@@ -211,6 +221,7 @@ settings under **Configuration → Last provisioning error**.
 ## Updates and signing
 
 Android only installs an update if the new APK is signed with the same key as the installed
-one. The current releases are **debug-signed**. When switching to a release key later, the app
-has to be uninstalled and reinstalled once – then enable and select the keyboard and
-distribute the configuration again.
+one. Releases from 2.0.0 on are signed with ICT-Baden's release key, so they update each other in
+place, keeping the configuration. The App Bundle for Google Play is signed with the same key
+([details](play-store.md#app-signing)). Check a downloaded APK with `SHA256SUMS.txt` from the
+same release (`sha256sum -c --ignore-missing SHA256SUMS.txt`).
