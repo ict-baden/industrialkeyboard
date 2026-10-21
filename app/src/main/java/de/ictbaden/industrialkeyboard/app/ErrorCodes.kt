@@ -11,4 +11,5 @@ object ErrorCodes {
     const val EXPORT_FAILED = "IK-0103"
     const val INVALID_COLOR = "IK-0104"
     const val INVALID_MACRO = "IK-0105"
+    const val CONFIG_UNREADABLE = "IK-0106"
 }

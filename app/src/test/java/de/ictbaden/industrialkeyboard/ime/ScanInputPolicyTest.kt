@@ -24,8 +24,7 @@ class ScanInputPolicyTest {
     fun `types into a visible text field`() {
         assertNull(refusal())
         assertNull(refusal(inputType = InputType.TYPE_CLASS_NUMBER))
-        // Often used for barcode fields to suppress suggestions; the text is visible anyway.
-        assertNull(refusal(inputType = text or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD))
+        assertNull(refusal(inputType = text or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS))
     }
 
     @Test
@@ -41,6 +40,8 @@ class ScanInputPolicyTest {
     fun `never into password or raw fields`() {
         assertNotNull(refusal(inputType = text or InputType.TYPE_TEXT_VARIATION_PASSWORD))
         assertNotNull(refusal(inputType = text or InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD))
+        // Also "show password"; fields that only want no suggestions should use TYPE_TEXT_FLAG_NO_SUGGESTIONS.
+        assertNotNull(refusal(inputType = text or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD))
         assertNotNull(refusal(inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD))
         assertNotNull(refusal(inputType = InputType.TYPE_NULL))
     }

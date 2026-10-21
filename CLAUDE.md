@@ -42,4 +42,5 @@ JDK 17–21, Android SDK mit Compile-SDK 37. Unter Windows `sdk.dir` in `local.p
 
 - Commit-Nachrichten auf Deutsch.
 - Nach Arbeit an diesem Projekt: Logbuch in `ict-baden-projekte` ergänzen.
-- Vor jedem Release: Abschnitt „Unveröffentlicht“ im `CHANGELOG.md` pflegen.
+- Vor jedem Release: Abschnitt „Unveröffentlicht“ im `CHANGELOG.md` pflegen und in die Version umbenennen, `versionName` in `app/build.gradle.kts` anheben.
+- Release: annotierter Tag, dessen Nachricht der CHANGELOG-Abschnitt auf Englisch ist (`git tag -a vX.Y.Z -F notes.md --cleanup=verbatim`); die CI setzt ihn als Release-Text vor die Dateiliste. Danach `versionName` auf main gleich auf die nächste Patch-Version heben, damit CI-Builds nicht älter heißen als das Release.

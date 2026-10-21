@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.toColorInt
 import de.ictbaden.industrialkeyboard.config.Appearance
 import de.ictbaden.industrialkeyboard.config.ThemeMode
 
@@ -100,7 +101,7 @@ data class Palette(
             dark = true,
         )
 
-        fun parse(value: String?): Int? = value?.let { runCatching { Color.parseColor(it) }.getOrNull() }
+        fun parse(value: String?): Int? = value?.let { runCatching { it.toColorInt() }.getOrNull() }
 
         fun onColor(color: Int): Int = if (ColorUtils.calculateLuminance(color) > 0.45) 0xFF111111.toInt() else Color.WHITE
 

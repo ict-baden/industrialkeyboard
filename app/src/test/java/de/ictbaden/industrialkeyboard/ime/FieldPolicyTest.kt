@@ -53,11 +53,11 @@ class FieldPolicyTest {
     }
 
     @Test
-    fun `hidden passwords are recognized`() {
+    fun `password fields are recognized, visible ones too`() {
         assertEquals(true, FieldPolicy.isPassword(text or InputType.TYPE_TEXT_VARIATION_PASSWORD))
         assertEquals(true, FieldPolicy.isPassword(text or InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD))
         assertEquals(true, FieldPolicy.isPassword(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD))
-        assertEquals(false, FieldPolicy.isPassword(text or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD))
+        assertEquals(true, FieldPolicy.isPassword(text or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD))
         assertEquals(false, FieldPolicy.isPassword(text or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS))
         assertEquals(false, FieldPolicy.isPassword(InputType.TYPE_NULL))
     }
