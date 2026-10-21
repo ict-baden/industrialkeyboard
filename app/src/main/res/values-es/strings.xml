@@ -33,6 +33,7 @@
     <string name="key_hints_summary">Números pequeños para la pulsación larga en la fila superior</string>
     <string name="language">Idioma</string>
     <string name="language_system">Idioma del sistema</string>
+    <string name="language_machine_translated">%1$s (traducción automática)</string>
 
     <string name="section_layout">Distribución</string>
     <string name="letters">Letras</string>
@@ -84,6 +85,7 @@
     <string name="scan_key">Tecla de escaneo</string>
     <string name="scan_key_summary">Junto a la barra espaciadora en las teclas de letras</string>
     <string name="scan_from_broadcasts">Escribir los escaneos recibidos por broadcast</string>
+    <string name="scan_from_broadcasts_open">%1$s · cualquier aplicación del dispositivo puede enviarlo</string>
     <string name="after_scan">Después de un escaneo</string>
     <string name="after_scan_nothing">Nada</string>
     <string name="after_scan_enter">Intro</string>
@@ -132,6 +134,7 @@
 
     <string name="settings_protected">La configuración está protegida</string>
     <string name="wrong_password">Contraseña incorrecta</string>
+    <string name="password_locked">Demasiadas contraseñas incorrectas. Vuelva a intentarlo en %1$d min.</string>
     <string name="new_password">Nueva contraseña</string>
     <string name="new_password_summary">Déjela vacía para quitar la contraseña</string>
     <string name="repeat_password">Repetir</string>

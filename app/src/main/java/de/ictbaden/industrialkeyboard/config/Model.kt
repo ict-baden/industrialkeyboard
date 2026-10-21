@@ -125,12 +125,23 @@ data class FeedbackSettings(
 )
 
 data class ScanInputSettings(
-    /** Type barcodes that arrive as a broadcast into the focused field. */
-    val enabled: Boolean = true,
+    /**
+     * Type barcodes that arrive as a broadcast into the focused field. Off by default: Android does
+     * not tell a receiver who sent a broadcast, so without [permission] any app could type.
+     */
+    val enabled: Boolean = false,
     val action: String = DEFAULT_ACTION,
     /** Extra with the barcode text; common scanner extras are also checked. */
     val extra: String = "data",
     val suffix: ScanSuffix = ScanSuffix.ENTER,
+    /** Permission the sending app must hold (enforced by Android); `null` = any app. */
+    val permission: String? = null,
+    /**
+     * Only these apps may send (Android 14+, and only senders that share their identity with
+     * `BroadcastOptions.setShareIdentityEnabled`); empty = no check. Fails closed: with a list set,
+     * unidentified senders and older Android versions are refused.
+     */
+    val allowedPackages: List<String> = emptyList(),
 ) {
     companion object {
         const val DEFAULT_ACTION = "de.ictbaden.industrialkeyboard.action.SCAN_INPUT"

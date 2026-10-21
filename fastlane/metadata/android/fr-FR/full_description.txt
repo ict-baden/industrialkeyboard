@@ -7,10 +7,10 @@ CONÇU POUR LES GANTS
 LES BONNES TOUCHES POUR CHAQUE CHAMP
 • Les champs numériques ouvrent le pavé numérique (ordre téléphone ou calculatrice, PIN, date, heure)
 • Les champs e-mail et adresse web proposent @, / et .com
-• La touche Entrée affiche l’action du champ  suivant, rechercher, envoyer, terminé
+• La touche Entrée affiche l’action du champ : suivant, rechercher, envoyer, terminé
 
 SCANNER INTÉGRÉ
-• Onglet de scan avec une grande zone de déclenchement  appuyer pour scanner, maintenir pour un scan continu
+• Onglet de scan avec une grande zone de déclenchement : appuyer pour scanner, maintenir pour un scan continu
 • Touche de scan en option, déclencheur logiciel pour Zebra DataWedge, Honeywell ou toute application de scan via intent
 
 TOUCHES DE FONCTION
@@ -27,7 +27,7 @@ CONFIGURATION CENTRALISÉE
 • Fichier de configuration ou intent de diffusion (StageNow), réglages protégés par un mot de passe administrateur
 
 CONFIDENTIALITÉ DÈS LA CONCEPTION
-• Pas d’autorisation Internet, pas de dictionnaire, pas de prédiction de mots  rien de ce que vous tapez n’est enregistré ni appris
+• Pas d’autorisation Internet, pas de dictionnaire, pas de prédiction de mots : rien de ce que vous tapez n’est enregistré ni appris
 • Pas de compte, pas de publicité, pas de suivi. Industrial Keyboard n’envoie aucune donnée à ICT-Baden.
 
 Interface en anglais, allemand, espagnol, français et chinois. Gratuit et open source (licence MIT), par ICT-Baden. Des contrats de support sont disponibles.

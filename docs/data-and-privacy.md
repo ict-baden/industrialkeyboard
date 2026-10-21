@@ -49,9 +49,9 @@ apps – see [Scanner & app integration](integration.md):
 | Direction | What | Why |
 |---|---|---|
 | sends | Soft scan trigger to DataWedge (Zebra), the Honeywell scanner service or the app in `scanner.intentAction` | Scan pad, scan key, `{SCAN}` |
-| receives | `…action.SCAN_INPUT` with a barcode | Types the barcode into the focused field. Any app on the device can send it – switch it off with `scanner.input.enabled: false` if you do not need it. |
+| receives | `…action.SCAN_INPUT` with a barcode | Only if `scanner.input.enabled` is switched on (off by default): types the barcode into the focused field, never into password fields. Without `scanner.input.permission` or `allowedPackages` any app on the device can send it ([details](integration.md#option-b--the-keyboard-types-it)). |
 | receives | `…action.SHOW_TAB` | Switches the keyboard page |
-| receives | `…action.INSTALL_CONFIG` | Installs a configuration; only with the admin password, or on an EMM-managed device while no password is set |
+| receives | `…action.INSTALL_CONFIG` | Installs a configuration; only with the admin password, or on an EMM-managed device while no password is set (then any app can – set a password). After 5 wrong passwords it is locked for 5 minutes |
 
 The links in *Settings → Info* (source code, support, website) open in the browser only when you
 tap them.

@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.text.InputType
+import android.util.Log
 import android.view.KeyCharacterMap
 import android.view.KeyEvent
 import android.view.View
@@ -23,6 +24,7 @@ import de.ictbaden.industrialkeyboard.app.SettingsActivity
 import de.ictbaden.industrialkeyboard.config.ConfigStore
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
 import de.ictbaden.industrialkeyboard.config.Provisioning
+import de.ictbaden.industrialkeyboard.config.ScanInputSettings
 import de.ictbaden.industrialkeyboard.config.ScanSuffix
 import de.ictbaden.industrialkeyboard.layout.Key
 import de.ictbaden.industrialkeyboard.layout.KeyCommand
@@ -53,7 +55,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private var autoReleasedByTap = false
     private var lastSpace = 0L
     private var scanning = false
-    private var receiverAction: String? = null
+    /** Action and permission the scan receiver is registered with; `null` = not registered. */
+    private var scanRegistration: Pair<String, String?>? = null
     private val location = IntArray(2)
     private val handler = Handler(Looper.getMainLooper())
     private val stopScanAnimation = Runnable { setScanning(false) }
@@ -65,9 +68,16 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             when (intent.action) {
                 // Through the bus: while the keyboard is hidden the request waits for the next field.
                 KeyboardApi.ACTION_SHOW_TAB -> intent.getStringExtra(KeyboardApi.EXTRA_TAB)?.trim()?.takeIf { it.isNotEmpty() }?.let(KeyboardBus::requestTab)
-                Intent.ACTION_APPLICATION_RESTRICTIONS_CHANGED -> Provisioning.applyAll(context)
-                config.scanner.input.action -> onScanInput(intent)
+                Intent.ACTION_APPLICATION_RESTRICTIONS_CHANGED -> Provisioning.applyAllAsync(context)
             }
+        }
+    }
+
+    /** Barcodes typed into the field: registered only while enabled, with the configured sender permission. */
+    private val scanReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val sender = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) sentFromPackage else null
+            if (intent.action == config.scanner.input.action) onScanInput(intent, sender)
         }
     }
 
@@ -76,6 +86,12 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         store = ConfigStore.get(this)
         feedback = Feedback(this)
         scanner = ScanTrigger(this)
+        // Exported: other apps request tabs; the restrictions broadcast is sent by the system only.
+        val filter = IntentFilter().apply {
+            addAction(KeyboardApi.ACTION_SHOW_TAB)
+            addAction(Intent.ACTION_APPLICATION_RESTRICTIONS_CHANGED)
+        }
+        ContextCompat.registerReceiver(this, receiver, filter, ContextCompat.RECEIVER_EXPORTED)
         applyConfig(store.config)
         store.addListener(configListener)
         KeyboardBus.onShowTab = { tab -> root?.isShown == true && showTab(tab) }
@@ -84,7 +100,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     override fun onDestroy() {
         store.removeListener(configListener)
         KeyboardBus.onShowTab = null
-        unregisterReceiverSafely()
+        runCatching { unregisterReceiver(receiver) }
+        unregisterScanReceiver()
         handler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }
@@ -93,27 +110,24 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         config = updated
         feedback.settings = updated.feedback
         scanner.settings = updated.scanner
-        if (receiverAction != updated.scanner.input.action) registerReceiver()
+        val input = updated.scanner.input.takeIf { it.enabled }
+        if (scanRegistration != input?.let { it.action to it.permission }) registerScanReceiver(input)
         if (FieldPolicy.pageForTab(page.tab, field, updated, scanner.available) == null) page = FieldPolicy.startPage(field, updated, scanner.available)
         render()
     }
 
-    private fun registerReceiver() {
-        unregisterReceiverSafely()
-        val filter = IntentFilter().apply {
-            addAction(KeyboardApi.ACTION_SHOW_TAB)
-            addAction(Intent.ACTION_APPLICATION_RESTRICTIONS_CHANGED)
-            addAction(config.scanner.input.action)
-        }
-        // Exported: scanner services and other apps deliver scans and tab requests.
-        ContextCompat.registerReceiver(this, receiver, filter, ContextCompat.RECEIVER_EXPORTED)
-        receiverAction = config.scanner.input.action
+    private fun registerScanReceiver(input: ScanInputSettings?) {
+        unregisterScanReceiver()
+        input ?: return
+        // Exported, since scanner apps send it – but Android delivers only from apps holding the permission, if set.
+        ContextCompat.registerReceiver(this, scanReceiver, IntentFilter(input.action), input.permission, null, ContextCompat.RECEIVER_EXPORTED)
+        scanRegistration = input.action to input.permission
     }
 
-    private fun unregisterReceiverSafely() {
-        if (receiverAction == null) return
-        runCatching { unregisterReceiver(receiver) }
-        receiverAction = null
+    private fun unregisterScanReceiver() {
+        if (scanRegistration == null) return
+        runCatching { unregisterReceiver(scanReceiver) }
+        scanRegistration = null
     }
 
     // region lifecycle
@@ -136,7 +150,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     override fun onStartInputView(info: EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
-        Provisioning.applyAll(this)
+        Provisioning.applyAllAsync(this)
         val newField = FieldPolicy.field(info.inputType)
         if (!restarting || newField != field) {
             field = newField
@@ -383,10 +397,15 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     }
 
     /** A barcode broadcast (scanner app or DataWedge intent output): type it into the field. */
-    private fun onScanInput(intent: Intent) {
+    private fun onScanInput(intent: Intent, sender: String?) {
         val settings = config.scanner.input
-        if (!settings.enabled) return
-        val data = (listOf(settings.extra) + SCAN_EXTRAS).firstNotNullOfOrNull { intent.getStringExtra(it) } ?: return
+        val data = (listOf(settings.extra) + SCAN_EXTRAS).firstNotNullOfOrNull { intent.getStringExtra(it) }
+        val inputType = currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL
+        val refusal = ScanInputPolicy.refusal(settings, sender, isInputViewShown, inputType, data)
+        if (refusal != null) {
+            Log.w(TAG, "Scan broadcast ignored: $refusal")
+            return
+        }
         val ic = currentInputConnection ?: return
         ic.commitText(data, 1)
         when (settings.suffix) {
@@ -401,7 +420,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     private fun render() {
         val root = root ?: return
-        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning))
+        val secret = FieldPolicy.isPassword(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)
+        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret))
     }
 
     private fun enterIcon(): Int {
@@ -418,6 +438,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     }
 
     private companion object {
+        const val TAG = "KeyboardService"
         const val DOUBLE_SPACE_MS = 450L
         const val DOUBLE_TAP_MS = 350L
         const val HOLD_TO_SCAN_MS = 600L

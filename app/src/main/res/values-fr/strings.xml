@@ -33,6 +33,7 @@
     <string name="key_hints_summary">Petits chiffres pour l\'appui long sur la rangée du haut</string>
     <string name="language">Langue</string>
     <string name="language_system">Langue du système</string>
+    <string name="language_machine_translated">%1$s (traduction automatique)</string>
 
     <string name="section_layout">Disposition</string>
     <string name="letters">Lettres</string>
@@ -84,6 +85,7 @@
     <string name="scan_key">Touche de scan</string>
     <string name="scan_key_summary">À côté de la barre d\'espace sur les touches de lettres</string>
     <string name="scan_from_broadcasts">Saisir les scans reçus par broadcast</string>
+    <string name="scan_from_broadcasts_open">%1$s · toute application de l\'appareil peut l\'envoyer</string>
     <string name="after_scan">Après un scan</string>
     <string name="after_scan_nothing">Rien</string>
     <string name="after_scan_enter">Entrée</string>
@@ -132,6 +134,7 @@
 
     <string name="settings_protected">Les paramètres sont protégés</string>
     <string name="wrong_password">Mot de passe incorrect</string>
+    <string name="password_locked">Trop de mots de passe incorrects. Réessayez dans %1$d min.</string>
     <string name="new_password">Nouveau mot de passe</string>
     <string name="new_password_summary">Laisser vide pour supprimer le mot de passe</string>
     <string name="repeat_password">Confirmer</string>

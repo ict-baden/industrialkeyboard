@@ -62,7 +62,7 @@ as managed configuration (`config_json`), as a file, as a broadcast, or imported
     "trigger": "auto",
     "scanKey": false,
     "input": {
-      "enabled": true,
+      "enabled": false,
       "action": "de.ictbaden.industrialkeyboard.action.SCAN_INPUT",
       "extra": "data",
       "suffix": "enter"
@@ -173,10 +173,12 @@ keyboards, double tap on Shift for caps lock, long press on the hide button for 
 | `intentAction` | text | – | Broadcast action that starts a scan, for `trigger: "intent"` (required then) |
 | `intentPackage` | text | – | Package that receives it (optional, recommended) |
 | `scanKey` | `true` / `false` | `false` | Scan key in the bottom row of the letters, next to Enter |
-| `input.enabled` | `true` / `false` | `true` | Type barcodes that a scanner app sends as broadcast |
+| `input.enabled` | `true` / `false` | `false` | Type barcodes that a scanner app sends as broadcast. Not into password fields or `TYPE_NULL` fields. See the [security note](integration.md#option-b--the-keyboard-types-it) |
 | `input.action` | text | `de.ictbaden.industrialkeyboard.action.SCAN_INPUT` | Broadcast action the keyboard listens to |
 | `input.extra` | text | `data` | String extra with the barcode. Also checked: `com.symbol.datawedge.data_string`, `barcode_string`, `decode_string`, `com.honeywell.aidc.extra.EXTRA_DATA` |
 | `input.suffix` | `none`, `enter`, `tab` | `enter` | Key after the barcode |
+| `input.permission` | text | – | Permission the sending app must hold; Android delivers the broadcast only from apps that have it |
+| `input.allowedPackages` | list of package names | – | Only these apps may send. Android 14+ and only senders that share their identity; with a list set, all others are refused |
 
 How it works with DataWedge and other scanner apps: [Scanner & app integration](integration.md).
 

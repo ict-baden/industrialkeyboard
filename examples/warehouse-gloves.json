@@ -13,5 +13,5 @@
   },
   "typing": { "autoCapitalize": false, "doubleSpacePeriod": false, "longPressDelay": 600 },
   "feedback": { "keyPopup": true, "sound": true, "soundVolume": 80, "vibrate": true, "vibrationMs": 35 },
-  "scanner": { "trigger": "auto", "scanKey": true, "input": { "enabled": true, "suffix": "enter" } }
+  "scanner": { "trigger": "auto", "scanKey": true, "input": { "enabled": false, "suffix": "enter" } }
 }

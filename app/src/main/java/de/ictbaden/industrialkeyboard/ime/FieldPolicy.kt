@@ -66,6 +66,19 @@ object FieldPolicy {
         return Field(alpha, numeric)
     }
 
+    /**
+     * Fields whose text is hidden: no key preview, no scanned text from other apps. A visible
+     * password field shows its text anyway and is often used for barcodes (no suggestions).
+     */
+    fun isPassword(inputType: Int): Boolean {
+        val variation = inputType and InputType.TYPE_MASK_VARIATION
+        return when (inputType and InputType.TYPE_MASK_CLASS) {
+            InputType.TYPE_CLASS_TEXT -> variation == InputType.TYPE_TEXT_VARIATION_PASSWORD || variation == InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD
+            InputType.TYPE_CLASS_NUMBER -> variation == InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            else -> false
+        }
+    }
+
     /** Tab bar entries in display order; empty with classic navigation. */
     fun tabs(config: KeyboardConfig, scanAvailable: Boolean): List<String> {
         if (config.layout.navigation == Navigation.KEYS) return emptyList()
