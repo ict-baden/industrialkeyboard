@@ -4,6 +4,8 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ## [Unveröffentlicht]
 
+## [2.1.0] – 2026-10-21
+
 ### Neu
 - **Oberfläche in fünf Sprachen:** Englisch, Deutsch, Spanisch, Französisch und Chinesisch (vereinfacht), nach Richtlinie 13 von ICT-Baden. Einrichtung, Einstellungen, Dialoge, Scan-Pad und das Schema der Managed Configuration sind übersetzt; die Tastenbeschriftungen bleiben, wie sie sind.
 - Sprache wählbar unter **Einstellungen → Aussehen → Sprache**, per Konfiguration (`"language": "de"`) oder als Einzeloption `language` der Managed Configuration. Standard `auto` folgt dem Gerät.
