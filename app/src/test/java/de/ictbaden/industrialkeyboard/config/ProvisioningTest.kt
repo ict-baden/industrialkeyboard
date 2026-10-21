@@ -56,16 +56,40 @@ class ProvisioningTest {
         assertTrue(PasswordHasher.verify("secret", store.config.adminPasswordHash))
     }
 
-    @Test
-    fun `app folder file is trusted on a managed device`() {
-        store.import(KeyboardConfig(adminPasswordHash = PasswordHasher.hash("secret")))
+    private fun manage() {
         val owner = ComponentName("com.example.mdm", "com.example.mdm.Admin")
         val dpm = shadowOf(context.getSystemService(DevicePolicyManager::class.java))
         dpm.setActiveAdmin(owner)
         dpm.setDeviceOwner(owner)
+    }
+
+    @Test
+    fun `app folder file on a managed device needs the current password once one is set`() {
+        store.import(KeyboardConfig(adminPasswordHash = PasswordHasher.hash("secret")))
+        manage()
+        write("""{"language":"de","adminPassword":"mine-now"}""", 1_000_000)
+        Provisioning.applyAll(context)
+        assertEquals("auto", store.config.language)
+        assertTrue(PasswordHasher.verify("secret", store.config.adminPasswordHash))
+
+        write("""{"password":"secret","language":"de"}""", 2_000_000)
+        Provisioning.applyAll(context)
+        assertEquals("de", store.config.language)
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun `app folder on a managed device before Android 11 is like the broadcast`() {
+        manage()
         write("""{"language":"de"}""", 1_000_000)
         Provisioning.applyAll(context)
         assertEquals("de", store.config.language)
+
+        store.update { it.copy(adminPasswordHash = PasswordHasher.hash("secret")) }
+        write("""{"language":"fr"}""", 2_000_000)
+        Provisioning.applyAll(context)
+        assertEquals("de", store.config.language)
+        assertTrue(Provisioning.lastError(context).orEmpty().contains("password"))
     }
 
     @Test

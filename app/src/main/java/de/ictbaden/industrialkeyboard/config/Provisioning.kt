@@ -155,14 +155,14 @@ object Provisioning {
     private class LockedException : ConfigException("Refused: locked after too many wrong passwords, tried again in a few minutes")
 
     /**
-     * `/enterprise/usr` is written by Zebra's MX (StageNow, EMM) only, and on a managed device the
-     * EMM controls the app folder. Otherwise the app folder is reachable over USB, and before
-     * Android 11 any app with storage permission can read and write it: there it is refused, from
-     * Android 11 on it must carry the current admin password once one is set.
+     * `/enterprise/usr` is written by Zebra's MX (StageNow, EMM) only. The app folder is reachable
+     * over USB, and before Android 11 any app with storage permission can read and write it – also
+     * on a managed device. So, like the `INSTALL_CONFIG` broadcast, a file there must carry the
+     * current admin password once one is set; before Android 11 it is refused on unmanaged devices.
      */
     private fun checkFileAllowed(context: Context, file: File, text: String) {
-        if (file.parent == ENTERPRISE_DIR || isManaged(context)) return
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+        if (file.parent == ENTERPRISE_DIR) return
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && !isManaged(context)) {
             throw ConfigException("Refused: before Android 11 other apps can read and write this folder. Use /enterprise/usr, the managed configuration or the INSTALL_CONFIG broadcast.")
         }
         val hash = ConfigStore.get(context).config.adminPasswordHash ?: return
