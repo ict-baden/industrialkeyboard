@@ -16,6 +16,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.withSave
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.config.KeyStyle
 import de.ictbaden.industrialkeyboard.layout.Key
@@ -204,33 +205,33 @@ class KeyboardView(context: Context) : View(context) {
         }
         val r = box.rect
         val radius = min(dp(9f), r.height() * 0.2f)
-        canvas.save()
-        if (pressed) canvas.scale(PRESS_SCALE, PRESS_SCALE, r.centerX(), r.centerY())
-        if (p.shadow != 0 && !pressed) {
-            fill.color = p.shadow
-            tmp.set(r)
-            tmp.offset(0f, dp(1.4f))
-            canvas.drawRoundRect(tmp, radius, radius, fill)
-        }
-        fill.color = background
-        canvas.drawRoundRect(r, radius, radius, fill)
-        if (overlay > 0f) {
-            fill.color = ColorUtils.setAlphaComponent(p.pressed, (android.graphics.Color.alpha(p.pressed) * overlay).toInt())
+        canvas.withSave {
+            if (pressed) canvas.scale(PRESS_SCALE, PRESS_SCALE, r.centerX(), r.centerY())
+            if (p.shadow != 0 && !pressed) {
+                fill.color = p.shadow
+                tmp.set(r)
+                tmp.offset(0f, dp(1.4f))
+                canvas.drawRoundRect(tmp, radius, radius, fill)
+            }
+            fill.color = background
             canvas.drawRoundRect(r, radius, radius, fill)
+            if (overlay > 0f) {
+                fill.color = ColorUtils.setAlphaComponent(p.pressed, (android.graphics.Color.alpha(p.pressed) * overlay).toInt())
+                canvas.drawRoundRect(r, radius, radius, fill)
+            }
+            if (p.border != 0) {
+                stroke.color = if (key.style == KeyStyle.ACCENT) p.accent else p.border
+                tmp.set(r)
+                tmp.inset(stroke.strokeWidth / 2, stroke.strokeWidth / 2)
+                canvas.drawRoundRect(tmp, radius, radius, stroke)
+            }
+            val icon = key.icon
+            when {
+                icon != null -> drawIcon(canvas, icon, r, iconColor(key, foreground))
+                key.label != null -> drawLabel(canvas, box, foreground)
+            }
+            key.hint?.let { drawHint(canvas, it, r, if (key.style == KeyStyle.ACCENT) p.accentText else p.keyHint) }
         }
-        if (p.border != 0) {
-            stroke.color = if (key.style == KeyStyle.ACCENT) p.accent else p.border
-            tmp.set(r)
-            tmp.inset(stroke.strokeWidth / 2, stroke.strokeWidth / 2)
-            canvas.drawRoundRect(tmp, radius, radius, stroke)
-        }
-        val icon = key.icon
-        when {
-            icon != null -> drawIcon(canvas, icon, r, iconColor(key, foreground))
-            key.label != null -> drawLabel(canvas, box, foreground)
-        }
-        key.hint?.let { drawHint(canvas, it, r, if (key.style == KeyStyle.ACCENT) p.accentText else p.keyHint) }
-        canvas.restore()
     }
 
     private fun iconColor(key: Key, foreground: Int): Int =

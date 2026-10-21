@@ -15,6 +15,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.withSave
 import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
 import kotlin.math.PI
@@ -93,41 +94,41 @@ class ScanPadView(context: Context) : View(context) {
             )
         }
         val radius = dp(18f)
-        canvas.save()
-        if (pressed) canvas.scale(0.985f, 0.985f, pad.centerX(), pad.centerY())
-        fill.shader = if (available) shader else null
-        fill.color = if (available) accent else palette.function
-        canvas.drawRoundRect(pad, radius, radius, fill)
-        fill.shader = null
-        if (pressed) {
-            fill.color = 0x22000000
+        canvas.withSave {
+            if (pressed) canvas.scale(0.985f, 0.985f, pad.centerX(), pad.centerY())
+            fill.shader = if (available) shader else null
+            fill.color = if (available) accent else palette.function
             canvas.drawRoundRect(pad, radius, radius, fill)
-        }
-        val foreground = if (available) palette.accentText else palette.functionText
-        if (scanning) drawLaser(canvas)
+            fill.shader = null
+            if (pressed) {
+                fill.color = 0x22000000
+                canvas.drawRoundRect(pad, radius, radius, fill)
+            }
+            val foreground = if (available) palette.accentText else palette.functionText
+            if (scanning) drawLaser(canvas)
 
-        val iconSize = min(dp(56f), pad.height() * 0.34f).toInt()
-        val iconTop = (pad.centerY() - iconSize * 0.95f).toInt()
-        val left = (pad.centerX() - iconSize / 2f).toInt()
-        icon.setBounds(left, iconTop, left + iconSize, iconTop + iconSize)
-        icon.setTint(foreground)
-        icon.alpha = if (available) 255 else 120
-        icon.draw(canvas)
+            val iconSize = min(dp(56f), pad.height() * 0.34f).toInt()
+            val iconTop = (pad.centerY() - iconSize * 0.95f).toInt()
+            val left = (pad.centerX() - iconSize / 2f).toInt()
+            icon.setBounds(left, iconTop, left + iconSize, iconTop + iconSize)
+            icon.setTint(foreground)
+            icon.alpha = if (available) 255 else 120
+            icon.draw(canvas)
 
-        title.color = foreground
-        title.textSize = min(sp(19f), pad.height() * 0.11f)
-        val label = when {
-            !available -> text(R.string.scan_pad_no_scanner)
-            scanning -> text(R.string.scan_pad_scanning)
-            else -> text(R.string.scan_pad_tap)
+            title.color = foreground
+            title.textSize = min(sp(19f), pad.height() * 0.11f)
+            val label = when {
+                !available -> text(R.string.scan_pad_no_scanner)
+                scanning -> text(R.string.scan_pad_scanning)
+                else -> text(R.string.scan_pad_tap)
+            }
+            val titleY = iconTop + iconSize + dp(10f) - title.ascent()
+            canvas.drawText(label, pad.centerX(), titleY, title)
+            subtitle.color = ColorUtils.setAlphaComponent(foreground, 190)
+            subtitle.textSize = min(sp(12.5f), pad.height() * 0.075f)
+            val hint = if (available) text(R.string.scan_pad_hint, scannerName) else text(R.string.scan_pad_configure)
+            canvas.drawText(hint, pad.centerX(), titleY + dp(6f) - subtitle.ascent() + subtitle.descent(), subtitle)
         }
-        val titleY = iconTop + iconSize + dp(10f) - title.ascent()
-        canvas.drawText(label, pad.centerX(), titleY, title)
-        subtitle.color = ColorUtils.setAlphaComponent(foreground, 190)
-        subtitle.textSize = min(sp(12.5f), pad.height() * 0.075f)
-        val hint = if (available) text(R.string.scan_pad_hint, scannerName) else text(R.string.scan_pad_configure)
-        canvas.drawText(hint, pad.centerX(), titleY + dp(6f) - subtitle.ascent() + subtitle.descent(), subtitle)
-        canvas.restore()
         if (scanning) postInvalidateOnAnimation()
     }
 

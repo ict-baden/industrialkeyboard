@@ -62,6 +62,11 @@ android {
     lint {
         // Covered by the bundle setting above; Play Core on-demand languages are not needed.
         disable += "AppBundleLocaleChanges"
+        // "1-2-3" and "7-8-9" are rows of keys, not ranges: an en dash would be wrong.
+        disable += "TypographyDashes"
+        // Kept visible, but no warning: targetSdk 37 waits until it can be tested on an Android 17
+        // device (Play requires it from August 2027); library updates come through Dependabot.
+        informational += listOf("OldTargetApi", "GradleDependency")
     }
 
     testOptions {
