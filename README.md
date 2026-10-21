@@ -30,7 +30,7 @@
 </p>
 
 > [!NOTE]
-> **Deutsch:** Industrial Keyboard ist eine Bildschirmtastatur für robuste Android-Geräte (Zebra, Honeywell): große Tasten für Handschuhe, Scan-Taste, F1–F24 für Terminal-Emulation, zentral per MDM konfigurierbar. Kostenlos und Open Source (MIT), ohne Internetzugriff. Download: [IndustrialKeyboard.apk](https://github.com/ict-baden/industrialkeyboard/releases/download/latest/IndustrialKeyboard.apk). Die Oberfläche gibt es auf Englisch, Deutsch, Spanisch, Französisch und Chinesisch.
+> **Deutsch:** Industrial Keyboard ist eine Bildschirmtastatur für robuste Android-Geräte (Zebra, Honeywell): große Tasten für Handschuhe, Scan-Taste, F1–F24 für Terminal-Emulation, zentral per MDM konfigurierbar. Kostenlos und Open Source (MIT), ohne Internetzugriff. Download: [IndustrialKeyboard.apk](https://github.com/ict-baden/industrialkeyboard/releases/download/latest/IndustrialKeyboard.apk). Die Oberfläche gibt es auf Englisch und Deutsch, dazu maschinell übersetzt auf Spanisch, Französisch und Chinesisch.
 
 ---
 
@@ -57,7 +57,7 @@
 |---|---|
 | 🧤 **Made for gloves** | Key height 70–160 %, forgiving touch targets, preview bubble above the finger, rollover typing, high-contrast theme |
 | 🔢 **The right keys for every field** | Number fields open the numeric pad (phone or calculator order, PIN, date, time), e-mail and URL fields get `@`, `/` and `.com`, Enter shows the field's action (next, search, send, done), auto-capitalization follows the field |
-| 🔫 **Scanner built in** | Scan tab with a large trigger pad, optional scan key, soft trigger for Zebra DataWedge, Honeywell or any scanner app via intent. Scan results sent as a broadcast are typed with Enter or Tab |
+| 🔫 **Scanner built in** | Scan tab with a large trigger pad, optional scan key, soft trigger for Zebra DataWedge, Honeywell or any scanner app via intent. Scan results sent as a broadcast can be typed with Enter or Tab (opt-in) |
 | ⌨️ **Function keys** | Fn tab with F1–F12, **Shift for F13–F24**, Esc, Ins, Del, Home/End, PgUp/PgDn and arrows – plus an optional F1–F12 row above the letters |
 | 🧩 **Programmable keys & macros** | Five free keys and custom layouts with macros such as `{TAB}`, `{F13}`, `OK{ENTER}`, `{SCAN}` or `{SHOW:numeric}` |
 | 🗂️ **Custom layouts** | Your own keyboards (e.g. *OK / Skip / Damaged*) as extra tabs – defined in JSON, no app update needed |
@@ -136,9 +136,11 @@ key is also available as a macro: `{F1}` … `{F24}`, `{ESC}`, `{PGDN}`, …
 - **Scan tab and scan key** – tap to read one barcode, hold for continuous scanning. The
   keyboard pulls the scanner's soft trigger: Zebra DataWedge and Honeywell are detected
   automatically, any other scanner app can be triggered with an intent.
-- **Scan results** – the scanner usually types the barcode itself (keystroke output). If your
-  scanner can send a broadcast instead, point it at the keyboard and it types the data into the
-  focused field, followed by Enter or Tab.
+- **Scan results** – the scanner usually types the barcode itself (keystroke output, the
+  recommended way). If your scanner can only send a broadcast, switch on `scanner.input` and the
+  keyboard types the data into the focused field, followed by Enter or Tab. It is off by default
+  because Android does not tell the keyboard which app sent a broadcast; restrict the senders with
+  `scanner.input.permission` or `allowedPackages` where you can. Scans never go into password fields.
 
 Details and a DataWedge example: [Scanner & app integration](docs/integration.md).
 
@@ -159,6 +161,17 @@ Details and a DataWedge example: [Scanner & app integration](docs/integration.md
 
 Each layout becomes a tab next to *ABC*, *123* and *Fn*; other apps can open it with an intent.
 Reference: [Configuration](docs/configuration.md#custom-layouts).
+
+## ⚠️ Limitations
+
+- **Tested on a Zebra HC20 (Android 15) with DataWedge.** Other Zebra models should behave the
+  same; other devices are untested.
+- **The Honeywell soft trigger is built from the vendor documentation only** and has not been
+  tried on a Honeywell device. Reports welcome.
+- Spanish, French and Chinese are machine translations, not yet proofread by native speakers.
+- No word prediction, no dictionary, no swipe typing, no voice input – on purpose.
+
+Details: [Limitations](docs/limitations.md).
 
 ## 🛠️ Building
 
@@ -181,6 +194,7 @@ the real keyboard code – see [tools/screenshots](tools/screenshots/README.md).
 - [Deployment](docs/deployment.md) – install, make it the keyboard, managed configuration, files, StageNow
 - [Scanner & app integration](docs/integration.md) – soft trigger, scan broadcasts, intent API
 - [Data and privacy](docs/data-and-privacy.md) – what is stored where, which broadcasts the keyboard sends and receives
+- [Limitations](docs/limitations.md) – tested devices, what is untested, what it does not do
 - [Error codes](docs/error-codes.md) – codes shown next to error messages, the same in every language
 - [Google Play](docs/play-store.md) – store texts, graphics, Play Console answers
 - [Changelog](CHANGELOG.md)
@@ -193,5 +207,6 @@ Licence: <a href="LICENSE">MIT</a> &nbsp;·&nbsp;
 Third-party licences: <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a> &nbsp;·&nbsp;
 Support: free via GitHub, guaranteed with a <a href="SUPPORT.md">support contract</a> &nbsp;·&nbsp;
 <a href="SECURITY.md">Security</a> &nbsp;·&nbsp;
-<a href="https://ict-baden.de/impressum">Impressum</a>
+<a href="https://ict-baden.de/datenschutz/industrialkeyboard/">Datenschutz</a> &nbsp;·&nbsp;
+<a href="https://ict-baden.de/impressum/">Impressum</a>
 </sub>

@@ -37,14 +37,18 @@ your scanner app. Nothing to configure in the keyboard – it only pulls the tri
 
 The scanner sends the barcode as a broadcast, the keyboard commits it to the focused field in
 one step and adds **Enter** (default), **Tab** or nothing
-([`scanner.input`](configuration.md#scanner)).
+([`scanner.input`](configuration.md#scanner)). **Off by default** – switch it on with
+`"scanner": { "input": { "enabled": true } }` (or in the settings under *Scanner*).
 
 - Action: `de.ictbaden.industrialkeyboard.action.SCAN_INPUT` (or your own
   `scanner.input.action`)
 - Data: string extra `data` (or `scanner.input.extra`); `com.symbol.datawedge.data_string`,
   `barcode_string`, `decode_string` and `com.honeywell.aidc.extra.EXTRA_DATA` are understood
   as well.
-- Industrial Keyboard must be the active keyboard and a text field must have focus.
+- Industrial Keyboard must be the active keyboard, visible, and a text field must have focus.
+- Never typed into password fields (hidden text) or fields without a text editor
+  (`TYPE_NULL`, some terminal emulators) – use keystroke output there. Barcodes longer than
+  8,192 characters are ignored.
 
 **DataWedge setup** – in the profile of your app:
 
@@ -64,9 +68,20 @@ adb shell am broadcast -a de.ictbaden.industrialkeyboard.action.SCAN_INPUT --es 
 
 The number appears in the focused field, followed by Enter.
 
-> **Security note:** every app on the device can send this broadcast and thereby type into the
-> focused field. Switch it off with `"scanner": { "input": { "enabled": false } }` when you use
-> keystroke output, or choose your own action name.
+> **Security note:** Android does not tell the keyboard which app sent a broadcast. Without
+> restrictions every app on the device can send it and thereby type into the focused field (not
+> into password fields). That is why it is off by default. If you switch it on, restrict the
+> senders where your scanner app allows it:
+>
+> - `scanner.input.permission` – a permission the sending app must hold; Android delivers the
+>   broadcast only from apps that have it. Use it with your own scanner or integration app (for
+>   example a `signature` permission of that app).
+> - `scanner.input.allowedPackages` – package names of the apps that may send. Android 14+ only,
+>   and only for senders that identify themselves (`BroadcastOptions.setShareIdentityEnabled`).
+>   It fails closed: with a list set, unidentified senders and older Android versions are
+>   refused. If scans stop arriving after you set it, your scanner app does not identify itself.
+>
+> Refused broadcasts are logged with the reason (`adb logcat -s KeyboardService`).
 
 ## Intent API
 

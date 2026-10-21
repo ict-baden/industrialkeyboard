@@ -21,7 +21,7 @@ Mit einem Supportvertrag von ICT-Baden bekommen Sie:
 - Vorrang bei Fehlerbehebungen und Sicherheitsinformationen vorab
 - Anpassungen und Schulungen nach Absprache
 
-Kontakt: [Impressum](https://ict-baden.de/impressum)
+Kontakt: [Impressum](https://ict-baden.de/impressum/)
 
 ## Konfiguration mitschicken / Send your configuration
 

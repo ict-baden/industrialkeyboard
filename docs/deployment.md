@@ -151,6 +151,19 @@ The keyboard reads `industrialkeyboard.json` from
 
 A file is applied when the keyboard opens, once per change of its timestamp or size.
 
+Who may write the file decides whether it is trusted:
+
+- `/enterprise/usr/` – always (written by Zebra's MX: StageNow, EMM).
+- the app folder on a device managed by an EMM – always.
+- the app folder on an unmanaged device – the folder can be reached over USB and, before
+  Android 11, by any app with storage permission. So once an admin password is set, the file must
+  contain it as top-level `"password"` (the current password, not a new one):
+  `{ "password": "change-me", "appearance": { … } }`. Without a password it is accepted on
+  Android 11 and later only.
+
+A refused file is shown under **Configuration → Last provisioning error**; change the file (or
+touch it) to try again. Five wrong passwords lock files and broadcasts for 5 minutes.
+
 ```bash
 adb push examples/warehouse-gloves.json \
   /sdcard/Android/data/de.ictbaden.industrialkeyboard/files/industrialkeyboard.json
@@ -171,6 +184,15 @@ did. So it is only accepted
 On an unmanaged device without a password the broadcast is refused. Set an admin password first
 (in the settings, in a configuration file or with the managed configuration key `admin_password`)
 or use the [configuration file](#configuration-file).
+
+> **Managed devices without an admin password:** Android does not tell the keyboard which app
+> sent the broadcast, so on such a device *every* app can reconfigure the keyboard (and set an
+> admin password). Set an admin password with your EMM (`admin_password`) unless you trust every
+> app on the device.
+
+After 5 wrong passwords, broadcasts and configuration files are refused for 5 minutes (result
+code `2`). The settings screen counts its own attempts, so an app cannot lock the administrator
+out of it.
 
 ```bash
 adb push examples/warehouse-gloves.json /data/local/tmp/keyboard.json
