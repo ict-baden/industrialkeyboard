@@ -3,10 +3,15 @@ package de.ictbaden.industrialkeyboard.config
 import android.app.admin.DevicePolicyManager
 import android.content.Context
 import android.content.RestrictionsManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
+import org.json.JSONObject
 import java.io.File
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Applies configuration pushed by an EMM: Android managed configurations
@@ -15,13 +20,40 @@ import java.io.File
  */
 object Provisioning {
     const val CONFIG_FILE_NAME = "industrialkeyboard.json"
+
+    /** Top-level key of a configuration file in the app folder with the current admin password. */
+    const val FILE_PASSWORD_KEY = "password"
+    private const val ENTERPRISE_DIR = "/enterprise/usr"
     private const val TAG = "Provisioning"
     private const val PREFS = "provisioning"
     private const val KEY_LAST_ERROR = "last_error"
 
+    private val worker = Executors.newSingleThreadExecutor { Thread(it, "provisioning").apply { isDaemon = true } }
+    private val queued = AtomicBoolean(false)
+
+    /**
+     * Checks all sources on a background thread: the keyboard calls this on every focus change and
+     * must not wait for file system and system services. Calls while a check is queued are merged.
+     */
+    fun applyAllAsync(context: Context) {
+        val app = context.applicationContext
+        if (!queued.compareAndSet(false, true)) return
+        worker.execute {
+            queued.set(false)
+            applyAll(app)
+        }
+    }
+
+    @VisibleForTesting
+    @Synchronized
     fun applyAll(context: Context) {
         applyManagedConfig(context)
         configFiles(context).forEach { applyConfigFile(context, it) }
+    }
+
+    /** Makes every source apply again on the next check (after a migration of the stored configuration). */
+    fun forgetApplied(context: Context) {
+        prefs(context).edit { prefs(context).all.keys.filter { it == "managed" || it.startsWith("file:") }.forEach(::remove) }
     }
 
     /**
@@ -40,7 +72,7 @@ object Provisioning {
 
     fun configFiles(context: Context): List<File> = listOfNotNull(
         context.getExternalFilesDir(null)?.let { File(it, CONFIG_FILE_NAME) },
-        File("/enterprise/usr", CONFIG_FILE_NAME),
+        File(ENTERPRISE_DIR, CONFIG_FILE_NAME),
     )
 
     private fun applyManagedConfig(context: Context) {
@@ -93,9 +125,36 @@ object Provisioning {
         val key = "file:${file.path}"
         if (fingerprint == prefs(context).getString(key, null)) return
         runSource(context, file.path) {
-            ConfigStore.get(context).import(ConfigJson.parse(file.readText()))
+            val text = file.readText()
+            val config = ConfigJson.parse(text)
+            checkFileAllowed(context, file, text)
+            ConfigStore.get(context).import(config)
         }
+        // Also after a refusal: a wrong password must not be counted again on every focus change.
         prefs(context).edit { putString(key, fingerprint) }
+    }
+
+    /**
+     * `/enterprise/usr` is written by Zebra's MX (StageNow, EMM) only, and on a managed device the
+     * EMM controls the app folder. Otherwise the app folder is reachable over USB and, before
+     * Android 11, by any app with storage permission: then the file must carry the current admin
+     * password, and without one it is accepted on Android 11+ only.
+     */
+    private fun checkFileAllowed(context: Context, file: File, text: String) {
+        if (file.parent == ENTERPRISE_DIR || isManaged(context)) return
+        val hash = ConfigStore.get(context).config.adminPasswordHash
+        if (hash == null) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                throw ConfigException("Refused: before Android 11 other apps can write this folder. Set an admin password and add it as \"$FILE_PASSWORD_KEY\", or use /enterprise/usr or the managed configuration.")
+            }
+            return
+        }
+        val password = runCatching { JSONObject(text).optString(FILE_PASSWORD_KEY, "") }.getOrDefault("")
+        when (PasswordGuard.remote(context).check(password, hash)) {
+            PasswordGuard.Result.OK -> Unit
+            PasswordGuard.Result.WRONG -> throw ConfigException("Refused: \"$FILE_PASSWORD_KEY\" with the current admin password is missing or wrong")
+            PasswordGuard.Result.LOCKED -> throw ConfigException("Refused: locked after too many wrong passwords, change the file again in a few minutes")
+        }
     }
 
     /** Remembers the outcome of a configuration source for the settings screen (`null` = applied). */
