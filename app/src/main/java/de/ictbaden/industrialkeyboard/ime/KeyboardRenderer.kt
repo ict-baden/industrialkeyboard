@@ -45,6 +45,8 @@ object KeyboardRenderer {
         scannerName: String?,
         @DrawableRes enterIcon: Int = R.drawable.kb_enter,
         scanning: Boolean = false,
+        /** No enlarged key preview over a password field: it would show the password to bystanders. */
+        passwordField: Boolean = false,
     ): RenderState {
         val appearance = config.appearance
         val rowHeight = (BASE_ROW_DP * context.resources.displayMetrics.density * appearance.keyHeight / 100f).toInt()
@@ -59,7 +61,7 @@ object KeyboardRenderer {
             enterIcon = enterIcon,
             rowHeight = rowHeight,
             heightRows = Layouts.alpha(config).rows.size,
-            keyPopups = config.feedback.keyPopup,
+            keyPopups = config.feedback.keyPopup && !passwordField,
             longPressDelay = config.typing.longPressDelay.toLong(),
             widthPercent = appearance.width,
             scannerName = scannerName,

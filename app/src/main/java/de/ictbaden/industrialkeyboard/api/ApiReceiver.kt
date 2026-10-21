@@ -7,7 +7,7 @@ import android.util.Log
 import de.ictbaden.industrialkeyboard.config.ConfigException
 import de.ictbaden.industrialkeyboard.config.ConfigJson
 import de.ictbaden.industrialkeyboard.config.ConfigStore
-import de.ictbaden.industrialkeyboard.config.PasswordHasher
+import de.ictbaden.industrialkeyboard.config.PasswordGuard
 import de.ictbaden.industrialkeyboard.config.Provisioning
 
 /**
@@ -26,13 +26,18 @@ class ApiReceiver : BroadcastReceiver() {
     private fun installConfig(context: Context, intent: Intent) {
         val store = ConfigStore.get(context)
         val hash = store.config.adminPasswordHash
-        if (hash != null && !PasswordHasher.verify(intent.getStringExtra(KeyboardApi.EXTRA_PASSWORD).orEmpty(), hash)) {
-            finish(context, KeyboardApi.RESULT_PASSWORD, "Admin password missing or wrong")
-            return
+        if (hash != null) {
+            // Wrong passwords lock this channel for a while, so an app cannot try them all.
+            when (PasswordGuard.remote(context).check(intent.getStringExtra(KeyboardApi.EXTRA_PASSWORD).orEmpty(), hash)) {
+                PasswordGuard.Result.OK -> Unit
+                PasswordGuard.Result.WRONG -> return finish(context, KeyboardApi.RESULT_PASSWORD, "Admin password missing or wrong")
+                PasswordGuard.Result.LOCKED -> return finish(context, KeyboardApi.RESULT_PASSWORD, "Locked after too many wrong passwords, try again in a few minutes")
+            }
         }
         // Any app can send this broadcast and Android does not tell us which one did: without a
         // password only an EMM-managed device may be configured this way, otherwise any app could
-        // reconfigure the keyboard of a store install.
+        // reconfigure the keyboard of a store install. On a managed device without a password every
+        // app can, too – documented in docs/deployment.md: set an admin password.
         if (hash == null && !Provisioning.isManaged(context)) {
             finish(context, KeyboardApi.RESULT_PASSWORD, "Refused: no admin password set and the device is not managed by an EMM. Set an admin password or use a configuration file or managed configuration.")
             return

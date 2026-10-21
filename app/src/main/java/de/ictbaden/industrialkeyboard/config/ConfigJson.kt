@@ -5,7 +5,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
-class ConfigException(message: String) : Exception(message)
+open class ConfigException(message: String) : Exception(message)
 
 /** The JSON configuration format (version 1). */
 object ConfigJson {
@@ -13,12 +13,16 @@ object ConfigJson {
 
     private val COLOR = Regex("#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})")
     private val ID = Regex("[a-z0-9][a-z0-9_-]{0,23}")
+    private val PACKAGE = Regex("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+")
+    private val JSON_POSITION = Regex("at character (\\d+)")
 
     fun parse(text: String): KeyboardConfig {
         val root = try {
             JSONObject(text)
         } catch (e: JSONException) {
-            throw ConfigException("Invalid JSON: ${e.message}")
+            // org.json appends the whole input to its message, admin password included: position only.
+            val position = e.message?.let { JSON_POSITION.find(it)?.groupValues?.get(1) }
+            throw ConfigException(if (position != null) "Invalid JSON at character $position" else "Invalid JSON")
         }
         val version = root.optInt("version", VERSION)
         if (version > VERSION) throw ConfigException("Configuration version $version is newer than this app supports ($VERSION)")
@@ -92,6 +96,8 @@ object ConfigJson {
                 put("action", s.input.action)
                 put("extra", s.input.extra)
                 put("suffix", s.input.suffix.key)
+                putOpt("permission", s.input.permission)
+                if (s.input.allowedPackages.isNotEmpty()) put("allowedPackages", JSONArray(s.input.allowedPackages))
             })
         })
         if (config.customLayouts.isNotEmpty()) {
@@ -106,6 +112,7 @@ object ConfigJson {
                                     row.forEach { key ->
                                         put(JSONObject().apply {
                                             put("label", key.label)
+                                            // Output exactly as typed: a space key is " ", never trimmed.
                                             if (key.output != key.label) put("output", key.output)
                                             if (key.width != 1f) put("width", key.width.toString().toDouble()) // 1.2, not 1.2000000476837158
                                             if (key.style != KeyStyle.NORMAL) put("style", key.style.key)
@@ -218,6 +225,8 @@ object ConfigJson {
                     action = input.optNonBlank("action") ?: inputDefaults.action,
                     extra = input.optNonBlank("extra") ?: inputDefaults.extra,
                     suffix = enumValue(input, "suffix", "scanner.input", inputDefaults.suffix),
+                    permission = input.optNonBlank("permission"),
+                    allowedPackages = packages(input.optJSONArray("allowedPackages"), "scanner.input.allowedPackages"),
                 )
             },
         )
@@ -249,14 +258,25 @@ object ConfigJson {
         return layouts
     }
 
+    private fun packages(array: JSONArray?, where: String): List<String> {
+        array ?: return emptyList()
+        return (0 until array.length()).map { i ->
+            val name = array.optString(i, "").trim()
+            if (!name.matches(PACKAGE)) throw ConfigException("$where[$i]: \"$name\" is not a package name")
+            name
+        }.distinct()
+    }
+
     private fun parseCustomKey(value: Any?, where: String): CustomKey = when (value) {
         is String -> {
+            if (value.isEmpty()) throw ConfigException("$where: empty key")
             checkMacro(value, where)
             CustomKey(label = "", output = value)
         }
         is JSONObject -> {
-            val label = value.optString("label", "")
-            val output = value.optNonBlank("output") ?: label.ifEmpty { throw ConfigException("$where: label or output required") }
+            val label = value.optRaw("label")
+            // Not trimmed: " " is a space key.
+            val output = value.optRaw("output").ifEmpty { label }.ifEmpty { throw ConfigException("$where: label or output required") }
             checkMacro(output, "$where.output")
             val width = value.optDouble("width", 1.0)
             if (width.isNaN() || width < 0.5 || width > 10) throw ConfigException("$where.width: 0.5–10 expected")
@@ -292,6 +312,9 @@ object ConfigJson {
         return (listOf(Languages.AUTO) + Languages.SUPPORTED).firstOrNull { it.equals(value, ignoreCase = true) }
             ?: throw ConfigException("language: unknown language \"$value\" (${Languages.AUTO}, ${Languages.SUPPORTED.joinToString()})")
     }
+
+    /** The string as written (`""` when missing or null). */
+    private fun JSONObject.optRaw(name: String): String = if (has(name) && !isNull(name)) optString(name) else ""
 
     private fun JSONObject.optNonBlank(name: String): String? =
         if (has(name) && !isNull(name)) optString(name).trim().ifEmpty { null } else null

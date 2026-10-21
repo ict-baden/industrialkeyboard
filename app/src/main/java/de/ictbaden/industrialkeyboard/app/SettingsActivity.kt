@@ -156,7 +156,7 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        Provisioning.applyAll(this)
+        Provisioning.applyAllAsync(this)
         render()
     }
 
@@ -399,7 +399,10 @@ class SettingsActivity : AppCompatActivity() {
                     ui.switchRow(
                         R.drawable.ic_scan,
                         getString(R.string.scan_from_broadcasts),
-                        c.scanner.input.action,
+                        // Android does not tell who sent a broadcast: say so while nothing restricts the senders.
+                        c.scanner.input.let { input ->
+                            if (input.enabled && input.permission == null && input.allowedPackages.isEmpty()) getString(R.string.scan_from_broadcasts_open, input.action) else input.action
+                        },
                         c.scanner.input.enabled,
                     ) { on -> update { it.copy(scanner = it.scanner.copy(input = it.scanner.input.copy(enabled = on))) } },
                     ui.choiceRow(
@@ -467,7 +470,7 @@ class SettingsActivity : AppCompatActivity() {
                     ) { imm?.showInputMethodPicker() },
                     // About block required by ict-baden/richtlinien 07.
                     ui.row(R.drawable.ic_lock, getString(R.string.about_privacy), getString(R.string.about_privacy_summary)) {
-                        openLink("$SOURCE/blob/main/docs/data-and-privacy.md")
+                        openLink(PRIVACY)
                     },
                     ui.row(R.drawable.ic_info, getString(R.string.about_licence), getString(R.string.about_licence_summary)) {
                         dialogs.message(getString(R.string.about_licence), asset("LICENSE"))
@@ -498,7 +501,11 @@ class SettingsActivity : AppCompatActivity() {
         ProgrammableKey.NUMERIC_P4 -> R.string.key_numeric_p4
     }
 
-    private fun languageName(language: String) = AppLanguage.NAMES[language] ?: getString(R.string.language_system)
+    private fun languageName(language: String): String {
+        val name = AppLanguage.NAMES[language] ?: return getString(R.string.language_system)
+        // Not yet proofread by native speakers (richtlinien/13-sprachen.md).
+        return if (language in AppLanguage.MACHINE_TRANSLATED) getString(R.string.language_machine_translated, name) else name
+    }
 
     /** Stored in `language` like every other setting; KeyboardApp applies it on every change. */
     private fun pickLanguage() {
@@ -566,7 +573,8 @@ class SettingsActivity : AppCompatActivity() {
     private companion object {
         const val KEY_UNLOCKED = "unlocked"
         const val SOURCE = "https://github.com/ict-baden/industrialkeyboard"
-        const val WEBSITE = "https://ict-baden.de"
-        const val IMPRESSUM = "https://ict-baden.de/impressum"
+        const val WEBSITE = "https://ict-baden.de/produkte/industrial-keyboard/"
+        const val IMPRESSUM = "https://ict-baden.de/impressum/"
+        const val PRIVACY = "https://ict-baden.de/datenschutz/industrialkeyboard/"
     }
 }

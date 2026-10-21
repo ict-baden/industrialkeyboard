@@ -4,6 +4,8 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ## [Unveröffentlicht]
 
+## [2.1.0] – 2026-10-21
+
 ### Neu
 - **Oberfläche in fünf Sprachen:** Englisch, Deutsch, Spanisch, Französisch und Chinesisch (vereinfacht), nach Richtlinie 13 von ICT-Baden. Einrichtung, Einstellungen, Dialoge, Scan-Pad und das Schema der Managed Configuration sind übersetzt; die Tastenbeschriftungen bleiben, wie sie sind.
 - Sprache wählbar unter **Einstellungen → Aussehen → Sprache**, per Konfiguration (`"language": "de"`) oder als Einzeloption `language` der Managed Configuration. Standard `auto` folgt dem Gerät.
@@ -15,8 +17,25 @@ Die Übersetzungen sind maschinell vorübersetzt und müssen vor dem ersten öff
 ### Sicherheit
 - **Konfigurations-Broadcasts (`INSTALL_CONFIG`) werden nur noch mit Admin-Passwort angenommen oder – solange keins gesetzt ist – auf Geräten, die ein EMM verwaltet** (Managed Configuration, Device oder Profile Owner). Bisher konnte auf einem nicht verwalteten Gerät jede App die Tastatur umkonfigurieren. **Handlungsbedarf**, wer nicht verwaltete Geräte per Broadcast konfiguriert (StageNow ohne EMM, adb): vorher ein Admin-Passwort setzen und als `password` mitsenden oder die Konfigurationsdatei nutzen (`/enterprise/usr/industrialkeyboard.json`). Abgelehnte Broadcasts stehen in den Einstellungen unter Konfiguration.
 
+- **Scans per Broadcast (`SCAN_INPUT`) sind ab Werk aus.** Android sagt einem Empfänger nicht, welche App einen Broadcast geschickt hat; bisher konnte jede App in das fokussierte Feld tippen, auch in Passwortfelder. Jetzt gilt: nur wenn `scanner.input.enabled` eingeschaltet ist, nie in Passwortfelder oder Felder ohne Texteditor (`TYPE_NULL`), nur bei sichtbarer Tastatur, höchstens 8 192 Zeichen. Neu `scanner.input.permission` (Berechtigung, die der Absender haben muss) und `scanner.input.allowedPackages` (Android 14+, nur Absender, die sich ausweisen). **Handlungsbedarf**, wer DataWedge mit Intent-Ausgabe an die Tastatur nutzt: `"scanner": { "input": { "enabled": true } }` in die Konfiguration. Beim Update wird der Scan-Eingang einmalig ausgeschaltet – außer die Managed Configuration (`config_json`) oder eine Konfigurationsdatei auf dem Gerät schaltet ihn ausdrücklich ein; sonst bleibt die Konfiguration, wie sie ist. Wer ihn per Broadcast-Konfiguration eingeschaltet hatte, sendet sie neu.
+- **Konfigurationsdatei im App-Ordner** (`Android/data/…/files/industrialkeyboard.json`) wird auf nicht verwalteten Geräten nur noch ab Android 11 angenommen und, sobald ein Admin-Passwort gesetzt ist, nur mit dem aktuellen Passwort (`"password"` in der Datei). Enthält die Datei ein Passwort, wird sie nach dem Anwenden gelöscht. `/enterprise/usr` und verwaltete Geräte wie bisher.
+- **Sperre nach Fehlversuchen:** Nach 5 falschen Admin-Passwörtern werden Broadcasts und Dateien 5 Minuten lang abgelehnt, ebenso der Passwortdialog der Einstellungen (eigener Zähler, damit eine App den Administrator nicht aussperren kann).
+- Fehlermeldungen zu ungültigem JSON enthalten nicht mehr den ganzen Text – bisher stand so ein mitgesendetes Admin-Passwort im Klartext in logcat und unter „Letzter Fehler“.
+- Keine vergrößerte Tastenvorschau mehr über Passwortfeldern.
+- Passwort-Hashes mit mehr als 1 000 000 Iterationen werden abgelehnt (hätten das Gerät beim Prüfen minutenlang blockiert).
+
 ### Behoben
 - Ein leeres Passwort (Einstellungsdialog oder Broadcast ohne `password`) bringt die App unter Android nicht mehr zum Absturz.
+- **Eine Leertaste im eigenen Layout (`" "`) setzte beim nächsten Start die ganze Konfiguration samt Admin-Passwort auf Standard zurück.** Die Taste wird jetzt richtig gespeichert und geladen. Lässt sich die gespeicherte Konfiguration trotzdem einmal nicht lesen, bleibt das Admin-Passwort erhalten, die Datei wird als `config.json.invalid-…` aufbewahrt und der Fehler steht unter Konfiguration.
+- Die Sprache aus Konfiguration oder MDM wird unter Android 13+ auch dann angewandt, wenn noch kein Einstellungsfenster offen war.
+- Konfigurationsquellen werden im Hintergrund geprüft, nicht mehr bei jedem Feldwechsel auf dem UI-Thread.
+- Französische Store-Texte: Steuerzeichen statt Doppelpunkt entfernt.
+
+### Doku
+- Neue Seite [Limitations](docs/limitations.md): getestet an Zebra HC20 (Android 15) mit DataWedge, Honeywell nur nach Herstellerdoku, Übersetzungen maschinell.
+- Spanisch, Französisch und Chinesisch sind in der Sprachauswahl und im README als maschinell übersetzt gekennzeichnet.
+- Datenschutz-Link in den Einstellungen und im README: https://ict-baden.de/datenschutz/industrialkeyboard/, Impressum https://ict-baden.de/impressum/, Webseite https://ict-baden.de/produkte/industrial-keyboard/.
+- Repository heißt jetzt `ict-baden/industrialkeyboard` (alte Adresse leitet weiter).
 
 ## [2.0.0] – 2026-10-17
 
