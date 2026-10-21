@@ -71,7 +71,7 @@
 **1. Install the app** – download the APK from the [releases](../../releases/latest) and distribute it with your MDM, or install it over USB:
 
 ```bash
-adb install -r IndustrialKeyboard-2.1.0.apk
+adb install -r IndustrialKeyboard-2.1.1.apk
 ```
 
 **2. Switch it on** – open *Industrial Keyboard* on the device, tap **Enable** and **Select**. Over USB:

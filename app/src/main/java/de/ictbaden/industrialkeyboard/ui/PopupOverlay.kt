@@ -9,6 +9,7 @@ import android.graphics.Typeface
 import android.os.SystemClock
 import android.util.TypedValue
 import android.view.View
+import androidx.core.graphics.withScale
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.max
@@ -124,18 +125,17 @@ class PopupOverlay(context: Context) : View(context), PopupHost {
     private fun drawPreview(canvas: Canvas, label: String) {
         val age = SystemClock.uptimeMillis() - previewShownAt
         val scale = if (age < POP_MS) 0.86f + 0.14f * age / POP_MS else 1f
-        canvas.save()
-        canvas.scale(scale, scale, previewRect.centerX(), previewRect.bottom)
-        val radius = dp(12f)
-        fill.color = palette.popup
-        fill.setShadowLayer(dp(8f), 0f, dp(3f), 0x55000000)
-        canvas.drawRoundRect(previewRect, radius, radius, fill)
-        fill.clearShadowLayer()
-        text.color = palette.popupText
-        text.textSize = min(sp(30f), previewRect.height() * 0.42f)
-        val cy = previewRect.top + previewRect.height() * 0.42f
-        canvas.drawText(label, previewRect.centerX(), cy - (text.descent() + text.ascent()) / 2, text)
-        canvas.restore()
+        canvas.withScale(scale, scale, previewRect.centerX(), previewRect.bottom) {
+            val radius = dp(12f)
+            fill.color = palette.popup
+            fill.setShadowLayer(dp(8f), 0f, dp(3f), 0x55000000)
+            canvas.drawRoundRect(previewRect, radius, radius, fill)
+            fill.clearShadowLayer()
+            text.color = palette.popupText
+            text.textSize = min(sp(30f), previewRect.height() * 0.42f)
+            val cy = previewRect.top + previewRect.height() * 0.42f
+            canvas.drawText(label, previewRect.centerX(), cy - (text.descent() + text.ascent()) / 2, text)
+        }
         if (age < POP_MS) postInvalidateOnAnimation()
     }
 

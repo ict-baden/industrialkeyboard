@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -130,7 +131,11 @@ class SettingsActivity : AppCompatActivity() {
         // Only a successful unlock survives a rotation; a recreated activity must not skip the password.
         unlocked = savedInstanceState?.getBoolean(KEY_UNLOCKED) == true
         val hash = store.config.adminPasswordHash
-        if (hash != null && !unlocked) {
+        if (store.unreadable) {
+            // No password can match: say why instead of counting wrong entries.
+            content.visibility = View.INVISIBLE
+            dialogs.message(getString(R.string.settings_protected), dialogs.withCode(getString(R.string.config_unreadable), ErrorCodes.CONFIG_UNREADABLE)) { finish() }
+        } else if (hash != null && !unlocked) {
             content.visibility = View.INVISIBLE
             dialogs.requirePassword(hash) { ok ->
                 if (ok) {
@@ -527,7 +532,7 @@ class SettingsActivity : AppCompatActivity() {
     /** Fixed https links only; locked-down devices often have no browser, then the address is shown. */
     private fun openLink(url: String) {
         try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
         } catch (_: ActivityNotFoundException) {
             dialogs.message(getString(R.string.no_browser), url)
         }

@@ -167,12 +167,13 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
             .show()
     }
 
-    fun message(title: String, message: String) {
+    fun message(title: String, message: String, onClose: () -> Unit = {}) {
         MaterialAlertDialogBuilder(activity)
             .setIcon(ui.icon(R.drawable.ic_info))
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton(R.string.button_ok, null)
+            .setOnDismissListener { onClose() }
             .show()
     }
 
