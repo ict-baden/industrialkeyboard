@@ -1,0 +1,20 @@
+name: Frage / Question
+description: Wie geht etwas, passt die Tastatur zu meinem Einsatz? / How does something work, does the keyboard fit my use?
+labels: [question]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Bitte zuerst in der [Dokumentation](https://github.com/ict-baden/industrialkeyboard#-documentation) nachsehen. Keine Passwörter, internen Hostnamen oder Kundendaten einfügen – dieses Issue ist öffentlich.
+        Please check the [documentation](https://github.com/ict-baden/industrialkeyboard#-documentation) first. Do not paste passwords, internal host names or customer data – this issue is public.
+  - type: textarea
+    id: frage
+    attributes:
+      label: Frage / Question
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Gerät, Android-Version, MDM / Device, Android version, MDM
+      placeholder: Zebra TC22, Android 14, SOTI MobiControl

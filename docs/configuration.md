@@ -159,7 +159,7 @@ keyboards, double tap on Shift for caps lock, long press on the hide button for 
 
 | Option | Values | Default | Effect |
 |---|---|---|---|
-| `keyPopup` | `true` / `false` | `true` | Preview bubble above the pressed key |
+| `keyPopup` | `true` / `false` | `true` | Preview bubble above the pressed key; never in password fields (visible ones included) |
 | `sound` | `true` / `false` | `false` | Click sound (independent of the system's touch sounds) |
 | `soundVolume` | 0–100 | not set = default volume | Click volume |
 | `vibrate` | `true` / `false` | `true` | Short vibration on every key |
@@ -246,8 +246,9 @@ Examples: `OK{ENTER}` · `{F13}` · `{TAB}{TAB}` · `{U+00E4}` · `{SHOW:picking
 { "adminPassword": "change-me" }
 ```
 
-- Protects the keyboard settings (asked when they are opened) and configuration broadcasts
-  (`INSTALL_CONFIG` needs the extra `password`; without a password broadcasts are only accepted on EMM-managed devices).
+- Protects the keyboard settings (asked when they are opened), configuration broadcasts
+  (`INSTALL_CONFIG` needs the extra `password`; without a password broadcasts are only accepted on EMM-managed devices)
+  and configuration files in the app folder (top-level `"password"`), see [Deployment](deployment.md#configuration-file).
 - Stored only as a salted PBKDF2 hash; an export contains `adminPasswordHash` instead of the
   password, and importing that export keeps the same password.
 - A configuration without `adminPassword` keeps the current password. Change or remove it in

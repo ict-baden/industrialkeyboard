@@ -5,8 +5,7 @@ Industrial Keyboard is free and open source. There are two ways to get help.
 
 ## Kostenlos: GitHub / Free: GitHub
 
-- **Fehler und Wünsche:** [Issue anlegen](https://github.com/ict-baden/industrialkeyboard/issues/new/choose)
-- **Fragen:** [Discussions](https://github.com/ict-baden/industrialkeyboard/discussions)
+- **Fehler, Wünsche und Fragen / Bugs, requests and questions:** [Issue anlegen / open an issue](https://github.com/ict-baden/industrialkeyboard/issues/new/choose)
 
 Wir lesen alles, können aber keine Reaktionszeit zusagen. Alles dort ist öffentlich – bitte keine internen Daten.
 We read everything but cannot promise response times. Everything there is public.

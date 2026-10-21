@@ -15,7 +15,7 @@ android {
         targetSdk = 36
         // The CI passes -PversionCode (run number) and -PversionName (e.g. 1.0.0-ci.12).
         versionCode = (findProperty("versionCode") as String?)?.toInt() ?: 1
-        versionName = findProperty("versionName") as String? ?: "2.1.0"
+        versionName = findProperty("versionName") as String? ?: "2.1.1"
         buildConfigField("String", "COMMIT", "\"${System.getenv("GITHUB_SHA")?.take(7) ?: "local"}\"")
     }
 
@@ -62,6 +62,11 @@ android {
     lint {
         // Covered by the bundle setting above; Play Core on-demand languages are not needed.
         disable += "AppBundleLocaleChanges"
+        // "1-2-3" and "7-8-9" are rows of keys, not ranges: an en dash would be wrong.
+        disable += "TypographyDashes"
+        // Kept visible, but no warning: targetSdk 37 waits until it can be tested on an Android 17
+        // device (Play requires it from August 2027); library updates come through Dependabot.
+        informational += listOf("OldTargetApi", "GradleDependency")
     }
 
     testOptions {

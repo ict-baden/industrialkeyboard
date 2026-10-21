@@ -134,6 +134,7 @@
 
     <string name="settings_protected">Einstellungen sind geschützt</string>
     <string name="wrong_password">Falsches Passwort</string>
+    <string name="config_unreadable">Die gespeicherte Konfiguration lässt sich nicht lesen. Das Admin-Passwort ist deshalb unbekannt, die Einstellungen bleiben gesperrt. Starten Sie das Gerät neu. Hilft das nicht, setzen Sie das Admin-Passwort mit Ihrem EMM (admin_password) oder löschen Sie den Speicher der App (Android-Einstellungen → Apps → Industrial Keyboard → Speicher).</string>
     <string name="password_locked">Zu viele falsche Passwörter. Erneut versuchen in %1$d Min.</string>
     <string name="new_password">Neues Passwort</string>
     <string name="new_password_summary">Leer lassen, um das Passwort zu entfernen</string>

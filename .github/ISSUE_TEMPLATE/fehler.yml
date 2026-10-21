@@ -1,6 +1,6 @@
 name: Fehler melden / Bug report
 description: Etwas funktioniert nicht wie beschrieben. / Something does not work as documented.
-labels: [fehler]
+labels: [bug]
 body:
   - type: markdown
     attributes:

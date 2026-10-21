@@ -34,11 +34,12 @@ Done once, by a person with access to the company accounts:
    accounts need.
 2. **Package name** is final once the app exists in Play: `de.ictbaden.industrialkeyboard`.
    The domain `ict-baden.de` belongs to ICT-Baden.
-3. **Privacy policy URL:** `https://ict-baden.de/datenschutz/industrialkeyboard/` (German and English,
-   source in `ict-baden/website`, `src/pages/datenschutz/[app].astro`). It must be online before
-   the app is submitted.
+3. **Privacy policy URL:** `https://ict-baden.de/datenschutz/industrialkeyboard/` (German and
+   English, matching [Data and privacy](data-and-privacy.md)). It must be online before the app
+   is submitted.
 4. **Contact details** for the store listing: e-mail (e.g. `support@ict-baden.de`), website.
-5. **Translations** of the app and of the store texts read by native speakers (richtlinien/13).
+5. **Translations** of the app and of the store texts read by native speakers (Spanish, French
+   and Chinese are machine translations so far).
 
 ## App signing
 
@@ -102,8 +103,10 @@ enables the keyboard). No sensitive permissions that need a declaration form.
 
 ## Publishing a version
 
-1. Update `CHANGELOG.md`, push the tag `vX.Y.Z`.
-2. The CI builds and signs APK and App Bundle and attaches both to the GitHub release.
+1. Update `CHANGELOG.md`, then push an annotated tag whose message is the changelog section in
+   English: `git tag -a vX.Y.Z -F notes.md --cleanup=verbatim`.
+2. The CI builds and signs APK and App Bundle and attaches both to the GitHub release, with the
+   tag message as release text.
 3. Play Console → *Testing → Internal testing* → create a release → upload the `.aab`
    → release notes from the changelog → roll out to the internal testers.
 4. Check the pre-launch report, then promote the release to *Production*.

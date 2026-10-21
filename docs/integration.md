@@ -46,9 +46,11 @@ one step and adds **Enter** (default), **Tab** or nothing
   `barcode_string`, `decode_string` and `com.honeywell.aidc.extra.EXTRA_DATA` are understood
   as well.
 - Industrial Keyboard must be the active keyboard, visible, and a text field must have focus.
-- Never typed into password fields (hidden text) or fields without a text editor
-  (`TYPE_NULL`, some terminal emulators) – use keystroke output there. Barcodes longer than
-  8,192 characters are ignored.
+- Never typed into password fields or fields without a text editor (`TYPE_NULL`, some
+  terminal emulators) – use keystroke output there. Visible password fields
+  (`textVisiblePassword`) count as password fields: apps switch to them for "show password". If
+  your app uses that type only to turn off suggestions, use `textNoSuggestions` instead, or
+  keystroke output. Barcodes longer than 8,192 characters are ignored.
 
 **DataWedge setup** – in the profile of your app:
 

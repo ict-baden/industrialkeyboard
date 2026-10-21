@@ -22,6 +22,18 @@ object PasswordHasher {
         return "$PREFIX\$$ITERATIONS\$${encoder.encodeToString(salt)}\$${encoder.encodeToString(key)}"
     }
 
+    /**
+     * A valid hash that no password matches: random salt and key, not derived from anything. Locks
+     * the settings when the stored password cannot be known; costs no key derivation.
+     */
+    fun unknown(): String {
+        val random = SecureRandom()
+        val encoder = Base64.getEncoder()
+        val salt = ByteArray(16).also { random.nextBytes(it) }
+        val key = ByteArray(KEY_BITS / 8).also { random.nextBytes(it) }
+        return "$PREFIX\$$ITERATIONS\$${encoder.encodeToString(salt)}\$${encoder.encodeToString(key)}"
+    }
+
     fun verify(password: String, stored: String?): Boolean {
         // Android's PBKDF2 throws on an empty password instead of returning a key.
         if (password.isEmpty()) return false

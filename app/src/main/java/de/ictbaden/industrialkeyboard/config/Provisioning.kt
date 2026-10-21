@@ -44,6 +44,11 @@ object Provisioning {
         }
     }
 
+    /**
+     * While the stored configuration cannot be read, [ConfigStore] keeps changes in memory only:
+     * then every source is applied again on each check instead of being marked as done. An
+     * `admin_password` of the EMM so also ends that state by itself.
+     */
     @VisibleForTesting
     @Synchronized
     fun applyAll(context: Context) {
@@ -84,9 +89,9 @@ object Provisioning {
     private fun applyManagedConfig(context: Context) {
         val restrictions = context.getSystemService(RestrictionsManager::class.java)?.applicationRestrictions ?: return
         val fingerprint = fingerprint(restrictions)
-        if (fingerprint == prefs(context).getString("managed", null)) return
+        val store = ConfigStore.get(context)
+        if (fingerprint == prefs(context).getString("managed", null) && !store.unreadable) return
         runSource(context, "Managed configuration") {
-            val store = ConfigStore.get(context)
             val configJson = restrictions.getString("config_json")?.trim()
             if (!configJson.isNullOrEmpty()) {
                 store.import(ConfigJson.parse(configJson))
@@ -99,7 +104,7 @@ object Provisioning {
                 }
             }
         }
-        prefs(context).edit { putString("managed", fingerprint) }
+        if (!store.unreadable) prefs(context).edit { putString("managed", fingerprint) }
     }
 
     /** The single options of the managed configuration schema. */
@@ -129,40 +134,47 @@ object Provisioning {
         if (!file.canRead()) return
         val fingerprint = "${file.lastModified()}:${file.length()}"
         val key = "file:${file.path}"
-        if (fingerprint == prefs(context).getString(key, null)) return
+        if (fingerprint == prefs(context).getString(key, null) && !ConfigStore.get(context).unreadable) return
         var locked = false
         runSource(context, file.path) {
             val text = file.readText()
-            val config = ConfigJson.parse(text)
             try {
+                val config = ConfigJson.parse(text)
                 checkFileAllowed(context, file, text)
+                ConfigStore.get(context).import(config)
             } catch (e: LockedException) {
                 locked = true
                 throw e
-            }
-            ConfigStore.get(context).import(config)
-            // A password in plain text must not stay in the app folder once it has been used.
-            val secret = text.contains("\"$FILE_PASSWORD_KEY\"") || text.contains("\"adminPassword\"")
-            if (file.parent != ENTERPRISE_DIR && secret && !file.delete()) {
-                Log.w(TAG, "Could not delete ${file.path} with the admin password")
+            } finally {
+                // A password in plain text must not stay in the app folder once the file has been read,
+                // applied or refused (the error is shown in the settings) – only during the lock it
+                // stays, to be tried again.
+                if (!locked) deleteIfSecret(file, text)
             }
         }
         // Also after a refusal, so a wrong password is not counted again on every focus change –
         // but not while locked: then the file is tried again (costs no attempt) until the lock ends.
-        if (!locked) prefs(context).edit { putString(key, fingerprint) }
+        if (!locked && !ConfigStore.get(context).unreadable) prefs(context).edit { putString(key, fingerprint) }
+    }
+
+    private fun deleteIfSecret(file: File, text: String) {
+        val secret = text.contains("\"$FILE_PASSWORD_KEY\"") || text.contains("\"adminPassword\"")
+        if (file.parent != ENTERPRISE_DIR && secret && !file.delete()) {
+            Log.w(TAG, "Could not delete ${file.path} with the admin password")
+        }
     }
 
     private class LockedException : ConfigException("Refused: locked after too many wrong passwords, tried again in a few minutes")
 
     /**
-     * `/enterprise/usr` is written by Zebra's MX (StageNow, EMM) only, and on a managed device the
-     * EMM controls the app folder. Otherwise the app folder is reachable over USB, and before
-     * Android 11 any app with storage permission can read and write it: there it is refused, from
-     * Android 11 on it must carry the current admin password once one is set.
+     * `/enterprise/usr` is written by Zebra's MX (StageNow, EMM) only. The app folder is reachable
+     * over USB, and before Android 11 any app with storage permission can read and write it – also
+     * on a managed device. So, like the `INSTALL_CONFIG` broadcast, a file there must carry the
+     * current admin password once one is set; before Android 11 it is refused on unmanaged devices.
      */
     private fun checkFileAllowed(context: Context, file: File, text: String) {
-        if (file.parent == ENTERPRISE_DIR || isManaged(context)) return
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+        if (file.parent == ENTERPRISE_DIR) return
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && !isManaged(context)) {
             throw ConfigException("Refused: before Android 11 other apps can read and write this folder. Use /enterprise/usr, the managed configuration or the INSTALL_CONFIG broadcast.")
         }
         val hash = ConfigStore.get(context).config.adminPasswordHash ?: return

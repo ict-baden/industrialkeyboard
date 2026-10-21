@@ -36,9 +36,17 @@ Please report results on other devices in the
   broadcast. That is why typing scan broadcasts is off by default; when switched on, restrict the
   senders with `permission` or `allowedPackages` where your scanner app allows it
   ([details](integration.md#option-b--the-keyboard-types-it)). Barcodes are never typed into
-  password fields.
+  password fields, visible ones (`textVisiblePassword`) included – use keystroke output for barcode
+  fields of that type.
 - **`INSTALL_CONFIG` on a managed device without admin password:** every app on the device can
-  reconfigure the keyboard. Set an admin password ([Deployment](deployment.md#broadcast-intent-stagenow-adb)).
+  reconfigure the keyboard – before Android 11 also with a file in the app folder. Set an admin
+  password ([Deployment](deployment.md#broadcast-intent-stagenow-adb)).
+- **Wrong passwords lock the remote channels:** any app can send 5 wrong passwords every 5
+  minutes and so keep `INSTALL_CONFIG` and the app folder locked. The managed configuration,
+  `/enterprise/usr` and the settings screen still work ([Deployment](deployment.md#broadcast-intent-stagenow-adb)).
+- **Stored configuration unreadable** (storage error): the settings stay locked, because the admin
+  password is unknown (`IK-0106`). Restart the device; otherwise set the admin password with the EMM
+  (`admin_password`) or clear the app's storage.
 - The admin password protects the settings screen and remote configuration. It is not a device
   lock: whoever can uninstall the app or clear its data gets the defaults.
 

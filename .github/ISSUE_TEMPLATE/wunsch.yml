@@ -1,6 +1,6 @@
 name: Wunsch / Feature request
 description: Eine Idee, was das Werkzeug zusätzlich können sollte. / An idea for something new.
-labels: [wunsch]
+labels: [enhancement]
 body:
   - type: textarea
     id: problem

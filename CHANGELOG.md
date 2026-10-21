@@ -4,6 +4,21 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ## [Unveröffentlicht]
 
+## [2.1.1] – 2026-10-21
+
+### Sicherheit
+- **Konfigurationsdatei im App-Ordner auf verwalteten Geräten:** Sie braucht jetzt wie der `INSTALL_CONFIG`-Broadcast das aktuelle Admin-Passwort (`"password"` in der Datei), sobald eins gesetzt ist. Bisher wurde sie auf EMM-verwalteten Geräten ohne Prüfung angenommen – auch unter Android 8–10, wo jede App mit Speicherberechtigung in den Ordner schreiben kann; so ließen sich Konfiguration und Passwort ohne Passwort ersetzen. `/enterprise/usr` und die Managed Configuration bleiben ohne Passwort. **Handlungsbedarf**, wer auf verwalteten Geräten mit Admin-Passwort Dateien in den App-Ordner legt: `"password"` ergänzen oder auf `/enterprise/usr` bzw. die Managed Configuration umstellen.
+- **Sichtbare Passwortfelder (`textVisiblePassword`) gelten jetzt als Passwortfelder:** keine Scans per Broadcast, keine vergrößerte Tastenvorschau. Apps schalten bei „Passwort anzeigen“ auf diesen Typ um. Wer ihn nur gegen Vorschläge nutzt (Barcode-Felder), nimmt `textNoSuggestions` oder die Tastatur-Ausgabe (Keystroke) von DataWedge.
+- Eine Konfigurationsdatei im App-Ordner mit Passwort wird auch gelöscht, wenn sie abgelehnt wird (falsches Passwort, ungültiges JSON) – bisher blieb das Passwort dann im Klartext liegen. Nur während der Sperre nach Fehlversuchen bleibt sie für den nächsten Versuch.
+- Lässt sich die gespeicherte Konfiguration gar nicht lesen (Lesefehler, leere Datei), bleiben die Einstellungen gesperrt (unbekanntes Passwort, Hinweis `IK-0106`), statt offen zu stehen. Die Datei wird nicht mit Standardwerten überschrieben, sondern bei der nächsten Änderung und beim nächsten Start wieder gelesen; das Admin-Passwort vom EMM (`admin_password` oder `adminPassword` in `/enterprise/usr`) hebt die Sperre auf; diese Quellen werden solange bei jeder Prüfung erneut angewendet. Die Konfiguration wird jetzt vor dem Umbenennen auf den Speicher geschrieben (fsync), damit ein Stromausfall keine leere Datei hinterlässt.
+
+### Doku
+- [Deployment](docs/deployment.md): Regeln für die Datei im App-Ordner; ausdrücklicher Hinweis, dass jede App mit 5 falschen Passwörtern Broadcast und App-Ordner immer wieder 5 Minuten sperren kann (DoS) und was dann hilft; Abschnitt zur Signatur auf den Stand gebracht (Releases seit 2.0.0 mit dem Release-Schlüssel signiert).
+- [Data and privacy](docs/data-and-privacy.md): alle gespeicherten Dateien, auch die Sicherungskopie einer kaputten Konfiguration und die Zähler der Passwortsperre.
+- [Deployment](docs/deployment.md), Intune: die APK nicht als eigene private App in managed Google Play hochladen – das belegt den Paketnamen in ganz Google Play.
+- `SUPPORT.md`: Fragen per Issue mit neuer Vorlage „Frage“ (Discussions sind nicht eingeschaltet); die Issue-Vorlagen nutzen die vorhandenen Labels.
+- Release-Texte auf Englisch, ohne automatische Liste der Pull Requests.
+
 ## [2.1.0] – 2026-10-21
 
 ### Neu

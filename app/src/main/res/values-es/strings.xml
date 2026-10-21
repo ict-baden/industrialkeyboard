@@ -134,6 +134,7 @@
 
     <string name="settings_protected">La configuración está protegida</string>
     <string name="wrong_password">Contraseña incorrecta</string>
+    <string name="config_unreadable">No se puede leer la configuración guardada, por lo que la contraseña de administrador es desconocida y la configuración permanece bloqueada. Reinicie el dispositivo. Si no funciona, establezca la contraseña de administrador con su EMM (admin_password) o borre el almacenamiento de la app (Ajustes de Android → Aplicaciones → Industrial Keyboard → Almacenamiento).</string>
     <string name="password_locked">Demasiadas contraseñas incorrectas. Vuelva a intentarlo en %1$d min.</string>
     <string name="new_password">Nueva contraseña</string>
     <string name="new_password_summary">Déjela vacía para quitar la contraseña</string>
