@@ -131,7 +131,11 @@ class SettingsActivity : AppCompatActivity() {
         // Only a successful unlock survives a rotation; a recreated activity must not skip the password.
         unlocked = savedInstanceState?.getBoolean(KEY_UNLOCKED) == true
         val hash = store.config.adminPasswordHash
-        if (hash != null && !unlocked) {
+        if (store.unreadable && !unlocked) {
+            // No password can match: say why instead of counting wrong entries.
+            content.visibility = View.INVISIBLE
+            dialogs.message(getString(R.string.settings_protected), dialogs.withCode(getString(R.string.config_unreadable), ErrorCodes.CONFIG_UNREADABLE)) { finish() }
+        } else if (hash != null && !unlocked) {
             content.visibility = View.INVISIBLE
             dialogs.requirePassword(hash) { ok ->
                 if (ok) {

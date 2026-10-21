@@ -16,8 +16,11 @@ object Migrations {
         // "enabled": true without anyone choosing it. Keep it only where the EMM's managed
         // configuration or a configuration file switches it on explicitly; nothing else changes.
         try {
+            val store = ConfigStore.get(context)
+            // Only the defaults are known now; the stored configuration is migrated once it can be read.
+            if (store.unreadable) return
             if (!Provisioning.scanInputRequested(context)) {
-                ConfigStore.get(context).update { it.copy(scanner = it.scanner.copy(input = it.scanner.input.copy(enabled = false))) }
+                store.update { it.copy(scanner = it.scanner.copy(input = it.scanner.input.copy(enabled = false))) }
             }
             prefs.edit { putBoolean(SCAN_INPUT_OFF, true) }
         } catch (e: Exception) {

@@ -134,6 +134,7 @@
 
     <string name="settings_protected">Les paramètres sont protégés</string>
     <string name="wrong_password">Mot de passe incorrect</string>
+    <string name="config_unreadable">La configuration enregistrée est illisible : le mot de passe administrateur est donc inconnu et les paramètres restent verrouillés. Redémarrez l\'appareil. Si cela ne suffit pas, définissez un nouveau mot de passe administrateur avec votre EMM ou effacez le stockage de l\'application (Paramètres Android → Applications → Industrial Keyboard → Stockage).</string>
     <string name="password_locked">Trop de mots de passe incorrects. Réessayez dans %1$d min.</string>
     <string name="new_password">Nouveau mot de passe</string>
     <string name="new_password_summary">Laisser vide pour supprimer le mot de passe</string>

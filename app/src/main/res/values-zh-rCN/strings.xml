@@ -134,6 +134,7 @@
 
     <string name="settings_protected">设置受保护</string>
     <string name="wrong_password">密码错误</string>
+    <string name="config_unreadable">无法读取已保存的配置，因此管理员密码未知，设置保持锁定。请重启设备。如果仍无效，请通过 EMM 设置新的管理员密码，或清除应用存储（Android 设置 → 应用 → Industrial Keyboard → 存储）。</string>
     <string name="password_locked">密码错误次数过多。请在 %1$d 分钟后重试。</string>
     <string name="new_password">新密码</string>
     <string name="new_password_summary">留空即可移除密码</string>
