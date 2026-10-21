@@ -133,23 +133,30 @@ object Provisioning {
         var locked = false
         runSource(context, file.path) {
             val text = file.readText()
-            val config = ConfigJson.parse(text)
             try {
+                val config = ConfigJson.parse(text)
                 checkFileAllowed(context, file, text)
+                ConfigStore.get(context).import(config)
             } catch (e: LockedException) {
                 locked = true
                 throw e
-            }
-            ConfigStore.get(context).import(config)
-            // A password in plain text must not stay in the app folder once it has been used.
-            val secret = text.contains("\"$FILE_PASSWORD_KEY\"") || text.contains("\"adminPassword\"")
-            if (file.parent != ENTERPRISE_DIR && secret && !file.delete()) {
-                Log.w(TAG, "Could not delete ${file.path} with the admin password")
+            } finally {
+                // A password in plain text must not stay in the app folder once the file has been read,
+                // applied or refused (the error is shown in the settings) – only during the lock it
+                // stays, to be tried again.
+                if (!locked) deleteIfSecret(file, text)
             }
         }
         // Also after a refusal, so a wrong password is not counted again on every focus change –
         // but not while locked: then the file is tried again (costs no attempt) until the lock ends.
         if (!locked) prefs(context).edit { putString(key, fingerprint) }
+    }
+
+    private fun deleteIfSecret(file: File, text: String) {
+        val secret = text.contains("\"$FILE_PASSWORD_KEY\"") || text.contains("\"adminPassword\"")
+        if (file.parent != ENTERPRISE_DIR && secret && !file.delete()) {
+            Log.w(TAG, "Could not delete ${file.path} with the admin password")
+        }
     }
 
     private class LockedException : ConfigException("Refused: locked after too many wrong passwords, tried again in a few minutes")

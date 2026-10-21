@@ -49,6 +49,7 @@ class ProvisioningTest {
         assertEquals("auto", store.config.language)
         assertTrue(PasswordHasher.verify("secret", store.config.adminPasswordHash))
         assertTrue(Provisioning.lastError(context).orEmpty().contains("password"))
+        assertTrue("a refused file with a password is deleted too", !appFile.exists())
 
         write("""{"password":"secret","language":"fr"}""", 2_000_000)
         Provisioning.applyAll(context)
@@ -109,6 +110,7 @@ class ProvisioningTest {
         Provisioning.applyAll(context)
         val error = Provisioning.lastError(context).orEmpty()
         assertTrue(error, error.contains("Invalid JSON") && !error.contains("geheim123"))
+        assertTrue(!appFile.exists())
     }
 
     @Test
@@ -138,6 +140,7 @@ class ProvisioningTest {
         write("""{"password":"secret","language":"fr"}""", 1_000_000)
         Provisioning.applyAll(context)
         assertEquals("auto", store.config.language)
+        assertTrue("kept during the lock", appFile.exists())
         // Unlock by moving the lock end into the past.
         context.getSharedPreferences("password_guard_remote", Context.MODE_PRIVATE).edit().putLong("locked_until", now - 1).commit()
         Provisioning.applyAll(context)
