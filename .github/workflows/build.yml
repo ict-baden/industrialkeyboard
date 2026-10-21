@@ -114,7 +114,25 @@ jobs:
         run: |
           # v1.0.0-rc1 und ähnliche: Vorabversion, nicht „Latest“
           pre=""; case "$GITHUB_REF_NAME" in *-*) pre="--prerelease";; esac
-          gh release create "$GITHUB_REF_NAME" dist/* --title "$APP $GITHUB_REF_NAME" --generate-notes $pre
+          v="${GITHUB_REF_NAME#v}"
+          # Release-Text englisch, ohne --generate-notes (deutsche PR-Titel): oben die Nachricht des annotierten Tags
+          # (der CHANGELOG-Abschnitt auf Englisch, git tag -a vX.Y.Z -F notes.md --cleanup=verbatim), darunter die Dateien.
+          ref=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$GITHUB_REF_NAME")
+          if [ "$(jq -r .object.type <<<"$ref")" = tag ]; then
+            gh api "repos/$GITHUB_REPOSITORY/git/tags/$(jq -r .object.sha <<<"$ref")" -q .message > "$RUNNER_TEMP/tag.md"
+          else
+            echo "::warning::$GITHUB_REF_NAME ist kein annotierter Tag – Release-Text nur mit der Dateiliste."
+            : > "$RUNNER_TEMP/tag.md"
+          fi
+          {
+            if [ -s "$RUNNER_TEMP/tag.md" ]; then cat "$RUNNER_TEMP/tag.md"; echo; fi
+            echo "**Files** – signed with the ICT-Baden release key; all changes in [CHANGELOG.md](https://github.com/$GITHUB_REPOSITORY/blob/$GITHUB_REF_NAME/CHANGELOG.md) (German):"
+            echo
+            echo "- **$APP-$v.apk**: to distribute with your MDM (SOTI, Intune, Workspace ONE, StageNow) or to install with adb"
+            echo "- **$APP-$v.aab**: App Bundle for Google Play"
+            echo "- **SHA256SUMS.txt**: checksums, check with \`sha256sum -c --ignore-missing SHA256SUMS.txt\`"
+          } > "$RUNNER_TEMP/notes.md"
+          gh release create "$GITHUB_REF_NAME" dist/* --title "$APP $GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md" $pre
 
       - name: "Release 'latest' aktualisieren (main)"
         if: env.SIGN == 'true' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
@@ -125,8 +143,8 @@ jobs:
           # Rollierendes Release: immer der neueste main-Stand, unter festen Links (Einzelheiten im Skript)
           $base = "https://github.com/$env:GITHUB_REPOSITORY/releases/download/latest"
           $built = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd HH:mm')
-          $notes = "Automatischer Build von main ($($env:GITHUB_SHA.Substring(0,7))), Version ${{ steps.version.outputs.version }}, gebaut $built UTC, signiert.`n`n" +
-                   "Die Links bleiben gleich und zeigen immer auf den neuesten Build:`n`n" +
-                   "- **[$env:APP.apk]($base/$env:APP.apk)**: zum Verteilen per MDM (SOTI, Intune, StageNow) oder zum Installieren per adb`n" +
-                   "- [SHA256SUMS.txt]($base/SHA256SUMS.txt): Prüfsummen"
+          $notes = "Automatic build of main ($($env:GITHUB_SHA.Substring(0,7))), version ${{ steps.version.outputs.version }}, built $built UTC, signed. For testing – for production use the newest tagged release.`n`n" +
+                   "The links stay the same and always point to the newest build:`n`n" +
+                   "- **[$env:APP.apk]($base/$env:APP.apk)**: to distribute with your MDM (SOTI, Intune, StageNow) or to install with adb`n" +
+                   "- [SHA256SUMS.txt]($base/SHA256SUMS.txt): checksums"
           ./.github/scripts/release-latest.ps1 -Notes $notes -Title "Latest Build (main) – ${{ steps.version.outputs.version }}"
