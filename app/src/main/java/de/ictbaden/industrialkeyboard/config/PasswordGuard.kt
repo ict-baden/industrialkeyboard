@@ -21,8 +21,13 @@ class PasswordGuard @VisibleForTesting internal constructor(
     @Synchronized
     fun lockedForMs(): Long {
         val until = prefs.getLong(KEY_UNTIL, 0)
-        // Clamped: a clock set back must not lock for longer.
-        return (until - now()).coerceIn(0, LOCK_MS)
+        val left = until - now()
+        if (left > LOCK_MS) {
+            // The clock was set back (battery swap, no network time): lock from now, not until the clock catches up.
+            prefs.edit { putLong(KEY_UNTIL, now() + LOCK_MS) }
+            return LOCK_MS
+        }
+        return left.coerceAtLeast(0)
     }
 
     /** Checks [password] against [hash]; while locked the password is not even checked. */
@@ -52,15 +57,23 @@ class PasswordGuard @VisibleForTesting internal constructor(
         private const val KEY_FAILURES = "failures"
         private const val KEY_UNTIL = "locked_until"
 
+        private val guards = HashMap<String, PasswordGuard>()
+
+        /** Forgets the shared instances (tests: every test has a new application). */
+        @VisibleForTesting
+        @Synchronized
+        internal fun reset() = guards.clear()
+
         /** Wrong entries in the settings screen. */
-        fun settings(context: Context) = create(context, "settings")
+        fun settings(context: Context) = shared(context, "settings")
 
         /** Wrong passwords sent by other apps or in configuration files. */
-        fun remote(context: Context) = create(context, "remote")
+        fun remote(context: Context) = shared(context, "remote")
 
-        private fun create(context: Context, channel: String) = PasswordGuard(
-            context.applicationContext.getSharedPreferences("password_guard_$channel", Context.MODE_PRIVATE),
-            System::currentTimeMillis,
-        )
+        /** One instance per channel, so the broadcast and the provisioning thread count together. */
+        @Synchronized
+        private fun shared(context: Context, channel: String) = guards.getOrPut(channel) {
+            PasswordGuard(context.applicationContext.getSharedPreferences("password_guard_$channel", Context.MODE_PRIVATE), System::currentTimeMillis)
+        }
     }
 }

@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.annotation.VisibleForTesting
+import org.json.JSONTokener
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.CopyOnWriteArrayList
@@ -30,12 +31,7 @@ class ConfigStore @VisibleForTesting internal constructor(
     fun update(transform: (KeyboardConfig) -> KeyboardConfig): KeyboardConfig {
         val updated = transform(config)
         if (updated == config) return updated
-        val tmp = File(file.parentFile, "${file.name}.tmp")
-        tmp.writeText(ConfigJson.write(updated))
-        if (!tmp.renameTo(file)) {
-            file.delete()
-            check(tmp.renameTo(file)) { "Could not save the configuration" }
-        }
+        save(updated)
         config = updated
         main.post { listeners.forEach { it(updated) } }
         return updated
@@ -70,15 +66,33 @@ class ConfigStore @VisibleForTesting internal constructor(
         val saved = runCatching { file.copyTo(backup, overwrite = true) }.isSuccess
         Log.e(TAG, "Stored configuration is invalid, using defaults; kept as ${backup.name.takeIf { saved }}: ${error.message}")
         onLoadError("Stored configuration could not be read (${error.message}); reset to defaults, admin password kept${if (saved) ", copy in ${backup.name}" else ""}")
-        val hash = text?.let { HASH.find(it)?.groupValues?.get(1) }?.takeIf(PasswordHasher::isHash)
-        return KeyboardConfig(adminPasswordHash = hash)
+        val recovered = KeyboardConfig(adminPasswordHash = text?.let(::findHash))
+        // Saved right away, so the next start does not recover (and copy) again.
+        runCatching { save(recovered) }.onFailure { Log.e(TAG, "Could not save the recovered configuration", it) }
+        return recovered
+    }
+
+    /** The admin password hash of a broken file; org.json writes `/` as `\/`. */
+    private fun findHash(text: String): String? {
+        val raw = HASH.find(text)?.groupValues?.get(1) ?: return null
+        val hash = runCatching { JSONTokener("\"$raw\"").nextValue() as String }.getOrNull() ?: return null
+        return hash.takeIf(PasswordHasher::isHash)
+    }
+
+    private fun save(config: KeyboardConfig) {
+        val tmp = File(file.parentFile, "${file.name}.tmp")
+        tmp.writeText(ConfigJson.write(config))
+        if (!tmp.renameTo(file)) {
+            file.delete()
+            check(tmp.renameTo(file)) { "Could not save the configuration" }
+        }
     }
 
     companion object {
         private const val TAG = "ConfigStore"
 
         /** Found even in a truncated or otherwise broken file. */
-        private val HASH = Regex("\"adminPasswordHash\"\\s*:\\s*\"([^\"]+)\"")
+        private val HASH = Regex("\"adminPasswordHash\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)+)\"")
 
         @Volatile
         private var instance: ConfigStore? = null

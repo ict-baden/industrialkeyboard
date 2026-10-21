@@ -51,9 +51,15 @@ object Provisioning {
         configFiles(context).forEach { applyConfigFile(context, it) }
     }
 
-    /** Makes every source apply again on the next check (after a migration of the stored configuration). */
-    fun forgetApplied(context: Context) {
-        prefs(context).edit { prefs(context).all.keys.filter { it == "managed" || it.startsWith("file:") }.forEach(::remove) }
+    /** True when the managed configuration or a configuration file sets `scanner.input.enabled: true` (migration to 2.1.0). */
+    fun scanInputRequested(context: Context): Boolean {
+        val sources = buildList {
+            context.getSystemService(RestrictionsManager::class.java)?.applicationRestrictions?.getString("config_json")?.let(::add)
+            configFiles(context).filter { it.canRead() }.forEach { file -> runCatching { add(file.readText()) } }
+        }
+        return sources.any { text ->
+            runCatching { JSONObject(text).optJSONObject("scanner")?.optJSONObject("input")?.optBoolean("enabled", false) == true }.getOrDefault(false)
+        }
     }
 
     /**
@@ -124,36 +130,47 @@ object Provisioning {
         val fingerprint = "${file.lastModified()}:${file.length()}"
         val key = "file:${file.path}"
         if (fingerprint == prefs(context).getString(key, null)) return
+        var locked = false
         runSource(context, file.path) {
             val text = file.readText()
             val config = ConfigJson.parse(text)
-            checkFileAllowed(context, file, text)
+            try {
+                checkFileAllowed(context, file, text)
+            } catch (e: LockedException) {
+                locked = true
+                throw e
+            }
             ConfigStore.get(context).import(config)
+            // A password in plain text must not stay in the app folder once it has been used.
+            val secret = text.contains("\"$FILE_PASSWORD_KEY\"") || text.contains("\"adminPassword\"")
+            if (file.parent != ENTERPRISE_DIR && secret && !file.delete()) {
+                Log.w(TAG, "Could not delete ${file.path} with the admin password")
+            }
         }
-        // Also after a refusal: a wrong password must not be counted again on every focus change.
-        prefs(context).edit { putString(key, fingerprint) }
+        // Also after a refusal, so a wrong password is not counted again on every focus change –
+        // but not while locked: then the file is tried again (costs no attempt) until the lock ends.
+        if (!locked) prefs(context).edit { putString(key, fingerprint) }
     }
+
+    private class LockedException : ConfigException("Refused: locked after too many wrong passwords, tried again in a few minutes")
 
     /**
      * `/enterprise/usr` is written by Zebra's MX (StageNow, EMM) only, and on a managed device the
-     * EMM controls the app folder. Otherwise the app folder is reachable over USB and, before
-     * Android 11, by any app with storage permission: then the file must carry the current admin
-     * password, and without one it is accepted on Android 11+ only.
+     * EMM controls the app folder. Otherwise the app folder is reachable over USB, and before
+     * Android 11 any app with storage permission can read and write it: there it is refused, from
+     * Android 11 on it must carry the current admin password once one is set.
      */
     private fun checkFileAllowed(context: Context, file: File, text: String) {
         if (file.parent == ENTERPRISE_DIR || isManaged(context)) return
-        val hash = ConfigStore.get(context).config.adminPasswordHash
-        if (hash == null) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-                throw ConfigException("Refused: before Android 11 other apps can write this folder. Set an admin password and add it as \"$FILE_PASSWORD_KEY\", or use /enterprise/usr or the managed configuration.")
-            }
-            return
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            throw ConfigException("Refused: before Android 11 other apps can read and write this folder. Use /enterprise/usr, the managed configuration or the INSTALL_CONFIG broadcast.")
         }
+        val hash = ConfigStore.get(context).config.adminPasswordHash ?: return
         val password = runCatching { JSONObject(text).optString(FILE_PASSWORD_KEY, "") }.getOrDefault("")
         when (PasswordGuard.remote(context).check(password, hash)) {
             PasswordGuard.Result.OK -> Unit
             PasswordGuard.Result.WRONG -> throw ConfigException("Refused: \"$FILE_PASSWORD_KEY\" with the current admin password is missing or wrong")
-            PasswordGuard.Result.LOCKED -> throw ConfigException("Refused: locked after too many wrong passwords, change the file again in a few minutes")
+            PasswordGuard.Result.LOCKED -> throw LockedException()
         }
     }
 

@@ -74,14 +74,17 @@ The number appears in the focused field, followed by Enter.
 > senders where your scanner app allows it:
 >
 > - `scanner.input.permission` – a permission the sending app must hold; Android delivers the
->   broadcast only from apps that have it. Use it with your own scanner or integration app (for
->   example a `signature` permission of that app).
+>   broadcast only from apps that have it. Use a `signature` (or `signatureOrSystem`) permission
+>   of your own scanner or integration app: a permission with protection level `normal` can be
+>   declared and granted by any app and protects nothing.
 > - `scanner.input.allowedPackages` – package names of the apps that may send. Android 14+ only,
 >   and only for senders that identify themselves (`BroadcastOptions.setShareIdentityEnabled`).
 >   It fails closed: with a list set, unidentified senders and older Android versions are
 >   refused. If scans stop arriving after you set it, your scanner app does not identify itself.
 >
-> Refused broadcasts are logged with the reason (`adb logcat -s KeyboardService`).
+> Broadcasts refused by the keyboard's own checks are logged with the reason
+> (`adb logcat -s KeyboardService`). Broadcasts from apps without the required `permission` are
+> dropped by Android and never reach the keyboard, without a log line.
 
 ## Intent API
 

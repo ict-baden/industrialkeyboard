@@ -1,6 +1,5 @@
 package de.ictbaden.industrialkeyboard.config
 
-import android.app.Application
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
@@ -16,8 +15,7 @@ import org.robolectric.annotation.Config
 import java.io.File
 
 @RunWith(AndroidJUnit4::class)
-// Plain Application: KeyboardApp would run the migration and a background provisioning check at start.
-@Config(sdk = [35], application = Application::class)
+@Config(sdk = [35])
 class ProvisioningTest {
 
     private val context: Context get() = ApplicationProvider.getApplicationContext()
@@ -27,6 +25,7 @@ class ProvisioningTest {
     @Before
     fun setUp() {
         ConfigStore.reset()
+        PasswordGuard.reset()
         File(context.filesDir, "config.json").delete()
     }
 
@@ -89,19 +88,55 @@ class ProvisioningTest {
     }
 
     @Test
-    fun `migration switches scan input off and applies the sources again`() {
-        store.update { it.copy(scanner = it.scanner.copy(input = it.scanner.input.copy(enabled = true))) }
-        write("""{"scanner":{"input":{"enabled":true}},"language":"fr"}""", 1_000_000)
+    fun `a file with a password is deleted after use`() {
+        store.import(KeyboardConfig(adminPasswordHash = PasswordHasher.hash("secret")))
+        write("""{"password":"secret","language":"fr"}""", 1_000_000)
         Provisioning.applyAll(context)
-        store.update { it.copy(language = "de") }
+        assertEquals("fr", store.config.language)
+        assertTrue(!appFile.exists())
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun `app folder is refused before Android 11 on unmanaged devices`() {
+        write("""{"language":"fr"}""", 1_000_000)
+        Provisioning.applyAll(context)
+        assertEquals("auto", store.config.language)
+        assertTrue(Provisioning.lastError(context).orEmpty().contains("Android 11"))
+    }
+
+    @Test
+    fun `a file arriving during the lock is applied after it`() {
+        val hash = PasswordHasher.hash("secret")
+        store.import(KeyboardConfig(adminPasswordHash = hash))
+        val now = System.currentTimeMillis()
+        repeat(PasswordGuard.MAX_FAILURES) { PasswordGuard.remote(context).check("guess$it", hash) }
+        write("""{"password":"secret","language":"fr"}""", 1_000_000)
+        Provisioning.applyAll(context)
+        assertEquals("auto", store.config.language)
+        // Unlock by moving the lock end into the past.
+        context.getSharedPreferences("password_guard_remote", Context.MODE_PRIVATE).edit().putLong("locked_until", now - 1).commit()
+        Provisioning.applyAll(context)
+        assertEquals("fr", store.config.language)
+    }
+
+    @Test
+    fun `migration switches scan input off unless a source asks for it`() {
+        store.update { it.copy(language = "de", scanner = it.scanner.copy(input = it.scanner.input.copy(enabled = true))) }
         Migrations.run(context)
         assertEquals(false, store.config.scanner.input.enabled)
-        Provisioning.applyAll(context)
-        // The file asked for it explicitly, so it is on again.
-        assertEquals(true, store.config.scanner.input.enabled)
-        assertEquals("fr", store.config.language)
+        // Nothing else changes.
+        assertEquals("de", store.config.language)
         // Only once.
         store.update { it.copy(scanner = it.scanner.copy(input = it.scanner.input.copy(enabled = true))) }
+        Migrations.run(context)
+        assertEquals(true, store.config.scanner.input.enabled)
+    }
+
+    @Test
+    fun `migration keeps scan input where a file switches it on`() {
+        store.update { it.copy(scanner = it.scanner.copy(input = it.scanner.input.copy(enabled = true))) }
+        write("""{"scanner":{"input":{"enabled":true}}}""", 1_000_000)
         Migrations.run(context)
         assertEquals(true, store.config.scanner.input.enabled)
     }

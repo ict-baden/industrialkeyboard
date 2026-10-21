@@ -46,5 +46,7 @@ class PasswordGuardTest {
         repeat(PasswordGuard.MAX_FAILURES) { guard.check("wrong", hash) }
         now -= 365L * 24 * 3600 * 1000
         assertEquals(PasswordGuard.LOCK_MS, guard.lockedForMs())
+        now += PasswordGuard.LOCK_MS
+        assertEquals(PasswordGuard.Result.OK, guard.check("secret", hash))
     }
 }

@@ -48,6 +48,20 @@ class ConfigStoreTest {
     }
 
     @Test
+    fun `a saved file that breaks keeps the admin password, slashes included`() {
+        // org.json writes "/" as "\/"; Base64 hashes usually contain one.
+        val hash = generateSequence { PasswordHasher.hash("secret") }.first { it.contains('/') }
+        ConfigStore(file).update { KeyboardConfig(adminPasswordHash = hash, appearance = Appearance(accentColor = "#FF8F00")) }
+        file.writeText(file.readText().replace("#FF8F00", "blue"))
+        val store = ConfigStore(file)
+        assertEquals(hash, store.config.adminPasswordHash)
+        assertTrue(PasswordHasher.verify("secret", store.config.adminPasswordHash))
+        // Recovered once: the next start reads the saved defaults without another copy.
+        assertEquals(hash, ConfigStore(file).config.adminPasswordHash)
+        assertEquals(1, folder.root.listFiles { f -> f.name.startsWith("config.json.invalid-") }.orEmpty().size)
+    }
+
+    @Test
     fun `a truncated file keeps the admin password`() {
         val hash = PasswordHasher.hash("secret")
         file.writeText("""{"version":1,"adminPasswordHash":"$hash","appea""")
@@ -56,7 +70,7 @@ class ConfigStoreTest {
 
     @Test
     fun `a broken file without password stays without password`() {
-        file.writeText("""{"adminPasswordHash":"plain-text"}""")
+        file.writeText("""{"adminPasswordHash":"pbkdf2-sha256${'$'}60000${'$'}not base64!${'$'}x","appearance":{"accentColor":"blue"}}""")
         assertNull(ConfigStore(file).config.adminPasswordHash)
     }
 }

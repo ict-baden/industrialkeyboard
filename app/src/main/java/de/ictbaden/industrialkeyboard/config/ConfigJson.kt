@@ -5,7 +5,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
-class ConfigException(message: String) : Exception(message)
+open class ConfigException(message: String) : Exception(message)
 
 /** The JSON configuration format (version 1). */
 object ConfigJson {

@@ -38,10 +38,10 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
                     dialog.dismiss()
                     onResult(true)
                 }
-                PasswordGuard.Result.WRONG -> field.error = s(R.string.wrong_password)
-                PasswordGuard.Result.LOCKED -> {
-                    val minutes = ((guard.lockedForMs() + 59_999) / 60_000).toInt().coerceAtLeast(1)
-                    field.error = activity.getString(R.string.password_locked, minutes)
+                // The attempt that starts the lock already says so.
+                PasswordGuard.Result.WRONG, PasswordGuard.Result.LOCKED -> {
+                    val lockedMs = guard.lockedForMs()
+                    field.error = if (lockedMs > 0) activity.getString(R.string.password_locked, ((lockedMs + 59_999) / 60_000).toInt()) else s(R.string.wrong_password)
                 }
             }
         }

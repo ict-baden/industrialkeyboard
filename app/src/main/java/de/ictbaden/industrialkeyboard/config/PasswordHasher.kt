@@ -37,10 +37,12 @@ object PasswordHasher {
         }
     }
 
-    /** A hash in our format with a usable iteration count (salt and key are checked by [verify]). */
+    /** A hash in our format with a usable iteration count and Base64 salt and key. */
     fun isHash(value: String?): Boolean {
         val parts = value?.split('$') ?: return false
-        return parts.size == 4 && parts[0] == PREFIX && parts[1].toIntOrNull() in 1..MAX_ITERATIONS
+        if (parts.size != 4 || parts[0] != PREFIX || parts[1].toIntOrNull() !in 1..MAX_ITERATIONS) return false
+        val decoder = Base64.getDecoder()
+        return runCatching { decoder.decode(parts[2]).isNotEmpty() && decoder.decode(parts[3]).isNotEmpty() }.getOrDefault(false)
     }
 
     private fun derive(password: String, salt: ByteArray, iterations: Int): ByteArray {

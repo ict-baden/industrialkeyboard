@@ -1,6 +1,5 @@
 package de.ictbaden.industrialkeyboard.api
 
-import android.app.Application
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
@@ -22,8 +21,7 @@ import org.robolectric.annotation.Config
 import java.io.File
 
 @RunWith(AndroidJUnit4::class)
-// Plain Application: KeyboardApp would run the migration and a background provisioning check at start.
-@Config(sdk = [35], application = Application::class)
+@Config(sdk = [35])
 class ApiReceiverTest {
 
     private val context: Context get() = ApplicationProvider.getApplicationContext()
@@ -32,6 +30,7 @@ class ApiReceiverTest {
     @Before
     fun setUp() {
         ConfigStore.reset()
+        PasswordGuard.reset()
         File(context.filesDir, "config.json").delete()
     }
 
