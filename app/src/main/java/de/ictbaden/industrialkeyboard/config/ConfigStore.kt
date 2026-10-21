@@ -8,6 +8,8 @@ import androidx.annotation.VisibleForTesting
 import org.json.JSONTokener
 import java.io.File
 import java.io.IOException
+import java.security.SecureRandom
+import java.util.Base64
 import java.util.concurrent.CopyOnWriteArrayList
 
 /** Process-wide holder of the persisted [KeyboardConfig] (`files/config.json`) with change listeners. */
@@ -43,7 +45,7 @@ class ConfigStore @VisibleForTesting internal constructor(
     }
 
     /**
-     * Reads the stored configuration. If it cannot be read, the file is kept as
+     * Reads the stored configuration. If it is broken, the file is kept as
      * `config.json.invalid-<time>` and the defaults are used – but with the admin password, so a
      * broken file never unlocks the settings.
      */
@@ -52,7 +54,7 @@ class ConfigStore @VisibleForTesting internal constructor(
         val text = try {
             file.readText()
         } catch (e: IOException) {
-            return recover(null, e)
+            return unreadable(e)
         }
         return try {
             ConfigJson.parse(text)
@@ -61,12 +63,26 @@ class ConfigStore @VisibleForTesting internal constructor(
         }
     }
 
-    private fun recover(text: String?, error: Exception): KeyboardConfig {
+    /**
+     * The file exists but cannot be read (I/O error), so its admin password is unknown: the
+     * defaults are used with a password nobody knows, which keeps the settings and the remote
+     * channels locked instead of open. Nothing is saved until the configuration changes, so the
+     * next start reads the file again. A new admin password from the EMM (`admin_password`, or
+     * `adminPassword` in `/enterprise/usr`) replaces the unknown one.
+     */
+    private fun unreadable(error: IOException): KeyboardConfig {
+        Log.e(TAG, "Stored configuration cannot be read, using defaults with the settings locked: ${error.message}")
+        onLoadError("Stored configuration could not be read (${error.message}); defaults until it can be read again, settings locked")
+        val unknown = ByteArray(32).also { SecureRandom().nextBytes(it) }
+        return KeyboardConfig(adminPasswordHash = PasswordHasher.hash(Base64.getEncoder().encodeToString(unknown)))
+    }
+
+    private fun recover(text: String, error: Exception): KeyboardConfig {
         val backup = File(file.parentFile, "${file.name}.invalid-${System.currentTimeMillis()}")
         val saved = runCatching { file.copyTo(backup, overwrite = true) }.isSuccess
         Log.e(TAG, "Stored configuration is invalid, using defaults; kept as ${backup.name.takeIf { saved }}: ${error.message}")
         onLoadError("Stored configuration could not be read (${error.message}); reset to defaults, admin password kept${if (saved) ", copy in ${backup.name}" else ""}")
-        val recovered = KeyboardConfig(adminPasswordHash = text?.let(::findHash))
+        val recovered = KeyboardConfig(adminPasswordHash = findHash(text))
         // Saved right away, so the next start does not recover (and copy) again.
         runCatching { save(recovered) }.onFailure { Log.e(TAG, "Could not save the recovered configuration", it) }
         return recovered

@@ -2,6 +2,8 @@ package de.ictbaden.industrialkeyboard.config
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -66,6 +68,20 @@ class ConfigStoreTest {
         val hash = PasswordHasher.hash("secret")
         file.writeText("""{"version":1,"adminPasswordHash":"$hash","appea""")
         assertEquals(hash, ConfigStore(file).config.adminPasswordHash)
+    }
+
+    @Test
+    fun `an unreadable file keeps the settings locked and stays`() {
+        // A directory exists but cannot be read as a file: an IOException like a storage error.
+        assertTrue(file.mkdir())
+        val errors = mutableListOf<String>()
+        val store = ConfigStore(file) { errors += it }
+        assertNotNull(store.config.adminPasswordHash)
+        assertFalse(PasswordHasher.verify("", store.config.adminPasswordHash))
+        assertFalse(PasswordHasher.verify("secret", store.config.adminPasswordHash))
+        assertTrue(errors.single(), errors.single().contains("settings locked"))
+        assertTrue(file.isDirectory)
+        assertEquals(0, folder.root.listFiles { f -> f.name.startsWith("config.json.invalid-") }.orEmpty().size)
     }
 
     @Test
