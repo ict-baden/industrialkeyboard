@@ -44,7 +44,7 @@ class ConfigStore @VisibleForTesting internal constructor(
         if (updated == config) return updated
         // Saving over an unreadable file would replace its configuration and password for good with
         // the defaults and a password nobody knows. Only a new admin password is known again.
-        if (!unreadable || updated.adminPasswordHash != config.adminPasswordHash) {
+        if (!unreadable || (updated.adminPasswordHash != null && updated.adminPasswordHash != config.adminPasswordHash)) {
             save(updated)
             unreadable = false
         }
@@ -73,8 +73,10 @@ class ConfigStore @VisibleForTesting internal constructor(
         return parse(text)
     }
 
-    /** Empty only after a broken write: its admin password is just as unknown as after an I/O error. */
-    private fun read(): String = file.readText().ifBlank { throw IOException("the file is empty") }
+    /** Empty (or zeros) only after a broken write: its admin password is as unknown as after an I/O error. */
+    private fun read(): String = file.readText().also { text ->
+        if (text.all { it == '\u0000' || it.isWhitespace() }) throw IOException("the file is empty")
+    }
 
     private fun parse(text: String): KeyboardConfig = try {
         ConfigJson.parse(text)
@@ -86,8 +88,8 @@ class ConfigStore @VisibleForTesting internal constructor(
      * The file exists but cannot be read (I/O error, empty), so its admin password is unknown: the
      * defaults are used with a password nobody knows, which keeps the settings and the remote
      * channels locked instead of open. The file stays as it is (see [update]) and is read again on
-     * the next change and the next start. A new admin password from the EMM (`admin_password`, or
-     * `adminPassword` in `/enterprise/usr`) replaces the unknown one.
+     * the next change and the next start. An admin password from the EMM (`admin_password`, or
+     * `adminPassword` in `/enterprise/usr` – both applied again meanwhile) replaces the unknown one.
      */
     private fun unreadable(error: IOException): KeyboardConfig {
         Log.e(TAG, "Stored configuration cannot be read, using defaults with the settings locked: ${error.message}")
@@ -103,8 +105,8 @@ class ConfigStore @VisibleForTesting internal constructor(
         } catch (_: IOException) {
             return
         }
-        unreadable = false
         val loaded = parse(text)
+        unreadable = false
         config = loaded
         main.post { listeners.forEach { it(loaded) } }
     }

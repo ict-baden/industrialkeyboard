@@ -3,15 +3,20 @@ package de.ictbaden.industrialkeyboard.config
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.RestrictionsManager
+import android.os.Bundle
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.robolectric.shadow.api.Shadow
+import org.robolectric.shadows.ShadowRestrictionsManager
 import java.io.File
 
 @RunWith(AndroidJUnit4::class)
@@ -91,6 +96,41 @@ class ProvisioningTest {
         Provisioning.applyAll(context)
         assertEquals("de", store.config.language)
         assertTrue(Provisioning.lastError(context).orEmpty().contains("password"))
+    }
+
+    private fun restrict(vararg values: Pair<String, String>) {
+        val bundle = Bundle().apply { values.forEach { (k, v) -> putString(k, v) } }
+        Shadow.extract<ShadowRestrictionsManager>(context.getSystemService(RestrictionsManager::class.java)).setApplicationRestrictions(bundle)
+    }
+
+    @Test
+    fun `the managed admin password ends an unreadable configuration`() {
+        assertTrue(File(context.filesDir, "config.json").mkdir())
+        assertTrue(store.unreadable)
+        restrict("config_json" to """{"language":"de"}""", "admin_password" to "secret")
+        Provisioning.applyAll(context)
+        assertFalse(store.unreadable)
+        assertEquals("de", store.config.language)
+        assertTrue(PasswordHasher.verify("secret", store.config.adminPasswordHash))
+        ConfigStore.reset()
+        assertEquals("de", store.config.language)
+    }
+
+    @Test
+    fun `sources are applied again while the configuration is unreadable`() {
+        val stored = File(context.filesDir, "config.json")
+        assertTrue(stored.mkdir())
+        restrict("config_json" to """{"language":"de"}""")
+        Provisioning.applyAll(context)
+        assertEquals("de", store.config.language)
+        assertTrue("only in memory", stored.isDirectory)
+
+        // Readable again (e.g. after a restart): the managed configuration is not marked as done.
+        assertTrue(stored.delete())
+        ConfigStore.reset()
+        Provisioning.applyAll(context)
+        assertEquals("de", store.config.language)
+        assertTrue(stored.isFile)
     }
 
     @Test

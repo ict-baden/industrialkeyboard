@@ -44,6 +44,11 @@ object Provisioning {
         }
     }
 
+    /**
+     * While the stored configuration cannot be read, [ConfigStore] keeps changes in memory only:
+     * then every source is applied again on each check instead of being marked as done. An
+     * `admin_password` of the EMM so also ends that state by itself.
+     */
     @VisibleForTesting
     @Synchronized
     fun applyAll(context: Context) {
@@ -84,9 +89,9 @@ object Provisioning {
     private fun applyManagedConfig(context: Context) {
         val restrictions = context.getSystemService(RestrictionsManager::class.java)?.applicationRestrictions ?: return
         val fingerprint = fingerprint(restrictions)
-        if (fingerprint == prefs(context).getString("managed", null)) return
+        val store = ConfigStore.get(context)
+        if (fingerprint == prefs(context).getString("managed", null) && !store.unreadable) return
         runSource(context, "Managed configuration") {
-            val store = ConfigStore.get(context)
             val configJson = restrictions.getString("config_json")?.trim()
             if (!configJson.isNullOrEmpty()) {
                 store.import(ConfigJson.parse(configJson))
@@ -99,7 +104,7 @@ object Provisioning {
                 }
             }
         }
-        prefs(context).edit { putString("managed", fingerprint) }
+        if (!store.unreadable) prefs(context).edit { putString("managed", fingerprint) }
     }
 
     /** The single options of the managed configuration schema. */
@@ -129,7 +134,7 @@ object Provisioning {
         if (!file.canRead()) return
         val fingerprint = "${file.lastModified()}:${file.length()}"
         val key = "file:${file.path}"
-        if (fingerprint == prefs(context).getString(key, null)) return
+        if (fingerprint == prefs(context).getString(key, null) && !ConfigStore.get(context).unreadable) return
         var locked = false
         runSource(context, file.path) {
             val text = file.readText()
@@ -149,7 +154,7 @@ object Provisioning {
         }
         // Also after a refusal, so a wrong password is not counted again on every focus change –
         // but not while locked: then the file is tried again (costs no attempt) until the lock ends.
-        if (!locked) prefs(context).edit { putString(key, fingerprint) }
+        if (!locked && !ConfigStore.get(context).unreadable) prefs(context).edit { putString(key, fingerprint) }
     }
 
     private fun deleteIfSecret(file: File, text: String) {

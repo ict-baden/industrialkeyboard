@@ -45,8 +45,8 @@ Please report results on other devices in the
   minutes and so keep `INSTALL_CONFIG` and the app folder locked. The managed configuration,
   `/enterprise/usr` and the settings screen still work ([Deployment](deployment.md#broadcast-intent-stagenow-adb)).
 - **Stored configuration unreadable** (storage error): the settings stay locked, because the admin
-  password is unknown (`IK-0106`). Restart the device; otherwise set a new password with the EMM
-  or clear the app's storage.
+  password is unknown (`IK-0106`). Restart the device; otherwise set the admin password with the EMM
+  (`admin_password`) or clear the app's storage.
 - The admin password protects the settings screen and remote configuration. It is not a device
   lock: whoever can uninstall the app or clear its data gets the defaults.
 
