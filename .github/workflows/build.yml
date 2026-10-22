@@ -29,6 +29,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # Schritte, die nur bei Tags oder auf main laufen, sonst erst beim Release prüfen: alle PowerShell-Blöcke parsen
+      - name: PowerShell-Syntax (alle Workflow-Schritte und Skripte)
+        run: |
+          python3 -m pip install --quiet pyyaml
+          python3 .github/scripts/ps-syntax.py > "$RUNNER_TEMP/ps-blocks.json"
+          pwsh -NoProfile -File .github/scripts/ps-syntax.ps1 -Blocks "$RUNNER_TEMP/ps-blocks.json"
+
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
