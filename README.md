@@ -184,8 +184,8 @@ Requirements: JDK 17–21 and the Android SDK (compile SDK 37).
 
 The APK lands in `app/build/outputs/apk/debug/`. Debug builds have the package
 `de.ictbaden.industrialkeyboard.debug`, so they install next to the release build. Releases are
-built and signed by the [CI](.github/workflows/build.yml): every push to `main` updates the
-release [`latest`](https://github.com/ict-baden/industrialkeyboard/releases/tag/latest), a tag
+built and signed by the [CI](.github/workflows/build.yml): the nightly build of `main` (only when
+`main` changed) updates the release [`latest`](https://github.com/ict-baden/industrialkeyboard/releases/tag/latest), a tag
 `vX.Y.Z` creates a versioned release with `SHA256SUMS.txt`. The images in `docs/images` are rendered from
 the real keyboard code – see [tools/screenshots](tools/screenshots/README.md).
 
