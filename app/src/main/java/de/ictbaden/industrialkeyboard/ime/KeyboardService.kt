@@ -323,7 +323,10 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     }
 
     private fun runMacro(steps: List<MacroStep>) {
-        val held = KeyChords.meta(modifiers.keys)
+        // A Shift tapped by hand also applies to Tab, arrows, Esc … (Shift+Tab, Shift+→ selects). Not the
+        // automatic one at a sentence start, and not Caps Lock, which would turn every Tab into Shift+Tab.
+        val manualShift = if (shift == ShiftState.ONCE && !autoShifted) KeyEvent.META_SHIFT_ON else 0
+        val held = KeyChords.meta(modifiers.keys) or manualShift
         for (step in steps) {
             when (step) {
                 is MacroStep.Text -> currentInputConnection?.commitText(step.text, 1)

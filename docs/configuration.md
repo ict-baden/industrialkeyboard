@@ -106,7 +106,7 @@ every language: [Error codes](error-codes.md).
 | `functionRow` | `true` / `false` | `false` | Row with F1–F12 above the letters (and above the number row) |
 | `keyHints` | `true` / `false` | `true` | Small digits on the top letter row – long press types them (only without number row) |
 | `modifierRow` | `true` / `false` | `false` | Row with **Ctrl, Win, Alt**, Esc, Tab and Del above the letters (above the number and function rows) – for remote desktop and PC shortcuts, see [Ctrl, Win and Alt](#ctrl-win-and-alt) |
-| `functionModifiers` | `true` / `false` | `false` | Ctrl, Win and Alt as an extra row on the Fn tab (Alt+F4, Ctrl+Home …). All pages then get the height of five rows |
+| `functionModifiers` | `true` / `false` | `false` | Extra row on the Fn tab with Ctrl, Win, Alt, Menu (context menu key), Print (Print Screen) and Pause (Alt+F4, Ctrl+Home …). All pages then get the height of five rows |
 
 <p align="center"><img src="images/themes.png" alt="Light, dark and high contrast" width="100%"></p>
 
@@ -264,6 +264,9 @@ The modifier keys are sticky, because you cannot hold two keys at once with glov
   Several modifiers combine (Ctrl, Alt, then Del). The modifiers stay on when you switch tabs, so
   *Alt* on the letters followed by *F4* on the Fn tab is Alt+F4.
 - **Tap again** – presses the key alone (*Win* opens the Start menu, *Alt* the menu bar).
+- **Shift** – a Shift you tap yourself also applies to Tab, the arrows, Esc, Del, Home/End and
+  the other keys: Shift+Tab goes back a field, Shift+→ selects. Neither the automatic Shift at
+  the start of a sentence nor Caps Lock does this, so Tab stays Tab while typing in capitals.
 - **Hold** – locks the key (filled with the accent color) until you tap it again.
 
 While a modifier is on, letters, digits and the US punctuation keys go out as key presses instead

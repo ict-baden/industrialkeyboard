@@ -32,7 +32,7 @@
     <string name="modifier_row">Ctrl、Win 和 Alt 行</string>
     <string name="modifier_row_summary">在字母上方，另含 Esc、Tab 和 Del，用于远程桌面。点按：作用于下一个键；再点：单独按下；长按：锁定</string>
     <string name="function_modifiers">Fn 页上的 Ctrl、Win 和 Alt</string>
-    <string name="function_modifiers_summary">功能键页上额外一行，例如用于 Alt+F4</string>
+    <string name="function_modifiers_summary">功能键页上额外一行，含菜单键、Print 和 Pause，例如用于 Alt+F4</string>
     <string name="key_hints">按键提示</string>
     <string name="key_hints_summary">在第一行显示长按对应的小数字</string>
     <string name="language">语言</string>

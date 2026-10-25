@@ -153,7 +153,14 @@ object Layouts {
             Key(label = label, icon = icon, output = KeyOutput.Macro(listOf(MacroStep.Key(code))), style = KeyStyle.FUNCTION, repeat = repeat)
         val fWidth = 7f / 6f
         val rows = listOfNotNull(
-            if (modifiers) KeyRow(ModifierKey.entries.map { modifierKey(it, width = 7f / 3f) }) else null,
+            if (modifiers) {
+                KeyRow(
+                    ModifierKey.entries.map { modifierKey(it, fWidth) } +
+                        listOf("{MENU}", "{PRINT}", "{PAUSE}").map { macroKey(it, null, fWidth, KeyStyle.FUNCTION) },
+                )
+            } else {
+                null
+            },
             KeyRow((1..6).map { fKey(it, shifted, fWidth) }),
             KeyRow((7..12).map { fKey(it, shifted, fWidth) }),
             KeyRow(
