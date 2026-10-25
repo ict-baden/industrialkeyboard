@@ -4,6 +4,11 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ## [Unveröffentlicht]
 
+### Neu
+- **Strg, Win und Alt für Remotedesktop:** wahlweise als Reihe über den Buchstaben (mit Esc, Tab und Entf, `appearance.modifierRow`) und als zusätzliche Reihe bei den Funktionstasten (`appearance.functionModifiers`), beides auch in den Einstellungen unter „Darstellung“. Die Tasten rasten ein: tippen gilt für die nächste Taste, nochmal tippen drückt sie allein (Win öffnet das Startmenü), halten stellt fest. Sie bleiben beim Wechsel des Tabs an, Alt und dann F4 auf dem Fn-Tab ergibt Alt+F4. Solange eine an ist, gehen Buchstaben, Ziffern und Satzzeichen als Tastendruck raus statt als Text, und Strg/Win/Alt werden wie auf einer PC-Tastatur um die Taste herum gedrückt und losgelassen.
+- **Makros:** `{CTRL}`, `{ALT}`, `{WIN}` (als eigene Taste einrastend), Tastenkombinationen wie `{CTRL+C}`, `{ALT+F4}`, `{WIN+R}`, `{CTRL+SHIFT+ESC}`, `{CTRL+ALT+END}`, dazu `{PRINT}`, `{PAUSE}` und `{MENU}`.
+- Vorlage [`examples/remote-desktop.json`](examples/remote-desktop.json) mit eigenem Tab „RDP“.
+
 ## [2.1.1] – 2026-10-21
 
 ### Sicherheit

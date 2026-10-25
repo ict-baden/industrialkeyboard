@@ -56,6 +56,8 @@ object ConfigJson {
             put("numberRow", a.numberRow)
             put("functionRow", a.functionRow)
             put("keyHints", a.keyHints)
+            put("modifierRow", a.modifierRow)
+            put("functionModifiers", a.functionModifiers)
         })
         root.put("layout", JSONObject().apply {
             put("alphabet", config.layout.alphabet.key)
@@ -142,6 +144,8 @@ object ConfigJson {
             numberRow = json.optBoolean("numberRow", d.numberRow),
             functionRow = json.optBoolean("functionRow", d.functionRow),
             keyHints = json.optBoolean("keyHints", d.keyHints),
+            modifierRow = json.optBoolean("modifierRow", d.modifierRow),
+            functionModifiers = json.optBoolean("functionModifiers", d.functionModifiers),
         )
     }
 

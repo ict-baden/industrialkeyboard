@@ -33,6 +33,10 @@
     <string name="number_row_summary">Digits above the letters</string>
     <string name="function_row">Function key row</string>
     <string name="function_row_summary">F1–F12 above the letters</string>
+    <string name="modifier_row">Ctrl, Win and Alt row</string>
+    <string name="modifier_row_summary">Above the letters, with Esc, Tab and Del – for remote desktop. Tap: next key, tap again: alone, hold: lock</string>
+    <string name="function_modifiers">Ctrl, Win and Alt on Fn</string>
+    <string name="function_modifiers_summary">Extra row on the function keys, e.g. for Alt+F4</string>
     <string name="key_hints">Key hints</string>
     <string name="key_hints_summary">Small digits for long press on the top row</string>
     <string name="language">Language</string>

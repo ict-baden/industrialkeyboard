@@ -29,7 +29,9 @@ import de.ictbaden.industrialkeyboard.config.ScanSuffix
 import de.ictbaden.industrialkeyboard.layout.Key
 import de.ictbaden.industrialkeyboard.layout.KeyCommand
 import de.ictbaden.industrialkeyboard.layout.KeyOutput
+import de.ictbaden.industrialkeyboard.layout.KeyChords
 import de.ictbaden.industrialkeyboard.layout.MacroStep
+import de.ictbaden.industrialkeyboard.layout.ModifierKey
 import de.ictbaden.industrialkeyboard.scanner.ScanTrigger
 import de.ictbaden.industrialkeyboard.ui.Feedback
 import de.ictbaden.industrialkeyboard.ui.KeyboardRootView
@@ -50,6 +52,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private var field = Field(de.ictbaden.industrialkeyboard.layout.AlphaVariant.TEXT, null)
     private var page: Page = Page.Alpha(field.alpha)
     private var shift = ShiftState.OFF
+    /** Ctrl, Win and Alt that are armed (ONCE, for the next key) or locked; absent = off. */
+    private val modifiers = LinkedHashMap<ModifierKey, ShiftState>()
     private var autoShifted = false
     private var lastShiftTap = 0L
     private var autoReleasedByTap = false
@@ -156,6 +160,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             field = newField
             page = FieldPolicy.startPage(field, config, scanner.available)
             shift = ShiftState.OFF
+            modifiers.clear()
         }
         KeyboardBus.takePendingTab()?.let { tab -> FieldPolicy.pageForTab(tab, field, config, scanner.available)?.let { page = it } }
         updateAutoShift()
@@ -199,16 +204,19 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     override fun onKey(key: Key, alternative: String?) {
         if (alternative != null) {
             commit(alternative)
+            releaseModifiers()
             return
         }
+        val held = modifiers.isNotEmpty()
         when (val output = key.output) {
-            is KeyOutput.Text -> commit(if (key.letter && shift != ShiftState.OFF) output.text.uppercase(Locale.getDefault()) else output.text)
+            is KeyOutput.Text -> if (held) typeWithModifiers(key, output.text) else commit(if (key.letter && shift != ShiftState.OFF) output.text.uppercase(Locale.getDefault()) else output.text)
             is KeyOutput.Macro -> runMacro(output.steps)
             is KeyOutput.ShowTab -> showTab(output.tab)
+            is KeyOutput.Modifier -> tapModifier(output.modifier)
             KeyOutput.Shift -> toggleShift()
-            KeyOutput.Backspace -> backspace()
-            KeyOutput.Enter -> enter()
-            KeyOutput.Space -> space()
+            KeyOutput.Backspace -> if (held) chordWithModifiers(KeyEvent.KEYCODE_DEL) else backspace()
+            KeyOutput.Enter -> if (held) chordWithModifiers(KeyEvent.KEYCODE_ENTER) else enter()
+            KeyOutput.Space -> if (held) chordWithModifiers(KeyEvent.KEYCODE_SPACE) else space()
             KeyOutput.SymbolsPage -> {
                 val current = page as? Page.Symbols
                 page = Page.Symbols(if (current?.page == 2) 1 else 2, field.alpha)
@@ -218,7 +226,12 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         }
     }
 
-    override fun onKeyLongPress(key: Key): Boolean = when (key.output) {
+    override fun onKeyLongPress(key: Key): Boolean = when (val output = key.output) {
+        is KeyOutput.Modifier -> {
+            modifiers[output.modifier] = ShiftState.LOCKED
+            render()
+            true
+        }
         KeyOutput.Space -> {
             getSystemService(InputMethodManager::class.java)?.showInputMethodPicker()
             true
@@ -310,12 +323,13 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     }
 
     private fun runMacro(steps: List<MacroStep>) {
+        val held = KeyChords.meta(modifiers.keys)
         for (step in steps) {
             when (step) {
                 is MacroStep.Text -> currentInputConnection?.commitText(step.text, 1)
                 is MacroStep.Key -> when {
-                    step.keyCode == KeyEvent.KEYCODE_ENTER && step.meta == 0 -> sendKeyChar('\n')
-                    step.meta != 0 -> sendKey(step.keyCode, step.meta)
+                    step.keyCode == KeyEvent.KEYCODE_ENTER && step.meta == 0 && held == 0 -> sendKeyChar('\n')
+                    step.meta != 0 || held != 0 -> sendKey(step.keyCode, step.meta or held)
                     else -> sendDownUpKeyEvents(step.keyCode)
                 }
                 is MacroStep.Command -> when (step.command) {
@@ -332,17 +346,71 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             shift = ShiftState.OFF
             render()
         }
+        // Ctrl, Win and Alt are used up by keys and text, not by {SHOW:…} or {SCAN}.
+        if (steps.any { it is MacroStep.Key || it is MacroStep.Text }) releaseModifiers()
         updateAutoShift()
     }
 
-    /** Key press with modifiers (Shift + F1 = F13 …). */
+    /**
+     * Key press with modifiers (Shift + F1 = F13, Ctrl + C …). Ctrl, Win and Alt are pressed and
+     * released around the key like on a PC keyboard, which remote desktop apps need.
+     */
     private fun sendKey(code: Int, meta: Int) {
         val ic = currentInputConnection ?: return
         val time = SystemClock.uptimeMillis()
         val flags = KeyEvent.FLAG_SOFT_KEYBOARD or KeyEvent.FLAG_KEEP_TOUCH_MODE
-        ic.sendKeyEvent(KeyEvent(time, time, KeyEvent.ACTION_DOWN, code, 0, meta, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, flags))
-        ic.sendKeyEvent(KeyEvent(time, time, KeyEvent.ACTION_UP, code, 0, meta, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, flags))
+        for (e in KeyChords.events(code, meta)) {
+            val action = if (e.down) KeyEvent.ACTION_DOWN else KeyEvent.ACTION_UP
+            ic.sendKeyEvent(KeyEvent(time, time, action, e.keyCode, 0, e.meta, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, flags))
+        }
     }
+
+    // region Ctrl, Win, Alt
+
+    /** First tap arms the modifier for the next key; tapping it again presses it alone (Win: Start menu). */
+    private fun tapModifier(modifier: ModifierKey) {
+        when (modifiers[modifier]) {
+            null -> modifiers[modifier] = ShiftState.ONCE
+            ShiftState.ONCE -> {
+                sendKey(modifier.keyCode, KeyChords.meta(modifiers.keys))
+                releaseModifiers()
+            }
+            else -> modifiers.remove(modifier)
+        }
+        render()
+    }
+
+    /** Letters, digits and US punctuation go out as key presses, so Ctrl+C reaches the app as Ctrl+C. */
+    private fun typeWithModifiers(key: Key, text: String) {
+        // Shift counts only when set by hand: at a sentence start Ctrl+C must not become Ctrl+Shift+C.
+        val upper = key.letter && shift != ShiftState.OFF && !autoShifted
+        val held = KeyChords.meta(modifiers.keys)
+        for (c in if (upper) text.uppercase(Locale.ROOT) else text.lowercase(Locale.ROOT)) {
+            val step = KeyChords.keyFor(c)
+            if (step != null) sendKey(step.keyCode, step.meta or held) else currentInputConnection?.commitText(c.toString(), 1)
+        }
+        if (shift == ShiftState.ONCE) {
+            shift = ShiftState.OFF
+            autoShifted = false
+        }
+        releaseModifiers()
+        updateAutoShift()
+    }
+
+    private fun chordWithModifiers(code: Int) {
+        sendKey(code, KeyChords.meta(modifiers.keys))
+        releaseModifiers()
+        updateAutoShift()
+    }
+
+    /** Armed modifiers apply to one key; locked ones stay. */
+    private fun releaseModifiers() {
+        if (modifiers.values.none { it == ShiftState.ONCE }) return
+        modifiers.values.removeAll { it == ShiftState.ONCE }
+        render()
+    }
+
+    // endregion
 
     /** Switches to [tab]; false when it is not available. */
     private fun showTab(tab: String): Boolean {
@@ -421,7 +489,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun render() {
         val root = root ?: return
         val secret = FieldPolicy.isPassword(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)
-        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret))
+        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap()))
     }
 
     private fun enterIcon(): Int {

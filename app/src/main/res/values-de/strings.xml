@@ -29,6 +29,10 @@
     <string name="number_row_summary">Ziffern über den Buchstaben</string>
     <string name="function_row">Funktionstastenreihe</string>
     <string name="function_row_summary">F1–F12 über den Buchstaben</string>
+    <string name="modifier_row">Strg-, Win- und Alt-Reihe</string>
+    <string name="modifier_row_summary">Über den Buchstaben, mit Esc, Tab und Entf – für Remotedesktop. Tippen: nächste Taste, nochmal: allein, halten: feststellen</string>
+    <string name="function_modifiers">Strg, Win und Alt bei Fn</string>
+    <string name="function_modifiers_summary">Zusätzliche Reihe bei den Funktionstasten, z. B. für Alt+F4</string>
     <string name="key_hints">Tastenhinweise</string>
     <string name="key_hints_summary">Kleine Ziffern für langes Drücken in der oberen Reihe</string>
     <string name="language">Sprache</string>
