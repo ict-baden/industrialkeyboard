@@ -23,6 +23,7 @@ import de.ictbaden.industrialkeyboard.layout.Key
 import de.ictbaden.industrialkeyboard.layout.KeyIcon
 import de.ictbaden.industrialkeyboard.layout.KeyOutput
 import de.ictbaden.industrialkeyboard.layout.KeyboardLayout
+import de.ictbaden.industrialkeyboard.layout.ModifierKey
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.min
@@ -62,6 +63,15 @@ class KeyboardView(context: Context) : View(context) {
             invalidate()
         }
     var shift: ShiftState = ShiftState.OFF
+        set(value) {
+            if (field != value) {
+                field = value
+                invalidate()
+            }
+        }
+
+    /** Ctrl, Win and Alt that apply to the next key (ONCE) or stay on (LOCKED). */
+    var modifiers: Map<ModifierKey, ShiftState> = emptyMap()
         set(value) {
             if (field != value) {
                 field = value
@@ -193,15 +203,24 @@ class KeyboardView(context: Context) : View(context) {
     private fun drawKey(canvas: Canvas, box: KeyBox, pressed: Boolean, overlay: Float) {
         val key = box.key
         val p = palette
-        val background = when (key.style) {
-            KeyStyle.NORMAL -> p.key
-            KeyStyle.FUNCTION -> p.function
-            KeyStyle.ACCENT -> p.accent
+        // An armed modifier shows its label in the accent color, a locked one is filled with it.
+        val modifier = (key.output as? KeyOutput.Modifier)?.let { modifiers[it.modifier] } ?: ShiftState.OFF
+        val background = when {
+            modifier == ShiftState.LOCKED -> p.accent
+            else -> when (key.style) {
+                KeyStyle.NORMAL -> p.key
+                KeyStyle.FUNCTION -> p.function
+                KeyStyle.ACCENT -> p.accent
+            }
         }
-        val foreground = when (key.style) {
-            KeyStyle.NORMAL -> p.keyText
-            KeyStyle.FUNCTION -> p.functionText
-            KeyStyle.ACCENT -> p.accentText
+        val foreground = when {
+            modifier == ShiftState.LOCKED -> p.accentText
+            modifier == ShiftState.ONCE && key.style != KeyStyle.ACCENT -> p.accent
+            else -> when (key.style) {
+                KeyStyle.NORMAL -> p.keyText
+                KeyStyle.FUNCTION -> p.functionText
+                KeyStyle.ACCENT -> p.accentText
+            }
         }
         val r = box.rect
         val radius = min(dp(9f), r.height() * 0.2f)

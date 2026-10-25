@@ -71,6 +71,10 @@ data class Appearance(
     val functionRow: Boolean = false,
     /** Small hints for long-press characters (digits on the top row). */
     val keyHints: Boolean = true,
+    /** Row with Ctrl, Win, Alt, Esc, Tab and Del above the letters (remote desktop, PC shortcuts). */
+    val modifierRow: Boolean = false,
+    /** Ctrl, Win and Alt as an extra row on the function key tab (Alt+F4, Ctrl+Home …). */
+    val functionModifiers: Boolean = false,
 )
 
 data class LayoutSettings(

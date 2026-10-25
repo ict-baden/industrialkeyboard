@@ -24,6 +24,9 @@ key are hidden.
 - **EMMs:** the managed configuration follows the Android Enterprise standard; SOTI MobiControl,
   Intune and Workspace ONE are documented in [Deployment](deployment.md) but not every console
   version has been tried.
+- **Remote desktop apps:** Ctrl, Win and Alt are sent as ordinary key events of the input
+  method (modifier key down, key, modifier key up). How a remote desktop, VNC or Citrix app
+  passes them on is up to that app; they have not yet been tried with one on a device.
 - **Translations:** Spanish, French and Chinese (simplified) are machine translations and have
   not yet been proofread by native speakers. They are marked as such in the language picker.
 

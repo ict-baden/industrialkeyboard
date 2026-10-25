@@ -59,6 +59,7 @@
 | 🔢 **The right keys for every field** | Number fields open the numeric pad (phone or calculator order, PIN, date, time), e-mail and URL fields get `@`, `/` and `.com`, Enter shows the field's action (next, search, send, done), auto-capitalization follows the field |
 | 🔫 **Scanner built in** | Scan tab with a large trigger pad, optional scan key, soft trigger for Zebra DataWedge, Honeywell or any scanner app via intent. Scan results sent as a broadcast can be typed with Enter or Tab (opt-in) |
 | ⌨️ **Function keys** | Fn tab with F1–F12, **Shift for F13–F24**, Esc, Ins, Del, Home/End, PgUp/PgDn and arrows – plus an optional F1–F12 row above the letters |
+| 🖥️ **Remote desktop ready** | Optional **Ctrl, Win and Alt** – sticky, so they work with gloves – above the letters or on the Fn tab, and combinations such as `{CTRL+ALT+END}` or `{WIN+R}` for your own keys ([details](docs/configuration.md#ctrl-win-and-alt)) |
 | 🧩 **Programmable keys & macros** | Five free keys and custom layouts with macros such as `{TAB}`, `{F13}`, `OK{ENTER}`, `{SCAN}` or `{SHOW:numeric}` |
 | 🗂️ **Custom layouts** | Your own keyboards (e.g. *OK / Skip / Damaged*) as extra tabs – defined in JSON, no app update needed |
 | 🌍 **Alphabets** | QWERTY, QWERTZ, AZERTY, Nordic and Spanish, accents on long press, optional number row |

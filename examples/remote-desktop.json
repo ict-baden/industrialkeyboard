@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "appearance": { "theme": "system", "modifierRow": true, "functionModifiers": true },
+  "layout": { "alphabet": "qwerty", "navigation": "tabs" },
+  "tabs": { "alpha": true, "numeric": true, "symbols": true, "function": true, "scan": false },
+  "typing": { "autoCapitalize": false, "doubleSpacePeriod": false },
+  "customLayouts": [
+    {
+      "id": "rdp",
+      "label": "RDP",
+      "rows": [
+        [ { "label": "Ctrl+Alt+Del", "output": "{CTRL+ALT+END}", "width": 2, "style": "accent" }, { "label": "Task Manager", "output": "{CTRL+SHIFT+ESC}", "width": 2, "style": "function" } ],
+        [ "{WIN+X}", "{WIN+R}", "{WIN+E}", "{WIN+D}" ],
+        [ "{ALT+TAB}", "{ALT+F4}", "{CTRL+W}", "{F5}" ],
+        [ "{CTRL+C}", "{CTRL+V}", "{CTRL+X}", "{CTRL+Z}" ]
+      ]
+    }
+  ]
+}

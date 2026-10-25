@@ -237,6 +237,12 @@ class SettingsActivity : AppCompatActivity() {
                     ui.switchRow(R.drawable.ic_keyboard, getString(R.string.function_row), getString(R.string.function_row_summary), c.appearance.functionRow) { on ->
                         update { it.copy(appearance = it.appearance.copy(functionRow = on)) }
                     },
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.modifier_row), getString(R.string.modifier_row_summary), c.appearance.modifierRow) { on ->
+                        update { it.copy(appearance = it.appearance.copy(modifierRow = on)) }
+                    },
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.function_modifiers), getString(R.string.function_modifiers_summary), c.appearance.functionModifiers) { on ->
+                        update { it.copy(appearance = it.appearance.copy(functionModifiers = on)) }
+                    },
                     ui.switchRow(R.drawable.ic_info, getString(R.string.key_hints), getString(R.string.key_hints_summary), c.appearance.keyHints) { on ->
                         update { it.copy(appearance = it.appearance.copy(keyHints = on)) }
                     },

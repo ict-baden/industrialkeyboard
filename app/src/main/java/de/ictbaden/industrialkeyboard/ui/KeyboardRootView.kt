@@ -14,6 +14,7 @@ import androidx.core.view.updatePadding
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.layout.KeyboardLayout
 import de.ictbaden.industrialkeyboard.layout.Layouts
+import de.ictbaden.industrialkeyboard.layout.ModifierKey
 
 /** Everything the keyboard frame shows; built by the keyboard service (or a preview). */
 data class RenderState(
@@ -24,6 +25,7 @@ data class RenderState(
     /** Key layout, or `null` for the scan pad. */
     val layout: KeyboardLayout?,
     val shift: ShiftState,
+    val modifiers: Map<ModifierKey, ShiftState> = emptyMap(),
     @param:DrawableRes val enterIcon: Int = R.drawable.kb_enter,
     val rowHeight: Int,
     val heightRows: Int,
@@ -111,6 +113,7 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         listOf(keyboard, scanRow).forEach {
             it.palette = p
             it.shift = state.shift
+            it.modifiers = state.modifiers
             it.enterIcon = state.enterIcon
             it.rowHeight = state.rowHeight
             it.keyPopups = state.keyPopups

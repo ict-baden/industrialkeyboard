@@ -91,6 +91,7 @@ object Layouts {
                 val width = letters[0].length / 12f
                 add(KeyRow((1..12).map { fKey(it, shifted = false, width = width, style = KeyStyle.FUNCTION) }))
             }
+            if (config.appearance.modifierRow) add(modifierRow(letters[0].length.toFloat()))
             if (config.appearance.numberRow) add(KeyRow(DIGITS.map { textKey(it.toString()) }))
             add(KeyRow(letters[0].mapIndexed { i, c -> letterKey(c, digit = if (hints && i < DIGITS.length) DIGITS[i] else null) }))
             add(KeyRow(letters[1].map { letterKey(it) }))
@@ -147,11 +148,19 @@ object Layouts {
      * F1–F12 (with Shift F13–F24), Esc, navigation and arrow keys – for terminal emulation and
      * hotkeys of web apps.
      */
-    fun function(shifted: Boolean = false): KeyboardLayout {
+    fun function(shifted: Boolean = false, modifiers: Boolean = false): KeyboardLayout {
         fun nav(label: String?, code: Int, icon: KeyIcon? = null, repeat: Boolean = false) =
             Key(label = label, icon = icon, output = KeyOutput.Macro(listOf(MacroStep.Key(code))), style = KeyStyle.FUNCTION, repeat = repeat)
         val fWidth = 7f / 6f
-        val rows = listOf(
+        val rows = listOfNotNull(
+            if (modifiers) {
+                KeyRow(
+                    ModifierKey.entries.map { modifierKey(it, fWidth) } +
+                        listOf("{MENU}", "{PRINT}", "{PAUSE}").map { macroKey(it, null, fWidth, KeyStyle.FUNCTION) },
+                )
+            } else {
+                null
+            },
             KeyRow((1..6).map { fKey(it, shifted, fWidth) }),
             KeyRow((7..12).map { fKey(it, shifted, fWidth) }),
             KeyRow(
@@ -226,6 +235,16 @@ object Layouts {
         return KeyRow(keys)
     }
 
+    /** Ctrl, Win, Alt, Esc, Tab and Del in the width of the top letter row. */
+    private fun modifierRow(units: Float): KeyRow {
+        val width = units / 6f
+        fun key(macro: String) = macroKey(macro, null, width, KeyStyle.FUNCTION)
+        return KeyRow(ModifierKey.entries.map { modifierKey(it, width) } + listOf(key("{ESC}"), key("{TAB}"), key("{DEL}").copy(repeat = true)))
+    }
+
+    fun modifierKey(modifier: ModifierKey, width: Float = 1f, style: KeyStyle = KeyStyle.FUNCTION) =
+        Key(label = modifier.label, output = KeyOutput.Modifier(modifier), width = width, style = style)
+
     private fun letterKey(c: Char, digit: Char? = null): Key {
         if (!c.isLetter()) return textKey(c.toString())
         val alternatives = LETTER_ALTERNATIVES[c].orEmpty().map { it.toString() }
@@ -271,6 +290,10 @@ object Layouts {
 
     private fun macroKey(macro: String, label: String?, width: Float, style: KeyStyle): Key {
         val steps = runCatching { Macro.parse(macro) }.getOrElse { listOf(MacroStep.Text(macro)) }
+        // {CTRL}, {ALT} or {WIN} alone: a sticky modifier key.
+        (steps.singleOrNull() as? MacroStep.Key)?.takeIf { it.meta == 0 }?.let { ModifierKey.byKeyCode(it.keyCode) }?.let { modifier ->
+            return modifierKey(modifier, width, style).copy(label = label ?: modifier.label)
+        }
         val icon = if (label == null) Macro.icon(steps) else null
         val output = (steps.singleOrNull() as? MacroStep.Text)?.let { KeyOutput.Text(it.text) } ?: KeyOutput.Macro(steps)
         return Key(label = label ?: Macro.label(steps).takeIf { icon == null }, icon = icon, output = output, width = width, style = style)

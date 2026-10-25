@@ -16,7 +16,7 @@ class ConfigJsonTest {
     @Test
     fun `round trip keeps every setting`() {
         val config = KeyboardConfig(
-            appearance = Appearance(ThemeMode.CONTRAST, "#FF8F00", keyHeight = 130, width = 80, numberRow = true, functionRow = true, keyHints = false),
+            appearance = Appearance(ThemeMode.CONTRAST, "#FF8F00", keyHeight = 130, width = 80, numberRow = true, functionRow = true, keyHints = false, modifierRow = true, functionModifiers = true),
             layout = LayoutSettings(Alphabet.AZERTY, Navigation.KEYS, NumericOrder.CALCULATOR),
             tabs = TabSettings(alpha = true, numeric = false, symbols = true, function = true, scan = false, preferred = "wms"),
             keys = KeySettings(ProgrammableKey.DEFAULTS + ("numeric.p1" to "{F13}") + ("alpha.p1" to "OK{ENTER}")),
