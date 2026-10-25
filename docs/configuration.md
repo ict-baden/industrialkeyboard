@@ -26,7 +26,9 @@ as managed configuration (`config_json`), as a file, as a broadcast, or imported
     "width": 100,
     "numberRow": false,
     "functionRow": false,
-    "keyHints": true
+    "keyHints": true,
+    "modifierRow": false,
+    "functionModifiers": false
   },
   "layout": {
     "alphabet": "qwerty",
@@ -103,6 +105,8 @@ every language: [Error codes](error-codes.md).
 | `numberRow` | `true` / `false` | `false` | Row with 1–0 above the letters |
 | `functionRow` | `true` / `false` | `false` | Row with F1–F12 above the letters (and above the number row) |
 | `keyHints` | `true` / `false` | `true` | Small digits on the top letter row – long press types them (only without number row) |
+| `modifierRow` | `true` / `false` | `false` | Row with **Ctrl, Win, Alt**, Esc, Tab and Del above the letters (above the number and function rows) – for remote desktop and PC shortcuts, see [Ctrl, Win and Alt](#ctrl-win-and-alt) |
+| `functionModifiers` | `true` / `false` | `false` | Extra row on the Fn tab with Ctrl, Win, Alt, Menu (context menu key), Print (Print Screen) and Pause (Alt+F4, Ctrl+Home …). All pages then get the height of five rows |
 
 <p align="center"><img src="images/themes.png" alt="Light, dark and high contrast" width="100%"></p>
 
@@ -232,13 +236,48 @@ when the configuration is loaded.
 |---|---|
 | Keys | `{TAB}` `{ENTER}` `{ESC}` `{BS}` (`{BACKSPACE}`) `{DEL}` (`{DELETE}`) `{INS}` (`{INSERT}`) `{HOME}` `{END}` `{PGUP}` (`{PAGE-UP}`) `{PGDN}` (`{PAGE-DOWN}`) `{UP}` `{DOWN}` `{LEFT}` `{RIGHT}` |
 | Function keys | `{F1}` … `{F12}`, `{F13}` … `{F24}` (sent as Shift + F1 … F12) |
+| Modifiers | `{CTRL}` (`{CONTROL}`), `{ALT}`, `{WIN}` (`{META}`) press the key alone (`{WIN}` opens the Start menu). A key whose whole macro is one of them becomes a sticky modifier key, like those of `modifierRow` |
+| Key combinations | Modifiers and one key joined with `+`: `{CTRL+C}`, `{ALT+F4}`, `{WIN+R}`, `{CTRL+SHIFT+ESC}`, `{CTRL+ALT+END}`. Modifiers: `CTRL`, `ALT`, `WIN`, `SHIFT`; key: any key name above, `A`–`Z`, `0`–`9` or `SPACE` |
+| More keys | `{PRINT}` (Print Screen), `{PAUSE}`, `{MENU}` (context menu key) |
 | Characters | `{SPACE}`, `{LBRACE}` / `{OPEN-BRACE}` = `{`, `{RBRACE}` / `{CLOSE-BRACE}` = `}`, `{U+20AC}` or `{HEX:20AC}` = any Unicode character (here €) |
 | Commands | `{SCAN}` start/stop the scanner, `{HIDE}` hide the keyboard, `{SETTINGS}` open the settings, `{NEXT-KEYBOARD}` switch to the next keyboard, `{SHOW:tab}` show a tab (`alpha`, `numeric`, `symbols`, `function`, `scan` or a custom layout id) |
 
 `{ENTER}` behaves like the Enter key: it runs the field's action (next field, search, send …)
 or starts a new line in multi-line fields.
 
-Examples: `OK{ENTER}` · `{F13}` · `{TAB}{TAB}` · `{U+00E4}` · `{SHOW:picking}` · `{ESC}{F3}`
+Examples: `OK{ENTER}` · `{F13}` · `{TAB}{TAB}` · `{U+00E4}` · `{SHOW:picking}` · `{ESC}{F3}` · `{CTRL+C}` · `{WIN}notepad{ENTER}`
+
+## Ctrl, Win and Alt
+
+For remote desktop (Microsoft Remote Desktop / Windows App, RD clients, VNC, Citrix) and PC
+shortcuts in web apps. There are three ways to get the keys – switch on what you need:
+
+| Option | Where | How |
+|---|---|---|
+| Row above the letters | ABC tab | `appearance.modifierRow: true`, or *Settings → Appearance → Ctrl, Win and Alt row* |
+| Row on the function keys | Fn tab | `appearance.functionModifiers: true`, or *Settings → Appearance → Ctrl, Win and Alt on Fn* |
+| Own keys | programmable keys, custom layouts | `{CTRL}`, `{ALT}`, `{WIN}` as sticky keys, or fixed combinations such as `{CTRL+ALT+END}` |
+
+The modifier keys are sticky, because you cannot hold two keys at once with gloves:
+
+- **Tap** – the key lights up and applies to the next key: tap *Ctrl*, then *C* = Ctrl+C.
+  Several modifiers combine (Ctrl, Alt, then Del). The modifiers stay on when you switch tabs, so
+  *Alt* on the letters followed by *F4* on the Fn tab is Alt+F4.
+- **Tap again** – presses the key alone (*Win* opens the Start menu, *Alt* the menu bar).
+- **Shift** – a Shift you tap yourself also applies to Tab, the arrows, Esc, Del, Home/End and
+  the other keys: Shift+Tab goes back a field, Shift+→ selects. Neither the automatic Shift at
+  the start of a sentence nor Caps Lock does this, so Tab stays Tab while typing in capitals.
+- **Hold** – locks the key (filled with the accent color) until you tap it again.
+
+While a modifier is on, letters, digits and the US punctuation keys go out as key presses instead
+of text, so the app sees Ctrl+C and not the letter c. Shift counts only when you tap it yourself,
+not at the start of a sentence. Ctrl, Win and Alt are pressed and released around the key like on
+a PC keyboard.
+
+> [!TIP]
+> Windows keeps Ctrl+Alt+Del for itself; in a remote session send **Ctrl+Alt+End**
+> (`{CTRL+ALT+END}`). [`examples/remote-desktop.json`](../examples/remote-desktop.json) has a
+> ready-made *RDP* tab with it, Alt+Tab, Win+R, Ctrl+C/V/Z and Alt+F4.
 
 ## Admin password
 

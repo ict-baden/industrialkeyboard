@@ -18,6 +18,9 @@ sealed interface KeyOutput {
     data object Enter : KeyOutput
     data object Space : KeyOutput
 
+    /** Ctrl, Alt or Win: applies to the next key; tap again to press it alone, hold to lock. */
+    data class Modifier(val modifier: ModifierKey) : KeyOutput
+
     /** Toggles between the two symbol pages. */
     data object SymbolsPage : KeyOutput
 

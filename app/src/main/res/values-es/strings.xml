@@ -29,6 +29,10 @@
     <string name="number_row_summary">Números encima de las letras</string>
     <string name="function_row">Fila de teclas de función</string>
     <string name="function_row_summary">F1–F12 encima de las letras</string>
+    <string name="modifier_row">Fila de Ctrl, Win y Alt</string>
+    <string name="modifier_row_summary">Encima de las letras, con Esc, Tab y Supr: para escritorio remoto. Tocar: siguiente tecla, otra vez: sola, mantener: bloquear</string>
+    <string name="function_modifiers">Ctrl, Win y Alt en Fn</string>
+    <string name="function_modifiers_summary">Fila adicional en las teclas de función con Menú, Impr y Pausa, p. ej. para Alt+F4</string>
     <string name="key_hints">Indicaciones en las teclas</string>
     <string name="key_hints_summary">Números pequeños para la pulsación larga en la fila superior</string>
     <string name="language">Idioma</string>

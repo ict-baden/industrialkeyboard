@@ -29,6 +29,10 @@
     <string name="number_row_summary">Chiffres au-dessus des lettres</string>
     <string name="function_row">Rangée de touches de fonction</string>
     <string name="function_row_summary">F1–F12 au-dessus des lettres</string>
+    <string name="modifier_row">Rangée Ctrl, Win et Alt</string>
+    <string name="modifier_row_summary">Au-dessus des lettres, avec Échap, Tab et Suppr, pour le bureau à distance. Toucher : touche suivante, encore : seule, maintenir : verrouiller</string>
+    <string name="function_modifiers">Ctrl, Win et Alt sur Fn</string>
+    <string name="function_modifiers_summary">Rangée supplémentaire sur les touches de fonction avec Menu, Impr et Pause, p. ex. pour Alt+F4</string>
     <string name="key_hints">Indications sur les touches</string>
     <string name="key_hints_summary">Petits chiffres pour l\'appui long sur la rangée du haut</string>
     <string name="language">Langue</string>
