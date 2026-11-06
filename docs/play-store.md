@@ -101,6 +101,11 @@ keyboards.
 The input method service is bound with `BIND_INPUT_METHOD` (granted by the system when the user
 enables the keyboard). No sensitive permissions that need a declaration form.
 
+## Store listing
+
+Published 2026-11-06 (first review pending): [https://play.google.com/store/apps/details?id=de.ictbaden.industrialkeyboard](https://play.google.com/store/apps/details?id=de.ictbaden.industrialkeyboard). Play and the MDM/GitHub APKs
+carry the same signature, so devices can switch between the sources.
+
 ## Publishing a version
 
 1. Update `CHANGELOG.md`, then push an annotated tag whose message is the changelog section in
