@@ -4,6 +4,9 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ## [Unveröffentlicht]
 
+### Geändert
+- **Release-Builds werden mit R8 verkleinert und verschleiert.** Google Play misst das unter *Android Vitals → Codeoptimierung* und warnt unter 25 %. Intent-API, Konfigurationsformat und Fehlercodes bleiben gleich. Jedes Release enthält jetzt zusätzlich `IndustrialKeyboard-<Version>-mapping.txt`, um Stacktraces zurück auf die Quellnamen zu übersetzen; das App Bundle trägt dasselbe Mapping, die Play Console löst Absturzberichte damit selbst auf.
+
 ### Neu
 - **Strg, Win und Alt für Remotedesktop:** wahlweise als Reihe über den Buchstaben (mit Esc, Tab und Entf, `appearance.modifierRow`) und als zusätzliche Reihe bei den Funktionstasten (`appearance.functionModifiers`), beides auch in den Einstellungen unter „Darstellung“. Die Tasten rasten ein: tippen gilt für die nächste Taste, nochmal tippen drückt sie allein (Win öffnet das Startmenü), halten stellt fest. Sie bleiben beim Wechsel des Tabs an, Alt und dann F4 auf dem Fn-Tab ergibt Alt+F4. Solange eine an ist, gehen Buchstaben, Ziffern und Satzzeichen als Tastendruck raus statt als Text, und Strg/Win/Alt werden wie auf einer PC-Tastatur um die Taste herum gedrückt und losgelassen.
 - **Shift auch für Tab, Pfeile und Co.:** ein von Hand getipptes Shift gilt jetzt auch für Tab, Pfeile, Esc, Entf, Pos1/Ende und die anderen Tasten – Shift+Tab springt zurück, Shift+Pfeil markiert, mit Strg zusammen Strg+Shift+Esc. Das automatische Shift am Satzanfang und die Feststelltaste tun das nicht.

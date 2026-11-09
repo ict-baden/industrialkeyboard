@@ -36,6 +36,7 @@ JDK 17–21, Android SDK mit Compile-SDK 37. Unter Windows `sdk.dir` in `local.p
 - `LICENSE` und `THIRD-PARTY-NOTICES.txt` werden beim Bauen als Assets in die APK kopiert (Info-Bereich). Neue Abhängigkeit → `THIRD-PARTY-NOTICES.txt` ergänzen.
 - Honeywell-Trigger ist nur nach Herstellerdoku gebaut, nicht an einem Gerät getestet. Getestet an Zebra HC20 (Android 15) mit DataWedge.
 - Oberfläche mehrsprachig nach Richtlinie 13: `res/values/strings.xml` (Englisch) plus `values-de`, `-es`, `-fr`, `-zh-rCN`. Kein Text fest im Code; neue Texte in allen fünf Dateien anlegen (Lint meldet fehlende). Französisch mit geschütztem Leerzeichen (U+00A0) vor `: ? ! ;`. Sprache per `language` in der Konfiguration, `AppLanguage` wendet sie an. Fehlermeldungen mit Code `IK-xxxx` (`app/ErrorCodes.kt`, `docs/error-codes.md`).
+- Release-Builds laufen durch R8 (`isMinifyEnabled`, `isShrinkResources`, Regeln in `app/proguard-rules.pro`). Wer Reflection, Klassennamen in Strings oder `getIdentifier` einführt, braucht dort eine Keep-Regel; danach die Release-APK einmal auf Gerät oder Emulator prüfen, R8-Fehler zeigen sich erst zur Laufzeit. Die `mapping.txt` liegt im Release (`<Name>-<version>-mapping.txt`) und im `.aab`.
 - Google Play: Store-Texte und -Grafiken in `fastlane/metadata/android/`, Anleitung und Console-Antworten in `docs/play-store.md`. Die CI legt bei Tags zusätzlich das signierte `.aab` ins Release.
 
 ## Regeln
