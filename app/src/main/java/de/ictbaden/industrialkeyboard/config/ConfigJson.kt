@@ -338,7 +338,11 @@ object ConfigJson {
             stripTrailing = intIn(json, "stripTrailing", where, 0, 999, d.stripTrailing),
             replace = replacements(json.optJSONArray("replace"), "$where.replace"),
             gs1 = enumValue(json, "gs1", where, d.gs1),
-            gsReplacement = if (json.has("gsReplacement") && !json.isNull("gsReplacement")) json.optString("gsReplacement") else null,
+            gsReplacement = if (json.has("gsReplacement") && !json.isNull("gsReplacement")) {
+                json.optString("gsReplacement").also { if (it.isNotEmpty()) checkMacro(it, "$where.gsReplacement") }
+            } else {
+                null
+            },
             rules = rules,
             unmatched = enumValue(json, "unmatched", where, d.unmatched),
         )

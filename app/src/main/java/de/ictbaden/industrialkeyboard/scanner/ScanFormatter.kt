@@ -15,15 +15,21 @@ import java.util.Locale
  */
 object ScanFormatter {
 
-    /** What to type: [prefix] and [suffix] are macros; [suffix] `null` = the old `input.suffix`. */
-    data class Output(val text: String, val prefix: String, val suffix: String?)
+    /**
+     * What to type: [prefix] and [suffix] are macros; [suffix] `null` = the old `input.suffix`.
+     * [text] may contain GS separators; [gs] is the macro typed in their place (`null` = the GS
+     * character itself).
+     */
+    data class Output(val text: String, val prefix: String, val suffix: String?, val gs: String? = null) {
+        /** The text pieces between GS separators. */
+        val parts: List<String> get() = text.split(GS)
+    }
 
-    private const val GS = '\u001D'
+    const val GS = '\u001D'
 
     /** `null` = drop the code (a rule says so, or no rule matches and `unmatched` is `drop`). */
     fun format(raw: String, symbology: Symbology?, data: DataSettings): Output? {
         var text = raw
-        data.gsReplacement?.let { text = text.replace(GS.toString(), it) }
         if (data.trim) text = trim(text)
         val rule = data.rules.firstOrNull { matches(it, text, symbology) }
         if (rule == null && data.rules.isNotEmpty() && data.unmatched == RuleAction.DROP) return null
@@ -38,7 +44,7 @@ object ScanFormatter {
             TextCase.LOWER -> text.lowercase(Locale.ROOT)
             TextCase.NONE -> text
         }
-        return Output(text, rule?.prefix ?: data.prefix, rule?.suffix ?: data.suffix)
+        return Output(text, rule?.prefix ?: data.prefix, rule?.suffix ?: data.suffix, data.gsReplacement)
     }
 
     /** True when [text] would be typed (the camera keeps looking otherwise). */

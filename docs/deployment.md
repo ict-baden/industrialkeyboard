@@ -87,6 +87,11 @@ The app ships a schema that every EMM with Android Enterprise support shows:
 | `function_tab` | Bool | Show the function key tab (default on) |
 | `sound` | Bool | Click sound (default off) |
 | `vibrate` | Bool | Vibration (default on) |
+| `scan_prefix` | String | Macro typed before every barcode ([`scanner.data.prefix`](configuration.md#scannerdata--scan-data-formatting)); empty = unchanged |
+| `scan_suffix` | String | Macro typed after every barcode instead of Enter/Tab (`scanner.data.suffix`); empty = unchanged |
+| `camera_aim` | Choice | Camera aiming: frame, crosshair (pick list), anywhere |
+| `camera_continuous` | Bool | Camera stays open and types every new code (default off) |
+| `camera_symbologies` | String | Barcode types for the camera, comma-separated, e.g. `ean13,code128,qr`; empty = unchanged |
 | `admin_password` | String | Protects the keyboard settings and configuration broadcasts |
 
 The keys are applied as soon as the EMM changes them and whenever the keyboard opens. The
@@ -145,6 +150,20 @@ shows the schema automatically.
 | Configuration as a file | FileMgr | target `/enterprise/usr/industrialkeyboard.json` |
 | Configuration via intent | Intent | Mode *Immediate*, Action *Broadcast*, Android Action Name `de.ictbaden.industrialkeyboard.action.INSTALL_CONFIG`, Package Name `de.ictbaden.industrialkeyboard`, Class Name `de.ictbaden.industrialkeyboard.api.ApiReceiver`, Extra 0: name `config`, type String, value = the JSON. Extra 1: name `password`, type String – required once an admin password is set; without one, only managed devices accept the broadcast ([details](#broadcast-intent-stagenow-adb)) |
 | Barcodes as keystrokes | DataWedge (or the DataWedge app) | a profile for your apps with keystroke output – see [Scanner & app integration](integration.md) |
+
+## Configuration as a QR code
+
+To set up a few devices by hand: configure one keyboard, open **Settings → Configuration → Export
+as barcode** and scan the QR code on the next device with **Import from barcode** (camera). The
+import asks before it replaces the configuration. Like the JSON export, the code contains the
+admin password as a hash.
+
+The code holds only the settings that differ from the defaults (the import fills in the rest), as
+plain JSON or compressed as `ICTZ1:` + base64url of raw DEFLATE – whichever is shorter; the line
+under the code says which. The JSON file export stays complete. Every place that takes a JSON configuration – file import,
+the app-folder file, `/enterprise/usr`, `config_json`, the `INSTALL_CONFIG` broadcast – also takes
+the `ICTZ1:` text. Very large configurations (many custom layouts) may not fit a QR code; then the
+dialog says so – use the file.
 
 ## Configuration file
 

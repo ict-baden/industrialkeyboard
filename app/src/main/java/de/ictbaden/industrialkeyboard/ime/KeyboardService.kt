@@ -524,7 +524,11 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun typeScan(output: ScanFormatter.Output) {
         val ic = currentInputConnection ?: return
         if (output.prefix.isNotEmpty()) runCatching { Macro.parse(output.prefix) }.getOrNull()?.let(::runMacro)
-        ic.commitText(output.text, 1)
+        val gs = output.gs?.let { runCatching { Macro.parse(it) }.getOrNull() }
+        output.parts.forEachIndexed { i, part ->
+            if (i > 0) if (gs != null) runMacro(gs) else ic.commitText(ScanFormatter.GS.toString(), 1)
+            if (part.isNotEmpty()) ic.commitText(part, 1)
+        }
         val suffix = output.suffix
         if (suffix != null) {
             if (suffix.isNotEmpty()) runCatching { Macro.parse(suffix) }.getOrNull()?.let(::runMacro)

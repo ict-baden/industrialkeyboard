@@ -684,7 +684,7 @@ class SettingsActivity : AppCompatActivity() {
                         }
                     },
                     ui.row(R.drawable.ic_scan, getString(R.string.data_gs_replacement), data.gsReplacement?.let { if (it.isEmpty()) getString(R.string.value_removed) else "\"$it\"" } ?: getString(R.string.value_keep)) {
-                        dialogs.editText(getString(R.string.data_gs_replacement), data.gsReplacement, getString(R.string.data_gs_replacement_helper), macro = false, defaultLabel = getString(R.string.value_keep)) { v ->
+                        dialogs.editText(getString(R.string.data_gs_replacement), data.gsReplacement, getString(R.string.data_gs_replacement_helper), macro = true, defaultLabel = getString(R.string.value_keep)) { v ->
                             set { it.copy(gsReplacement = v) }
                         }
                     },

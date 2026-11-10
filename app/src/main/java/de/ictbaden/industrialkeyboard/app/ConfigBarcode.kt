@@ -26,7 +26,12 @@ object ConfigBarcode {
         }
     }
 
-    fun payload(config: KeyboardConfig): String = ConfigCodec.encode(ConfigJson.write(config))
+    /**
+     * Only the values that differ from the defaults (the import fills those in), then the shorter
+     * of JSON and `ICTZ1:`. The JSON file export stays complete.
+     */
+    fun payload(config: KeyboardConfig): String =
+        ConfigCodec.encode(ConfigCodec.compact(ConfigJson.write(config), ConfigJson.write(KeyboardConfig())))
 
     fun show(activity: Activity, ui: Ui, config: KeyboardConfig) {
         val payload = payload(config)
@@ -49,7 +54,14 @@ object ConfigBarcode {
         }
         val info = TextView(activity).apply {
             text = buildString {
-                append(activity.getString(R.string.export_barcode_info, payload.length, code.version))
+                append(
+                    activity.getString(
+                        R.string.export_barcode_info,
+                        payload.length,
+                        code.version,
+                        activity.getString(if (ConfigCodec.isCompressed(payload)) R.string.export_barcode_compressed else R.string.export_barcode_json),
+                    ),
+                )
                 if (config.adminPasswordHash != null) append("\n").append(activity.getString(R.string.export_barcode_password))
             }
             setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)

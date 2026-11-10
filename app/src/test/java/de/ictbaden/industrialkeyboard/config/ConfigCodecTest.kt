@@ -15,7 +15,36 @@ class ConfigCodecTest {
     fun `short configurations stay plain minified JSON`() {
         val encoded = ConfigCodec.encode("""{ "layout": { "alphabet": "qwertz" } }""")
         assertEquals("""{"layout":{"alphabet":"qwertz"}}""", encoded)
+        assertFalse(ConfigCodec.isCompressed(encoded))
         assertEquals(encoded, ConfigCodec.decode(encoded))
+    }
+
+    @Test
+    fun `compact keeps only what differs from the defaults and means the same`() {
+        val config = KeyboardConfig(
+            language = "de",
+            layout = LayoutSettings(alphabet = Alphabet.QWERTZ),
+            appearance = Appearance(theme = ThemeMode.DARK, accentColor = "#C62828", keyHeight = 120),
+            keys = KeySettings(ProgrammableKey.DEFAULTS + (ProgrammableKey.NUMERIC_P1.id to "{F5}")),
+            scanner = ScannerSettings(
+                trigger = ScanTriggerType.CAMERA,
+                input = ScanInputSettings(enabled = true, suffix = ScanSuffix.TAB),
+                camera = CameraSettings(aim = AimMode.CENTER, symbologies = setOf(Symbology.EAN13)),
+                data = DataSettings(prefix = "{TAB}", suffix = "", rules = listOf(ScanRule(symbologies = setOf(Symbology.EAN13), stripTrailing = 1))),
+            ),
+            customLayouts = listOf(CustomLayout("pick", "Pick", listOf(listOf(CustomKey("OK", "OK{ENTER}"))))),
+            adminPasswordHash = PasswordHasher.hash("secret"),
+        )
+        val defaults = ConfigJson.write(KeyboardConfig())
+        val compact = ConfigCodec.compact(ConfigJson.write(config), defaults)
+        assertEquals(config, ConfigJson.parse(compact))
+        val json = org.json.JSONObject(compact)
+        assertEquals(1, json.getInt("version"))
+        assertFalse(json.has("typing"))
+        assertFalse(json.getJSONObject("scanner").getJSONObject("camera").has("zoom"))
+        assertEquals("""{"version":1}""", ConfigCodec.compact(defaults, defaults))
+        assertEquals(KeyboardConfig(), ConfigJson.parse(ConfigCodec.compact(defaults, defaults)))
+        assertTrue(compact.length < ConfigJson.write(config).length / 3)
     }
 
     @Test

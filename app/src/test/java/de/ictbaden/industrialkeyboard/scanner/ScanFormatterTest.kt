@@ -48,9 +48,12 @@ class ScanFormatterTest {
     }
 
     @Test
-    fun `gs replacement`() {
-        assertEquals("(01)1|10ABC", text("(01)1\u001D10ABC", DataSettings(gsReplacement = "|")))
-        assertEquals("011", text("01\u001D1", DataSettings(gsReplacement = "")))
+    fun `gs replacement is a macro typed between the parts`() {
+        val out = ScanFormatter.format("0104012345678901\u001D10AB12\u001D", null, DataSettings(gsReplacement = "{TAB}"))!!
+        // Trimming keeps the GS at the end; the keyboard types TAB in its place.
+        assertEquals(listOf("0104012345678901", "10AB12", ""), out.parts)
+        assertEquals("{TAB}", out.gs)
+        assertNull(ScanFormatter.format("a", null, DataSettings())!!.gs)
     }
 
     @Test

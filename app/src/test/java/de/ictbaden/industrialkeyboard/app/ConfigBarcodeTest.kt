@@ -16,12 +16,27 @@ import kotlin.random.Random
 class ConfigBarcodeTest {
 
     @Test
-    fun `default configuration fits a QR code with at least medium error correction`() {
+    fun `default configuration is tiny`() {
         val payload = ConfigBarcode.payload(KeyboardConfig())
+        assertEquals("""{"version":1}""", payload)
         val code = ConfigBarcode.qr(payload)
         assertNotNull(code)
         assertTrue(code!!.errorCorrectionLevel.ordinal >= QrCode.Ecc.MEDIUM.ordinal)
         assertEquals(KeyboardConfig(), ConfigJson.parse(payload))
+    }
+
+    @Test
+    fun `payload is the shorter form`() {
+        val small = ConfigBarcode.payload(KeyboardConfig(language = "fr"))
+        val json = org.json.JSONObject(small)
+        assertEquals(setOf("version", "language"), json.keys().asSequence().toSet())
+        assertEquals("fr", json.getString("language"))
+        val config = KeyboardConfig(
+            customLayouts = (1..4).map { n -> CustomLayout("l$n", "Layout $n", listOf((1..10).map { CustomKey("Key $it of layout $n", "{F$it}") })) },
+        )
+        val payload = ConfigBarcode.payload(config)
+        assertTrue(ConfigCodec.isCompressed(payload))
+        assertEquals(config, ConfigJson.parse(payload))
     }
 
     @Test

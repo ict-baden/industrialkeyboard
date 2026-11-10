@@ -1,5 +1,7 @@
 package de.ictbaden.industrialkeyboard.config
 
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.util.Base64
 import java.util.zip.DataFormatException
@@ -7,23 +9,59 @@ import java.util.zip.Deflater
 import java.util.zip.Inflater
 
 /**
- * Configuration text for barcodes: plain JSON when it is short, otherwise `ICTZ1:` plus
- * base64url (without padding) of the raw-DEFLATE compressed UTF-8 JSON. Shared format of the
- * ICT-Baden Android apps; every place that accepts a JSON configuration also accepts `ICTZ1:`.
+ * Configuration text for barcodes: minified JSON or `ICTZ1:` plus base64url (without padding) of
+ * the raw-DEFLATE compressed UTF-8 JSON, whichever is shorter. Shared format of the ICT-Baden
+ * Android apps; every place that accepts a JSON configuration also accepts `ICTZ1:`.
  */
 object ConfigCodec {
     const val PREFIX = "ICTZ1:"
 
-    /** Up to this length the barcode carries plain JSON, readable by older versions and any reader. */
-    const val PLAIN_LIMIT = 1800
-
     /** Inflated size limit against "zip bombs". */
     const val MAX_INFLATED = 1_000_000
 
-    /** Minified JSON, compressed when longer than [PLAIN_LIMIT]. */
+    /** Minified JSON or its compressed form, whichever is shorter. */
     fun encode(json: String): String {
         val minified = minify(json)
-        if (minified.length <= PLAIN_LIMIT) return minified
+        val compressed = compress(minified)
+        return if (compressed.length < minified.length) compressed else minified
+    }
+
+    fun isCompressed(text: String) = text.trimStart().startsWith(PREFIX, ignoreCase = true)
+
+    /**
+     * [json] without every value that equals the one in [defaults] (objects compared key by key,
+     * arrays and plain values as a whole). The parser fills in the defaults again, so the result
+     * means the same configuration; `version` stays.
+     */
+    fun compact(json: String, defaults: String): String {
+        val config = JSONObject(json)
+        prune(config, JSONObject(defaults), top = true)
+        return config.toString()
+    }
+
+    private fun prune(config: JSONObject, defaults: JSONObject, top: Boolean) {
+        for (key in config.keys().asSequence().toList()) {
+            if (top && key == "version") continue
+            if (!defaults.has(key)) continue
+            val value = config.opt(key)
+            val default = defaults.opt(key)
+            if (value is JSONObject && default is JSONObject) {
+                prune(value, default, top = false)
+                if (value.length() == 0) config.remove(key)
+            } else if (same(value, default)) {
+                config.remove(key)
+            }
+        }
+    }
+
+    private fun same(a: Any?, b: Any?): Boolean = when {
+        a is JSONArray && b is JSONArray -> a.toString() == b.toString()
+        a is JSONObject && b is JSONObject -> a.toString() == b.toString()
+        a is Number && b is Number -> a.toDouble() == b.toDouble()
+        else -> a == b
+    }
+
+    private fun compress(minified: String): String {
         val deflater = Deflater(Deflater.BEST_COMPRESSION, true)
         deflater.setInput(minified.toByteArray(Charsets.UTF_8))
         deflater.finish()
@@ -63,5 +101,5 @@ object ConfigCodec {
     }
 
     /** JSON without the indentation of [ConfigJson.write]. */
-    private fun minify(json: String): String = runCatching { org.json.JSONObject(json).toString() }.getOrDefault(json.trim())
+    private fun minify(json: String): String = runCatching { JSONObject(json).toString() }.getOrDefault(json.trim())
 }

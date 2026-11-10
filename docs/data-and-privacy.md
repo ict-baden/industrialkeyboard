@@ -21,7 +21,8 @@ learning, no history and no clipboard access.
 ([`scanner.trigger`](configuration.md#scanner)). The camera runs only while its picture is shown in
 the keyboard (after a tap on scan, at most one minute) and stops after the first code. The pictures
 are decoded in memory on the device and are neither stored nor sent; only the barcode text is typed
-into the field. Android asks for the camera permission the first time.
+into the field. Android asks for the camera permission the first time. The same camera reads a
+configuration QR code when you choose **Import from barcode** in the settings.
 
 The operator of the devices (your company) is responsible for the data typed with the keyboard;
 ICT-Baden processes none of it.

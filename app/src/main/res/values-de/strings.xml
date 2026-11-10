@@ -109,6 +109,7 @@
     <string name="camera_continuous_status">Gescannt: %1$d · zuletzt: %2$s</string>
     <string name="section_camera">Scannen mit der Kamera</string>
     <string name="camera_symbologies">Barcode-Typen</string>
+    <string name="camera_symbologies_pick">Barcode-Typen (keiner = alle)</string>
     <string name="symbologies_all">Alle</string>
     <string name="camera_aim">Zielen</string>
     <string name="camera_aim_frame">Rahmen</string>
@@ -157,7 +158,7 @@
     <string name="data_strip_leading">Zeichen vorn</string>
     <string name="data_strip_trailing">Zeichen hinten</string>
     <string name="data_gs_replacement">GS-Trennzeichen</string>
-    <string name="data_gs_replacement_helper">Text statt des GS-Zeichens, leer = entfernen</string>
+    <string name="data_gs_replacement_helper">Makro statt des GS-Zeichens, z. B. {TAB}; leer = entfernen</string>
     <string name="value_keep">Behalten</string>
     <string name="value_removed">Entfernt</string>
     <string name="data_replace">Ersetzungen</string>
@@ -166,7 +167,9 @@
     <string name="text_hint">Text</string>
     <string name="export_barcode">Als Barcode exportieren</string>
     <string name="export_barcode_summary">QR-Code zum Scannen am nächsten Gerät</string>
-    <string name="export_barcode_info">Länge: %1$d · QR-Version %2$d</string>
+    <string name="export_barcode_info">Länge: %1$d · QR-Version %2$d · %3$s</string>
+    <string name="export_barcode_compressed">komprimiert</string>
+    <string name="export_barcode_json">JSON</string>
     <string name="export_barcode_password">Enthält das Admin-Passwort (als Hash), wie die JSON-Datei.</string>
     <string name="export_barcode_too_large">Die Konfiguration ist zu groß für einen Barcode (Länge %1$d). Bitte die JSON-Datei nehmen.</string>
     <string name="import_barcode">Aus Barcode importieren</string>
