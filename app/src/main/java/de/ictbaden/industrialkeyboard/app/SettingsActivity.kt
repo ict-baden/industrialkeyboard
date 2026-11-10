@@ -26,10 +26,14 @@ import com.google.android.material.card.MaterialCardView
 import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.BuildConfig
 import de.ictbaden.industrialkeyboard.R
+import de.ictbaden.industrialkeyboard.config.AimMode
 import de.ictbaden.industrialkeyboard.config.Alphabet
+import de.ictbaden.industrialkeyboard.config.CameraSettings
 import de.ictbaden.industrialkeyboard.config.ConfigException
 import de.ictbaden.industrialkeyboard.config.ConfigJson
 import de.ictbaden.industrialkeyboard.config.ConfigStore
+import de.ictbaden.industrialkeyboard.config.DataSettings
+import de.ictbaden.industrialkeyboard.config.Gs1Mode
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
 import de.ictbaden.industrialkeyboard.config.Languages
 import de.ictbaden.industrialkeyboard.config.Navigation
@@ -38,7 +42,9 @@ import de.ictbaden.industrialkeyboard.config.ProgrammableKey
 import de.ictbaden.industrialkeyboard.config.Provisioning
 import de.ictbaden.industrialkeyboard.config.ScanSuffix
 import de.ictbaden.industrialkeyboard.config.ScanTriggerType
+import de.ictbaden.industrialkeyboard.config.Symbology
 import de.ictbaden.industrialkeyboard.config.Tabs
+import de.ictbaden.industrialkeyboard.config.TextCase
 import de.ictbaden.industrialkeyboard.config.ThemeMode
 import de.ictbaden.industrialkeyboard.ime.Field
 import de.ictbaden.industrialkeyboard.ime.FieldPolicy
@@ -52,6 +58,7 @@ import de.ictbaden.industrialkeyboard.ui.KeyboardRootView
 import de.ictbaden.industrialkeyboard.ui.KeyboardView
 import de.ictbaden.industrialkeyboard.ui.Palette
 import de.ictbaden.industrialkeyboard.ui.ShiftState
+import java.util.Locale
 
 /** All keyboard options with a live preview at the top. Protected by the admin password if one is set. */
 class SettingsActivity : AppCompatActivity() {
@@ -70,6 +77,10 @@ class SettingsActivity : AppCompatActivity() {
 
     private val importFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(::readText)?.let(::confirmImport)
+    }
+
+    private val importBarcode = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        result.data?.getStringExtra(ConfigScanActivity.EXTRA_TEXT)?.takeIf { result.resultCode == RESULT_OK }?.let(::confirmImport)
     }
 
     private val exportFile = registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
@@ -427,11 +438,14 @@ class SettingsActivity : AppCompatActivity() {
                             ScanSuffix.TAB to getString(R.string.after_scan_tab),
                         ),
                         c.scanner.input.suffix,
-                        enabled = c.scanner.input.enabled,
+                        enabled = c.scanner.data.suffix == null,
                     ) { suffix -> update { it.copy(scanner = it.scanner.copy(input = it.scanner.input.copy(suffix = suffix))) } },
                 ),
             ),
         )
+
+        renderCameraSection(c)
+        renderDataSection(c)
 
         content.addView(ui.section(getString(R.string.section_configuration)))
         content.addView(
@@ -442,6 +456,12 @@ class SettingsActivity : AppCompatActivity() {
                     },
                     ui.row(R.drawable.ic_download, getString(R.string.export_file), getString(R.string.export_file_summary)) {
                         exportFile.launch(Provisioning.CONFIG_FILE_NAME)
+                    },
+                    ui.row(R.drawable.ic_qr, getString(R.string.export_barcode), getString(R.string.export_barcode_summary)) {
+                        ConfigBarcode.show(this, ui, store.config)
+                    },
+                    ui.row(R.drawable.ic_qr, getString(R.string.import_barcode), getString(R.string.import_barcode_summary)) {
+                        importBarcode.launch(Intent(this, ConfigScanActivity::class.java))
                     },
                     ui.row(R.drawable.ic_restart, getString(R.string.reset_defaults), getString(R.string.reset_defaults_summary)) {
                         dialogs.confirm(getString(R.string.reset_confirm_title), getString(R.string.reset_confirm_message), getString(R.string.button_reset)) {
@@ -568,6 +588,127 @@ class SettingsActivity : AppCompatActivity() {
             }
             .setNegativeButton(R.string.button_cancel, null)
             .show()
+    }
+
+    private fun renderCameraSection(c: KeyboardConfig) {
+        val cam = c.scanner.camera
+        fun set(transform: (CameraSettings) -> CameraSettings) = update { it.copy(scanner = it.scanner.copy(camera = transform(it.scanner.camera))) }
+        val timeouts = (listOf(30, 60, 120, 300, 0) + cam.timeoutSeconds).distinct()
+        content.addView(ui.section(getString(R.string.section_camera)))
+        content.addView(
+            ui.card(
+                listOf(
+                    ui.row(R.drawable.ic_scan, getString(R.string.camera_symbologies), symbologyList(cam.symbologies)) {
+                        dialogs.pickSymbologies(cam.symbologies) { types -> set { it.copy(symbologies = types) } }
+                    },
+                    ui.choiceRow(
+                        R.drawable.ic_scan,
+                        getString(R.string.camera_aim),
+                        listOf(
+                            AimMode.FRAME to getString(R.string.camera_aim_frame),
+                            AimMode.CENTER to getString(R.string.camera_aim_center),
+                            AimMode.ANYWHERE to getString(R.string.camera_aim_anywhere),
+                        ),
+                        cam.aim,
+                    ) { aim -> set { it.copy(aim = aim) } },
+                    ui.switchRow(R.drawable.ic_scan, getString(R.string.camera_continuous), getString(R.string.camera_continuous_summary), cam.continuous) { on ->
+                        set { it.copy(continuous = on) }
+                    },
+                    ui.row(R.drawable.ic_timer, getString(R.string.camera_duplicate_delay), getString(R.string.value_ms, cam.duplicateDelayMs), onClick = if (cam.continuous) ({
+                        dialogs.editNumber(getString(R.string.camera_duplicate_delay), cam.duplicateDelayMs, 0, 10_000) { v -> set { it.copy(duplicateDelayMs = v) } }
+                    }) else null),
+                    ui.choiceRow(R.drawable.ic_check, getString(R.string.camera_confirm_reads), listOf(1, 2, 3).map { it to it.toString() }, cam.confirmReads) { n ->
+                        set { it.copy(confirmReads = n) }
+                    },
+                    ui.row(R.drawable.ic_scan, getString(R.string.camera_length), lengthText(cam.minLength, cam.maxLength)) {
+                        dialogs.editNumber(getString(R.string.camera_min_length), cam.minLength, 0, 9999, getString(R.string.zero_no_limit)) { min ->
+                            dialogs.editNumber(getString(R.string.camera_max_length), cam.maxLength, 0, 9999, getString(R.string.zero_no_limit)) { max ->
+                                set { it.copy(minLength = min, maxLength = if (max in 1 until min) min else max) }
+                            }
+                        }
+                    },
+                    ui.choiceRow(R.drawable.ic_scan, getString(R.string.camera_zoom_start), listOf(1f, 2f, 3f, 4f).map { it to String.format(Locale.ROOT, "%.0f×", it) }, listOf(1f, 2f, 3f, 4f).minByOrNull { kotlin.math.abs(it - cam.zoom) }!!) { z ->
+                        set { it.copy(zoom = z) }
+                    },
+                    ui.switchRow(R.drawable.ic_scan, getString(R.string.camera_torch_start), null, cam.torch) { on -> set { it.copy(torch = on) } },
+                    ui.switchRow(R.drawable.ic_scan, getString(R.string.camera_inverted), getString(R.string.camera_inverted_summary), cam.inverted) { on -> set { it.copy(inverted = on) } },
+                    ui.switchRow(R.drawable.ic_scan, getString(R.string.camera_beep), null, cam.beep) { on -> set { it.copy(beep = on) } },
+                    ui.switchRow(R.drawable.ic_scan, getString(R.string.camera_vibrate), null, cam.vibrate) { on -> set { it.copy(vibrate = on) } },
+                    ui.choiceRow(R.drawable.ic_timer, getString(R.string.camera_timeout), timeouts.map { it to timeoutText(it) }, cam.timeoutSeconds) { t ->
+                        set { it.copy(timeoutSeconds = t) }
+                    },
+                    ui.choiceRow(
+                        R.drawable.ic_scan,
+                        getString(R.string.data_gs1),
+                        listOf(Gs1Mode.HRI to getString(R.string.data_gs1_hri), Gs1Mode.RAW to getString(R.string.data_gs1_raw)),
+                        c.scanner.data.gs1,
+                    ) { mode -> update { it.copy(scanner = it.scanner.copy(data = it.scanner.data.copy(gs1 = mode))) } },
+                ),
+            ),
+        )
+    }
+
+    private fun renderDataSection(c: KeyboardConfig) {
+        val data = c.scanner.data
+        fun set(transform: (DataSettings) -> DataSettings) = update { it.copy(scanner = it.scanner.copy(data = transform(it.scanner.data))) }
+        val asBefore = getString(R.string.data_suffix_default)
+        content.addView(ui.section(getString(R.string.section_scan_data)))
+        content.addView(
+            ui.card(
+                listOf(
+                    ui.row(R.drawable.ic_key, getString(R.string.data_prefix), data.prefix.ifEmpty { getString(R.string.value_none) }) {
+                        dialogs.editText(getString(R.string.data_prefix), data.prefix, getString(R.string.macro_helper), macro = true) { v -> set { it.copy(prefix = v.orEmpty()) } }
+                    },
+                    ui.row(R.drawable.ic_key, getString(R.string.data_suffix), data.suffix?.ifEmpty { getString(R.string.value_none) } ?: asBefore) {
+                        dialogs.editText(getString(R.string.data_suffix), data.suffix, getString(R.string.macro_helper), macro = true, defaultLabel = getString(R.string.data_suffix_reset)) { v ->
+                            set { it.copy(suffix = v) }
+                        }
+                    },
+                    ui.switchRow(R.drawable.ic_scan, getString(R.string.data_trim), getString(R.string.data_trim_summary), data.trim) { on -> set { it.copy(trim = on) } },
+                    ui.switchRow(R.drawable.ic_scan, getString(R.string.data_remove_spaces), null, data.removeSpaces) { on -> set { it.copy(removeSpaces = on) } },
+                    ui.choiceRow(
+                        R.drawable.ic_keyboard,
+                        getString(R.string.data_case),
+                        listOf(
+                            TextCase.NONE to getString(R.string.data_case_none),
+                            TextCase.UPPER to getString(R.string.data_case_upper),
+                            TextCase.LOWER to getString(R.string.data_case_lower),
+                        ),
+                        data.case,
+                    ) { case -> set { it.copy(case = case) } },
+                    ui.row(R.drawable.ic_scan, getString(R.string.data_strip), getString(R.string.data_strip_value, data.stripLeading, data.stripTrailing)) {
+                        dialogs.editNumber(getString(R.string.data_strip_leading), data.stripLeading, 0, 999) { lead ->
+                            dialogs.editNumber(getString(R.string.data_strip_trailing), data.stripTrailing, 0, 999) { trail ->
+                                set { it.copy(stripLeading = lead, stripTrailing = trail) }
+                            }
+                        }
+                    },
+                    ui.row(R.drawable.ic_scan, getString(R.string.data_gs_replacement), data.gsReplacement?.let { if (it.isEmpty()) getString(R.string.value_removed) else "\"$it\"" } ?: getString(R.string.value_keep)) {
+                        dialogs.editText(getString(R.string.data_gs_replacement), data.gsReplacement, getString(R.string.data_gs_replacement_helper), macro = false, defaultLabel = getString(R.string.value_keep)) { v ->
+                            set { it.copy(gsReplacement = v) }
+                        }
+                    },
+                    ui.row(R.drawable.ic_info, getString(R.string.data_replace), resources.getQuantityString(R.plurals.json_only_count, data.replace.size, data.replace.size), onClick = null),
+                    ui.row(R.drawable.ic_info, getString(R.string.data_rules), resources.getQuantityString(R.plurals.json_only_count, data.rules.size, data.rules.size), onClick = null),
+                ),
+            ),
+        )
+    }
+
+    private fun symbologyList(types: Set<Symbology>): String =
+        if (types.isEmpty()) getString(R.string.symbologies_all) else types.sortedBy { it.ordinal }.joinToString { it.label }
+
+    private fun lengthText(min: Int, max: Int): String = when {
+        min == 0 && max == 0 -> getString(R.string.length_any)
+        max == 0 -> getString(R.string.length_min, min)
+        min == 0 -> getString(R.string.length_max, max)
+        else -> getString(R.string.length_range, min, max)
+    }
+
+    private fun timeoutText(seconds: Int): String = when {
+        seconds == 0 -> getString(R.string.timeout_never)
+        seconds % 60 == 0 -> getString(R.string.value_min, seconds / 60)
+        else -> getString(R.string.value_s, seconds)
     }
 
     private fun readText(uri: Uri): String? = runCatching {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="settings_title">Tastatur-Einstellungen</string>
     <string name="message_with_code">%1$s (%2$s)</string>
     <string name="value_percent">%1$d %%</string>
@@ -9,6 +9,7 @@
     <string name="button_cancel">Abbrechen</string>
     <string name="button_save">Speichern</string>
     <string name="button_ok">OK</string>
+    <string name="button_close">Schließen</string>
     <string name="button_apply">Übernehmen</string>
     <string name="button_import">Importieren</string>
     <string name="button_reset">Zurücksetzen</string>
@@ -105,7 +106,72 @@
     <string name="camera_failed">Die Kamera ließ sich nicht starten.</string>
     <string name="camera_hint_center">Fadenkreuz auf den Barcode richten</string>
     <string name="camera_zoom">Zoom</string>
-    <string name="camera_continuous_status">%1$d gescannt · zuletzt: %2$s</string>
+    <string name="camera_continuous_status">Gescannt: %1$d · zuletzt: %2$s</string>
+    <string name="section_camera">Scannen mit der Kamera</string>
+    <string name="camera_symbologies">Barcode-Typen</string>
+    <string name="symbologies_all">Alle</string>
+    <string name="camera_aim">Zielen</string>
+    <string name="camera_aim_frame">Rahmen</string>
+    <string name="camera_aim_center">Fadenkreuz</string>
+    <string name="camera_aim_anywhere">Überall</string>
+    <string name="camera_continuous">Dauerscan</string>
+    <string name="camera_continuous_summary">Kamera bleibt offen und tippt jeden neuen Code</string>
+    <string name="camera_duplicate_delay">Gleicher Code wieder nach</string>
+    <string name="camera_confirm_reads">Lesungen, bis ein Code zählt</string>
+    <string name="camera_length">Code-Länge</string>
+    <string name="camera_min_length">Mindestlänge</string>
+    <string name="camera_max_length">Höchstlänge</string>
+    <string name="zero_no_limit">0 = keine Grenze</string>
+    <string name="length_any">Beliebig</string>
+    <string name="length_min">Min. %1$d</string>
+    <string name="length_max">Max. %1$d</string>
+    <string name="length_range">%1$d–%2$d</string>
+    <string name="camera_zoom_start">Zoom beim Öffnen</string>
+    <string name="camera_torch_start">Taschenlampe beim Öffnen an</string>
+    <string name="camera_inverted">Inverse Codes</string>
+    <string name="camera_inverted_summary">Helle Codes auf dunklem Grund</string>
+    <string name="camera_beep">Ton</string>
+    <string name="camera_vibrate">Vibration</string>
+    <string name="camera_timeout">Kamera schließen nach</string>
+    <string name="timeout_never">Nie</string>
+    <string name="value_s">%1$d s</string>
+    <string name="value_min">%1$d min</string>
+    <string name="data_gs1" tools:ignore="Typos">GS1-Codes</string>
+    <string name="data_gs1_hri">Lesbar (01)…</string>
+    <string name="data_gs1_raw">Roh mit GS</string>
+    <string name="section_scan_data">Scan-Daten</string>
+    <string name="data_prefix">Präfix</string>
+    <string name="data_suffix">Suffix</string>
+    <string name="data_suffix_default">Wie bei „Nach dem Scan“</string>
+    <string name="data_suffix_reset">Wie „Nach dem Scan“</string>
+    <string name="value_none">Keins</string>
+    <string name="data_trim">Ränder bereinigen</string>
+    <string name="data_trim_summary">Leerzeichen und Steuerzeichen am Anfang und Ende entfernen</string>
+    <string name="data_remove_spaces">Alle Leerzeichen entfernen</string>
+    <string name="data_case">Groß-/Kleinschreibung</string>
+    <string name="data_case_none">Unverändert</string>
+    <string name="data_case_upper">GROSS</string>
+    <string name="data_case_lower">klein</string>
+    <string name="data_strip">Zeichen abschneiden</string>
+    <string name="data_strip_value">%1$d vorn, %2$d hinten</string>
+    <string name="data_strip_leading">Zeichen vorn</string>
+    <string name="data_strip_trailing">Zeichen hinten</string>
+    <string name="data_gs_replacement">GS-Trennzeichen</string>
+    <string name="data_gs_replacement_helper">Text statt des GS-Zeichens, leer = entfernen</string>
+    <string name="value_keep">Behalten</string>
+    <string name="value_removed">Entfernt</string>
+    <string name="data_replace">Ersetzungen</string>
+    <string name="data_rules">Regeln</string>
+    <string name="number_range">%1$d–%2$d</string>
+    <string name="text_hint">Text</string>
+    <string name="export_barcode">Als Barcode exportieren</string>
+    <string name="export_barcode_summary">QR-Code zum Scannen am nächsten Gerät</string>
+    <string name="export_barcode_info">Länge: %1$d · QR-Version %2$d</string>
+    <string name="export_barcode_password">Enthält das Admin-Passwort (als Hash), wie die JSON-Datei.</string>
+    <string name="export_barcode_too_large">Die Konfiguration ist zu groß für einen Barcode (Länge %1$d). Bitte die JSON-Datei nehmen.</string>
+    <string name="import_barcode">Aus Barcode importieren</string>
+    <string name="import_barcode_summary">QR-Code eines anderen Geräts scannen</string>
+    <string name="import_barcode_hint">Konfigurations-QR-Code vor die Kamera halten</string>
 
     <string name="section_configuration">Konfiguration</string>
     <string name="import_file">Aus Datei importieren</string>
@@ -221,6 +287,16 @@
     <string name="mc_sound_description">Bei jedem Tastendruck klicken.</string>
     <string name="mc_vibrate_title">Vibration bei Tastendruck</string>
     <string name="mc_vibrate_description">Kurze Vibration bei jedem Tastendruck.</string>
+    <string name="mc_scan_prefix_title">Scan-Präfix</string>
+    <string name="mc_scan_prefix_description">Wird vor jedem Barcode getippt. Text und Kürzel wie {TAB}; leer = aktuelle Einstellung bleibt.</string>
+    <string name="mc_scan_suffix_title">Scan-Suffix</string>
+    <string name="mc_scan_suffix_description">Wird nach jedem Barcode statt Enter/Tab getippt, z. B. {TAB} oder {ENTER}; leer = aktuelle Einstellung bleibt.</string>
+    <string name="mc_camera_aim_title">Kamera: Zielen</string>
+    <string name="mc_camera_aim_description">Welche Codes im Kamerabild zählen.</string>
+    <string name="mc_camera_continuous_title">Kamera: Dauerscan</string>
+    <string name="mc_camera_continuous_description">Kamera bleibt offen und tippt jeden neuen Code.</string>
+    <string name="mc_camera_symbologies_title">Kamera: Barcode-Typen</string>
+    <string name="mc_camera_symbologies_description">Durch Kommas getrennt, z. B. ean13,code128,qr; leer = aktuelle Einstellung bleibt.</string>
     <string name="mc_admin_password_title">Admin-Passwort</string>
     <string name="mc_admin_password_description">Schützt die Tastatur-Einstellungen und Konfigurationsimporte.</string>
 
@@ -249,5 +325,14 @@
     <string-array name="mc_numeric_order_entries">
         <item>Telefon (1-2-3 oben)</item>
         <item>Taschenrechner (7-8-9 oben)</item>
+    </string-array>
+    <plurals name="json_only_count">
+        <item quantity="one">%1$d – nur in der JSON-Konfiguration</item>
+        <item quantity="other">%1$d – nur in der JSON-Konfiguration</item>
+    </plurals>
+    <string-array name="mc_camera_aim_entries">
+        <item>Rahmen</item>
+        <item>Fadenkreuz (Auswahl)</item>
+        <item>Überall</item>
     </string-array>
 </resources>

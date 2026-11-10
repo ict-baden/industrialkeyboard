@@ -2,6 +2,7 @@ package de.ictbaden.industrialkeyboard.app
 
 import android.app.Activity
 import android.content.res.ColorStateList
+import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
@@ -14,6 +15,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.config.PasswordGuard
 import de.ictbaden.industrialkeyboard.config.PasswordHasher
+import de.ictbaden.industrialkeyboard.config.Symbology
 import de.ictbaden.industrialkeyboard.layout.Macro
 import de.ictbaden.industrialkeyboard.ui.Palette
 
@@ -154,6 +156,71 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
                     else -> toast(withCode(activity.getString(R.string.invalid_color, value), ErrorCodes.INVALID_COLOR))
                 }
             }
+            .setNegativeButton(R.string.button_cancel, null)
+            .show()
+    }
+
+    /** Edits a whole number in [min]..[max]. */
+    fun editNumber(title: String, current: Int, min: Int, max: Int, helper: String? = null, onSave: (Int) -> Unit) {
+        val field = ui.textField(activity.getString(R.string.number_range, min, max), current.toString(), inputType = InputType.TYPE_CLASS_NUMBER, helper = helper)
+        val dialog = MaterialAlertDialogBuilder(activity)
+            .setTitle(title)
+            .setView(ui.form(field))
+            .setPositiveButton(R.string.button_save, null)
+            .setNegativeButton(R.string.button_cancel, null)
+            .show()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val value = field.value.trim().toIntOrNull()
+            if (value == null || value < min || value > max) {
+                field.error = activity.getString(R.string.number_range, min, max)
+            } else {
+                dialog.dismiss()
+                onSave(value)
+            }
+        }
+    }
+
+    /**
+     * Edits a text; with [macro] it is checked like a key macro. [defaultLabel] adds a button that
+     * saves `null` (the default behaviour).
+     */
+    fun editText(title: String, current: String?, helper: String?, macro: Boolean, defaultLabel: String? = null, onSave: (String?) -> Unit) {
+        val field = ui.textField(s(if (macro) R.string.macro_hint else R.string.text_hint), current.orEmpty(), helper = helper)
+        val builder = MaterialAlertDialogBuilder(activity)
+            .setTitle(title)
+            .setView(ui.form(field))
+            .setPositiveButton(R.string.button_save, null)
+            .setNegativeButton(R.string.button_cancel, null)
+        defaultLabel?.let { builder.setNeutralButton(it) { _, _ -> onSave(null) } }
+        val dialog = builder.show()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val text = field.editText?.text?.toString().orEmpty()
+            val error = if (macro && text.isNotEmpty()) {
+                runCatching { Macro.parse(text) }.exceptionOrNull()?.let {
+                    withCode(activity.getString(R.string.macro_invalid, it.message), ErrorCodes.INVALID_MACRO)
+                }
+            } else {
+                null
+            }
+            if (error != null) {
+                field.error = error
+            } else {
+                dialog.dismiss()
+                onSave(text)
+            }
+        }
+    }
+
+    /** Multi-select of barcode types; an empty selection means all. */
+    fun pickSymbologies(current: Set<Symbology>, onSave: (Set<Symbology>) -> Unit) {
+        val all = Symbology.entries
+        val checked = BooleanArray(all.size) { all[it] in current }
+        MaterialAlertDialogBuilder(activity)
+            .setIcon(ui.icon(R.drawable.ic_scan))
+            .setTitle(R.string.camera_symbologies)
+            .setMultiChoiceItems(all.map { it.label }.toTypedArray(), checked) { _, which, isChecked -> checked[which] = isChecked }
+            .setPositiveButton(R.string.button_save) { _, _ -> onSave(all.filterIndexed { i, _ -> checked[i] }.toSet()) }
+            .setNeutralButton(R.string.symbologies_all) { _, _ -> onSave(emptySet()) }
             .setNegativeButton(R.string.button_cancel, null)
             .show()
     }

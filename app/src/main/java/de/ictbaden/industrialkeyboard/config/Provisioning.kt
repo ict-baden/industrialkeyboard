@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
+import de.ictbaden.industrialkeyboard.layout.Macro
 import org.json.JSONObject
 import java.io.File
 import java.util.concurrent.Executors
@@ -127,7 +128,31 @@ object Provisioning {
                 sound = bool("sound", config.feedback.sound),
                 vibrate = bool("vibrate", config.feedback.vibrate),
             ),
+            scanner = config.scanner.copy(
+                camera = config.scanner.camera.copy(
+                    aim = choice("camera_aim", AimMode.entries.toTypedArray(), config.scanner.camera.aim),
+                    continuous = bool("camera_continuous", config.scanner.camera.continuous),
+                    symbologies = values.getString("camera_symbologies")?.takeIf { it.isNotBlank() }?.let(::symbologyList) ?: config.scanner.camera.symbologies,
+                ),
+                data = config.scanner.data.copy(
+                    prefix = values.getString("scan_prefix")?.takeIf { it.isNotEmpty() }?.also { checkMacro(it, "scan_prefix") } ?: config.scanner.data.prefix,
+                    suffix = values.getString("scan_suffix")?.takeIf { it.isNotEmpty() }?.also { checkMacro(it, "scan_suffix") } ?: config.scanner.data.suffix,
+                ),
+            ),
         )
+    }
+
+    /** `ean13, code128,qr` → types; unknown names are an error, so typos surface in the EMM. */
+    private fun symbologyList(value: String): Set<Symbology> = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }.map { name ->
+        Symbology.byKey(name) ?: throw ConfigException("camera_symbologies: unknown barcode type \"$name\" (${Symbology.entries.joinToString { it.key }})")
+    }.toSet()
+
+    private fun checkMacro(macro: String, key: String) {
+        try {
+            Macro.parse(macro)
+        } catch (e: IllegalArgumentException) {
+            throw ConfigException("$key: ${e.message}")
+        }
     }
 
     private fun applyConfigFile(context: Context, file: File) {
