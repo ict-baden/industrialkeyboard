@@ -96,6 +96,13 @@
     <string name="after_scan_enter">回车</string>
     <string name="after_scan_tab">Tab</string>
     <string name="scanner_app">扫描应用</string>
+    <string name="scanner_camera">相机</string>
+    <string name="camera_hint">将条码置于框内</string>
+    <string name="camera_close">关闭相机</string>
+    <string name="camera_torch">手电筒</string>
+    <string name="camera_permission_granted">已允许使用相机。请再次点击扫描。</string>
+    <string name="camera_permission_denied">没有相机权限，键盘无法用相机扫描。</string>
+    <string name="camera_failed">无法启动相机。</string>
 
     <string name="section_configuration">配置</string>
     <string name="import_file">从文件导入</string>
@@ -190,6 +197,7 @@
     <string name="scan_pad_scanning">正在扫描…</string>
     <string name="scan_pad_tap">点按扫描</string>
     <string name="scan_pad_hint">按住可连续扫描 · %1$s</string>
+    <string name="scan_pad_hint_camera">点击打开相机 · %1$s</string>
     <string name="scan_pad_configure">请在键盘设置中配置扫描器</string>
 
     <string name="mc_config_json_title">配置（JSON）</string>

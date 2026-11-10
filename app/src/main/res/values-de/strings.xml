@@ -96,6 +96,13 @@
     <string name="after_scan_enter">Enter</string>
     <string name="after_scan_tab">Tab</string>
     <string name="scanner_app">Scanner-App</string>
+    <string name="scanner_camera">Kamera</string>
+    <string name="camera_hint">Barcode in den Rahmen halten</string>
+    <string name="camera_close">Kamera schließen</string>
+    <string name="camera_torch">Taschenlampe</string>
+    <string name="camera_permission_granted">Kamera erlaubt. Bitte noch einmal auf Scannen tippen.</string>
+    <string name="camera_permission_denied">Ohne Kamera-Berechtigung kann die Tastatur nicht mit der Kamera scannen.</string>
+    <string name="camera_failed">Die Kamera ließ sich nicht starten.</string>
 
     <string name="section_configuration">Konfiguration</string>
     <string name="import_file">Aus Datei importieren</string>
@@ -190,6 +197,7 @@
     <string name="scan_pad_scanning">Scannt …</string>
     <string name="scan_pad_tap">Zum Scannen tippen</string>
     <string name="scan_pad_hint">Halten für Dauerscan · %1$s</string>
+    <string name="scan_pad_hint_camera">Tippen öffnet die Kamera · %1$s</string>
     <string name="scan_pad_configure">Scanner in den Tastatur-Einstellungen einrichten</string>
 
     <string name="mc_config_json_title">Konfiguration (JSON)</string>

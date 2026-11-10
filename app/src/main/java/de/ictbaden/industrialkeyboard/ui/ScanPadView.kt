@@ -45,6 +45,13 @@ class ScanPadView(context: Context) : View(context) {
             field = value
             invalidate()
         }
+
+    /** The camera scans once per tap; holding does not keep it running. */
+    var camera = false
+        set(value) {
+            field = value
+            invalidate()
+        }
     var scanning = false
         set(value) {
             if (field != value) {
@@ -126,7 +133,11 @@ class ScanPadView(context: Context) : View(context) {
             canvas.drawText(label, pad.centerX(), titleY, title)
             subtitle.color = ColorUtils.setAlphaComponent(foreground, 190)
             subtitle.textSize = min(sp(12.5f), pad.height() * 0.075f)
-            val hint = if (available) text(R.string.scan_pad_hint, scannerName) else text(R.string.scan_pad_configure)
+            val hint = when {
+                !available -> text(R.string.scan_pad_configure)
+                camera -> text(R.string.scan_pad_hint_camera, scannerName)
+                else -> text(R.string.scan_pad_hint, scannerName)
+            }
             canvas.drawText(hint, pad.centerX(), titleY + dp(6f) - subtitle.ascent() + subtitle.descent(), subtitle)
         }
         if (scanning) postInvalidateOnAnimation()

@@ -35,6 +35,8 @@ data class RenderState(
     val widthPercent: Int,
     val scannerName: String?,
     val scanning: Boolean,
+    /** The scanner is the camera (tap opens the picture, no hold-to-scan). */
+    val camera: Boolean = false,
 )
 
 /**
@@ -51,6 +53,9 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
     val scanRow = KeyboardView(context).apply { heightRows = 1 }
     val overlay = PopupOverlay(context)
 
+    /** Camera picture over the keys while scanning with the camera; gone otherwise. */
+    val camera = CameraScanView(context).apply { visibility = GONE }
+
     private val content = FrameLayout(context)
     private val scanPage = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
     private val headroom = (headroomDp * resources.displayMetrics.density).toInt()
@@ -65,6 +70,8 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         scanPage.addView(scanPad, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0))
         scanPage.addView(scanRow, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         content.addView(scanPage, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+        // Same size as the keys: the frame keeps its height, the tab bar stays in place.
+        content.addView(camera, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         addView(panel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM).apply { topMargin = headroom })
         addView(overlay, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         keyboard.popupHost = overlay
@@ -125,12 +132,17 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         scanPage.isVisible = scan
         if (!scan && keyboard.layout != state.layout) keyboard.layout = state.layout
         scanPad.palette = p
+        camera.palette = p
         scanPad.scannerName = state.scannerName
+        scanPad.camera = state.camera
         scanPad.scanning = state.scanning
         // Same total height as the key pages (incl. their padding), so the tab bar does not jump.
         (scanPad.layoutParams as LinearLayout.LayoutParams).height = state.rowHeight * (state.heightRows - 1) +
             keyboard.paddingTop + keyboard.paddingBottom - scanRow.paddingTop - scanRow.paddingBottom
         scanPad.requestLayout()
+        // The camera picture takes exactly the place of the keys, not the whole screen.
+        (camera.layoutParams as LayoutParams).height = state.rowHeight * state.heightRows + keyboard.paddingTop + keyboard.paddingBottom
+        camera.requestLayout()
         if (previous?.widthPercent != state.widthPercent) post { requestLayout() }
     }
 

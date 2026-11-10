@@ -96,6 +96,13 @@
     <string name="after_scan_enter">Intro</string>
     <string name="after_scan_tab">Tabulador</string>
     <string name="scanner_app">App de escáner</string>
+    <string name="scanner_camera">Cámara</string>
+    <string name="camera_hint">Mantenga el código de barras dentro del marco</string>
+    <string name="camera_close">Cerrar cámara</string>
+    <string name="camera_torch">Linterna</string>
+    <string name="camera_permission_granted">Cámara permitida. Toque de nuevo en escanear.</string>
+    <string name="camera_permission_denied">Sin permiso de cámara, el teclado no puede escanear con la cámara.</string>
+    <string name="camera_failed">No se pudo iniciar la cámara.</string>
 
     <string name="section_configuration">Configuración</string>
     <string name="import_file">Importar desde archivo</string>
@@ -190,6 +197,7 @@
     <string name="scan_pad_scanning">Escaneando…</string>
     <string name="scan_pad_tap">Toque para escanear</string>
     <string name="scan_pad_hint">Mantenga pulsado para escanear de forma continua · %1$s</string>
+    <string name="scan_pad_hint_camera">Toque para abrir la cámara · %1$s</string>
     <string name="scan_pad_configure">Configure un escáner en la configuración del teclado</string>
 
     <string name="mc_config_json_title">Configuración (JSON)</string>
