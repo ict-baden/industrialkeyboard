@@ -63,7 +63,7 @@ object Provisioning {
             configFiles(context).filter { it.canRead() }.forEach { file -> runCatching { add(file.readText()) } }
         }
         return sources.any { text ->
-            runCatching { JSONObject(text).optJSONObject("scanner")?.optJSONObject("input")?.optBoolean("enabled", false) == true }.getOrDefault(false)
+            runCatching { JSONObject(ConfigCodec.decode(text)).optJSONObject("scanner")?.optJSONObject("input")?.optBoolean("enabled", false) == true }.getOrDefault(false)
         }
     }
 
@@ -157,7 +157,8 @@ object Provisioning {
         if (!locked && !ConfigStore.get(context).unreadable) prefs(context).edit { putString(key, fingerprint) }
     }
 
-    private fun deleteIfSecret(file: File, text: String) {
+    private fun deleteIfSecret(file: File, raw: String) {
+        val text = runCatching { ConfigCodec.decode(raw) }.getOrDefault(raw)
         val secret = text.contains("\"$FILE_PASSWORD_KEY\"") || text.contains("\"adminPassword\"")
         if (file.parent != ENTERPRISE_DIR && secret && !file.delete()) {
             Log.w(TAG, "Could not delete ${file.path} with the admin password")
@@ -178,7 +179,7 @@ object Provisioning {
             throw ConfigException("Refused: before Android 11 other apps can read and write this folder. Use /enterprise/usr, the managed configuration or the INSTALL_CONFIG broadcast.")
         }
         val hash = ConfigStore.get(context).config.adminPasswordHash ?: return
-        val password = runCatching { JSONObject(text).optString(FILE_PASSWORD_KEY, "") }.getOrDefault("")
+        val password = runCatching { JSONObject(ConfigCodec.decode(text)).optString(FILE_PASSWORD_KEY, "") }.getOrDefault("")
         when (PasswordGuard.remote(context).check(password, hash)) {
             PasswordGuard.Result.OK -> Unit
             PasswordGuard.Result.WRONG -> throw ConfigException("Refused: \"$FILE_PASSWORD_KEY\" with the current admin password is missing or wrong")
