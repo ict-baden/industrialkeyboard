@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.inputmethodservice.InputMethodService
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -32,6 +34,7 @@ import de.ictbaden.industrialkeyboard.layout.Key
 import de.ictbaden.industrialkeyboard.layout.KeyCommand
 import de.ictbaden.industrialkeyboard.layout.KeyOutput
 import de.ictbaden.industrialkeyboard.layout.KeyChords
+import de.ictbaden.industrialkeyboard.layout.Macro
 import de.ictbaden.industrialkeyboard.layout.MacroStep
 import de.ictbaden.industrialkeyboard.layout.ModifierKey
 import de.ictbaden.industrialkeyboard.app.CameraPermissionActivity
@@ -39,7 +42,9 @@ import de.ictbaden.industrialkeyboard.app.ErrorCodes
 import de.ictbaden.industrialkeyboard.config.ScanTriggerType
 import de.ictbaden.industrialkeyboard.scanner.CameraScanner
 import de.ictbaden.industrialkeyboard.scanner.HardwareScanner
+import de.ictbaden.industrialkeyboard.scanner.ScanFormatter
 import de.ictbaden.industrialkeyboard.scanner.ScanTrigger
+import de.ictbaden.industrialkeyboard.scanner.Symbologies
 import de.ictbaden.industrialkeyboard.ui.Feedback
 import de.ictbaden.industrialkeyboard.ui.KeyboardRootView
 import de.ictbaden.industrialkeyboard.ui.KeyboardView
@@ -72,6 +77,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private val handler = Handler(Looper.getMainLooper())
     private val stopScanAnimation = Runnable { setScanning(false) }
     private var camera: CameraScanner? = null
+    private var cameraCount = 0
+    private var tone: ToneGenerator? = null
     /** The camera does not run unattended: it closes after a while without a code. */
     private val closeCameraLater = Runnable { closeCamera() }
     private val engineListener: () -> Unit = { applyConfig(config) }
@@ -120,6 +127,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         HardwareScanner.removeListener(engineListener)
         camera?.destroy()
         camera = null
+        tone?.release()
+        tone = null
         runCatching { unregisterReceiver(receiver) }
         unregisterScanReceiver()
         handler.removeCallbacksAndMessages(null)
@@ -500,14 +509,27 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             Log.w(TAG, "Scan broadcast ignored: $refusal")
             return
         }
-        typeScan(data ?: return)
+        val symbology = Symbologies.fromDataWedge(intent.getStringExtra(EXTRA_DATAWEDGE_LABEL_TYPE))
+            ?: Symbologies.fromAim(intent.getStringExtra(EXTRA_AIM_ID))
+        val output = ScanFormatter.format(data ?: return, symbology, config.scanner.data)
+        if (output == null) {
+            Log.i(TAG, "Scan broadcast dropped by scanner.data (${symbology?.key ?: "unknown type"}, ${data.length} characters)")
+            return
+        }
+        typeScan(output)
         setScanning(false)
     }
 
-    /** Types a barcode into the field, followed by the configured suffix (Enter, Tab or nothing). */
-    private fun typeScan(data: String) {
+    /** Types a formatted barcode: prefix macro, text, suffix macro (or the old Enter/Tab/nothing). */
+    private fun typeScan(output: ScanFormatter.Output) {
         val ic = currentInputConnection ?: return
-        ic.commitText(data, 1)
+        if (output.prefix.isNotEmpty()) runCatching { Macro.parse(output.prefix) }.getOrNull()?.let(::runMacro)
+        ic.commitText(output.text, 1)
+        val suffix = output.suffix
+        if (suffix != null) {
+            if (suffix.isNotEmpty()) runCatching { Macro.parse(suffix) }.getOrNull()?.let(::runMacro)
+            return
+        }
         when (config.scanner.input.suffix) {
             ScanSuffix.ENTER -> sendKeyChar('\n')
             ScanSuffix.TAB -> sendDownUpKeyEvents(KeyEvent.KEYCODE_TAB)
@@ -526,15 +548,29 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             return
         }
         val cam = camera ?: CameraScanner(this, ::onCameraScan, ::onCameraError).also { camera = it }
-        cam.onStarted = { view.showTorch(cam.hasTorch) }
-        view.reset()
+        val settings = config.scanner.camera
+        val data = config.scanner.data
+        cam.settings = settings
+        cam.gs1 = data.gs1
+        cam.accept = { text, type -> ScanFormatter.accepts(text, type, data) }
+        cam.onStarted = { hasTorch, torchOn -> view.showTorch(hasTorch, torchOn) }
+        cameraCount = 0
+        view.reset(settings.aim, settings.zoom)
         view.onClose = { closeCamera() }
         view.onTorch = { on -> cam.setTorch(on) }
+        view.onZoom = { cam.cycleZoom() }
+        view.onScreen = { cam.screen = it }
+        if (view.width > 0) cam.screen = view.screen()
         view.visibility = View.VISIBLE
         cam.open(view.preview)
         feedback.keyDown(null)
+        restartCameraTimeout()
+    }
+
+    private fun restartCameraTimeout() {
         handler.removeCallbacks(closeCameraLater)
-        handler.postDelayed(closeCameraLater, CAMERA_TIMEOUT_MS)
+        val seconds = config.scanner.camera.timeoutSeconds
+        if (seconds > 0) handler.postDelayed(closeCameraLater, seconds * 1000L)
     }
 
     private fun closeCamera() {
@@ -543,11 +579,25 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         root?.camera?.visibility = View.GONE
     }
 
-    private fun onCameraScan(text: String, format: String) {
-        Log.i(TAG, "Camera scan ($format, ${text.length} characters)")
-        closeCamera()
-        feedback.scanned()
-        typeScan(text)
+    private fun onCameraScan(hit: CameraScanner.Hit) {
+        val settings = config.scanner.camera
+        val output = ScanFormatter.format(hit.text, hit.symbology, config.scanner.data) ?: return
+        Log.i(TAG, "Camera scan (${hit.format}, ${hit.text.length} characters)")
+        if (settings.continuous) {
+            cameraCount++
+            restartCameraTimeout()
+            root?.camera?.setStatus(AppLanguage.localized(this).getString(R.string.camera_continuous_status, cameraCount, output.text.take(40)))
+        } else {
+            closeCamera()
+        }
+        if (settings.vibrate) feedback.scanned()
+        if (settings.beep) beep()
+        typeScan(output)
+    }
+
+    private fun beep() {
+        val tone = this.tone ?: runCatching { ToneGenerator(AudioManager.STREAM_NOTIFICATION, BEEP_VOLUME) }.getOrNull()?.also { this.tone = it }
+        tone?.startTone(ToneGenerator.TONE_PROP_BEEP, BEEP_MS)
     }
 
     private fun onCameraError(error: Throwable) {
@@ -583,7 +633,10 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         const val DOUBLE_TAP_MS = 350L
         const val HOLD_TO_SCAN_MS = 600L
         const val SCAN_ANIMATION_MS = 5_000L
-        const val CAMERA_TIMEOUT_MS = 60_000L
+        const val BEEP_MS = 120
+        const val BEEP_VOLUME = 80
+        const val EXTRA_DATAWEDGE_LABEL_TYPE = "com.symbol.datawedge.label_type"
+        const val EXTRA_AIM_ID = "aimId"
         val SCAN_EXTRAS = listOf(
             "com.symbol.datawedge.data_string",
             "data",

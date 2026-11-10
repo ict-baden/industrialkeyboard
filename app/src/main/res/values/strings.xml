@@ -111,6 +111,9 @@
     <string name="camera_permission_granted">Camera allowed. Tap scan again.</string>
     <string name="camera_permission_denied">Without camera permission the keyboard cannot scan with the camera.</string>
     <string name="camera_failed">The camera could not be started.</string>
+    <string name="camera_hint_center">Put the crosshair on the barcode</string>
+    <string name="camera_zoom">Zoom</string>
+    <string name="camera_continuous_status">%1$d scanned · last: %2$s</string>
 
     <!-- Settings: configuration -->
     <string name="section_configuration">Configuration</string>

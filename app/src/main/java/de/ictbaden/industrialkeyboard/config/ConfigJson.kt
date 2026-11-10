@@ -18,7 +18,7 @@ object ConfigJson {
 
     fun parse(text: String): KeyboardConfig {
         val root = try {
-            JSONObject(text)
+            JSONObject(ConfigCodec.decode(text))
         } catch (e: JSONException) {
             // org.json appends the whole input to its message, admin password included: position only.
             val position = e.message?.let { JSON_POSITION.find(it)?.groupValues?.get(1) }
@@ -100,6 +100,56 @@ object ConfigJson {
                 put("suffix", s.input.suffix.key)
                 putOpt("permission", s.input.permission)
                 if (s.input.allowedPackages.isNotEmpty()) put("allowedPackages", JSONArray(s.input.allowedPackages))
+            })
+            put("camera", JSONObject().apply {
+                val c = s.camera
+                put("symbologies", JSONArray(c.symbologies.sortedBy { it.ordinal }.map { it.key }))
+                put("aim", c.aim.key)
+                put("continuous", c.continuous)
+                put("duplicateDelayMs", c.duplicateDelayMs)
+                put("confirmReads", c.confirmReads)
+                put("minLength", c.minLength)
+                put("maxLength", c.maxLength)
+                put("zoom", c.zoom.toString().toDouble())
+                put("torch", c.torch)
+                put("inverted", c.inverted)
+                put("beep", c.beep)
+                put("vibrate", c.vibrate)
+                put("timeoutSeconds", c.timeoutSeconds)
+            })
+            put("data", JSONObject().apply {
+                val d = s.data
+                put("prefix", d.prefix)
+                put("suffix", d.suffix ?: JSONObject.NULL)
+                put("trim", d.trim)
+                put("removeSpaces", d.removeSpaces)
+                put("case", d.case.key)
+                put("stripLeading", d.stripLeading)
+                put("stripTrailing", d.stripTrailing)
+                put("replace", writeReplacements(d.replace))
+                put("gs1", d.gs1.key)
+                put("gsReplacement", d.gsReplacement ?: JSONObject.NULL)
+                put("rules", JSONArray().apply {
+                    d.rules.forEach { r ->
+                        put(JSONObject().apply {
+                            if (r.name.isNotEmpty()) put("name", r.name)
+                            if (r.symbologies.isNotEmpty()) put("symbologies", JSONArray(r.symbologies.sortedBy { it.ordinal }.map { it.key }))
+                            if (r.minLength > 0) put("minLength", r.minLength)
+                            if (r.maxLength > 0) put("maxLength", r.maxLength)
+                            if (r.startsWith.isNotEmpty()) put("startsWith", r.startsWith)
+                            if (r.pattern.isNotEmpty()) put("pattern", r.pattern)
+                            put("action", r.action.key)
+                            putOpt("prefix", r.prefix)
+                            putOpt("suffix", r.suffix)
+                            putOpt("case", r.case?.key)
+                            putOpt("stripLeading", r.stripLeading)
+                            putOpt("stripTrailing", r.stripTrailing)
+                            putOpt("removeSpaces", r.removeSpaces)
+                            r.replace?.let { put("replace", writeReplacements(it)) }
+                        })
+                    }
+                })
+                put("unmatched", d.unmatched.key)
             })
         })
         if (config.customLayouts.isNotEmpty()) {
@@ -233,7 +283,139 @@ object ConfigJson {
                     allowedPackages = packages(input.optJSONArray("allowedPackages"), "scanner.input.allowedPackages"),
                 )
             },
+            camera = parseCamera(json.optJSONObject("camera"), d.camera),
+            data = parseData(json.optJSONObject("data"), d.data),
         )
+    }
+
+    private fun parseCamera(json: JSONObject?, d: CameraSettings): CameraSettings {
+        json ?: return d
+        val where = "scanner.camera"
+        val zoom = json.optDouble("zoom", d.zoom.toDouble())
+        if (zoom.isNaN() || zoom < 1.0 || zoom > 4.0) throw ConfigException("$where.zoom: 1.0–4.0 expected")
+        val min = intIn(json, "minLength", where, 0, 9999, d.minLength)
+        val max = intIn(json, "maxLength", where, 0, 9999, d.maxLength)
+        if (max in 1 until min) throw ConfigException("$where.maxLength: smaller than minLength")
+        return CameraSettings(
+            symbologies = symbologies(json.optJSONArray("symbologies"), "$where.symbologies"),
+            aim = enumValue(json, "aim", where, d.aim),
+            continuous = json.optBoolean("continuous", d.continuous),
+            duplicateDelayMs = intIn(json, "duplicateDelayMs", where, 0, 10_000, d.duplicateDelayMs),
+            confirmReads = intIn(json, "confirmReads", where, 1, 3, d.confirmReads),
+            minLength = min,
+            maxLength = max,
+            zoom = zoom.toFloat(),
+            torch = json.optBoolean("torch", d.torch),
+            inverted = json.optBoolean("inverted", d.inverted),
+            beep = json.optBoolean("beep", d.beep),
+            vibrate = json.optBoolean("vibrate", d.vibrate),
+            timeoutSeconds = intIn(json, "timeoutSeconds", where, 0, 600, d.timeoutSeconds),
+        )
+    }
+
+    private fun parseData(json: JSONObject?, d: DataSettings): DataSettings {
+        json ?: return d
+        val where = "scanner.data"
+        val prefix = json.optRaw("prefix")
+        if (prefix.isNotEmpty()) checkMacro(prefix, "$where.prefix")
+        val suffix = if (json.has("suffix") && !json.isNull("suffix")) {
+            json.optString("suffix").also { if (it.isNotEmpty()) checkMacro(it, "$where.suffix") }
+        } else {
+            null
+        }
+        val rules = json.optJSONArray("rules")?.let { array ->
+            (0 until array.length()).map { i ->
+                parseRule(array.optJSONObject(i) ?: throw ConfigException("$where.rules[$i]: object expected"), "$where.rules[$i]")
+            }
+        }.orEmpty()
+        return DataSettings(
+            prefix = prefix,
+            suffix = suffix,
+            trim = json.optBoolean("trim", d.trim),
+            removeSpaces = json.optBoolean("removeSpaces", d.removeSpaces),
+            case = enumValue(json, "case", where, d.case),
+            stripLeading = intIn(json, "stripLeading", where, 0, 999, d.stripLeading),
+            stripTrailing = intIn(json, "stripTrailing", where, 0, 999, d.stripTrailing),
+            replace = replacements(json.optJSONArray("replace"), "$where.replace"),
+            gs1 = enumValue(json, "gs1", where, d.gs1),
+            gsReplacement = if (json.has("gsReplacement") && !json.isNull("gsReplacement")) json.optString("gsReplacement") else null,
+            rules = rules,
+            unmatched = enumValue(json, "unmatched", where, d.unmatched),
+        )
+    }
+
+    private fun parseRule(json: JSONObject, where: String): ScanRule {
+        val pattern = json.optRaw("pattern")
+        if (pattern.isNotEmpty()) checkRegex(pattern, "$where.pattern")
+        val min = intIn(json, "minLength", where, 0, 9999, 0)
+        val max = intIn(json, "maxLength", where, 0, 9999, 0)
+        if (max in 1 until min) throw ConfigException("$where.maxLength: smaller than minLength")
+        fun macro(name: String): String? =
+            if (json.has(name) && !json.isNull(name)) json.optString(name).also { if (it.isNotEmpty()) checkMacro(it, "$where.$name") } else null
+        fun optInt(name: String): Int? = if (json.has(name) && !json.isNull(name)) intIn(json, name, where, 0, 999, 0) else null
+        return ScanRule(
+            name = json.optNonBlank("name").orEmpty(),
+            symbologies = symbologies(json.optJSONArray("symbologies"), "$where.symbologies"),
+            minLength = min,
+            maxLength = max,
+            startsWith = json.optRaw("startsWith"),
+            pattern = pattern,
+            action = enumValue(json, "action", where, RuleAction.SEND),
+            prefix = macro("prefix"),
+            suffix = macro("suffix"),
+            case = if (json.has("case") && !json.isNull("case")) enumValue(json, "case", where, TextCase.NONE) else null,
+            stripLeading = optInt("stripLeading"),
+            stripTrailing = optInt("stripTrailing"),
+            removeSpaces = if (json.has("removeSpaces") && !json.isNull("removeSpaces")) json.optBoolean("removeSpaces") else null,
+            replace = json.optJSONArray("replace")?.let { replacements(it, "$where.replace") },
+        )
+    }
+
+    private fun symbologies(array: JSONArray?, where: String): Set<Symbology> {
+        array ?: return emptySet()
+        return (0 until array.length()).map { i ->
+            val name = array.optString(i, "")
+            Symbology.byKey(name) ?: throw ConfigException("$where[$i]: unknown barcode type \"$name\" (${Symbology.entries.joinToString { it.key }})")
+        }.toSet()
+    }
+
+    private fun replacements(array: JSONArray?, where: String): List<Replacement> {
+        array ?: return emptyList()
+        return (0 until array.length()).map { i ->
+            val json = array.optJSONObject(i) ?: throw ConfigException("$where[$i]: object expected")
+            val find = json.optRaw("find")
+            if (find.isEmpty()) throw ConfigException("$where[$i].find is missing")
+            val regex = json.optBoolean("regex", false)
+            if (regex) checkRegex(find, "$where[$i].find")
+            Replacement(find = find, with = json.optRaw("with"), regex = regex)
+        }
+    }
+
+    private fun writeReplacements(list: List<Replacement>) = JSONArray().apply {
+        list.forEach { r ->
+            put(JSONObject().apply {
+                put("find", r.find)
+                put("with", r.with)
+                if (r.regex) put("regex", true)
+            })
+        }
+    }
+
+    private fun checkRegex(pattern: String, where: String) {
+        try {
+            Regex(pattern)
+        } catch (e: IllegalArgumentException) {
+            throw ConfigException("$where: invalid regular expression (${e.message?.lineSequence()?.firstOrNull()})")
+        }
+    }
+
+    private fun intIn(json: JSONObject, name: String, where: String, min: Int, max: Int, default: Int): Int {
+        if (!json.has(name) || json.isNull(name)) return default
+        val value = json.opt(name)
+        val number = (value as? Number)?.toDouble() ?: (value as? String)?.toDoubleOrNull()
+            ?: throw ConfigException("$where.$name: number expected")
+        if (number.isNaN() || number < min || number > max || number != Math.floor(number)) throw ConfigException("$where.$name: $min–$max expected")
+        return number.toInt()
     }
 
     private fun parseCustomLayouts(array: JSONArray?): List<CustomLayout> {

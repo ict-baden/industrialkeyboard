@@ -200,6 +200,8 @@ data class ScannerSettings(
     /** Scan key next to the space bar of the letter layout. */
     val scanKey: Boolean = false,
     val input: ScanInputSettings = ScanInputSettings(),
+    val camera: CameraSettings = CameraSettings(),
+    val data: DataSettings = DataSettings(),
 )
 
 data class CustomKey(

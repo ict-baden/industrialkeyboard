@@ -103,6 +103,9 @@
     <string name="camera_permission_granted">Caméra autorisée. Touchez à nouveau Scanner.</string>
     <string name="camera_permission_denied">Sans l’autorisation caméra, le clavier ne peut pas scanner avec la caméra.</string>
     <string name="camera_failed">Impossible de démarrer la caméra.</string>
+    <string name="camera_hint_center">Placez le réticule sur le code-barres</string>
+    <string name="camera_zoom">Zoom</string>
+    <string name="camera_continuous_status">%1$d scannés · dernier : %2$s</string>
 
     <string name="section_configuration">Configuration</string>
     <string name="import_file">Importer depuis un fichier</string>

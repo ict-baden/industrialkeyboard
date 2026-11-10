@@ -103,6 +103,9 @@
     <string name="camera_permission_granted">Cámara permitida. Toque de nuevo en escanear.</string>
     <string name="camera_permission_denied">Sin permiso de cámara, el teclado no puede escanear con la cámara.</string>
     <string name="camera_failed">No se pudo iniciar la cámara.</string>
+    <string name="camera_hint_center">Coloque la cruz sobre el código de barras</string>
+    <string name="camera_zoom">Zoom</string>
+    <string name="camera_continuous_status">%1$d escaneados · último: %2$s</string>
 
     <string name="section_configuration">Configuración</string>
     <string name="import_file">Importar desde archivo</string>
