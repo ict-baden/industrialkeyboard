@@ -12,6 +12,7 @@
     <string name="button_cancel">Cancel</string>
     <string name="button_save">Save</string>
     <string name="button_ok">OK</string>
+    <string name="button_close">Close</string>
     <string name="button_apply">Apply</string>
     <string name="button_import">Import</string>
     <string name="button_reset">Reset</string>
@@ -113,7 +114,72 @@
     <string name="camera_failed">The camera could not be started.</string>
     <string name="camera_hint_center">Put the crosshair on the barcode</string>
     <string name="camera_zoom">Zoom</string>
-    <string name="camera_continuous_status">%1$d scanned · last: %2$s</string>
+    <string name="camera_continuous_status">Scanned: %1$d · last: %2$s</string>
+    <string name="section_camera">Camera scanning</string>
+    <string name="camera_symbologies">Barcode types</string>
+    <string name="symbologies_all">All</string>
+    <string name="camera_aim">Aiming</string>
+    <string name="camera_aim_frame">Frame</string>
+    <string name="camera_aim_center">Crosshair</string>
+    <string name="camera_aim_anywhere">Anywhere</string>
+    <string name="camera_continuous">Continuous scanning</string>
+    <string name="camera_continuous_summary">Camera stays open and types every new code</string>
+    <string name="camera_duplicate_delay">Same code again after</string>
+    <string name="camera_confirm_reads">Reads before a code counts</string>
+    <string name="camera_length">Code length</string>
+    <string name="camera_min_length">Minimum length</string>
+    <string name="camera_max_length">Maximum length</string>
+    <string name="zero_no_limit">0 = no limit</string>
+    <string name="length_any">Any</string>
+    <string name="length_min">Min. %1$d</string>
+    <string name="length_max">Max. %1$d</string>
+    <string name="length_range">%1$d–%2$d</string>
+    <string name="camera_zoom_start">Zoom when opening</string>
+    <string name="camera_torch_start">Torch on when opening</string>
+    <string name="camera_inverted">Inverted codes</string>
+    <string name="camera_inverted_summary">Light codes on a dark background</string>
+    <string name="camera_beep">Beep</string>
+    <string name="camera_vibrate">Vibrate</string>
+    <string name="camera_timeout">Close the camera after</string>
+    <string name="timeout_never">Never</string>
+    <string name="value_s">%1$d s</string>
+    <string name="value_min">%1$d min</string>
+    <string name="data_gs1">GS1 codes</string>
+    <string name="data_gs1_hri">Readable (01)…</string>
+    <string name="data_gs1_raw">Raw with GS</string>
+    <string name="section_scan_data">Scan data</string>
+    <string name="data_prefix">Prefix</string>
+    <string name="data_suffix">Suffix</string>
+    <string name="data_suffix_default">As set in “After a scan”</string>
+    <string name="data_suffix_reset">Like “After a scan”</string>
+    <string name="value_none">None</string>
+    <string name="data_trim">Trim</string>
+    <string name="data_trim_summary">Remove spaces and control characters at the start and end</string>
+    <string name="data_remove_spaces">Remove all spaces</string>
+    <string name="data_case">Upper/lower case</string>
+    <string name="data_case_none">Unchanged</string>
+    <string name="data_case_upper">UPPER</string>
+    <string name="data_case_lower">lower</string>
+    <string name="data_strip">Cut characters</string>
+    <string name="data_strip_value">%1$d at the start, %2$d at the end</string>
+    <string name="data_strip_leading">Characters at the start</string>
+    <string name="data_strip_trailing">Characters at the end</string>
+    <string name="data_gs_replacement">GS separator</string>
+    <string name="data_gs_replacement_helper">Text instead of the GS character, empty = remove it</string>
+    <string name="value_keep">Keep</string>
+    <string name="value_removed">Removed</string>
+    <string name="data_replace">Replacements</string>
+    <string name="data_rules">Rules</string>
+    <string name="number_range">%1$d–%2$d</string>
+    <string name="text_hint">Text</string>
+    <string name="export_barcode">Export as barcode</string>
+    <string name="export_barcode_summary">QR code to scan on the next device</string>
+    <string name="export_barcode_info">Length: %1$d · QR version %2$d</string>
+    <string name="export_barcode_password">Contains the admin password (as a hash), like the JSON file.</string>
+    <string name="export_barcode_too_large">The configuration is too large for a barcode (length %1$d). Use the JSON file instead.</string>
+    <string name="import_barcode">Import from barcode</string>
+    <string name="import_barcode_summary">Scan the QR code of another device</string>
+    <string name="import_barcode_hint">Hold the configuration QR code in front of the camera</string>
 
     <!-- Settings: configuration -->
     <string name="section_configuration">Configuration</string>
@@ -238,6 +304,16 @@
     <string name="mc_sound_description">Play a click on every key press.</string>
     <string name="mc_vibrate_title">Vibrate on keypress</string>
     <string name="mc_vibrate_description">Short vibration on every key press.</string>
+    <string name="mc_scan_prefix_title">Scan prefix</string>
+    <string name="mc_scan_prefix_description">Typed before every barcode. Text and tokens such as {TAB}; empty = keep the current setting.</string>
+    <string name="mc_scan_suffix_title">Scan suffix</string>
+    <string name="mc_scan_suffix_description">Typed after every barcode instead of Enter/Tab, e.g. {TAB} or {ENTER}; empty = keep the current setting.</string>
+    <string name="mc_camera_aim_title">Camera aiming</string>
+    <string name="mc_camera_aim_description">Which codes in the camera picture count.</string>
+    <string name="mc_camera_continuous_title">Camera continuous scanning</string>
+    <string name="mc_camera_continuous_description">Camera stays open and types every new code.</string>
+    <string name="mc_camera_symbologies_title">Camera barcode types</string>
+    <string name="mc_camera_symbologies_description">Comma-separated, e.g. ean13,code128,qr; empty = keep the current setting.</string>
     <string name="mc_admin_password_title">Admin password</string>
     <string name="mc_admin_password_description">Protects the keyboard settings and configuration imports.</string>
 
@@ -292,5 +368,19 @@
     <string-array name="mc_numeric_order_values" translatable="false">
         <item>phone</item>
         <item>calculator</item>
+    </string-array>
+    <plurals name="json_only_count">
+        <item quantity="one">%1$d – set in the JSON configuration only</item>
+        <item quantity="other">%1$d – set in the JSON configuration only</item>
+    </plurals>
+    <string-array name="mc_camera_aim_entries">
+        <item>Frame</item>
+        <item>Crosshair (pick list)</item>
+        <item>Anywhere</item>
+    </string-array>
+    <string-array name="mc_camera_aim_values" translatable="false">
+        <item>frame</item>
+        <item>center</item>
+        <item>anywhere</item>
     </string-array>
 </resources>

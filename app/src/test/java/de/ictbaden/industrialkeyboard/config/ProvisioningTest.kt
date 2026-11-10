@@ -104,6 +104,36 @@ class ProvisioningTest {
     }
 
     @Test
+    fun `managed scan options`() {
+        restrict("scan_prefix" to "{TAB}", "scan_suffix" to "{ENTER}{ENTER}", "camera_aim" to "center", "camera_symbologies" to "ean13, QR")
+        Provisioning.applyAll(context)
+        val scanner = store.config.scanner
+        assertEquals("{TAB}", scanner.data.prefix)
+        assertEquals("{ENTER}{ENTER}", scanner.data.suffix)
+        assertEquals(AimMode.CENTER, scanner.camera.aim)
+        assertEquals(setOf(Symbology.EAN13, Symbology.QR), scanner.camera.symbologies)
+    }
+
+    @Test
+    fun `invalid managed scan options are reported`() {
+        restrict("camera_symbologies" to "ean13,ean-14")
+        Provisioning.applyAll(context)
+        assertTrue(Provisioning.lastError(context).orEmpty().contains("ean-14"))
+        assertTrue(store.config.scanner.camera.symbologies.isEmpty())
+    }
+
+    @Test
+    fun `compressed configuration in the app folder`() {
+        val json = ConfigJson.write(KeyboardConfig(language = "es", customLayouts = (1..8).map { n -> CustomLayout("l$n", "L$n", listOf((1..10).map { CustomKey("K$it of $n", "{F$it}") })) }))
+        val encoded = ConfigCodec.encode(json)
+        assertTrue(encoded.startsWith(ConfigCodec.PREFIX))
+        write(encoded, 2_000_000)
+        Provisioning.applyAll(context)
+        assertEquals("es", store.config.language)
+        assertEquals(8, store.config.customLayouts.size)
+    }
+
+    @Test
     fun `the managed admin password ends an unreadable configuration`() {
         assertTrue(File(context.filesDir, "config.json").mkdir())
         assertTrue(store.unreadable)

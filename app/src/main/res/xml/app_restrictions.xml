@@ -65,6 +65,38 @@
         android:title="@string/mc_vibrate_title" />
     <restriction
         android:defaultValue=""
+        android:description="@string/mc_scan_prefix_description"
+        android:key="scan_prefix"
+        android:restrictionType="string"
+        android:title="@string/mc_scan_prefix_title" />
+    <restriction
+        android:defaultValue=""
+        android:description="@string/mc_scan_suffix_description"
+        android:key="scan_suffix"
+        android:restrictionType="string"
+        android:title="@string/mc_scan_suffix_title" />
+    <restriction
+        android:defaultValue="frame"
+        android:description="@string/mc_camera_aim_description"
+        android:entries="@array/mc_camera_aim_entries"
+        android:entryValues="@array/mc_camera_aim_values"
+        android:key="camera_aim"
+        android:restrictionType="choice"
+        android:title="@string/mc_camera_aim_title" />
+    <restriction
+        android:defaultValue="false"
+        android:description="@string/mc_camera_continuous_description"
+        android:key="camera_continuous"
+        android:restrictionType="bool"
+        android:title="@string/mc_camera_continuous_title" />
+    <restriction
+        android:defaultValue=""
+        android:description="@string/mc_camera_symbologies_description"
+        android:key="camera_symbologies"
+        android:restrictionType="string"
+        android:title="@string/mc_camera_symbologies_title" />
+    <restriction
+        android:defaultValue=""
         android:description="@string/mc_admin_password_description"
         android:key="admin_password"
         android:restrictionType="string"
