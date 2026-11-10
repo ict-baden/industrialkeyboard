@@ -57,6 +57,7 @@
     <string name="tab_scan">Scan</string>
     <string name="start_tab">Start tab for text fields</string>
     <string name="automatic">Automatic</string>
+    <string name="automatic_with">Automatic (%1$s)</string>
 
     <!-- Settings: programmable keys -->
     <string name="section_programmable_keys">Programmable keys</string>
@@ -258,6 +259,7 @@
         <item>contrast</item>
     </string-array>
     <string-array name="mc_alphabet_entries">
+        <item>Automatic (system language)</item>
         <item>QWERTY (English)</item>
         <item>QWERTZ (German)</item>
         <item>AZERTY (French)</item>
@@ -265,6 +267,7 @@
         <item>Spanish</item>
     </string-array>
     <string-array name="mc_alphabet_values" translatable="false">
+        <item>auto</item>
         <item>qwerty</item>
         <item>qwertz</item>
         <item>azerty</item>

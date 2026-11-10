@@ -82,7 +82,7 @@ object Layouts {
     )
 
     fun alpha(config: KeyboardConfig, variant: AlphaVariant = AlphaVariant.TEXT): KeyboardLayout {
-        val alphabet = config.layout.alphabet
+        val alphabet = config.layout.alphabet.resolve()
         val letters = ROWS.getValue(alphabet)
         val hints = config.appearance.keyHints && !config.appearance.numberRow
         val rows = buildList {

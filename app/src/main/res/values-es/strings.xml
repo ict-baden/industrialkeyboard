@@ -52,6 +52,7 @@
     <string name="tab_scan">Escanear</string>
     <string name="start_tab">Pestaña inicial para campos de texto</string>
     <string name="automatic">Automático</string>
+    <string name="automatic_with">Automático (%1$s)</string>
 
     <string name="section_programmable_keys">Teclas programables</string>
     <string name="key_alpha_p1">Letras, fila inferior a la izquierda</string>
@@ -227,6 +228,7 @@
         <item>Alto contraste</item>
     </string-array>
     <string-array name="mc_alphabet_entries">
+        <item>Automático (idioma del sistema)</item>
         <item>QWERTY (inglés)</item>
         <item>QWERTZ (alemán)</item>
         <item>AZERTY (francés)</item>

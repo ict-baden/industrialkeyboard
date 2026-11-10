@@ -9,6 +9,7 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 - **Shift auch für Tab, Pfeile und Co.:** ein von Hand getipptes Shift gilt jetzt auch für Tab, Pfeile, Esc, Entf, Pos1/Ende und die anderen Tasten – Shift+Tab springt zurück, Shift+Pfeil markiert, mit Strg zusammen Strg+Shift+Esc. Das automatische Shift am Satzanfang und die Feststelltaste tun das nicht.
 - **Menü, Druck und Pause** auf dem Fn-Tab, in der Reihe mit Strg, Win und Alt (`appearance.functionModifiers`).
 - **Makros:** `{CTRL}`, `{ALT}`, `{WIN}` (als eigene Taste einrastend), Tastenkombinationen wie `{CTRL+C}`, `{ALT+F4}`, `{WIN+R}`, `{CTRL+SHIFT+ESC}`, `{CTRL+ALT+END}`, dazu `{PRINT}`, `{PAUSE}` und `{MENU}`.
+- **Buchstabenlayout nach der Systemsprache** (`layout.alphabet: "auto"`, neuer Standard, [#18](https://github.com/ict-baden/industrialkeyboard/issues/18)): Deutsch, Tschechisch, Schweiz … → QWERTZ, Französisch und Belgien → AZERTY, Skandinavisch → Nordisch, Spanisch und Katalanisch → Español, sonst QWERTY. Wechselt mit der Systemsprache, nicht mit der App-Sprache. In den Einstellungen steht dazu, welches Layout gerade gilt („Automatisch (QWERTZ)“). Gespeicherte Konfigurationen behalten ihr Layout; nur Konfigurationsdateien ohne `alphabet` bekommen jetzt das Layout der Systemsprache statt QWERTY.
 - Vorlage [`examples/remote-desktop.json`](examples/remote-desktop.json) mit eigenem Tab „RDP“.
 
 ## [2.1.1] – 2026-10-21
