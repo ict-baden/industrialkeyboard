@@ -9,6 +9,7 @@
     <string name="button_cancel">取消</string>
     <string name="button_save">保存</string>
     <string name="button_ok">确定</string>
+    <string name="button_close">关闭</string>
     <string name="button_apply">应用</string>
     <string name="button_import">导入</string>
     <string name="button_reset">重置</string>
@@ -105,7 +106,72 @@
     <string name="camera_failed">无法启动相机。</string>
     <string name="camera_hint_center">将十字准星对准条码</string>
     <string name="camera_zoom">缩放</string>
-    <string name="camera_continuous_status">已扫描 %1$d 个 · 最近：%2$s</string>
+    <string name="camera_continuous_status">已扫描：%1$d · 最近：%2$s</string>
+    <string name="section_camera">相机扫描</string>
+    <string name="camera_symbologies">条码类型</string>
+    <string name="symbologies_all">全部</string>
+    <string name="camera_aim">瞄准</string>
+    <string name="camera_aim_frame">取景框</string>
+    <string name="camera_aim_center">十字准星</string>
+    <string name="camera_aim_anywhere">任意位置</string>
+    <string name="camera_continuous">连续扫描</string>
+    <string name="camera_continuous_summary">相机保持打开并输入每个新条码</string>
+    <string name="camera_duplicate_delay">相同条码再次接受间隔</string>
+    <string name="camera_confirm_reads">确认读取次数</string>
+    <string name="camera_length">条码长度</string>
+    <string name="camera_min_length">最小长度</string>
+    <string name="camera_max_length">最大长度</string>
+    <string name="zero_no_limit">0 = 不限</string>
+    <string name="length_any">任意</string>
+    <string name="length_min">最少 %1$d</string>
+    <string name="length_max">最多 %1$d</string>
+    <string name="length_range">%1$d–%2$d</string>
+    <string name="camera_zoom_start">打开时缩放</string>
+    <string name="camera_torch_start">打开时开启手电筒</string>
+    <string name="camera_inverted">反色条码</string>
+    <string name="camera_inverted_summary">深色背景上的浅色条码</string>
+    <string name="camera_beep">提示音</string>
+    <string name="camera_vibrate">振动</string>
+    <string name="camera_timeout">相机自动关闭时间</string>
+    <string name="timeout_never">从不</string>
+    <string name="value_s">%1$d 秒</string>
+    <string name="value_min">%1$d 分钟</string>
+    <string name="data_gs1">GS1 条码</string>
+    <string name="data_gs1_hri">可读 (01)…</string>
+    <string name="data_gs1_raw">原始（含 GS）</string>
+    <string name="section_scan_data">扫描数据</string>
+    <string name="data_prefix">前缀</string>
+    <string name="data_suffix">后缀</string>
+    <string name="data_suffix_default">同“扫描后”设置</string>
+    <string name="data_suffix_reset">同“扫描后”</string>
+    <string name="value_none">无</string>
+    <string name="data_trim">去除首尾空白</string>
+    <string name="data_trim_summary">删除开头和结尾的空格与控制字符</string>
+    <string name="data_remove_spaces">删除所有空格</string>
+    <string name="data_case">大小写</string>
+    <string name="data_case_none">不变</string>
+    <string name="data_case_upper">大写</string>
+    <string name="data_case_lower">小写</string>
+    <string name="data_strip">截掉字符</string>
+    <string name="data_strip_value">开头 %1$d 个，结尾 %2$d 个</string>
+    <string name="data_strip_leading">开头字符数</string>
+    <string name="data_strip_trailing">结尾字符数</string>
+    <string name="data_gs_replacement">GS 分隔符</string>
+    <string name="data_gs_replacement_helper">替代 GS 字符的文本，留空 = 删除</string>
+    <string name="value_keep">保留</string>
+    <string name="value_removed">删除</string>
+    <string name="data_replace">替换</string>
+    <string name="data_rules">规则</string>
+    <string name="number_range">%1$d–%2$d</string>
+    <string name="text_hint">文本</string>
+    <string name="export_barcode">导出为条码</string>
+    <string name="export_barcode_summary">供下一台设备扫描的二维码</string>
+    <string name="export_barcode_info">长度：%1$d · 二维码版本 %2$d</string>
+    <string name="export_barcode_password">与 JSON 文件一样，包含管理员密码（哈希值）。</string>
+    <string name="export_barcode_too_large">配置过大，无法生成条码（长度 %1$d）。请改用 JSON 文件。</string>
+    <string name="import_barcode">从条码导入</string>
+    <string name="import_barcode_summary">扫描另一台设备的二维码</string>
+    <string name="import_barcode_hint">将配置二维码对准相机</string>
 
     <string name="section_configuration">配置</string>
     <string name="import_file">从文件导入</string>
@@ -221,6 +287,16 @@
     <string name="mc_sound_description">每次按键时发出咔嗒声。</string>
     <string name="mc_vibrate_title">按键振动</string>
     <string name="mc_vibrate_description">每次按键时短暂振动。</string>
+    <string name="mc_scan_prefix_title">扫描前缀</string>
+    <string name="mc_scan_prefix_description">在每个条码前输入。文本和 {TAB} 等标记；留空 = 保留当前设置。</string>
+    <string name="mc_scan_suffix_title">扫描后缀</string>
+    <string name="mc_scan_suffix_description">在每个条码后输入，代替回车/Tab，例如 {TAB} 或 {ENTER}；留空 = 保留当前设置。</string>
+    <string name="mc_camera_aim_title">相机：瞄准</string>
+    <string name="mc_camera_aim_description">相机画面中哪些条码有效。</string>
+    <string name="mc_camera_continuous_title">相机：连续扫描</string>
+    <string name="mc_camera_continuous_description">相机保持打开并输入每个新条码。</string>
+    <string name="mc_camera_symbologies_title">相机：条码类型</string>
+    <string name="mc_camera_symbologies_description">用逗号分隔，例如 ean13,code128,qr；留空 = 保留当前设置。</string>
     <string name="mc_admin_password_title">管理员密码</string>
     <string name="mc_admin_password_description">保护键盘设置和配置导入。</string>
 
@@ -249,5 +325,13 @@
     <string-array name="mc_numeric_order_entries">
         <item>电话（1-2-3 在上）</item>
         <item>计算器（7-8-9 在上）</item>
+    </string-array>
+    <plurals name="json_only_count">
+        <item quantity="other">%1$d – 仅可在 JSON 配置中设置</item>
+    </plurals>
+    <string-array name="mc_camera_aim_entries">
+        <item>取景框</item>
+        <item>十字准星（选择）</item>
+        <item>任意位置</item>
     </string-array>
 </resources>

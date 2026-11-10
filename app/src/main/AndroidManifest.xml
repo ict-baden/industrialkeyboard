@@ -71,6 +71,12 @@
             android:exported="false"
             android:theme="@style/Theme.IndustrialKeyboard.Transparent" />
 
+        <!-- Reads a configuration QR code with the camera (settings, import from barcode). -->
+        <activity
+            android:name=".app.ConfigScanActivity"
+            android:exported="false"
+            android:theme="@style/Theme.IndustrialKeyboard" />
+
         <!-- Configuration and tab switching by other apps or the MDM (explicit broadcasts). Without a
              permission on purpose: StageNow and MDM scripts cannot hold one. INSTALL_CONFIG checks
              the admin password itself (ApiReceiver, docs/deployment.md). -->

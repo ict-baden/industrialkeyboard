@@ -9,6 +9,7 @@
     <string name="button_cancel">Cancelar</string>
     <string name="button_save">Guardar</string>
     <string name="button_ok">Aceptar</string>
+    <string name="button_close">Cerrar</string>
     <string name="button_apply">Aplicar</string>
     <string name="button_import">Importar</string>
     <string name="button_reset">Restablecer</string>
@@ -105,7 +106,72 @@
     <string name="camera_failed">No se pudo iniciar la cámara.</string>
     <string name="camera_hint_center">Coloque la cruz sobre el código de barras</string>
     <string name="camera_zoom">Zoom</string>
-    <string name="camera_continuous_status">%1$d escaneados · último: %2$s</string>
+    <string name="camera_continuous_status">Escaneados: %1$d · último: %2$s</string>
+    <string name="section_camera">Escaneo con la cámara</string>
+    <string name="camera_symbologies">Tipos de código de barras</string>
+    <string name="symbologies_all">Todos</string>
+    <string name="camera_aim">Apuntar</string>
+    <string name="camera_aim_frame">Marco</string>
+    <string name="camera_aim_center">Cruz</string>
+    <string name="camera_aim_anywhere">Cualquier lugar</string>
+    <string name="camera_continuous">Escaneo continuo</string>
+    <string name="camera_continuous_summary">La cámara sigue abierta y escribe cada código nuevo</string>
+    <string name="camera_duplicate_delay">Mismo código de nuevo tras</string>
+    <string name="camera_confirm_reads">Lecturas antes de aceptar un código</string>
+    <string name="camera_length">Longitud del código</string>
+    <string name="camera_min_length">Longitud mínima</string>
+    <string name="camera_max_length">Longitud máxima</string>
+    <string name="zero_no_limit">0 = sin límite</string>
+    <string name="length_any">Cualquiera</string>
+    <string name="length_min">Mín. %1$d</string>
+    <string name="length_max">Máx. %1$d</string>
+    <string name="length_range">%1$d–%2$d</string>
+    <string name="camera_zoom_start">Zoom al abrir</string>
+    <string name="camera_torch_start">Linterna encendida al abrir</string>
+    <string name="camera_inverted">Códigos invertidos</string>
+    <string name="camera_inverted_summary">Códigos claros sobre fondo oscuro</string>
+    <string name="camera_beep">Pitido</string>
+    <string name="camera_vibrate">Vibración</string>
+    <string name="camera_timeout">Cerrar la cámara tras</string>
+    <string name="timeout_never">Nunca</string>
+    <string name="value_s">%1$d s</string>
+    <string name="value_min">%1$d min</string>
+    <string name="data_gs1">Códigos GS1</string>
+    <string name="data_gs1_hri">Legible (01)…</string>
+    <string name="data_gs1_raw">En bruto con GS</string>
+    <string name="section_scan_data">Datos escaneados</string>
+    <string name="data_prefix">Prefijo</string>
+    <string name="data_suffix">Sufijo</string>
+    <string name="data_suffix_default">Como en «Después de escanear»</string>
+    <string name="data_suffix_reset">Como «Después de escanear»</string>
+    <string name="value_none">Ninguno</string>
+    <string name="data_trim">Recortar</string>
+    <string name="data_trim_summary">Quitar espacios y caracteres de control al principio y al final</string>
+    <string name="data_remove_spaces">Quitar todos los espacios</string>
+    <string name="data_case">Mayúsculas/minúsculas</string>
+    <string name="data_case_none">Sin cambios</string>
+    <string name="data_case_upper">MAYÚSCULAS</string>
+    <string name="data_case_lower">minúsculas</string>
+    <string name="data_strip">Recortar caracteres</string>
+    <string name="data_strip_value">%1$d al principio, %2$d al final</string>
+    <string name="data_strip_leading">Caracteres al principio</string>
+    <string name="data_strip_trailing">Caracteres al final</string>
+    <string name="data_gs_replacement">Separador GS</string>
+    <string name="data_gs_replacement_helper">Texto en lugar del carácter GS, vacío = quitarlo</string>
+    <string name="value_keep">Mantener</string>
+    <string name="value_removed">Eliminado</string>
+    <string name="data_replace">Sustituciones</string>
+    <string name="data_rules">Reglas</string>
+    <string name="number_range">%1$d–%2$d</string>
+    <string name="text_hint">Texto</string>
+    <string name="export_barcode">Exportar como código de barras</string>
+    <string name="export_barcode_summary">Código QR para escanear en el siguiente dispositivo</string>
+    <string name="export_barcode_info">Longitud: %1$d · versión QR %2$d</string>
+    <string name="export_barcode_password">Contiene la contraseña de administrador (como hash), como el archivo JSON.</string>
+    <string name="export_barcode_too_large">La configuración es demasiado grande para un código de barras (longitud %1$d). Use el archivo JSON.</string>
+    <string name="import_barcode">Importar desde código de barras</string>
+    <string name="import_barcode_summary">Escanear el código QR de otro dispositivo</string>
+    <string name="import_barcode_hint">Sostenga el código QR de configuración frente a la cámara</string>
 
     <string name="section_configuration">Configuración</string>
     <string name="import_file">Importar desde archivo</string>
@@ -221,6 +287,16 @@
     <string name="mc_sound_description">Reproducir un clic en cada pulsación.</string>
     <string name="mc_vibrate_title">Vibrar al pulsar</string>
     <string name="mc_vibrate_description">Vibración corta en cada pulsación.</string>
+    <string name="mc_scan_prefix_title">Prefijo de escaneo</string>
+    <string name="mc_scan_prefix_description">Se escribe antes de cada código. Texto y comandos como {TAB}; vacío = se mantiene el ajuste actual.</string>
+    <string name="mc_scan_suffix_title">Sufijo de escaneo</string>
+    <string name="mc_scan_suffix_description">Se escribe después de cada código en lugar de Intro/Tab, p. ej. {TAB} o {ENTER}; vacío = se mantiene el ajuste actual.</string>
+    <string name="mc_camera_aim_title">Cámara: apuntar</string>
+    <string name="mc_camera_aim_description">Qué códigos de la imagen de la cámara cuentan.</string>
+    <string name="mc_camera_continuous_title">Cámara: escaneo continuo</string>
+    <string name="mc_camera_continuous_description">La cámara sigue abierta y escribe cada código nuevo.</string>
+    <string name="mc_camera_symbologies_title">Cámara: tipos de código</string>
+    <string name="mc_camera_symbologies_description">Separados por comas, p. ej. ean13,code128,qr; vacío = se mantiene el ajuste actual.</string>
     <string name="mc_admin_password_title">Contraseña de administrador</string>
     <string name="mc_admin_password_description">Protege la configuración del teclado y la importación de configuraciones.</string>
 
@@ -249,5 +325,15 @@
     <string-array name="mc_numeric_order_entries">
         <item>Teléfono (1-2-3 arriba)</item>
         <item>Calculadora (7-8-9 arriba)</item>
+    </string-array>
+    <plurals name="json_only_count">
+        <item quantity="one">%1$d – solo en la configuración JSON</item>
+        <item quantity="many">%1$d – solo en la configuración JSON</item>
+        <item quantity="other">%1$d – solo en la configuración JSON</item>
+    </plurals>
+    <string-array name="mc_camera_aim_entries">
+        <item>Marco</item>
+        <item>Cruz (selección)</item>
+        <item>Cualquier lugar</item>
     </string-array>
 </resources>
