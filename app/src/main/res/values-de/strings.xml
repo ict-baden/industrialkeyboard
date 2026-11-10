@@ -103,6 +103,9 @@
     <string name="camera_permission_granted">Kamera erlaubt. Bitte noch einmal auf Scannen tippen.</string>
     <string name="camera_permission_denied">Ohne Kamera-Berechtigung kann die Tastatur nicht mit der Kamera scannen.</string>
     <string name="camera_failed">Die Kamera ließ sich nicht starten.</string>
+    <string name="camera_hint_center">Fadenkreuz auf den Barcode richten</string>
+    <string name="camera_zoom">Zoom</string>
+    <string name="camera_continuous_status">%1$d gescannt · zuletzt: %2$s</string>
 
     <string name="section_configuration">Konfiguration</string>
     <string name="import_file">Aus Datei importieren</string>
