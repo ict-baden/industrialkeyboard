@@ -79,6 +79,9 @@ enum class ScanTriggerType(override val key: String) : Keyed {
     DATAWEDGE("datawedge"),
     HONEYWELL("honeywell"),
     INTENT("intent"),
+
+    /** The camera of the device, shown in the keyboard; `auto` uses it when there is no scan engine. */
+    CAMERA("camera"),
     NONE("none"),
 }
 

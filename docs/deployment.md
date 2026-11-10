@@ -26,7 +26,9 @@ or install it over USB:
 adb install -r IndustrialKeyboard-2.1.1.apk
 ```
 
-The app needs no permissions apart from vibration – in particular **no internet access**.
+The app needs no permissions apart from vibration and – for the camera scan on devices without a
+scan engine – the camera, which Android asks for on first use. In particular **no internet access**.
+To grant the camera ahead of time, use your EMM's permission policy (or `adb shell pm grant de.ictbaden.industrialkeyboard android.permission.CAMERA`).
 
 ## Make it the keyboard
 

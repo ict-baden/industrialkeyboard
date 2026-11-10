@@ -91,6 +91,16 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.8.0")
     implementation("androidx.activity:activity-ktx:1.11.0")
     implementation("com.google.android.material:material:1.14.0")
+    // Camera scan on devices without a scan engine (issue #17): CameraX for the picture,
+    // zxing-cpp (the same engine as Lupe) for decoding. Both Apache-2.0.
+    implementation("androidx.camera:camera-camera2:1.5.2")
+    implementation("androidx.camera:camera-lifecycle:1.5.2")
+    implementation("androidx.camera:camera-view:1.5.2") {
+        // Only PreviewView is used; video recording (with media3) is not needed.
+        exclude(group = "androidx.camera", module = "camera-video")
+        exclude(group = "androidx.media3")
+    }
+    implementation("io.github.zxing-cpp:android:3.1.1")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20260814")

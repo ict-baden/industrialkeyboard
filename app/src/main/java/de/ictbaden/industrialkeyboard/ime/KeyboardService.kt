@@ -16,7 +16,9 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.core.content.ContextCompat
+import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.api.KeyboardApi
 import de.ictbaden.industrialkeyboard.api.KeyboardBus
@@ -32,6 +34,11 @@ import de.ictbaden.industrialkeyboard.layout.KeyOutput
 import de.ictbaden.industrialkeyboard.layout.KeyChords
 import de.ictbaden.industrialkeyboard.layout.MacroStep
 import de.ictbaden.industrialkeyboard.layout.ModifierKey
+import de.ictbaden.industrialkeyboard.app.CameraPermissionActivity
+import de.ictbaden.industrialkeyboard.app.ErrorCodes
+import de.ictbaden.industrialkeyboard.config.ScanTriggerType
+import de.ictbaden.industrialkeyboard.scanner.CameraScanner
+import de.ictbaden.industrialkeyboard.scanner.HardwareScanner
 import de.ictbaden.industrialkeyboard.scanner.ScanTrigger
 import de.ictbaden.industrialkeyboard.ui.Feedback
 import de.ictbaden.industrialkeyboard.ui.KeyboardRootView
@@ -64,6 +71,10 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private val location = IntArray(2)
     private val handler = Handler(Looper.getMainLooper())
     private val stopScanAnimation = Runnable { setScanning(false) }
+    private var camera: CameraScanner? = null
+    /** The camera does not run unattended: it closes after a while without a code. */
+    private val closeCameraLater = Runnable { closeCamera() }
+    private val engineListener: () -> Unit = { applyConfig(config) }
 
     private val configListener: (KeyboardConfig) -> Unit = { applyConfig(it) }
 
@@ -90,6 +101,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         store = ConfigStore.get(this)
         feedback = Feedback(this)
         scanner = ScanTrigger(this)
+        HardwareScanner.addListener(engineListener)
+        HardwareScanner.detect(this)
         // Exported: other apps request tabs; the restrictions broadcast is sent by the system only.
         val filter = IntentFilter().apply {
             addAction(KeyboardApi.ACTION_SHOW_TAB)
@@ -104,6 +117,9 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     override fun onDestroy() {
         store.removeListener(configListener)
         KeyboardBus.onShowTab = null
+        HardwareScanner.removeListener(engineListener)
+        camera?.destroy()
+        camera = null
         runCatching { unregisterReceiver(receiver) }
         unregisterScanReceiver()
         handler.removeCallbacksAndMessages(null)
@@ -173,6 +189,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             scanner.stop()
             setScanning(false)
         }
+        closeCamera()
     }
 
     override fun onUpdateSelection(oldSelStart: Int, oldSelEnd: Int, newSelStart: Int, newSelEnd: Int, candidatesStart: Int, candidatesEnd: Int) {
@@ -336,7 +353,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
                     else -> sendDownUpKeyEvents(step.keyCode)
                 }
                 is MacroStep.Command -> when (step.command) {
-                    KeyCommand.SCAN -> scanner.toggle()
+                    KeyCommand.SCAN -> if (scanner.type == ScanTriggerType.CAMERA) toggleCamera() else scanner.toggle()
                     KeyCommand.HIDE -> requestHideSelf(0)
                     KeyCommand.SETTINGS -> openSettings()
                     KeyCommand.NEXT_KEYBOARD -> nextKeyboard()
@@ -419,6 +436,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun showTab(tab: String): Boolean {
         val target = FieldPolicy.pageForTab(tab, field, config, scanner.available) ?: return false
         page = target
+        closeCamera()
         // Shift belongs to the page it was set on (letters vs. F13–F24 on the function keys).
         shift = ShiftState.OFF
         autoShifted = false
@@ -446,11 +464,16 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     // region scanning
 
     override fun onScanPress() {
+        if (scanner.type == ScanTriggerType.CAMERA) {
+            toggleCamera()
+            return
+        }
         scanner.start()
         setScanning(true)
     }
 
     override fun onScanRelease(heldMs: Long) {
+        if (scanner.type == ScanTriggerType.CAMERA) return
         // A tap scans until a barcode is read; holding scans until released.
         if (heldMs >= HOLD_TO_SCAN_MS) {
             scanner.stop()
@@ -477,14 +500,60 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             Log.w(TAG, "Scan broadcast ignored: $refusal")
             return
         }
+        typeScan(data ?: return)
+        setScanning(false)
+    }
+
+    /** Types a barcode into the field, followed by the configured suffix (Enter, Tab or nothing). */
+    private fun typeScan(data: String) {
         val ic = currentInputConnection ?: return
         ic.commitText(data, 1)
-        when (settings.suffix) {
+        when (config.scanner.input.suffix) {
             ScanSuffix.ENTER -> sendKeyChar('\n')
             ScanSuffix.TAB -> sendDownUpKeyEvents(KeyEvent.KEYCODE_TAB)
             ScanSuffix.NONE -> Unit
         }
-        setScanning(false)
+    }
+
+    private fun toggleCamera() {
+        if (camera?.isOpen == true) closeCamera() else openCamera()
+    }
+
+    private fun openCamera() {
+        val view = root?.camera ?: return
+        if (!CameraPermissionActivity.granted(this)) {
+            CameraPermissionActivity.start(this)
+            return
+        }
+        val cam = camera ?: CameraScanner(this, ::onCameraScan, ::onCameraError).also { camera = it }
+        cam.onStarted = { view.showTorch(cam.hasTorch) }
+        view.reset()
+        view.onClose = { closeCamera() }
+        view.onTorch = { on -> cam.setTorch(on) }
+        view.visibility = View.VISIBLE
+        cam.open(view.preview)
+        feedback.keyDown(null)
+        handler.removeCallbacks(closeCameraLater)
+        handler.postDelayed(closeCameraLater, CAMERA_TIMEOUT_MS)
+    }
+
+    private fun closeCamera() {
+        handler.removeCallbacks(closeCameraLater)
+        camera?.close()
+        root?.camera?.visibility = View.GONE
+    }
+
+    private fun onCameraScan(text: String, format: String) {
+        Log.i(TAG, "Camera scan ($format, ${text.length} characters)")
+        closeCamera()
+        feedback.scanned()
+        typeScan(text)
+    }
+
+    private fun onCameraError(error: Throwable) {
+        closeCamera()
+        val text = AppLanguage.localized(this).getString(R.string.camera_failed)
+        Toast.makeText(this, "$text (${ErrorCodes.CAMERA_FAILED})", Toast.LENGTH_LONG).show()
     }
 
     // endregion
@@ -492,7 +561,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun render() {
         val root = root ?: return
         val secret = FieldPolicy.isPassword(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)
-        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap()))
+        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA))
     }
 
     private fun enterIcon(): Int {
@@ -514,6 +583,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         const val DOUBLE_TAP_MS = 350L
         const val HOLD_TO_SCAN_MS = 600L
         const val SCAN_ANIMATION_MS = 5_000L
+        const val CAMERA_TIMEOUT_MS = 60_000L
         val SCAN_EXTRAS = listOf(
             "com.symbol.datawedge.data_string",
             "data",

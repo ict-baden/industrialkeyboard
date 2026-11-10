@@ -173,7 +173,7 @@ keyboards, double tap on Shift for caps lock, long press on the hide button for 
 
 | Option | Values | Default | Effect |
 |---|---|---|---|
-| `trigger` | `auto`, `datawedge`, `honeywell`, `intent`, `none` | `auto` | How the scan pad, the scan key and `{SCAN}` start the scanner. `auto`: Zebra DataWedge if installed, otherwise Honeywell, otherwise none. Without a scanner the scan tab and the scan key are hidden |
+| `trigger` | `auto`, `datawedge`, `honeywell`, `intent`, `camera`, `none` | `auto` | How the scan pad, the scan key and `{SCAN}` start the scanner. `auto`: the scan engine of the device if it has one (Zebra: DataWedge lists a built-in imager or laser or a connected Bluetooth/USB scanner; Honeywell: scanner service installed), otherwise the camera. `camera`: always the camera – its picture replaces the keys, the first code read is typed with `input.suffix`, the camera closes after the code, with ✕ or after one minute. Without a scanner and camera the scan tab and the scan key are hidden |
 | `intentAction` | text | – | Broadcast action that starts a scan, for `trigger: "intent"` (required then) |
 | `intentPackage` | text | – | Package that receives it (optional, recommended) |
 | `scanKey` | `true` / `false` | `false` | Scan key in the bottom row of the letters, next to Enter |

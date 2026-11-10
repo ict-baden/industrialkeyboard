@@ -12,4 +12,6 @@ object ErrorCodes {
     const val INVALID_COLOR = "IK-0104"
     const val INVALID_MACRO = "IK-0105"
     const val CONFIG_UNREADABLE = "IK-0106"
+    const val CAMERA_PERMISSION = "IK-0200"
+    const val CAMERA_FAILED = "IK-0201"
 }
