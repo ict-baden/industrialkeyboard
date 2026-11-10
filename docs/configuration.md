@@ -68,6 +68,35 @@ as managed configuration (`config_json`), as a file, as a broadcast, or imported
       "action": "de.ictbaden.industrialkeyboard.action.SCAN_INPUT",
       "extra": "data",
       "suffix": "enter"
+    },
+    "camera": {
+      "symbologies": [],
+      "aim": "frame",
+      "continuous": false,
+      "duplicateDelayMs": 1500,
+      "confirmReads": 1,
+      "minLength": 0,
+      "maxLength": 0,
+      "zoom": 1.0,
+      "torch": false,
+      "inverted": true,
+      "beep": true,
+      "vibrate": true,
+      "timeoutSeconds": 60
+    },
+    "data": {
+      "prefix": "",
+      "suffix": null,
+      "trim": true,
+      "removeSpaces": false,
+      "case": "none",
+      "stripLeading": 0,
+      "stripTrailing": 0,
+      "replace": [],
+      "gs1": "hri",
+      "gsReplacement": null,
+      "rules": [],
+      "unmatched": "send"
     }
   }
 }
@@ -185,6 +214,92 @@ keyboards, double tap on Shift for caps lock, long press on the hide button for 
 | `input.allowedPackages` | list of package names | – | Only these apps may send. Android 14+ and only senders that share their identity; with a list set, all others are refused |
 
 How it works with DataWedge and other scanner apps: [Scanner & app integration](integration.md).
+
+### `scanner.camera` – scanning with the camera
+
+Only for the camera (`trigger: "camera"`, or `auto` on a device without scan engine). Aiming, barcode
+types and decoders of a scan engine are set in DataWedge or the Honeywell settings, not here.
+
+| Option | Values | Default | Effect |
+|---|---|---|---|
+| `symbologies` | list of [barcode types](#barcode-types) | `[]` | Codes the camera reads; empty = all |
+| `aim` | `frame`, `center`, `anywhere` | `frame` | `frame`: only codes whose centre is inside the aiming frame. `center`: only the code under the crosshair in the middle – the pick list for labels with many codes. `anywhere`: the whole picture, the code nearest the middle wins |
+| `continuous` | `true` / `false` | `false` | The camera stays open and types every new code (stock taking); the line under the frame counts them. Close with ✕ |
+| `duplicateDelayMs` | 0–10000 | `1500` | Continuous mode: the same code counts again only after this time without seeing it |
+| `confirmReads` | 1–3 | `1` | The same code has to be read in this many frames in a row – against misreads of damaged 1D codes |
+| `minLength`, `maxLength` | 0–9999 | `0` | Accepted text length, `0` = no limit. Other codes are ignored and the camera keeps looking |
+| `zoom` | 1.0–4.0 | `1.0` | Zoom when the camera opens. The button next to the torch switches 1× → 2× → 3× |
+| `torch` | `true` / `false` | `false` | Torch on when the camera opens |
+| `inverted` | `true` / `false` | `true` | Also light codes on a dark background |
+| `beep`, `vibrate` | `true` / `false` | `true` | Beep and short vibration on every code |
+| `timeoutSeconds` | 0–600 | `60` | The camera closes after this time without a code, `0` = never. In continuous mode the time starts again after each code |
+
+### `scanner.data` – scan data formatting
+
+Changes the barcode text before the keyboard types it, like the data formatting of scanner apps.
+It applies to camera scans and to barcodes from `scanner.input` broadcasts. Barcodes that DataWedge
+types itself (keystroke output) never pass through the keyboard – format those in DataWedge.
+
+| Option | Values | Default | Effect |
+|---|---|---|---|
+| `prefix` | [macro](#macros) | `""` | Typed before the code, e.g. `{TAB}` or `LOC:` |
+| `suffix` | [macro](#macros) or `null` | `null` | Typed after the code instead of `input.suffix`, e.g. `{TAB}{TAB}` or `{F5}`; `""` = nothing. `null` keeps `input.suffix` (Enter, Tab or nothing) |
+| `trim` | `true` / `false` | `true` | Remove spaces and control characters at both ends (the GS separator stays) |
+| `removeSpaces` | `true` / `false` | `false` | Remove all spaces |
+| `case` | `none`, `upper`, `lower` | `none` | Upper or lower case |
+| `stripLeading`, `stripTrailing` | 0–999 | `0` | Cut this many characters at the start / end, e.g. a check digit |
+| `replace` | list of `{"find", "with", "regex"}` | `[]` | Replacements in this order. With `"regex": true`, `find` is a Java regular expression and `with` may use `$1` … |
+| `gs1` | `hri`, `raw` | `hri` | Camera: GS1 codes (GS1-128, GS1 DataMatrix, GS1 QR) human readable as `(01)04012345678901(10)AB12`, or raw with the GS separator (U+001D) between variable-length fields |
+| `gsReplacement` | [macro](#macros) or `null` | `null` | Typed in place of the GS separator in every code, e.g. `{TAB}`, `"|"` or `""` (remove); `null` = type the GS character itself |
+| `rules` | list of rules | `[]` | Different formatting per barcode type or content, see below |
+| `unmatched` | `send`, `drop` | `send` | With rules: what happens to a code that no rule matches – type it with the settings above, or ignore it |
+
+The steps run in this order: trimming, cutting, removing spaces, replacements,
+case, then prefix and suffix around the text; the GS replacement is typed while the text is typed.
+
+**Rules.** The first rule that matches a code wins; every field it sets replaces the setting above
+for that code. A rule matches when all its conditions hold:
+
+| Field | Meaning |
+|---|---|
+| `name` | Free text, for you |
+| `symbologies` | [Barcode types](#barcode-types); empty = all, also when the type is unknown (a broadcast without type) |
+| `minLength`, `maxLength` | Length of the (trimmed) text, `0` = no limit |
+| `startsWith` | Text the code starts with |
+| `pattern` | Java regular expression that has to match the whole (trimmed) text |
+| `action` | `send` (default) or `drop` – a dropped camera code is ignored and the camera keeps looking |
+| `prefix`, `suffix`, `case`, `stripLeading`, `stripTrailing`, `removeSpaces`, `replace` | Same as above, for the codes of this rule |
+
+The type of a broadcast is taken from DataWedge's `com.symbol.datawedge.label_type` or an AIM
+identifier in `aimId` (Honeywell); the camera always knows it.
+
+**Example: GTIN without the check digit, Code 128 as is.**
+
+```json
+"data": {
+  "rules": [ { "name": "GTIN", "symbologies": ["ean13", "upca"], "stripTrailing": 1 } ]
+}
+```
+
+**Example: accept only EAN-13**, everything else is ignored (the camera keeps looking):
+
+```json
+"camera": { "symbologies": ["ean13"] },
+"data": { "rules": [ { "symbologies": ["ean13"] } ], "unmatched": "drop" }
+```
+
+**Example: GS1 fields separated by Tab.** Read GS1 codes raw and press Tab in place of every GS
+separator, so for example the GTIN (`01…`) and the batch (`10…`) land in two form fields:
+
+```json
+"data": { "gs1": "raw", "gsReplacement": "{TAB}", "suffix": "{ENTER}" }
+```
+
+### Barcode types
+
+`aztec`, `codabar`, `code39`, `code93`, `code128` (also GS1-128), `databar`, `databarexpanded`,
+`databarlimited`, `datamatrix`, `ean8`, `ean13`, `itf`, `maxicode`, `pdf417`, `micropdf417`, `qr`,
+`microqr`, `rmqr`, `upca`, `upce`.
 
 ## Custom layouts
 

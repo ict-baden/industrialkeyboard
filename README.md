@@ -58,11 +58,14 @@
 | 🧤 **Made for gloves** | Key height 70–160 %, forgiving touch targets, preview bubble above the finger, rollover typing, high-contrast theme |
 | 🔢 **The right keys for every field** | Number fields open the numeric pad (phone or calculator order, PIN, date, time), e-mail and URL fields get `@`, `/` and `.com`, Enter shows the field's action (next, search, send, done), auto-capitalization follows the field |
 | 🔫 **Scanner built in** | Scan tab with a large trigger pad, optional scan key, soft trigger for Zebra DataWedge, Honeywell or any scanner app via intent. Scan results sent as a broadcast can be typed with Enter or Tab (opt-in) |
+| 📷 **Camera scanning** | Devices without a scan engine read barcodes with the camera inside the keyboard: aiming frame or crosshair (pick list), barcode types, continuous scanning, zoom, torch |
+| 🧩 **Scan data formatting** | Prefix and suffix as macros, cut, replace (also regex), upper/lower case, GS1 fields with Tab, and rules per barcode type, length or content – like the data formatting of scanner apps |
+| 🔳 **Configuration as QR code** | Export the settings as a QR code and import them on the next device with the camera |
 | ⌨️ **Function keys** | Fn tab with F1–F12, **Shift for F13–F24**, Esc, Ins, Del, Home/End, PgUp/PgDn and arrows – plus an optional F1–F12 row above the letters |
 | 🖥️ **Remote desktop ready** | Optional **Ctrl, Win and Alt** – sticky, so they work with gloves – above the letters or on the Fn tab, and combinations such as `{CTRL+ALT+END}` or `{WIN+R}` for your own keys ([details](docs/configuration.md#ctrl-win-and-alt)) |
 | 🧩 **Programmable keys & macros** | Five free keys and custom layouts with macros such as `{TAB}`, `{F13}`, `OK{ENTER}`, `{SCAN}` or `{SHOW:numeric}` |
 | 🗂️ **Custom layouts** | Your own keyboards (e.g. *OK / Skip / Damaged*) as extra tabs – defined in JSON, no app update needed |
-| 🌍 **Alphabets** | QWERTY, QWERTZ, AZERTY, Nordic and Spanish, accents on long press, optional number row |
+| 🌍 **Alphabets** | Follows the system language, or QWERTY, QWERTZ, AZERTY, Nordic and Spanish; accents on long press, optional number row |
 | 🎨 **Looks good** | Light, dark, high contrast or follow the system; custom accent color; smooth animations |
 | 📡 **Central configuration** | Managed configuration (SOTI, Intune, Workspace ONE …), configuration file (also Zebra `/enterprise/usr`), broadcast intent (StageNow, only with the admin password or on EMM-managed devices), admin password |
 | 🔒 **Private by design** | No internet permission, no dictionary, nothing you type is stored or learned; configuration excluded from backups |

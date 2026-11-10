@@ -8,7 +8,7 @@ any of the five languages. Source: [`ErrorCodes.kt`](../app/src/main/java/de/ict
 | Code | Message (English) | Typical cause |
 |---|---|---|
 | `IK-0100` | Last provisioning error | A configuration from the MDM, a file or a broadcast was rejected; the detail names the source and the JSON field |
-| `IK-0101` | Import failed | Invalid configuration in the import file |
+| `IK-0101` | Import failed | Invalid configuration in the import file or the scanned QR code (also a damaged `ICTZ1:` text) |
 | `IK-0102` | Could not read the file | Import file not readable |
 | `IK-0103` | Export failed | Target not writable |
 | `IK-0104` | Invalid color | Accent color is not `#RRGGBB` |
