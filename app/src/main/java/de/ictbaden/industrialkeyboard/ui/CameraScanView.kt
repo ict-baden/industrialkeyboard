@@ -88,7 +88,8 @@ class CameraScanView(context: Context) : FrameLayout(context) {
         val size = dp(48)
         addView(close, LayoutParams(size, size, Gravity.TOP or Gravity.END).apply { setMargins(dp(4), dp(4), dp(4), dp(4)) })
         addView(torch, LayoutParams(size, size, Gravity.TOP or Gravity.START).apply { setMargins(dp(4), dp(4), dp(4), dp(4)) })
-        addView(zoom, LayoutParams(size, size, Gravity.BOTTOM or Gravity.END).apply { setMargins(dp(4), dp(4), dp(4), dp(4)) })
+        // Next to the torch, so the hint line below stays free.
+        addView(zoom, LayoutParams(size, size, Gravity.TOP or Gravity.START).apply { setMargins(dp(56), dp(4), dp(4), dp(4)) })
         addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> if (width > 0 && height > 0) onScreen?.invoke(screen()) }
     }
 

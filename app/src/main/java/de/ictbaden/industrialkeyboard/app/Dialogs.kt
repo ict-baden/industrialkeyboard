@@ -217,10 +217,9 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
         val checked = BooleanArray(all.size) { all[it] in current }
         MaterialAlertDialogBuilder(activity)
             .setIcon(ui.icon(R.drawable.ic_scan))
-            .setTitle(R.string.camera_symbologies)
+            .setTitle(R.string.camera_symbologies_pick)
             .setMultiChoiceItems(all.map { it.label }.toTypedArray(), checked) { _, which, isChecked -> checked[which] = isChecked }
             .setPositiveButton(R.string.button_save) { _, _ -> onSave(all.filterIndexed { i, _ -> checked[i] }.toSet()) }
-            .setNeutralButton(R.string.symbologies_all) { _, _ -> onSave(emptySet()) }
             .setNegativeButton(R.string.button_cancel, null)
             .show()
     }

@@ -117,6 +117,7 @@
     <string name="camera_continuous_status">Scanned: %1$d · last: %2$s</string>
     <string name="section_camera">Camera scanning</string>
     <string name="camera_symbologies">Barcode types</string>
+    <string name="camera_symbologies_pick">Barcode types (none = all)</string>
     <string name="symbologies_all">All</string>
     <string name="camera_aim">Aiming</string>
     <string name="camera_aim_frame">Frame</string>
@@ -165,7 +166,7 @@
     <string name="data_strip_leading">Characters at the start</string>
     <string name="data_strip_trailing">Characters at the end</string>
     <string name="data_gs_replacement">GS separator</string>
-    <string name="data_gs_replacement_helper">Text instead of the GS character, empty = remove it</string>
+    <string name="data_gs_replacement_helper">Macro instead of the GS character, e.g. {TAB}; empty = remove it</string>
     <string name="value_keep">Keep</string>
     <string name="value_removed">Removed</string>
     <string name="data_replace">Replacements</string>
@@ -174,7 +175,9 @@
     <string name="text_hint">Text</string>
     <string name="export_barcode">Export as barcode</string>
     <string name="export_barcode_summary">QR code to scan on the next device</string>
-    <string name="export_barcode_info">Length: %1$d · QR version %2$d</string>
+    <string name="export_barcode_info">Length: %1$d · QR version %2$d · %3$s</string>
+    <string name="export_barcode_compressed">compressed</string>
+    <string name="export_barcode_json">JSON</string>
     <string name="export_barcode_password">Contains the admin password (as a hash), like the JSON file.</string>
     <string name="export_barcode_too_large">The configuration is too large for a barcode (length %1$d). Use the JSON file instead.</string>
     <string name="import_barcode">Import from barcode</string>

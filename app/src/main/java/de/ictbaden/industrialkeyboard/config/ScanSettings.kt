@@ -127,7 +127,7 @@ data class DataSettings(
     val stripTrailing: Int = 0,
     val replace: List<Replacement> = emptyList(),
     val gs1: Gs1Mode = Gs1Mode.HRI,
-    /** Replaces the GS separator (U+001D); `null` = keep it. */
+    /** Macro typed in place of the GS separator (U+001D), e.g. `{TAB}` or `|`; `null` = keep it. */
     val gsReplacement: String? = null,
     val rules: List<ScanRule> = emptyList(),
     /** With rules and none matching: type the code anyway (`SEND`) or ignore it (`DROP`). */
