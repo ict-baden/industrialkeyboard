@@ -58,4 +58,6 @@ Please report results on other devices in the
 - No word prediction, no dictionary, no autocorrect, no swipe typing, no voice input, no emoji
   picker: nothing that learns or stores what is typed.
 - No internet permission: the keyboard cannot send anything off the device.
+- Camera scan reads one code per tap and has no batch or multi-code mode; a scan engine is faster
+  and works in the dark. The camera picture fills only the keyboard area.
 - Key labels are not translated (they are what the keys type).

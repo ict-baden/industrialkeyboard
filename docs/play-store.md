@@ -97,9 +97,11 @@ keyboards.
 | Permission | Why |
 |---|---|
 | `VIBRATE` | Key and scan feedback |
+| `CAMERA` | Scanning barcodes with the camera on devices without a scan engine (`scanner.trigger` `auto` or `camera`). Asked only when the user taps scan the first time. The pictures are decoded on the device and never stored or sent |
 
 The input method service is bound with `BIND_INPUT_METHOD` (granted by the system when the user
-enables the keyboard). No sensitive permissions that need a declaration form.
+enables the keyboard). No sensitive permissions that need a declaration form. Data safety: the
+camera pictures are processed on the device only and not collected (no internet permission).
 
 ## Publishing a version
 

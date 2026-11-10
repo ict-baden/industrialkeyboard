@@ -388,6 +388,7 @@ class SettingsActivity : AppCompatActivity() {
                             ScanTriggerType.DATAWEDGE to "DataWedge",
                             ScanTriggerType.HONEYWELL to "Honeywell",
                             ScanTriggerType.INTENT to "Intent",
+                            ScanTriggerType.CAMERA to getString(R.string.scanner_camera),
                             ScanTriggerType.NONE to getString(R.string.scan_trigger_off),
                         ),
                         c.scanner.trigger,
@@ -396,6 +397,7 @@ class SettingsActivity : AppCompatActivity() {
                             editIntentAction(c)
                         } else {
                             update { it.copy(scanner = it.scanner.copy(trigger = trigger)) }
+                            if (trigger == ScanTriggerType.CAMERA && !CameraPermissionActivity.granted(this)) CameraPermissionActivity.start(this)
                         }
                     },
                     if (c.scanner.trigger == ScanTriggerType.INTENT) {

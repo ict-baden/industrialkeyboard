@@ -27,6 +27,12 @@ class Feedback(context: Context) {
         if (settings.sound) click(key?.output)
     }
 
+    /** A barcode was read with the camera: a longer buzz, like a scanner beep you can feel. */
+    fun scanned() {
+        val vibrator = vibrator?.takeIf { it.hasVibrator() } ?: return
+        runCatching { vibrator.vibrate(VibrationEffect.createOneShot(SCAN_VIBRATION_MS, VibrationEffect.DEFAULT_AMPLITUDE)) }
+    }
+
     private fun vibrate() {
         val vibrator = vibrator?.takeIf { it.hasVibrator() } ?: return
         val ms = (settings.vibrationMs ?: DEFAULT_VIBRATION_MS).coerceIn(5, 100).toLong()
@@ -46,5 +52,6 @@ class Feedback(context: Context) {
 
     private companion object {
         const val DEFAULT_VIBRATION_MS = 18
+        const val SCAN_VIBRATION_MS = 60L
     }
 }

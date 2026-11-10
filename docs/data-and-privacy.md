@@ -17,6 +17,12 @@ no crash reporting, no update check and no account.
 What you type is passed to the focused app and **not stored**: there is no dictionary, no word
 learning, no history and no clipboard access.
 
+**Camera:** on devices without a scan engine the keyboard can read barcodes with the camera
+([`scanner.trigger`](configuration.md#scanner)). The camera runs only while its picture is shown in
+the keyboard (after a tap on scan, at most one minute) and stops after the first code. The pictures
+are decoded in memory on the device and are neither stored nor sent; only the barcode text is typed
+into the field. Android asks for the camera permission the first time.
+
 The operator of the devices (your company) is responsible for the data typed with the keyboard;
 ICT-Baden processes none of it.
 

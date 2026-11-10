@@ -57,6 +57,7 @@ object KeyboardRenderer {
         passwordField: Boolean = false,
         /** Armed (ONCE) or locked Ctrl, Win and Alt. */
         modifiers: Map<ModifierKey, ShiftState> = emptyMap(),
+        camera: Boolean = false,
     ): RenderState {
         val appearance = config.appearance
         val rowHeight = (BASE_ROW_DP * context.resources.displayMetrics.density * appearance.keyHeight / 100f).toInt()
@@ -77,6 +78,7 @@ object KeyboardRenderer {
             widthPercent = appearance.width,
             scannerName = scannerName,
             scanning = scanning,
+            camera = camera,
         )
     }
 }

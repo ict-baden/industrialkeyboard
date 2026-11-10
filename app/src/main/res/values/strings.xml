@@ -104,6 +104,13 @@
     <string name="after_scan_enter">Enter</string>
     <string name="after_scan_tab">Tab</string>
     <string name="scanner_app">Scanner app</string>
+    <string name="scanner_camera">Camera</string>
+    <string name="camera_hint">Hold the barcode inside the frame</string>
+    <string name="camera_close">Close camera</string>
+    <string name="camera_torch">Torch</string>
+    <string name="camera_permission_granted">Camera allowed. Tap scan again.</string>
+    <string name="camera_permission_denied">Without camera permission the keyboard cannot scan with the camera.</string>
+    <string name="camera_failed">The camera could not be started.</string>
 
     <!-- Settings: configuration -->
     <string name="section_configuration">Configuration</string>
@@ -206,6 +213,7 @@
     <string name="scan_pad_scanning">Scanning…</string>
     <string name="scan_pad_tap">Tap to scan</string>
     <string name="scan_pad_hint">Hold for continuous scanning · %1$s</string>
+    <string name="scan_pad_hint_camera">Tap to open the camera · %1$s</string>
     <string name="scan_pad_configure">Configure a scanner in the keyboard settings</string>
 
     <!-- Managed configuration schema shown by EMMs -->
