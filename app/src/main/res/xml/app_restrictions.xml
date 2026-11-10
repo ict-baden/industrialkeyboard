@@ -24,7 +24,7 @@
         android:restrictionType="choice"
         android:title="@string/mc_theme_title" />
     <restriction
-        android:defaultValue="qwerty"
+        android:defaultValue="auto"
         android:description="@string/mc_alphabet_description"
         android:entries="@array/mc_alphabet_entries"
         android:entryValues="@array/mc_alphabet_values"

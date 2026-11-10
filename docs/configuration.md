@@ -31,7 +31,7 @@ as managed configuration (`config_json`), as a file, as a broadcast, or imported
     "functionModifiers": false
   },
   "layout": {
-    "alphabet": "qwerty",
+    "alphabet": "auto",
     "navigation": "tabs",
     "numericOrder": "phone"
   },
@@ -114,7 +114,7 @@ every language: [Error codes](error-codes.md).
 
 | Option | Values | Default | Effect |
 |---|---|---|---|
-| `alphabet` | `qwerty`, `qwertz`, `azerty`, `nordic`, `spanish` | `qwerty` | Letter layout. `qwertz` adds ü ö ä, `nordic` å ö ä, `spanish` ñ. Accents and special letters (ß, é, ç …) on long press |
+| `alphabet` | `auto`, `qwerty`, `qwertz`, `azerty`, `nordic`, `spanish` | `auto` | Letter layout. `auto` follows the first system language of the device (German, Czech, Swiss … → `qwertz`, French and Belgian → `azerty`, Swedish, Danish, Norwegian, Finnish → `nordic`, Spanish and Catalan → `spanish`, everything else `qwerty`) and changes with it. `qwertz` adds ü ö ä, `nordic` å ö ä, `spanish` ñ. Accents and special letters (ß, é, ç …) on long press |
 | `navigation` | `tabs`, `keys` | `tabs` | `tabs`: tab bar above the keys (ABC, 123, #+=, Fn, scan, custom layouts, hide button). `keys`: no tab bar, `?123` / `ABC` keys like a phone keyboard; on the numeric pad the last side key becomes `ABC`. Other pages are then reachable with [`{SHOW:…}`](#macros) on a programmable key |
 | `numericOrder` | `phone`, `calculator` | `phone` | `phone`: 1-2-3 at the top. `calculator`: 7-8-9 at the top. Dial pads (phone number fields) always use phone order |
 

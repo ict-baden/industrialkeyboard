@@ -79,7 +79,7 @@ The app ships a schema that every EMM with Android Enterprise support shows:
 | `config_json` | String | **Complete configuration** (contents of a JSON file from `examples/`). Takes precedence over the keys below |
 | `language` | Choice | Automatic (device language), English, Deutsch, Español, Français, 简体中文 |
 | `theme` | Choice | System, Light, Dark, High contrast |
-| `alphabet` | Choice | QWERTY, QWERTZ, AZERTY, Nordic, Spanish |
+| `alphabet` | Choice | Automatic (system language), QWERTY, QWERTZ, AZERTY, Nordic, Spanish |
 | `numeric_order` | Choice | Phone (1-2-3 at the top) or Calculator (7-8-9 at the top) |
 | `scan_tab` | Bool | Show the scan tab (default on) |
 | `function_tab` | Bool | Show the function key tab (default on) |
