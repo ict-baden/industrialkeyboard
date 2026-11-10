@@ -1,5 +1,8 @@
 package de.ictbaden.industrialkeyboard.config
 
+import android.content.res.Resources
+import java.util.Locale
+
 /** Enum values that have a stable key in the JSON format. */
 interface Keyed {
     val key: String
@@ -14,11 +17,45 @@ enum class ThemeMode(override val key: String) : Keyed {
 
 /** Arrangement of the letter keys. */
 enum class Alphabet(override val key: String, val label: String) : Keyed {
+    /** Follows the system language of the device, see [forLocale]. */
+    AUTO("auto", "Auto"),
     QWERTY("qwerty", "QWERTY"),
     QWERTZ("qwertz", "QWERTZ"),
     AZERTY("azerty", "AZERTY"),
     NORDIC("nordic", "Nordic"),
     SPANISH("spanish", "Español"),
+    ;
+
+    /** The layout actually shown: [AUTO] becomes the layout of the system language. */
+    fun resolve(locale: Locale = systemLocale()): Alphabet = if (this == AUTO) forLocale(locale) else this
+
+    companion object {
+        private val QWERTZ_LANGUAGES = setOf("de", "lb", "rm", "cs", "sk", "hu", "sl", "hr", "bs", "sq")
+        private val NORDIC_LANGUAGES = setOf("sv", "fi", "da", "nb", "nn", "no", "is", "fo")
+        private val SPANISH_LANGUAGES = setOf("es", "ca", "gl", "eu")
+
+        /** Letter layout people expect for a language and region, like the system keyboards do. */
+        fun forLocale(locale: Locale): Alphabet {
+            val language = locale.language.lowercase(Locale.ROOT)
+            val country = locale.country.uppercase(Locale.ROOT)
+            return when {
+                // Switzerland types QWERTZ in every language, French Canada QWERTY.
+                country == "CH" && language in setOf("de", "fr", "it", "rm") -> QWERTZ
+                language in QWERTZ_LANGUAGES -> QWERTZ
+                language == "fr" && country != "CA" -> AZERTY
+                language == "nl" && country == "BE" -> AZERTY
+                language in NORDIC_LANGUAGES -> NORDIC
+                language in SPANISH_LANGUAGES -> SPANISH
+                else -> QWERTY
+            }
+        }
+
+        /**
+         * First language of the device settings – not the app language, which an administrator may
+         * set differently for the texts of the keyboard.
+         */
+        fun systemLocale(): Locale = runCatching { Resources.getSystem().configuration.locales[0] }.getOrNull() ?: Locale.getDefault()
+    }
 }
 
 enum class NumericOrder(override val key: String) : Keyed {
@@ -78,7 +115,7 @@ data class Appearance(
 )
 
 data class LayoutSettings(
-    val alphabet: Alphabet = Alphabet.QWERTY,
+    val alphabet: Alphabet = Alphabet.AUTO,
     val navigation: Navigation = Navigation.TABS,
     val numericOrder: NumericOrder = NumericOrder.PHONE,
 )

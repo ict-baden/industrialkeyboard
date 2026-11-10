@@ -254,7 +254,7 @@ class SettingsActivity : AppCompatActivity() {
         content.addView(
             ui.card(
                 listOf(
-                    ui.choiceRow(R.drawable.ic_keyboard, getString(R.string.letters), Alphabet.entries.map { it to it.label }, c.layout.alphabet) { alphabet ->
+                    ui.choiceRow(R.drawable.ic_keyboard, getString(R.string.letters), Alphabet.entries.map { it to alphabetLabel(it) }, c.layout.alphabet) { alphabet ->
                         update { it.copy(layout = it.layout.copy(alphabet = alphabet)) }
                     },
                     ui.choiceRow(
@@ -549,6 +549,10 @@ class SettingsActivity : AppCompatActivity() {
         imageTintList = ColorStateList.valueOf(Palette.resolve(this@SettingsActivity, config.appearance).accent)
         layoutParams = LinearLayout.LayoutParams(ui.dp(28), ui.dp(28))
     }
+
+    /** „Automatic (QWERTZ)“: shows which layout the system language gives. */
+    private fun alphabetLabel(alphabet: Alphabet): String =
+        if (alphabet == Alphabet.AUTO) getString(R.string.automatic_with, Alphabet.AUTO.resolve().label) else alphabet.label
 
     private fun editIntentAction(config: KeyboardConfig) {
         val field = ui.textField(getString(R.string.broadcast_action), config.scanner.intentAction.orEmpty(), helper = getString(R.string.broadcast_action_helper))
