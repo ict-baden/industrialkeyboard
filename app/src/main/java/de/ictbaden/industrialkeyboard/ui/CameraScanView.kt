@@ -174,7 +174,15 @@ class CameraScanView(context: Context) : FrameLayout(context) {
             },
         )
         listOf(modeBarcode to !textMode, modeText to textMode).forEach { (button, on) ->
-            button.background = if (on) ContextCompat.getDrawable(context, R.drawable.bg_pill)?.mutate()?.apply { setTint(palette.accent) } else null
+            // Opaque: a tint on the half-transparent pill would only darken the accent.
+            button.background = if (on) {
+                android.graphics.drawable.GradientDrawable().apply {
+                    cornerRadius = dp(24).toFloat()
+                    setColor(palette.accent)
+                }
+            } else {
+                null
+            }
             button.setTextColor(if (on) palette.accentText else Color.WHITE)
         }
         finder.invalidate()
