@@ -72,7 +72,7 @@
 
 ## ⚡ Up and running in 5 minutes
 
-**1. Install the app** – download the APK from the [releases](../../releases/latest) and distribute it with your MDM, or install it over USB:
+**1. Install the app** – get it from [Google Play](https://play.google.com/store/apps/details?id=de.ictbaden.industrialkeyboard) (also through managed Google Play of your EMM), or download the APK from the [releases](../../releases/latest) and distribute it with your MDM or install it over USB:
 
 ```bash
 adb install -r IndustrialKeyboard-2.1.1.apk

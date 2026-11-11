@@ -125,11 +125,10 @@ Android+). The flow:
 ## Microsoft Intune
 
 1. On Android Enterprise devices the app has to come through **managed Google Play**. Use
-   the listing of ICT-Baden once the app is published there. **Do not upload the APK as your own
-   private app:** package names are unique in all of Google Play, so your upload would take
-   `de.ictbaden.industrialkeyboard` for your developer account, and the official app could not
-   use it any more. Until it is published, ask ICT-Baden: the Play Console can also publish an
-   app privately to the managed Google Play of your organisation.
+   the [listing of ICT-Baden](https://play.google.com/store/apps/details?id=de.ictbaden.industrialkeyboard) (approve it for your organisation in managed Google Play).
+   **Do not upload the APK as your own private app:** package names are unique in all of Google
+   Play, so your upload would take `de.ictbaden.industrialkeyboard` for your developer account,
+   and the official app could not use it any more.
 2. Create an **app configuration policy** (managed devices), use the configuration designer
    and set `config_json` or the single keys.
 3. Allow the keyboard in the device restrictions if you limit input methods, and select it on
