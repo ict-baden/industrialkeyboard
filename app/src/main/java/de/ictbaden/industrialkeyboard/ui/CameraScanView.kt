@@ -11,9 +11,11 @@ import android.graphics.RectF
 import android.graphics.Typeface
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
@@ -21,10 +23,14 @@ import androidx.core.view.isVisible
 import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.config.AimMode
+import de.ictbaden.industrialkeyboard.config.OcrMode
 import de.ictbaden.industrialkeyboard.scanner.AimGeometry
 import java.util.Locale
 
-/** Camera picture with an aiming frame or crosshair, plus close, torch and zoom buttons. */
+/**
+ * Camera picture with an aiming frame or crosshair, plus close, torch and zoom buttons, and a switch
+ * between barcode and text (OCR) with tappable boxes around the recognised lines.
+ */
 @SuppressLint("ViewConstructor")
 class CameraScanView(context: Context) : FrameLayout(context) {
 
@@ -39,6 +45,12 @@ class CameraScanView(context: Context) : FrameLayout(context) {
 
     /** Returns the new zoom ratio. */
     var onZoom: (() -> Float)? = null
+
+    /** The user switched between barcode (`false`) and text (`true`). */
+    var onTextMode: ((Boolean) -> Unit)? = null
+
+    /** Pick mode: the user tapped a recognised line. */
+    var onPickLine: ((String) -> Unit)? = null
 
     /** Called after every layout with the preview and frame on the screen. */
     var onScreen: ((AimGeometry.Screen) -> Unit)? = null
@@ -57,6 +69,18 @@ class CameraScanView(context: Context) : FrameLayout(context) {
         }
 
     private var torchOn = false
+    private var textMode = false
+    private var ocrMode = OcrMode.PICK
+    private var lines: List<Pair<String, RectF>> = emptyList()
+    private val modeBarcode = modeButton()
+    private val modeText = modeButton()
+    private val modeSwitch = LinearLayout(context).apply {
+        orientation = LinearLayout.HORIZONTAL
+        background = ContextCompat.getDrawable(context, R.drawable.bg_pill)?.mutate()
+        addView(modeBarcode)
+        addView(modeText)
+        isVisible = false
+    }
     private val finder = Finder(context)
     private val hint = TextView(context).apply {
         setTextColor(Color.WHITE)
@@ -90,18 +114,30 @@ class CameraScanView(context: Context) : FrameLayout(context) {
         addView(torch, LayoutParams(size, size, Gravity.TOP or Gravity.START).apply { setMargins(dp(4), dp(4), dp(4), dp(4)) })
         // Next to the torch, so the hint line below stays free.
         addView(zoom, LayoutParams(size, size, Gravity.TOP or Gravity.START).apply { setMargins(dp(56), dp(4), dp(4), dp(4)) })
+        addView(modeSwitch, LayoutParams(LayoutParams.WRAP_CONTENT, size, Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply { setMargins(dp(4), dp(4), dp(4), dp(4)) })
+        modeBarcode.setOnClickListener { switchMode(false) }
+        modeText.setOnClickListener { switchMode(true) }
         addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> if (width > 0 && height > 0) onScreen?.invoke(screen()) }
     }
 
-    /** Resets buttons and texts for a new scan. */
-    fun reset(aim: AimMode, zoomRatio: Float) {
+    /**
+     * Resets buttons and texts for a new scan. [ocr] `null` hides the barcode/text switch;
+     * [startInText] opens in text mode.
+     */
+    fun reset(aim: AimMode, zoomRatio: Float, ocr: OcrMode? = null, startInText: Boolean = false) {
         this.aim = aim
+        ocrMode = ocr ?: OcrMode.PICK
+        textMode = ocr != null && startInText
+        lines = emptyList()
+        modeSwitch.isVisible = ocr != null
         torchOn = false
         torch.isVisible = false
         updateTorch()
         showZoom(zoomRatio)
         val localized = AppLanguage.localized(context)
-        hint.text = localized.getString(if (aim == AimMode.CENTER) R.string.camera_hint_center else R.string.camera_hint)
+        modeBarcode.text = localized.getString(R.string.camera_mode_barcode)
+        modeText.text = localized.getString(R.string.camera_mode_text)
+        updateMode()
         close.contentDescription = localized.getString(R.string.camera_close)
         torch.contentDescription = localized.getString(R.string.camera_torch)
         zoom.contentDescription = localized.getString(R.string.camera_zoom)
@@ -111,6 +147,45 @@ class CameraScanView(context: Context) : FrameLayout(context) {
         torch.isVisible = available
         torchOn = on && available
         updateTorch()
+    }
+
+    /** Pick mode: the lines to show as tappable boxes (view coordinates). */
+    fun showLines(found: List<Pair<String, RectF>>) {
+        lines = found
+        finder.invalidate()
+    }
+
+    private fun switchMode(text: Boolean) {
+        if (textMode == text) return
+        textMode = text
+        lines = emptyList()
+        updateMode()
+        onTextMode?.invoke(text)
+    }
+
+    private fun updateMode() {
+        val localized = AppLanguage.localized(context)
+        hint.text = localized.getString(
+            when {
+                textMode && ocrMode == OcrMode.PATTERN -> R.string.camera_hint_text_pattern
+                textMode -> R.string.camera_hint_text_pick
+                aim == AimMode.CENTER -> R.string.camera_hint_center
+                else -> R.string.camera_hint
+            },
+        )
+        listOf(modeBarcode to !textMode, modeText to textMode).forEach { (button, on) ->
+            button.background = if (on) ContextCompat.getDrawable(context, R.drawable.bg_pill)?.mutate()?.apply { setTint(palette.accent) } else null
+            button.setTextColor(if (on) palette.accentText else Color.WHITE)
+        }
+        finder.invalidate()
+    }
+
+    private fun modeButton() = TextView(context).apply {
+        gravity = Gravity.CENTER
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+        typeface = Typeface.DEFAULT_BOLD
+        setPadding(dp(14), 0, dp(14), 0)
+        layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT)
     }
 
     fun showZoom(ratio: Float) {
@@ -159,6 +234,26 @@ class CameraScanView(context: Context) : FrameLayout(context) {
             color = 0xEEFF3B30.toInt()
         }
         private val path = Path()
+        private val box = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
+        private val boxFill = Paint(Paint.ANTI_ALIAS_FLAG)
+
+        init {
+            setOnTouchListener { _, event -> touch(event) }
+        }
+
+        /** Pick mode: a tap on a box takes its line (a little tolerance for gloves). */
+        private fun touch(event: MotionEvent): Boolean {
+            if (!textMode || ocrMode != OcrMode.PICK || lines.isEmpty()) return false
+            if (event.action == MotionEvent.ACTION_DOWN) return true
+            if (event.action != MotionEvent.ACTION_UP) return false
+            val slack = 12f * resources.displayMetrics.density
+            val hit = lines.firstOrNull { (_, r) -> RectF(r.left - slack, r.top - slack, r.right + slack, r.bottom + slack).contains(event.x, event.y) }
+            if (hit != null) {
+                performClick()
+                onPickLine?.invoke(hit.first)
+            }
+            return hit != null
+        }
 
         override fun onDraw(canvas: Canvas) {
             val w = width.toFloat()
@@ -183,6 +278,19 @@ class CameraScanView(context: Context) : FrameLayout(context) {
             canvas.drawPath(path, corner)
             val cx = frame.centerX()
             val cy = frame.centerY()
+            if (textMode) {
+                // Text: boxes around the lines that can be taken, no scan line.
+                box.strokeWidth = stroke * 0.6f
+                box.color = palette.accent
+                boxFill.color = palette.accent
+                boxFill.alpha = 0x40
+                val radius = stroke
+                for ((_, r) in lines) {
+                    canvas.drawRoundRect(r, radius, radius, boxFill)
+                    canvas.drawRoundRect(r, radius, radius, box)
+                }
+                return
+            }
             if (aim == AimMode.CENTER) {
                 // Pick list: only the code under the crosshair counts.
                 val size = minOf(frame.width(), frame.height()) * 0.12f

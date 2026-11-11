@@ -113,6 +113,48 @@
     <string name="camera_permission_denied">Without camera permission the keyboard cannot scan with the camera.</string>
     <string name="camera_failed">The camera could not be started.</string>
     <string name="camera_hint_center">Put the crosshair on the barcode</string>
+    <string name="camera_mode_barcode">Barcode</string>
+    <string name="camera_mode_text">Text</string>
+    <string name="camera_hint_text_pick">Tap the text you want</string>
+    <string name="camera_hint_text_pattern">Hold the text inside the frame</string>
+    <string name="nfc_no_field">NFC: no input field active</string>
+    <string name="section_ocr">Text recognition (OCR)</string>
+    <string name="ocr_enabled">Text recognition on the camera screen</string>
+    <string name="ocr_enabled_summary">Switch Barcode | Text; runs on the device</string>
+    <string name="ocr_mode">Taking text</string>
+    <string name="ocr_mode_pick">Tap a line</string>
+    <string name="ocr_mode_pattern">Automatically by pattern</string>
+    <string name="ocr_pattern">Pattern (regular expression)</string>
+    <string name="ocr_pattern_helper">The whole line must match, e.g. [A-Z]{2}\\d{6}</string>
+    <string name="ocr_pattern_invalid">Invalid regular expression</string>
+    <string name="ocr_charset">Characters</string>
+    <string name="ocr_charset_any">All</string>
+    <string name="ocr_charset_digits">Digits only (and , . -)</string>
+    <string name="ocr_charset_alnum">Letters and digits</string>
+    <string name="ocr_charset_upper">Letters and digits, upper case</string>
+    <string name="ocr_confirm_reads">Confirm reads (pattern)</string>
+    <string name="ocr_start_in_text">Camera opens in text mode</string>
+    <string name="section_nfc">NFC</string>
+    <string name="nfc_state">NFC on this device</string>
+    <string name="nfc_state_missing">Not available</string>
+    <string name="nfc_state_on">On</string>
+    <string name="nfc_state_off">Off – tap to open the settings</string>
+    <string name="nfc_enabled">Type NFC tags</string>
+    <string name="nfc_enabled_summary">Hold a tag to the device while the keyboard is open</string>
+    <string name="nfc_read">Read</string>
+    <string name="nfc_read_ndef_or_uid">Text on the tag, else UID</string>
+    <string name="nfc_read_uid">UID (serial number)</string>
+    <string name="nfc_read_ndef">Text on the tag (NDEF)</string>
+    <string name="nfc_uid_format">UID format</string>
+    <string name="nfc_uid_hex">Hexadecimal</string>
+    <string name="nfc_uid_decimal">Decimal</string>
+    <string name="nfc_uid_reversed">Reverse byte order</string>
+    <string name="nfc_uid_reversed_summary">Many badge readers show the UID reversed</string>
+    <string name="nfc_uid_separator">Separator between bytes</string>
+    <string name="nfc_uid_separator_too_long">At most 4 characters</string>
+    <string name="nfc_ndef_records">Text records</string>
+    <string name="nfc_ndef_first">First only</string>
+    <string name="nfc_ndef_all">All, one per line</string>
     <string name="camera_zoom">Zoom</string>
     <string name="camera_continuous_status">Scanned: %1$d · last: %2$s</string>
     <string name="section_camera">Camera scanning</string>
@@ -317,6 +359,14 @@
     <string name="mc_camera_continuous_description">Camera stays open and types every new code.</string>
     <string name="mc_camera_symbologies_title">Camera barcode types</string>
     <string name="mc_camera_symbologies_description">Comma-separated, e.g. ean13,code128,qr; empty = keep the current setting.</string>
+    <string name="mc_ocr_mode_title">OCR: taking text</string>
+    <string name="mc_ocr_mode_description">Tap a recognised line, or take the first line matching the pattern automatically.</string>
+    <string name="mc_ocr_pattern_title">OCR: pattern</string>
+    <string name="mc_ocr_pattern_description">Regular expression the whole line must match; empty = keep the current setting.</string>
+    <string name="mc_nfc_enabled_title">Type NFC tags</string>
+    <string name="mc_nfc_enabled_description">Type a tag held to the device into the field the keyboard is open in.</string>
+    <string name="mc_nfc_read_title">NFC: read</string>
+    <string name="mc_nfc_read_description">UID (serial number), the text on the tag (NDEF), or the text and else the UID.</string>
     <string name="mc_admin_password_title">Admin password</string>
     <string name="mc_admin_password_description">Protects the keyboard settings and configuration imports.</string>
 
@@ -385,5 +435,23 @@
         <item>frame</item>
         <item>center</item>
         <item>anywhere</item>
+    </string-array>
+    <string-array name="mc_ocr_mode_entries">
+        <item>Tap a line</item>
+        <item>Automatically by pattern</item>
+    </string-array>
+    <string-array name="mc_nfc_read_entries">
+        <item>Text, else UID</item>
+        <item>UID (serial number)</item>
+        <item>Text on the tag (NDEF)</item>
+    </string-array>
+    <string-array name="mc_ocr_mode_values" translatable="false">
+        <item>pick</item>
+        <item>pattern</item>
+    </string-array>
+    <string-array name="mc_nfc_read_values" translatable="false">
+        <item>ndefOrUid</item>
+        <item>uid</item>
+        <item>ndef</item>
     </string-array>
 </resources>

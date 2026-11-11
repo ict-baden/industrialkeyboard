@@ -1,7 +1,7 @@
 package de.ictbaden.industrialkeyboard.config
 
 /** Barcode types by their stable name in the configuration (`scanner.camera.symbologies`, rules). */
-enum class Symbology(override val key: String, val label: String) : Keyed {
+enum class Symbology(override val key: String, val label: String, val barcode: Boolean = true) : Keyed {
     AZTEC("aztec", "Aztec"),
     CODABAR("codabar", "Codabar"),
     CODE39("code39", "Code 39"),
@@ -22,6 +22,12 @@ enum class Symbology(override val key: String, val label: String) : Keyed {
     RMQR("rmqr", "rMQR"),
     UPCA("upca", "UPC-A"),
     UPCE("upce", "UPC-E"),
+
+    /** Text read by OCR – for `scanner.data` rules only, not a camera barcode type. */
+    OCR("ocr", "Text (OCR)", barcode = false),
+
+    /** NFC tag – for `scanner.data` rules only. */
+    NFC("nfc", "NFC", barcode = false),
     ;
 
     companion object {
@@ -132,4 +138,73 @@ data class DataSettings(
     val rules: List<ScanRule> = emptyList(),
     /** With rules and none matching: type the code anyway (`SEND`) or ignore it (`DROP`). */
     val unmatched: RuleAction = RuleAction.SEND,
+)
+
+/** How a recognised text line is taken (`scanner.ocr.mode`). */
+enum class OcrMode(override val key: String) : Keyed {
+    /** Lines in the frame are shown as boxes; a tap takes one. */
+    PICK("pick"),
+
+    /** The first line in the frame matching `scanner.ocr.pattern` is taken automatically. */
+    PATTERN("pattern"),
+}
+
+/** Cleanup of a recognised line before length and pattern checks. */
+enum class OcrCharset(override val key: String) : Keyed {
+    ANY("any"),
+
+    /** Digits plus `,` `.` `-`. */
+    DIGITS("digits"),
+
+    /** Letters and digits. */
+    ALNUM("alnum"),
+
+    /** Letters and digits, upper case. */
+    UPPER("upper"),
+}
+
+/** Text recognition with the camera (`scanner.ocr`). */
+data class OcrSettings(
+    val enabled: Boolean = true,
+    val mode: OcrMode = OcrMode.PICK,
+    /** Java regex the whole line has to match; required for [OcrMode.PATTERN]. */
+    val pattern: String? = null,
+    /** The camera opens in text mode. */
+    val startInOcr: Boolean = false,
+    /** Pattern mode: the same text in this many frames in a row. 1–5. */
+    val confirmReads: Int = 2,
+    val minLength: Int = 0,
+    val maxLength: Int = 0,
+    val charset: OcrCharset = OcrCharset.ANY,
+)
+
+/** What an NFC tag gives (`scanner.nfc.read`). */
+enum class NfcRead(override val key: String) : Keyed {
+    UID("uid"),
+    NDEF("ndef"),
+
+    /** The NDEF text or URI, the UID when the tag has none. */
+    NDEF_OR_UID("ndefOrUid"),
+}
+
+enum class UidFormat(override val key: String) : Keyed {
+    HEX("hex"),
+    DECIMAL("decimal"),
+}
+
+enum class NdefRecords(override val key: String) : Keyed {
+    FIRST("first"),
+    ALL_LINES("allLines"),
+}
+
+/** Reading NFC tags (`scanner.nfc`). */
+data class NfcSettings(
+    val enabled: Boolean = true,
+    val read: NfcRead = NfcRead.NDEF_OR_UID,
+    val uidFormat: UidFormat = UidFormat.HEX,
+    val uidReversed: Boolean = false,
+    val uidSeparator: String = "",
+    val ndefRecord: NdefRecords = NdefRecords.FIRST,
+    val beep: Boolean = true,
+    val vibrate: Boolean = true,
 )

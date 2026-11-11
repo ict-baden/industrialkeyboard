@@ -115,6 +115,24 @@ class ProvisioningTest {
     }
 
     @Test
+    fun `managed ocr and nfc options`() {
+        restrict("ocr_mode" to "pattern", "ocr_pattern" to "[A-Z]{2}\\d{6}", "nfc_read" to "uid")
+        Provisioning.applyAll(context)
+        val scanner = store.config.scanner
+        assertEquals(OcrMode.PATTERN, scanner.ocr.mode)
+        assertEquals("[A-Z]{2}\\d{6}", scanner.ocr.pattern)
+        assertEquals(NfcRead.UID, scanner.nfc.read)
+    }
+
+    @Test
+    fun `ocr pattern mode without a pattern is reported`() {
+        restrict("ocr_mode" to "pattern")
+        Provisioning.applyAll(context)
+        assertTrue(Provisioning.lastError(context).orEmpty().contains("ocr_pattern"))
+        assertEquals(OcrMode.PICK, store.config.scanner.ocr.mode)
+    }
+
+    @Test
     fun `invalid managed scan options are reported`() {
         restrict("camera_symbologies" to "ean13,ean-14")
         Provisioning.applyAll(context)

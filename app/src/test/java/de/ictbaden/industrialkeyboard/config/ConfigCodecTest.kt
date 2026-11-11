@@ -31,6 +31,8 @@ class ConfigCodecTest {
                 input = ScanInputSettings(enabled = true, suffix = ScanSuffix.TAB),
                 camera = CameraSettings(aim = AimMode.CENTER, symbologies = setOf(Symbology.EAN13)),
                 data = DataSettings(prefix = "{TAB}", suffix = "", rules = listOf(ScanRule(symbologies = setOf(Symbology.EAN13), stripTrailing = 1))),
+                ocr = OcrSettings(mode = OcrMode.PATTERN, pattern = "\\d{2}\\.\\d{2}\\.\\d{4}"),
+                nfc = NfcSettings(read = NfcRead.UID, uidReversed = true),
             ),
             customLayouts = listOf(CustomLayout("pick", "Pick", listOf(listOf(CustomKey("OK", "OK{ENTER}"))))),
             adminPasswordHash = PasswordHasher.hash("secret"),

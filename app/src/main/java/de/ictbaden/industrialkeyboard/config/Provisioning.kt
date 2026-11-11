@@ -138,8 +138,23 @@ object Provisioning {
                     prefix = values.getString("scan_prefix")?.takeIf { it.isNotEmpty() }?.also { checkMacro(it, "scan_prefix") } ?: config.scanner.data.prefix,
                     suffix = values.getString("scan_suffix")?.takeIf { it.isNotEmpty() }?.also { checkMacro(it, "scan_suffix") } ?: config.scanner.data.suffix,
                 ),
+                ocr = ocrFromRestrictions(values, config.scanner.ocr),
+                nfc = config.scanner.nfc.copy(
+                    enabled = bool("nfc_enabled", config.scanner.nfc.enabled),
+                    read = choice("nfc_read", NfcRead.entries.toTypedArray(), config.scanner.nfc.read),
+                ),
             ),
         )
+    }
+
+    /** `ocr_mode` and `ocr_pattern`; pattern mode without a pattern is an error, so it surfaces in the EMM. */
+    private fun ocrFromRestrictions(values: Bundle, current: OcrSettings): OcrSettings {
+        val pattern = values.getString("ocr_pattern")?.takeIf { it.isNotBlank() }?.also {
+            runCatching { Regex(it) }.onFailure { e -> throw ConfigException("ocr_pattern: invalid regular expression (${e.message?.lineSequence()?.firstOrNull()})") }
+        } ?: current.pattern
+        val mode = values.getString("ocr_mode")?.let { v -> OcrMode.entries.firstOrNull { it.key == v } } ?: current.mode
+        if (mode == OcrMode.PATTERN && pattern == null) throw ConfigException("ocr_mode pattern needs ocr_pattern")
+        return current.copy(mode = mode, pattern = pattern)
     }
 
     /** `ean13, code128,qr` → types; unknown names are an error, so typos surface in the EMM. */

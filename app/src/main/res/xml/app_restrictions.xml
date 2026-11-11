@@ -96,6 +96,34 @@
         android:restrictionType="string"
         android:title="@string/mc_camera_symbologies_title" />
     <restriction
+        android:defaultValue="pick"
+        android:description="@string/mc_ocr_mode_description"
+        android:entries="@array/mc_ocr_mode_entries"
+        android:entryValues="@array/mc_ocr_mode_values"
+        android:key="ocr_mode"
+        android:restrictionType="choice"
+        android:title="@string/mc_ocr_mode_title" />
+    <restriction
+        android:defaultValue=""
+        android:description="@string/mc_ocr_pattern_description"
+        android:key="ocr_pattern"
+        android:restrictionType="string"
+        android:title="@string/mc_ocr_pattern_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_nfc_enabled_description"
+        android:key="nfc_enabled"
+        android:restrictionType="bool"
+        android:title="@string/mc_nfc_enabled_title" />
+    <restriction
+        android:defaultValue="ndefOrUid"
+        android:description="@string/mc_nfc_read_description"
+        android:entries="@array/mc_nfc_read_entries"
+        android:entryValues="@array/mc_nfc_read_values"
+        android:key="nfc_read"
+        android:restrictionType="choice"
+        android:title="@string/mc_nfc_read_title" />
+    <restriction
         android:defaultValue=""
         android:description="@string/mc_admin_password_description"
         android:key="admin_password"

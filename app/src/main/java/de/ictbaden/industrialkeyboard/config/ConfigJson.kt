@@ -151,6 +151,28 @@ object ConfigJson {
                 })
                 put("unmatched", d.unmatched.key)
             })
+            put("ocr", JSONObject().apply {
+                val o = s.ocr
+                put("enabled", o.enabled)
+                put("mode", o.mode.key)
+                put("pattern", o.pattern ?: JSONObject.NULL)
+                put("startInOcr", o.startInOcr)
+                put("confirmReads", o.confirmReads)
+                put("minLength", o.minLength)
+                put("maxLength", o.maxLength)
+                put("charset", o.charset.key)
+            })
+            put("nfc", JSONObject().apply {
+                val n = s.nfc
+                put("enabled", n.enabled)
+                put("read", n.read.key)
+                put("uidFormat", n.uidFormat.key)
+                put("uidReversed", n.uidReversed)
+                put("uidSeparator", n.uidSeparator)
+                put("ndefRecord", n.ndefRecord.key)
+                put("beep", n.beep)
+                put("vibrate", n.vibrate)
+            })
         })
         if (config.customLayouts.isNotEmpty()) {
             root.put("customLayouts", JSONArray().apply {
@@ -285,6 +307,47 @@ object ConfigJson {
             },
             camera = parseCamera(json.optJSONObject("camera"), d.camera),
             data = parseData(json.optJSONObject("data"), d.data),
+            ocr = parseOcr(json.optJSONObject("ocr"), d.ocr),
+            nfc = parseNfc(json.optJSONObject("nfc"), d.nfc),
+        )
+    }
+
+    private fun parseOcr(json: JSONObject?, d: OcrSettings): OcrSettings {
+        json ?: return d
+        val where = "scanner.ocr"
+        val pattern = if (json.has("pattern") && !json.isNull("pattern")) json.optString("pattern").ifEmpty { null } else null
+        pattern?.let { checkRegex(it, "$where.pattern") }
+        val mode = enumValue(json, "mode", where, d.mode)
+        if (mode == OcrMode.PATTERN && pattern == null) throw ConfigException("$where.pattern is required for mode pattern")
+        val min = intIn(json, "minLength", where, 0, 999, d.minLength)
+        val max = intIn(json, "maxLength", where, 0, 999, d.maxLength)
+        if (max in 1 until min) throw ConfigException("$where.maxLength: smaller than minLength")
+        return OcrSettings(
+            enabled = json.optBoolean("enabled", d.enabled),
+            mode = mode,
+            pattern = pattern,
+            startInOcr = json.optBoolean("startInOcr", d.startInOcr),
+            confirmReads = intIn(json, "confirmReads", where, 1, 5, d.confirmReads),
+            minLength = min,
+            maxLength = max,
+            charset = enumValue(json, "charset", where, d.charset),
+        )
+    }
+
+    private fun parseNfc(json: JSONObject?, d: NfcSettings): NfcSettings {
+        json ?: return d
+        val where = "scanner.nfc"
+        val separator = if (json.has("uidSeparator") && !json.isNull("uidSeparator")) json.optString("uidSeparator") else d.uidSeparator
+        if (separator.length > 4) throw ConfigException("$where.uidSeparator: at most 4 characters")
+        return NfcSettings(
+            enabled = json.optBoolean("enabled", d.enabled),
+            read = enumValue(json, "read", where, d.read),
+            uidFormat = enumValue(json, "uidFormat", where, d.uidFormat),
+            uidReversed = json.optBoolean("uidReversed", d.uidReversed),
+            uidSeparator = separator,
+            ndefRecord = enumValue(json, "ndefRecord", where, d.ndefRecord),
+            beep = json.optBoolean("beep", d.beep),
+            vibrate = json.optBoolean("vibrate", d.vibrate),
         )
     }
 
@@ -297,7 +360,8 @@ object ConfigJson {
         val max = intIn(json, "maxLength", where, 0, 9999, d.maxLength)
         if (max in 1 until min) throw ConfigException("$where.maxLength: smaller than minLength")
         return CameraSettings(
-            symbologies = symbologies(json.optJSONArray("symbologies"), "$where.symbologies"),
+            // `ocr` and `nfc` are no camera barcode types; they only make sense in rules.
+            symbologies = symbologies(json.optJSONArray("symbologies"), "$where.symbologies").filter { it.barcode }.toSet(),
             aim = enumValue(json, "aim", where, d.aim),
             continuous = json.optBoolean("continuous", d.continuous),
             duplicateDelayMs = intIn(json, "duplicateDelayMs", where, 0, 10_000, d.duplicateDelayMs),

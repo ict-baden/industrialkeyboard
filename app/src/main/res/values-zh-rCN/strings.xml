@@ -105,6 +105,48 @@
     <string name="camera_permission_denied">没有相机权限，键盘无法用相机扫描。</string>
     <string name="camera_failed">无法启动相机。</string>
     <string name="camera_hint_center">将十字准星对准条码</string>
+    <string name="camera_mode_barcode">条码</string>
+    <string name="camera_mode_text">文字</string>
+    <string name="camera_hint_text_pick">点击所需文字</string>
+    <string name="camera_hint_text_pattern">将文字置于框内</string>
+    <string name="nfc_no_field">NFC：没有活动的输入框</string>
+    <string name="section_ocr">文字识别（OCR）</string>
+    <string name="ocr_enabled">在相机画面中识别文字</string>
+    <string name="ocr_enabled_summary">条码 | 文字切换；在设备上运行</string>
+    <string name="ocr_mode">文字采用方式</string>
+    <string name="ocr_mode_pick">点击一行</string>
+    <string name="ocr_mode_pattern">按模式自动</string>
+    <string name="ocr_pattern">模式（正则表达式）</string>
+    <string name="ocr_pattern_helper">整行必须匹配，例如 [A-Z]{2}\\d{6}</string>
+    <string name="ocr_pattern_invalid">正则表达式无效</string>
+    <string name="ocr_charset">字符</string>
+    <string name="ocr_charset_any">全部</string>
+    <string name="ocr_charset_digits">仅数字（及 , . -）</string>
+    <string name="ocr_charset_alnum">字母和数字</string>
+    <string name="ocr_charset_upper">字母和数字，大写</string>
+    <string name="ocr_confirm_reads">确认读取次数（模式）</string>
+    <string name="ocr_start_in_text">相机以文字模式打开</string>
+    <string name="section_nfc">NFC</string>
+    <string name="nfc_state">本设备的 NFC</string>
+    <string name="nfc_state_missing">不可用</string>
+    <string name="nfc_state_on">已开启</string>
+    <string name="nfc_state_off">已关闭 – 点击打开设置</string>
+    <string name="nfc_enabled">输入 NFC 标签</string>
+    <string name="nfc_enabled_summary">在键盘打开时将标签靠近设备</string>
+    <string name="nfc_read">读取</string>
+    <string name="nfc_read_ndef_or_uid">标签上的文字，否则 UID</string>
+    <string name="nfc_read_uid">UID（序列号）</string>
+    <string name="nfc_read_ndef">标签上的文字（NDEF）</string>
+    <string name="nfc_uid_format">UID 格式</string>
+    <string name="nfc_uid_hex">十六进制</string>
+    <string name="nfc_uid_decimal">十进制</string>
+    <string name="nfc_uid_reversed">反转字节顺序</string>
+    <string name="nfc_uid_reversed_summary">许多读卡器以反向显示 UID</string>
+    <string name="nfc_uid_separator">字节间分隔符</string>
+    <string name="nfc_uid_separator_too_long">最多 4 个字符</string>
+    <string name="nfc_ndef_records">文本记录</string>
+    <string name="nfc_ndef_first">仅第一个</string>
+    <string name="nfc_ndef_all">全部，每行一个</string>
     <string name="camera_zoom">缩放</string>
     <string name="camera_continuous_status">已扫描：%1$d · 最近：%2$s</string>
     <string name="section_camera">相机扫描</string>
@@ -300,6 +342,14 @@
     <string name="mc_camera_continuous_description">相机保持打开并输入每个新条码。</string>
     <string name="mc_camera_symbologies_title">相机：条码类型</string>
     <string name="mc_camera_symbologies_description">用逗号分隔，例如 ean13,code128,qr；留空 = 保留当前设置。</string>
+    <string name="mc_ocr_mode_title">OCR：文字采用方式</string>
+    <string name="mc_ocr_mode_description">点击识别出的行，或自动采用第一行符合模式的文字。</string>
+    <string name="mc_ocr_pattern_title">OCR：模式</string>
+    <string name="mc_ocr_pattern_description">整行必须匹配的正则表达式；空 = 保留当前设置。</string>
+    <string name="mc_nfc_enabled_title">输入 NFC 标签</string>
+    <string name="mc_nfc_enabled_description">将靠近设备的标签输入到键盘所在的输入框中。</string>
+    <string name="mc_nfc_read_title">NFC：读取</string>
+    <string name="mc_nfc_read_description">UID（序列号）、标签上的文字（NDEF），或文字否则 UID。</string>
     <string name="mc_admin_password_title">管理员密码</string>
     <string name="mc_admin_password_description">保护键盘设置和配置导入。</string>
 
@@ -336,5 +386,14 @@
         <item>取景框</item>
         <item>十字准星（选择）</item>
         <item>任意位置</item>
+    </string-array>
+    <string-array name="mc_ocr_mode_entries">
+        <item>点击一行</item>
+        <item>按模式自动</item>
+    </string-array>
+    <string-array name="mc_nfc_read_entries">
+        <item>文字，否则 UID</item>
+        <item>UID（序列号）</item>
+        <item>标签上的文字（NDEF）</item>
     </string-array>
 </resources>

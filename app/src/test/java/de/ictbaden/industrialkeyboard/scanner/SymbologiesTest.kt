@@ -29,7 +29,9 @@ class SymbologiesTest {
     @Test
     fun `every type maps to zxing formats and back`() {
         assertTrue(Symbologies.toZxing(emptySet()).isEmpty())
-        Symbology.entries.forEach { type ->
+        // OCR and NFC are no barcodes: no zxing formats.
+        assertTrue(Symbologies.toZxing(setOf(Symbology.OCR, Symbology.NFC)).isEmpty())
+        Symbology.entries.filter { it.barcode }.forEach { type ->
             val formats = Symbologies.toZxing(setOf(type))
             assertTrue("$type has formats", formats.isNotEmpty())
             formats.forEach { assertEquals("$it", type, Symbologies.fromZxing(it.name)) }
