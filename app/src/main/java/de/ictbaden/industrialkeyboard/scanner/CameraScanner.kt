@@ -2,13 +2,16 @@ package de.ictbaden.industrialkeyboard.scanner
 
 import android.content.Context
 import android.graphics.Point
+import android.graphics.RectF
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
 import android.util.Size
+import androidx.annotation.OptIn
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
@@ -22,13 +25,20 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import de.ictbaden.industrialkeyboard.config.CameraSettings
 import de.ictbaden.industrialkeyboard.config.Gs1Mode
+import de.ictbaden.industrialkeyboard.config.OcrMode
+import de.ictbaden.industrialkeyboard.config.OcrSettings
 import de.ictbaden.industrialkeyboard.config.Symbology
+import com.google.android.gms.tasks.Tasks
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.TextRecognizer
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import zxingcpp.BarcodeReader
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 /**
- * Reads barcodes with the camera (CameraX + zxing-cpp) into a [PreviewView]. The input method is
+ * Reads barcodes (CameraX + zxing-cpp) or text (ML Kit, `scanner.ocr`) with the camera into a [PreviewView]. The input method is
  * no activity, so this class is the lifecycle the camera is bound to: RESUMED while open, CREATED
  * while closed. All calls on the main thread.
  */
@@ -52,6 +62,23 @@ class CameraScanner(
     /** Applied on the next [open]. */
     var settings = CameraSettings()
 
+    /** Text recognition settings; applied on the next [open]. */
+    var ocr = OcrSettings()
+
+    /** Text instead of barcodes; can be switched while the camera runs. */
+    @Volatile
+    var textMode = false
+        set(value) {
+            field = value
+            textConfirmer = OcrText.Confirmer(ocr.confirmReads)
+        }
+
+    /** Pick mode: the recognised lines inside the frame, in view coordinates (main thread). */
+    var onLines: ((List<Line>) -> Unit)? = null
+
+    /** A recognised text line on the screen. */
+    data class Line(val text: String, val box: RectF)
+
     /** GS1 codes human readable or raw (`scanner.data.gs1`); applied on the next [open]. */
     var gs1 = Gs1Mode.HRI
 
@@ -71,6 +98,15 @@ class CameraScanner(
 
     @Volatile
     private var reader: BarcodeReader? = null
+
+    @Volatile
+    private var recognizer: TextRecognizer? = null
+
+    @Volatile
+    private var ocrRegex: Regex? = null
+
+    @Volatile
+    private var textConfirmer = OcrText.Confirmer(2)
 
     /** Set once a single scan was delivered, so frames still in the queue do not type it twice. */
     @Volatile
@@ -92,6 +128,8 @@ class CameraScanner(
     fun open(preview: PreviewView) {
         if (isOpen) return
         active = settings
+        ocrRegex = ocr.pattern?.let { runCatching { Regex(it) }.getOrNull() }
+        textConfirmer = OcrText.Confirmer(ocr.confirmReads)
         delivered = false
         candidate = null
         candidateCount = 0
@@ -140,6 +178,10 @@ class CameraScanner(
 
     private fun analyze(image: ImageProxy) {
         if (delivered) return
+        if (textMode) {
+            analyzeText(image)
+            return
+        }
         val reader = reader ?: return
         val results = runCatching { reader.read(image) }
             .onFailure { Log.w(TAG, "Decoding failed", it) }
@@ -170,6 +212,16 @@ class CameraScanner(
         candidateCount = if (hit.text == candidate) candidateCount + 1 else 1
         candidate = hit.text
         if (candidateCount < settings.confirmReads) return
+        candidate = null
+        candidateCount = 0
+        deliver(hit)
+    }
+
+    /** Continuous mode with duplicate delay, or a single scan; called on the analyzer or main thread. */
+    @Synchronized
+    private fun deliver(hit: Hit) {
+        if (delivered) return
+        val settings = active
         val now = SystemClock.elapsedRealtime()
         if (settings.continuous && hit.text == lastText && now - lastAt < settings.duplicateDelayMs) {
             lastAt = now
@@ -177,10 +229,46 @@ class CameraScanner(
         }
         lastText = hit.text
         lastAt = now
-        candidate = null
-        candidateCount = 0
         if (!settings.continuous) delivered = true
         main.post { if (isOpen) onResult(hit) }
+    }
+
+    /** Pick mode: the user tapped a recognised line. */
+    fun pickLine(text: String) {
+        if (isOpen && textMode) deliver(Hit(text, Symbology.OCR, "OCR"))
+    }
+
+    @OptIn(ExperimentalGetImage::class)
+    private fun analyzeText(image: ImageProxy) {
+        val media = image.image ?: return
+        val rotation = image.imageInfo.rotationDegrees
+        val client = recognizer ?: TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS).also { recognizer = it }
+        // On the analyzer thread: wait here, so the frame is closed only after ML Kit read it.
+        val result = runCatching { Tasks.await(client.process(InputImage.fromMediaImage(media, rotation))) }
+            .onFailure { Log.w(TAG, "Text recognition failed", it) }
+            .getOrNull() ?: return
+        val screen = screen ?: return
+        // ML Kit reports boxes in the upright image.
+        val turned = rotation % 180 != 0
+        val width = (if (turned) image.height else image.width).toFloat()
+        val height = (if (turned) image.width else image.height).toFloat()
+        val settings = ocr
+        val lines = result.textBlocks.flatMap { it.lines }.mapNotNull { line ->
+            val box = line.boundingBox ?: return@mapNotNull null
+            val a = AimGeometry.toView(AimGeometry.Point(box.left.toFloat(), box.top.toFloat()), width, height, screen)
+            val b = AimGeometry.toView(AimGeometry.Point(box.right.toFloat(), box.bottom.toFloat()), width, height, screen)
+            val view = RectF(a.x, a.y, b.x, b.y)
+            if (view.centerX() !in screen.left..screen.right || view.centerY() !in screen.top..screen.bottom) return@mapNotNull null
+            val text = OcrText.accept(line.text, settings, ocrRegex) ?: return@mapNotNull null
+            if (!accept(text, Symbology.OCR)) return@mapNotNull null
+            Line(text, view)
+        }
+        if (settings.mode == OcrMode.PICK) {
+            main.post { if (isOpen && textMode) onLines?.invoke(lines) }
+            return
+        }
+        val best = lines.minByOrNull { kotlin.math.hypot(it.box.centerX() - screen.centerX, it.box.centerY() - screen.centerY) }
+        textConfirmer.offer(best?.text)?.let { deliver(Hit(it, Symbology.OCR, "OCR")) }
     }
 
     fun setTorch(on: Boolean) {
@@ -217,6 +305,8 @@ class CameraScanner(
         registry.currentState = Lifecycle.State.DESTROYED
         executor?.shutdown()
         executor = null
+        recognizer?.close()
+        recognizer = null
     }
 
     private fun fail(error: Throwable) {

@@ -184,7 +184,7 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
      * Edits a text; with [macro] it is checked like a key macro. [defaultLabel] adds a button that
      * saves `null` (the default behaviour).
      */
-    fun editText(title: String, current: String?, helper: String?, macro: Boolean, defaultLabel: String? = null, onSave: (String?) -> Unit) {
+    fun editText(title: String, current: String?, helper: String?, macro: Boolean, defaultLabel: String? = null, validate: ((String) -> String?)? = null, onSave: (String?) -> Unit) {
         val field = ui.textField(s(if (macro) R.string.macro_hint else R.string.text_hint), current.orEmpty(), helper = helper)
         val builder = MaterialAlertDialogBuilder(activity)
             .setTitle(title)
@@ -199,6 +199,8 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
                 runCatching { Macro.parse(text) }.exceptionOrNull()?.let {
                     withCode(activity.getString(R.string.macro_invalid, it.message), ErrorCodes.INVALID_MACRO)
                 }
+            } else if (text.isNotEmpty()) {
+                validate?.invoke(text)
             } else {
                 null
             }
@@ -213,7 +215,8 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
 
     /** Multi-select of barcode types; an empty selection means all. */
     fun pickSymbologies(current: Set<Symbology>, onSave: (Set<Symbology>) -> Unit) {
-        val all = Symbology.entries
+        // OCR and NFC are no camera barcode types.
+        val all = Symbology.entries.filter { it.barcode }
         val checked = BooleanArray(all.size) { all[it] in current }
         MaterialAlertDialogBuilder(activity)
             .setIcon(ui.icon(R.drawable.ic_scan))

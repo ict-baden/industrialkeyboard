@@ -52,8 +52,47 @@ class ScanSettingsJsonTest {
                 ),
                 unmatched = RuleAction.DROP,
             ),
+            ocr = OcrSettings(
+                enabled = false,
+                mode = OcrMode.PATTERN,
+                pattern = "[A-Z]{2}\\d{6}",
+                startInOcr = true,
+                confirmReads = 3,
+                minLength = 8,
+                maxLength = 8,
+                charset = OcrCharset.UPPER,
+            ),
+            nfc = NfcSettings(
+                enabled = false,
+                read = NfcRead.UID,
+                uidFormat = UidFormat.DECIMAL,
+                uidReversed = true,
+                uidSeparator = ":",
+                ndefRecord = NdefRecords.ALL_LINES,
+                beep = false,
+                vibrate = false,
+            ),
         ),
     )
+
+    @Test
+    fun `ocr and nfc are rule types but no camera barcode types`() {
+        val c = ConfigJson.parse("""{"scanner":{"camera":{"symbologies":["ocr","qr","nfc"]},"data":{"rules":[{"symbologies":["ocr","nfc"],"action":"drop"}]}}}""")
+        assertEquals(setOf(Symbology.QR), c.scanner.camera.symbologies)
+        assertEquals(setOf(Symbology.OCR, Symbology.NFC), c.scanner.data.rules.single().symbologies)
+    }
+
+    @Test
+    fun `invalid ocr and nfc values name the field`() {
+        rejected("""{"scanner":{"ocr":{"mode":"pattern"}}}""", "scanner.ocr.pattern")
+        rejected("""{"scanner":{"ocr":{"pattern":"[a-"}}}""", "scanner.ocr.pattern")
+        rejected("""{"scanner":{"ocr":{"confirmReads":6}}}""", "scanner.ocr.confirmReads")
+        rejected("""{"scanner":{"ocr":{"charset":"latin"}}}""", "scanner.ocr.charset")
+        rejected("""{"scanner":{"ocr":{"minLength":9,"maxLength":3}}}""", "scanner.ocr.maxLength")
+        rejected("""{"scanner":{"nfc":{"read":"serial"}}}""", "scanner.nfc.read")
+        rejected("""{"scanner":{"nfc":{"uidFormat":"octal"}}}""", "scanner.nfc.uidFormat")
+        rejected("""{"scanner":{"nfc":{"uidSeparator":"-----"}}}""", "scanner.nfc.uidSeparator")
+    }
 
     @Test
     fun `round trip of all scan fields`() {

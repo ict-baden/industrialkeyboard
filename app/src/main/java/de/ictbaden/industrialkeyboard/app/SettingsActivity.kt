@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.net.Uri
+import android.nfc.NfcAdapter
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -37,7 +38,13 @@ import de.ictbaden.industrialkeyboard.config.Gs1Mode
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
 import de.ictbaden.industrialkeyboard.config.Languages
 import de.ictbaden.industrialkeyboard.config.Navigation
+import de.ictbaden.industrialkeyboard.config.NdefRecords
+import de.ictbaden.industrialkeyboard.config.NfcRead
+import de.ictbaden.industrialkeyboard.config.NfcSettings
 import de.ictbaden.industrialkeyboard.config.NumericOrder
+import de.ictbaden.industrialkeyboard.config.OcrCharset
+import de.ictbaden.industrialkeyboard.config.OcrMode
+import de.ictbaden.industrialkeyboard.config.OcrSettings
 import de.ictbaden.industrialkeyboard.config.ProgrammableKey
 import de.ictbaden.industrialkeyboard.config.Provisioning
 import de.ictbaden.industrialkeyboard.config.ScanSuffix
@@ -46,6 +53,7 @@ import de.ictbaden.industrialkeyboard.config.Symbology
 import de.ictbaden.industrialkeyboard.config.Tabs
 import de.ictbaden.industrialkeyboard.config.TextCase
 import de.ictbaden.industrialkeyboard.config.ThemeMode
+import de.ictbaden.industrialkeyboard.config.UidFormat
 import de.ictbaden.industrialkeyboard.ime.Field
 import de.ictbaden.industrialkeyboard.ime.FieldPolicy
 import de.ictbaden.industrialkeyboard.ime.KeyboardRenderer
@@ -445,6 +453,8 @@ class SettingsActivity : AppCompatActivity() {
         )
 
         renderCameraSection(c)
+        renderOcrSection(c)
+        renderNfcSection(c)
         renderDataSection(c)
 
         content.addView(ui.section(getString(R.string.section_configuration)))
@@ -643,6 +653,123 @@ class SettingsActivity : AppCompatActivity() {
                         listOf(Gs1Mode.HRI to getString(R.string.data_gs1_hri), Gs1Mode.RAW to getString(R.string.data_gs1_raw)),
                         c.scanner.data.gs1,
                     ) { mode -> update { it.copy(scanner = it.scanner.copy(data = it.scanner.data.copy(gs1 = mode))) } },
+                ),
+            ),
+        )
+    }
+
+    private fun renderOcrSection(c: KeyboardConfig) {
+        val ocr = c.scanner.ocr
+        fun set(transform: (OcrSettings) -> OcrSettings) = update { it.copy(scanner = it.scanner.copy(ocr = transform(it.scanner.ocr))) }
+        content.addView(ui.section(getString(R.string.section_ocr)))
+        content.addView(
+            ui.card(
+                listOf(
+                    ui.switchRow(R.drawable.ic_text, getString(R.string.ocr_enabled), getString(R.string.ocr_enabled_summary), ocr.enabled) { on -> set { it.copy(enabled = on) } },
+                    ui.choiceRow(
+                        R.drawable.ic_text,
+                        getString(R.string.ocr_mode),
+                        listOf(OcrMode.PICK to getString(R.string.ocr_mode_pick), OcrMode.PATTERN to getString(R.string.ocr_mode_pattern)),
+                        ocr.mode,
+                    ) { mode ->
+                        if (mode == OcrMode.PATTERN && ocr.pattern == null) {
+                            editOcrPattern(ocr) { pattern -> set { it.copy(mode = OcrMode.PATTERN, pattern = pattern) } }
+                        } else {
+                            set { it.copy(mode = mode) }
+                        }
+                    },
+                    ui.row(R.drawable.ic_text, getString(R.string.ocr_pattern), ocr.pattern ?: getString(R.string.value_none)) {
+                        editOcrPattern(ocr) { pattern -> set { it.copy(pattern = pattern, mode = if (pattern == null) OcrMode.PICK else it.mode) } }
+                    },
+                    ui.choiceRow(
+                        R.drawable.ic_text,
+                        getString(R.string.ocr_charset),
+                        listOf(
+                            OcrCharset.ANY to getString(R.string.ocr_charset_any),
+                            OcrCharset.DIGITS to getString(R.string.ocr_charset_digits),
+                            OcrCharset.ALNUM to getString(R.string.ocr_charset_alnum),
+                            OcrCharset.UPPER to getString(R.string.ocr_charset_upper),
+                        ),
+                        ocr.charset,
+                    ) { charset -> set { it.copy(charset = charset) } },
+                    ui.row(R.drawable.ic_text, getString(R.string.camera_length), lengthText(ocr.minLength, ocr.maxLength)) {
+                        dialogs.editNumber(getString(R.string.camera_min_length), ocr.minLength, 0, 999, getString(R.string.zero_no_limit)) { min ->
+                            dialogs.editNumber(getString(R.string.camera_max_length), ocr.maxLength, 0, 999, getString(R.string.zero_no_limit)) { max ->
+                                set { it.copy(minLength = min, maxLength = if (max in 1 until min) min else max) }
+                            }
+                        }
+                    },
+                    ui.choiceRow(R.drawable.ic_check, getString(R.string.ocr_confirm_reads), (1..5).map { it to it.toString() }, ocr.confirmReads) { n ->
+                        set { it.copy(confirmReads = n) }
+                    },
+                    ui.switchRow(R.drawable.ic_text, getString(R.string.ocr_start_in_text), null, ocr.startInOcr) { on -> set { it.copy(startInOcr = on) } },
+                ),
+            ),
+        )
+    }
+
+    /** Regex for OCR pattern mode; an empty field removes it. */
+    private fun editOcrPattern(ocr: OcrSettings, onSave: (String?) -> Unit) {
+        dialogs.editText(
+            getString(R.string.ocr_pattern),
+            ocr.pattern,
+            getString(R.string.ocr_pattern_helper),
+            macro = false,
+            validate = { text -> runCatching { Regex(text) }.exceptionOrNull()?.let { getString(R.string.ocr_pattern_invalid) } },
+        ) { value -> onSave(value?.ifEmpty { null }) }
+    }
+
+    private fun renderNfcSection(c: KeyboardConfig) {
+        val nfc = c.scanner.nfc
+        fun set(transform: (NfcSettings) -> NfcSettings) = update { it.copy(scanner = it.scanner.copy(nfc = transform(it.scanner.nfc))) }
+        val adapter = NfcAdapter.getDefaultAdapter(this)
+        val state = when {
+            adapter == null -> getString(R.string.nfc_state_missing)
+            adapter.isEnabled -> getString(R.string.nfc_state_on)
+            else -> getString(R.string.nfc_state_off)
+        }
+        content.addView(ui.section(getString(R.string.section_nfc)))
+        content.addView(
+            ui.card(
+                listOf(
+                    ui.row(R.drawable.ic_nfc, getString(R.string.nfc_state), state, onClick = if (adapter != null && !adapter.isEnabled) ({
+                        runCatching { startActivity(Intent(Settings.ACTION_NFC_SETTINGS)) }
+                    }) else null),
+                    ui.switchRow(R.drawable.ic_nfc, getString(R.string.nfc_enabled), getString(R.string.nfc_enabled_summary), nfc.enabled) { on -> set { it.copy(enabled = on) } },
+                    ui.choiceRow(
+                        R.drawable.ic_nfc,
+                        getString(R.string.nfc_read),
+                        listOf(
+                            NfcRead.NDEF_OR_UID to getString(R.string.nfc_read_ndef_or_uid),
+                            NfcRead.UID to getString(R.string.nfc_read_uid),
+                            NfcRead.NDEF to getString(R.string.nfc_read_ndef),
+                        ),
+                        nfc.read,
+                    ) { read -> set { it.copy(read = read) } },
+                    ui.choiceRow(
+                        R.drawable.ic_nfc,
+                        getString(R.string.nfc_uid_format),
+                        listOf(UidFormat.HEX to getString(R.string.nfc_uid_hex), UidFormat.DECIMAL to getString(R.string.nfc_uid_decimal)),
+                        nfc.uidFormat,
+                    ) { format -> set { it.copy(uidFormat = format) } },
+                    ui.switchRow(R.drawable.ic_nfc, getString(R.string.nfc_uid_reversed), getString(R.string.nfc_uid_reversed_summary), nfc.uidReversed) { on -> set { it.copy(uidReversed = on) } },
+                    ui.row(R.drawable.ic_nfc, getString(R.string.nfc_uid_separator), nfc.uidSeparator.ifEmpty { getString(R.string.value_none) }) {
+                        dialogs.editText(
+                            getString(R.string.nfc_uid_separator),
+                            nfc.uidSeparator,
+                            null,
+                            macro = false,
+                            validate = { text -> if (text.length > 4) getString(R.string.nfc_uid_separator_too_long) else null },
+                        ) { v -> set { it.copy(uidSeparator = v.orEmpty()) } }
+                    },
+                    ui.choiceRow(
+                        R.drawable.ic_nfc,
+                        getString(R.string.nfc_ndef_records),
+                        listOf(NdefRecords.FIRST to getString(R.string.nfc_ndef_first), NdefRecords.ALL_LINES to getString(R.string.nfc_ndef_all)),
+                        nfc.ndefRecord,
+                    ) { mode -> set { it.copy(ndefRecord = mode) } },
+                    ui.switchRow(R.drawable.ic_nfc, getString(R.string.camera_beep), null, nfc.beep) { on -> set { it.copy(beep = on) } },
+                    ui.switchRow(R.drawable.ic_nfc, getString(R.string.camera_vibrate), null, nfc.vibrate) { on -> set { it.copy(vibrate = on) } },
                 ),
             ),
         )

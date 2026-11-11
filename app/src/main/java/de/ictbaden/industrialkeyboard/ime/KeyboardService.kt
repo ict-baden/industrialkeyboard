@@ -40,6 +40,7 @@ import de.ictbaden.industrialkeyboard.layout.ModifierKey
 import de.ictbaden.industrialkeyboard.app.CameraPermissionActivity
 import de.ictbaden.industrialkeyboard.app.ErrorCodes
 import de.ictbaden.industrialkeyboard.config.ScanTriggerType
+import de.ictbaden.industrialkeyboard.config.Symbology
 import de.ictbaden.industrialkeyboard.scanner.CameraScanner
 import de.ictbaden.industrialkeyboard.scanner.HardwareScanner
 import de.ictbaden.industrialkeyboard.scanner.ScanFormatter
@@ -119,11 +120,14 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         applyConfig(store.config)
         store.addListener(configListener)
         KeyboardBus.onShowTab = { tab -> root?.isShown == true && showTab(tab) }
+        KeyboardBus.onNfc = ::typeNfc
     }
 
     override fun onDestroy() {
         store.removeListener(configListener)
         KeyboardBus.onShowTab = null
+        KeyboardBus.onNfc = null
+        KeyboardBus.keyboardShown = false
         HardwareScanner.removeListener(engineListener)
         camera?.destroy()
         camera = null
@@ -190,10 +194,15 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         KeyboardBus.takePendingTab()?.let { tab -> FieldPolicy.pageForTab(tab, field, config, scanner.available)?.let { page = it } }
         updateAutoShift()
         render()
+        KeyboardBus.keyboardShown = true
+        // An NFC tag read while the tag activity had the focus: the field has the keyboard back.
+        KeyboardBus.takePendingNfc(SystemClock.elapsedRealtime())?.let { text -> handler.post { typeNfc(text) } }
     }
 
     override fun onFinishInputView(finishingInput: Boolean) {
         super.onFinishInputView(finishingInput)
+        KeyboardBus.keyboardShown = false
+        KeyboardBus.hiddenAt = SystemClock.elapsedRealtime()
         if (scanning) {
             scanner.stop()
             setScanning(false)
@@ -554,12 +563,18 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         val cam = camera ?: CameraScanner(this, ::onCameraScan, ::onCameraError).also { camera = it }
         val settings = config.scanner.camera
         val data = config.scanner.data
+        val ocr = config.scanner.ocr
         cam.settings = settings
+        cam.ocr = ocr
+        cam.textMode = ocr.enabled && ocr.startInOcr
+        cam.onLines = { lines -> view.showLines(lines.map { it.text to it.box }) }
         cam.gs1 = data.gs1
         cam.accept = { text, type -> ScanFormatter.accepts(text, type, data) }
         cam.onStarted = { hasTorch, torchOn -> view.showTorch(hasTorch, torchOn) }
         cameraCount = 0
-        view.reset(settings.aim, settings.zoom)
+        view.reset(settings.aim, settings.zoom, ocr = ocr.mode.takeIf { ocr.enabled }, startInText = ocr.enabled && ocr.startInOcr)
+        view.onTextMode = { text -> cam.textMode = text }
+        view.onPickLine = { line -> cam.pickLine(line) }
         view.onClose = { closeCamera() }
         view.onTorch = { on -> cam.setTorch(on) }
         view.onZoom = { cam.cycleZoom() }
@@ -597,6 +612,22 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         if (settings.vibrate) feedback.scanned()
         if (settings.beep) beep()
         typeScan(output)
+    }
+
+    /** A tag from [NfcTagActivity][de.ictbaden.industrialkeyboard.app.NfcTagActivity]; `false` = no field now. */
+    private fun typeNfc(text: String): Boolean {
+        if (!isInputViewShown || currentInputConnection == null) return false
+        val settings = config.scanner.nfc
+        val output = ScanFormatter.format(text, Symbology.NFC, config.scanner.data)
+        if (output == null) {
+            Log.i(TAG, "NFC tag dropped by scanner.data (${text.length} characters)")
+            return true
+        }
+        Log.i(TAG, "NFC tag (${text.length} characters)")
+        if (settings.vibrate) feedback.scanned()
+        if (settings.beep) beep()
+        typeScan(output)
+        return true
     }
 
     private fun beep() {

@@ -105,6 +105,48 @@
     <string name="camera_permission_denied">Sin permiso de cámara, el teclado no puede escanear con la cámara.</string>
     <string name="camera_failed">No se pudo iniciar la cámara.</string>
     <string name="camera_hint_center">Coloque la cruz sobre el código de barras</string>
+    <string name="camera_mode_barcode">Código</string>
+    <string name="camera_mode_text">Texto</string>
+    <string name="camera_hint_text_pick">Toque el texto que desea</string>
+    <string name="camera_hint_text_pattern">Mantenga el texto dentro del marco</string>
+    <string name="nfc_no_field">NFC: ningún campo de entrada activo</string>
+    <string name="section_ocr">Reconocimiento de texto (OCR)</string>
+    <string name="ocr_enabled">Reconocimiento de texto en la cámara</string>
+    <string name="ocr_enabled_summary">Selector Código | Texto; se ejecuta en el dispositivo</string>
+    <string name="ocr_mode">Tomar el texto</string>
+    <string name="ocr_mode_pick">Tocar una línea</string>
+    <string name="ocr_mode_pattern">Automático por patrón</string>
+    <string name="ocr_pattern">Patrón (expresión regular)</string>
+    <string name="ocr_pattern_helper">Toda la línea debe coincidir, p. ej. [A-Z]{2}\\d{6}</string>
+    <string name="ocr_pattern_invalid">Expresión regular no válida</string>
+    <string name="ocr_charset">Caracteres</string>
+    <string name="ocr_charset_any">Todos</string>
+    <string name="ocr_charset_digits">Solo dígitos (y , . -)</string>
+    <string name="ocr_charset_alnum">Letras y dígitos</string>
+    <string name="ocr_charset_upper">Letras y dígitos, mayúsculas</string>
+    <string name="ocr_confirm_reads">Confirmar lecturas (patrón)</string>
+    <string name="ocr_start_in_text">La cámara se abre en modo texto</string>
+    <string name="section_nfc">NFC</string>
+    <string name="nfc_state">NFC en este dispositivo</string>
+    <string name="nfc_state_missing">No disponible</string>
+    <string name="nfc_state_on">Activado</string>
+    <string name="nfc_state_off">Desactivado – toque para abrir los ajustes</string>
+    <string name="nfc_enabled">Escribir etiquetas NFC</string>
+    <string name="nfc_enabled_summary">Acerque una etiqueta mientras el teclado está abierto</string>
+    <string name="nfc_read">Leer</string>
+    <string name="nfc_read_ndef_or_uid">Texto de la etiqueta, si no UID</string>
+    <string name="nfc_read_uid">UID (número de serie)</string>
+    <string name="nfc_read_ndef">Texto de la etiqueta (NDEF)</string>
+    <string name="nfc_uid_format">Formato del UID</string>
+    <string name="nfc_uid_hex">Hexadecimal</string>
+    <string name="nfc_uid_decimal">Decimal</string>
+    <string name="nfc_uid_reversed">Invertir el orden de bytes</string>
+    <string name="nfc_uid_reversed_summary">Muchos lectores de tarjetas muestran el UID invertido</string>
+    <string name="nfc_uid_separator">Separador entre bytes</string>
+    <string name="nfc_uid_separator_too_long">Como máximo 4 caracteres</string>
+    <string name="nfc_ndef_records">Registros de texto</string>
+    <string name="nfc_ndef_first">Solo el primero</string>
+    <string name="nfc_ndef_all">Todos, uno por línea</string>
     <string name="camera_zoom">Zoom</string>
     <string name="camera_continuous_status">Escaneados: %1$d · último: %2$s</string>
     <string name="section_camera">Escaneo con la cámara</string>
@@ -300,6 +342,14 @@
     <string name="mc_camera_continuous_description">La cámara sigue abierta y escribe cada código nuevo.</string>
     <string name="mc_camera_symbologies_title">Cámara: tipos de código</string>
     <string name="mc_camera_symbologies_description">Separados por comas, p. ej. ean13,code128,qr; vacío = se mantiene el ajuste actual.</string>
+    <string name="mc_ocr_mode_title">OCR: tomar el texto</string>
+    <string name="mc_ocr_mode_description">Tocar una línea reconocida o tomar automáticamente la primera que coincida con el patrón.</string>
+    <string name="mc_ocr_pattern_title">OCR: patrón</string>
+    <string name="mc_ocr_pattern_description">Expresión regular con la que debe coincidir toda la línea; vacío = se mantiene el ajuste actual.</string>
+    <string name="mc_nfc_enabled_title">Escribir etiquetas NFC</string>
+    <string name="mc_nfc_enabled_description">Escribir una etiqueta acercada al dispositivo en el campo donde está abierto el teclado.</string>
+    <string name="mc_nfc_read_title">NFC: leer</string>
+    <string name="mc_nfc_read_description">UID (número de serie), el texto de la etiqueta (NDEF) o el texto y si no el UID.</string>
     <string name="mc_admin_password_title">Contraseña de administrador</string>
     <string name="mc_admin_password_description">Protege la configuración del teclado y la importación de configuraciones.</string>
 
@@ -338,5 +388,14 @@
         <item>Marco</item>
         <item>Cruz (selección)</item>
         <item>Cualquier lugar</item>
+    </string-array>
+    <string-array name="mc_ocr_mode_entries">
+        <item>Tocar una línea</item>
+        <item>Automático por patrón</item>
+    </string-array>
+    <string-array name="mc_nfc_read_entries">
+        <item>Texto, si no UID</item>
+        <item>UID (número de serie)</item>
+        <item>Texto de la etiqueta (NDEF)</item>
     </string-array>
 </resources>

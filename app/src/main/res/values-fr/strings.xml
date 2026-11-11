@@ -105,6 +105,48 @@
     <string name="camera_permission_denied">Sans l’autorisation caméra, le clavier ne peut pas scanner avec la caméra.</string>
     <string name="camera_failed">Impossible de démarrer la caméra.</string>
     <string name="camera_hint_center">Placez le réticule sur le code-barres</string>
+    <string name="camera_mode_barcode">Code-barres</string>
+    <string name="camera_mode_text">Texte</string>
+    <string name="camera_hint_text_pick">Touchez le texte voulu</string>
+    <string name="camera_hint_text_pattern">Placez le texte dans le cadre</string>
+    <string name="nfc_no_field">NFC : aucun champ de saisie actif</string>
+    <string name="section_ocr">Reconnaissance de texte (OCR)</string>
+    <string name="ocr_enabled">Reconnaissance de texte dans la caméra</string>
+    <string name="ocr_enabled_summary">Sélecteur Code-barres | Texte ; fonctionne sur l’appareil</string>
+    <string name="ocr_mode">Prise du texte</string>
+    <string name="ocr_mode_pick">Toucher une ligne</string>
+    <string name="ocr_mode_pattern">Automatique par motif</string>
+    <string name="ocr_pattern">Motif (expression régulière)</string>
+    <string name="ocr_pattern_helper">Toute la ligne doit correspondre, p. ex. [A-Z]{2}\\d{6}</string>
+    <string name="ocr_pattern_invalid">Expression régulière non valide</string>
+    <string name="ocr_charset">Caractères</string>
+    <string name="ocr_charset_any">Tous</string>
+    <string name="ocr_charset_digits">Chiffres seulement (et , . -)</string>
+    <string name="ocr_charset_alnum">Lettres et chiffres</string>
+    <string name="ocr_charset_upper">Lettres et chiffres, majuscules</string>
+    <string name="ocr_confirm_reads">Confirmer les lectures (motif)</string>
+    <string name="ocr_start_in_text">La caméra s’ouvre en mode texte</string>
+    <string name="section_nfc">NFC</string>
+    <string name="nfc_state">NFC sur cet appareil</string>
+    <string name="nfc_state_missing">Non disponible</string>
+    <string name="nfc_state_on">Activé</string>
+    <string name="nfc_state_off">Désactivé – touchez pour ouvrir les réglages</string>
+    <string name="nfc_enabled">Saisir les étiquettes NFC</string>
+    <string name="nfc_enabled_summary">Approchez une étiquette pendant que le clavier est ouvert</string>
+    <string name="nfc_read">Lire</string>
+    <string name="nfc_read_ndef_or_uid">Texte de l’étiquette, sinon UID</string>
+    <string name="nfc_read_uid">UID (numéro de série)</string>
+    <string name="nfc_read_ndef">Texte de l’étiquette (NDEF)</string>
+    <string name="nfc_uid_format">Format de l’UID</string>
+    <string name="nfc_uid_hex">Hexadécimal</string>
+    <string name="nfc_uid_decimal">Décimal</string>
+    <string name="nfc_uid_reversed">Inverser l’ordre des octets</string>
+    <string name="nfc_uid_reversed_summary">Beaucoup de lecteurs de badges affichent l’UID inversé</string>
+    <string name="nfc_uid_separator">Séparateur entre octets</string>
+    <string name="nfc_uid_separator_too_long">4 caractères au maximum</string>
+    <string name="nfc_ndef_records">Enregistrements texte</string>
+    <string name="nfc_ndef_first">Le premier seulement</string>
+    <string name="nfc_ndef_all">Tous, un par ligne</string>
     <string name="camera_zoom">Zoom</string>
     <string name="camera_continuous_status">Scannés : %1$d · dernier : %2$s</string>
     <string name="section_camera">Scan avec la caméra</string>
@@ -300,6 +342,14 @@
     <string name="mc_camera_continuous_description">La caméra reste ouverte et saisit chaque nouveau code.</string>
     <string name="mc_camera_symbologies_title">Caméra : types de codes</string>
     <string name="mc_camera_symbologies_description">Séparés par des virgules, p. ex. ean13,code128,qr ; vide = le réglage actuel reste.</string>
+    <string name="mc_ocr_mode_title">OCR : prise du texte</string>
+    <string name="mc_ocr_mode_description">Toucher une ligne reconnue ou prendre automatiquement la première ligne correspondant au motif.</string>
+    <string name="mc_ocr_pattern_title">OCR : motif</string>
+    <string name="mc_ocr_pattern_description">Expression régulière à laquelle toute la ligne doit correspondre ; vide = le réglage actuel reste.</string>
+    <string name="mc_nfc_enabled_title">Saisir les étiquettes NFC</string>
+    <string name="mc_nfc_enabled_description">Saisir une étiquette approchée de l’appareil dans le champ où le clavier est ouvert.</string>
+    <string name="mc_nfc_read_title">NFC : lire</string>
+    <string name="mc_nfc_read_description">UID (numéro de série), le texte de l’étiquette (NDEF) ou le texte, sinon l’UID.</string>
     <string name="mc_admin_password_title">Mot de passe administrateur</string>
     <string name="mc_admin_password_description">Protège les paramètres du clavier et les importations de configuration.</string>
 
@@ -338,5 +388,14 @@
         <item>Cadre</item>
         <item>Réticule (sélection)</item>
         <item>Partout</item>
+    </string-array>
+    <string-array name="mc_ocr_mode_entries">
+        <item>Toucher une ligne</item>
+        <item>Automatique par motif</item>
+    </string-array>
+    <string-array name="mc_nfc_read_entries">
+        <item>Texte, sinon UID</item>
+        <item>UID (numéro de série)</item>
+        <item>Texte de l’étiquette (NDEF)</item>
     </string-array>
 </resources>

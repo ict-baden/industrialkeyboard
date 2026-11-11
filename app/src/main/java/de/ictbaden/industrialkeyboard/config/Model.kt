@@ -202,6 +202,8 @@ data class ScannerSettings(
     val input: ScanInputSettings = ScanInputSettings(),
     val camera: CameraSettings = CameraSettings(),
     val data: DataSettings = DataSettings(),
+    val ocr: OcrSettings = OcrSettings(),
+    val nfc: NfcSettings = NfcSettings(),
 )
 
 data class CustomKey(

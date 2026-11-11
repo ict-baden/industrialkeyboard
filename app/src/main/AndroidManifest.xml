@@ -5,9 +5,23 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- Camera scan when the device has no scan engine (scanner.trigger auto/camera). -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- NFC tags into the focused field (scanner.nfc). -->
+    <uses-permission android:name="android.permission.NFC" />
+
+    <!-- No network, on purpose: nothing typed or recognised can leave the device. ML Kit (OCR)
+         brings these through its usage statistics (datatransport); they are removed here. -->
+    <uses-permission
+        android:name="android.permission.INTERNET"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.ACCESS_NETWORK_STATE"
+        tools:node="remove" />
 
     <uses-feature
         android:name="android.hardware.camera.any"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.nfc"
         android:required="false" />
 
     <!-- Scanner services addressed via setPackage() for the soft scan trigger. -->
@@ -76,6 +90,33 @@
             android:name=".app.ConfigScanActivity"
             android:exported="false"
             android:theme="@style/Theme.IndustrialKeyboard" />
+
+        <!-- NFC tags for the keyboard: an input method cannot read tags itself (reader mode needs
+             an activity in front). Transparent, closes at once; the keyboard types the value. -->
+        <activity
+            android:name=".app.NfcTagActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.IndustrialKeyboard.Transparent">
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.nfc.action.TECH_DISCOVERED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.nfc.action.TECH_DISCOVERED"
+                android:resource="@xml/nfc_tech_filter" />
+        </activity>
 
         <!-- Configuration and tab switching by other apps or the MDM (explicit broadcasts). Without a
              permission on purpose: StageNow and MDM scripts cannot hold one. INSTALL_CONFIG checks

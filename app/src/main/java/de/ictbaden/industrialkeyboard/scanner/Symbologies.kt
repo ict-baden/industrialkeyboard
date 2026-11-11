@@ -57,6 +57,7 @@ object Symbologies {
             Symbology.RMQR -> listOf(Format.RMQR_CODE)
             Symbology.UPCA -> listOf(Format.UPC_A)
             Symbology.UPCE -> listOf(Format.UPC_E)
+            Symbology.OCR, Symbology.NFC -> emptyList()
         }
     }.toSet()
 

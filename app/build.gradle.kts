@@ -39,6 +39,12 @@ android {
         release {
             isMinifyEnabled = false
             if (keystore != null) signingConfig = signingConfigs.getByName("release")
+            // Rugged Android devices from Android 8 on are ARM only. Without x86 the OCR library of
+            // ML Kit (about 11 MB per ABI) and zxing-cpp are in the APK twice instead of four times.
+            // Debug builds keep x86/x86_64 for the emulator.
+            ndk {
+                abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+            }
         }
     }
 
@@ -64,6 +70,8 @@ android {
         disable += "AppBundleLocaleChanges"
         // "1-2-3" and "7-8-9" are rows of keys, not ranges: an en dash would be wrong.
         disable += "TypographyDashes"
+        // Release is ARM only on purpose (see buildTypes.release.ndk): no rugged ChromeOS devices.
+        disable += "ChromeOsAbiSupport"
         // Kept visible, but no warning: targetSdk 37 waits until it can be tested on an Android 17
         // device (Play requires it from August 2027); library updates come through Dependabot.
         informational += listOf("OldTargetApi", "GradleDependency")
@@ -103,6 +111,10 @@ dependencies {
     implementation("io.github.zxing-cpp:android:3.1.1")
     // QR code of the configuration (export as barcode). MIT, one class, no dependencies.
     implementation("io.nayuki:qrcodegen:1.8.0")
+    // Text recognition (OCR, issues #19): Google ML Kit with the Latin model inside the APK, offline.
+    // Not open source (ML Kit terms); Till decided for it. Its usage statistics cannot leave the
+    // device: the manifest removes the internet permission ML Kit brings.
+    implementation("com.google.mlkit:text-recognition:16.0.1")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20260814")
