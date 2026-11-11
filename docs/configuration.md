@@ -97,6 +97,26 @@ as managed configuration (`config_json`), as a file, as a broadcast, or imported
       "gsReplacement": null,
       "rules": [],
       "unmatched": "send"
+    },
+    "ocr": {
+      "enabled": true,
+      "mode": "pick",
+      "pattern": null,
+      "startInOcr": false,
+      "confirmReads": 2,
+      "minLength": 0,
+      "maxLength": 0,
+      "charset": "any"
+    },
+    "nfc": {
+      "enabled": true,
+      "read": "ndefOrUid",
+      "uidFormat": "hex",
+      "uidReversed": false,
+      "uidSeparator": "",
+      "ndefRecord": "first",
+      "beep": true,
+      "vibrate": true
     }
   }
 }
@@ -295,11 +315,79 @@ separator, so for example the GTIN (`01…`) and the batch (`10…`) land in two
 "data": { "gs1": "raw", "gsReplacement": "{TAB}", "suffix": "{ENTER}" }
 ```
 
+### `scanner.ocr` – text recognition (OCR)
+
+Where the keyboard scans with the camera, its picture has a switch **Barcode | Text**. In text mode
+the keyboard reads printed text instead of barcodes – serial numbers, batch numbers, best-before
+dates, meter readings. Recognition is Google ML Kit (Latin script) and runs on the device; the
+keyboard has no internet permission, so nothing can leave it.
+
+| Field | Values | Default | Meaning |
+|---|---|---|---|
+| `enabled` | `true` / `false` | `true` | Offer the switch Barcode \| Text on the camera picture |
+| `mode` | `pick`, `pattern` | `pick` | `pick`: the lines recognised inside the frame get boxes, tap one to type it. `pattern`: the first line inside the frame that fully matches `pattern` is typed automatically |
+| `pattern` | Java regular expression or `null` | `null` | Required for `pattern`. The whole (cleaned) line has to match |
+| `startInOcr` | `true` / `false` | `false` | The camera opens in text mode |
+| `confirmReads` | 1–5 | `2` | `pattern` mode: the same text in this many pictures in a row before it counts (OCR mixes up single characters more often than a barcode decoder) |
+| `minLength`, `maxLength` | 0–999 | `0` | Accepted line length, 0 = no limit |
+| `charset` | `any`, `digits`, `alnum`, `upper` | `any` | Cleanup of each line before length and pattern: `digits` keeps 0–9 and `, . -`; `alnum` letters and digits; `upper` letters and digits in upper case |
+
+The text then goes through [`scanner.data`](#scannerdata--scan-data-formatting) like a barcode, with
+the type `ocr` – so rules can treat it differently (`"symbologies": ["ocr"]`). Continuous mode,
+duplicate delay, beep and vibration of `scanner.camera` apply as well.
+
+**Example: serial numbers like `AB123456` automatically.**
+
+```json
+"ocr": { "mode": "pattern", "pattern": "[A-Z]{2}\\d{6}", "charset": "upper" }
+```
+
+**Example: best-before date `31.12.2027`.**
+
+```json
+"ocr": { "mode": "pattern", "pattern": "\\d{2}\\.\\d{2}\\.\\d{4}", "startInOcr": true }
+```
+
+OCR depends on light and print quality more than barcodes do; see [Limitations](limitations.md).
+
+### `scanner.nfc` – NFC tags
+
+Hold an NFC tag (badge, container label, storage location) to the device while the keyboard is
+open: its UID or the text stored on it is typed into the field.
+
+| Field | Values | Default | Meaning |
+|---|---|---|---|
+| `enabled` | `true` / `false` | `true` | Type NFC tags (when the device has NFC and it is switched on) |
+| `read` | `uid`, `ndef`, `ndefOrUid` | `ndefOrUid` | `uid`: the serial number of the chip. `ndef`: the text or URI stored on the tag (NDEF text, URI and `text/*` records). `ndefOrUid`: the stored text, the UID if there is none |
+| `uidFormat` | `hex`, `decimal` | `hex` | UID as upper-case hex bytes or as an unsigned decimal number |
+| `uidReversed` | `true` / `false` | `false` | Reverse the byte order – many badge readers show the UID reversed |
+| `uidSeparator` | up to 4 characters | `""` | Between hex bytes, e.g. `":"` → `04:A2:3B:FF` |
+| `ndefRecord` | `first`, `allLines` | `first` | The first text/URI record, or all of them one per line |
+| `beep`, `vibrate` | `true` / `false` | `true` | Feedback when a tag was typed |
+
+The value goes through [`scanner.data`](#scannerdata--scan-data-formatting) with the type `nfc`.
+
+**Example: badge number as reversed decimal UID** (as printed by many access systems):
+
+```json
+"nfc": { "read": "uid", "uidFormat": "decimal", "uidReversed": true }
+```
+
+How it works: an input method cannot read tags itself (Android's reader mode needs an app screen in
+front). Android hands the tag to a small invisible screen of the keyboard, which closes at once and
+passes the value to the keyboard. When no field has the keyboard, the tag is ignored with a short
+message. If several apps on the device handle NFC tags, Android may ask which one to use; choose
+Industrial Keyboard with *Always* (or set it as default through the EMM). Apps that read tags
+themselves while they are in front (reader mode) get the tag first.
+
 ### Barcode types
 
 `aztec`, `codabar`, `code39`, `code93`, `code128` (also GS1-128), `databar`, `databarexpanded`,
 `databarlimited`, `datamatrix`, `ean8`, `ean13`, `itf`, `maxicode`, `pdf417`, `micropdf417`, `qr`,
 `microqr`, `rmqr`, `upca`, `upce`.
+
+For [rules](#scannerdata--scan-data-formatting) there are also `ocr` (text from the camera) and
+`nfc` (NFC tags); they are not camera barcode types and are ignored in `scanner.camera.symbologies`.
 
 ## Custom layouts
 

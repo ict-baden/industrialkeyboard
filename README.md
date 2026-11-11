@@ -60,6 +60,8 @@
 | 🔫 **Scanner built in** | Scan tab with a large trigger pad, optional scan key, soft trigger for Zebra DataWedge, Honeywell or any scanner app via intent. Scan results sent as a broadcast can be typed with Enter or Tab (opt-in) |
 | 📷 **Camera scanning** | Devices without a scan engine read barcodes with the camera inside the keyboard: aiming frame or crosshair (pick list), barcode types, continuous scanning, zoom, torch |
 | 🧩 **Scan data formatting** | Prefix and suffix as macros, cut, replace (also regex), upper/lower case, GS1 fields with Tab, and rules per barcode type, length or content – like the data formatting of scanner apps |
+| 🔤 **Text recognition (OCR)** | Read serial numbers, batch numbers and dates with the camera: tap a line, or take it automatically by pattern. On the device, no network |
+| 📶 **NFC** | Hold a badge or tag to the device: its UID (hex/decimal, reversed) or the stored text is typed into the field |
 | 🔳 **Configuration as QR code** | Export the settings as a QR code and import them on the next device with the camera |
 | ⌨️ **Function keys** | Fn tab with F1–F12, **Shift for F13–F24**, Esc, Ins, Del, Home/End, PgUp/PgDn and arrows – plus an optional F1–F12 row above the letters |
 | 🖥️ **Remote desktop ready** | Optional **Ctrl, Win and Alt** – sticky, so they work with gloves – above the letters or on the Fn tab, and combinations such as `{CTRL+ALT+END}` or `{WIN+R}` for your own keys ([details](docs/configuration.md#ctrl-win-and-alt)) |

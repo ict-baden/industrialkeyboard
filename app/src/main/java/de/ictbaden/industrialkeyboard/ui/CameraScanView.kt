@@ -237,12 +237,10 @@ class CameraScanView(context: Context) : FrameLayout(context) {
         private val box = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
         private val boxFill = Paint(Paint.ANTI_ALIAS_FLAG)
 
-        init {
-            setOnTouchListener { _, event -> touch(event) }
-        }
+        override fun performClick(): Boolean = super.performClick()
 
         /** Pick mode: a tap on a box takes its line (a little tolerance for gloves). */
-        private fun touch(event: MotionEvent): Boolean {
+        override fun onTouchEvent(event: MotionEvent): Boolean {
             if (!textMode || ocrMode != OcrMode.PICK || lines.isEmpty()) return false
             if (event.action == MotionEvent.ACTION_DOWN) return true
             if (event.action != MotionEvent.ACTION_UP) return false
