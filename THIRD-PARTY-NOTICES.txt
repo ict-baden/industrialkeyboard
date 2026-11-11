@@ -4,8 +4,10 @@ THIRD-PARTY NOTICES
 Industrial Keyboard contains the following third-party software. Each part keeps its own licence; the licence text follows below.
 Industrial Keyboard enthält die folgende Software Dritter. Jeder Teil behält seine eigene Lizenz; der Lizenztext folgt unten.
 
-All parts are compiled into the APK (classes.dex, resources and, for zxing-cpp, native libraries in lib/).
-Alle Teile sind in die APK einkompiliert (classes.dex, Ressourcen und bei zxing-cpp native Bibliotheken in lib/).
+All parts are compiled into the APK (classes.dex, resources and, for zxing-cpp and ML Kit, native libraries in lib/
+and model files in assets/). Parts 12 and 13 are not open source (see there); everything else is.
+Alle Teile sind in die APK einkompiliert (classes.dex, Ressourcen und bei zxing-cpp und ML Kit native Bibliotheken in
+lib/ und Modelldateien in assets/). Teil 12 und 13 sind nicht quelloffen (siehe dort); alles andere ist es.
 
 1. AndroidX libraries - Android support libraries (UI, compatibility, lifecycle)
    Source: https://developer.android.com/jetpack/androidx (https://android.googlesource.com/platform/frameworks/support)
@@ -84,6 +86,37 @@ Alle Teile sind in die APK einkompiliert (classes.dex, Ressourcen und bei zxing-
    Source: https://github.com/nayuki/QR-Code-generator
    Copyright (c) Project Nayuki
    Licence: MIT (section D)
+
+12. Google ML Kit Text Recognition - text recognition (OCR) with the camera, Latin model bundled in the app
+   Components: com.google.mlkit:text-recognition 16.0.1, text-recognition-bundled-common 17.0.0, common 18.11.0,
+   vision-common 17.3.0, vision-interfaces 16.3.0; com.google.android.odml:image 1.0.0-beta1
+   Files: lib/*/libmlkit_google_ocr_pipeline.so, assets/mlkit-google-ocr-models/, classes in classes.dex
+   Copyright Google LLC
+   Licence: NOT open source. Used under the ML Kit Terms of Service, https://developers.google.com/ml-kit/terms
+   (which refer to the Google APIs Terms of Service, https://developers.google.com/terms). The keyboard removes
+   the internet permission, so ML Kit cannot send usage data from the device.
+
+13. Google Play services libraries - used by ML Kit
+   Components: com.google.android.gms:play-services-base 18.5.0, play-services-basement 18.4.0,
+   play-services-tasks 18.2.0, play-services-mlkit-text-recognition 19.0.1,
+   play-services-mlkit-text-recognition-common 19.1.0
+   Copyright Google LLC
+   Licence: NOT open source. Android Software Development Kit License,
+   https://developer.android.com/studio/terms
+
+14. Firebase components and Android Data Transport - used by ML Kit for its usage statistics (inactive here,
+   no internet permission)
+   Components: com.google.firebase:firebase-annotations 16.0.0, firebase-components 16.1.0,
+   firebase-encoders 16.1.0, firebase-encoders-json 17.1.0; com.google.android.datatransport:transport-api 2.2.1,
+   transport-backend-cct 2.3.3, transport-runtime 2.2.6
+   Source: https://github.com/firebase/firebase-android-sdk
+   Copyright Google LLC
+   Licence: Apache-2.0 (section A)
+
+15. javax.inject 1 - used by Android Data Transport
+   Source: https://github.com/javax-inject/javax-inject
+   Copyright The JSR-330 Expert Group
+   Licence: Apache-2.0 (section A)
 
 -------------------------------------------------------------------------------
 A. Apache License, Version 2.0

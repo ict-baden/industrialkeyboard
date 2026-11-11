@@ -24,6 +24,15 @@ are decoded in memory on the device and are neither stored nor sent; only the ba
 into the field. Android asks for the camera permission the first time. The same camera reads a
 configuration QR code when you choose **Import from barcode** in the settings.
 
+**Text recognition (OCR):** the camera picture can also be read as text
+([`scanner.ocr`](configuration.md#scannerocr--text-recognition-ocr)). This uses Google ML Kit with the
+recognition model inside the app; it runs on the device. ML Kit would like to send anonymous usage
+statistics to Google, but the keyboard has no internet permission – it is removed from the app on
+purpose – so neither pictures, recognised text nor statistics can leave the device.
+
+**NFC:** a tag held to the device is read once (UID or the text stored on it) and typed into the
+field; nothing is kept.
+
 The operator of the devices (your company) is responsible for the data typed with the keyboard;
 ICT-Baden processes none of it.
 
@@ -62,6 +71,7 @@ apps – see [Scanner & app integration](integration.md):
 | sends | Soft scan trigger to DataWedge (Zebra), the Honeywell scanner service or the app in `scanner.intentAction` | Scan pad, scan key, `{SCAN}` |
 | receives | `…action.SCAN_INPUT` with a barcode | Only if `scanner.input.enabled` is switched on (off by default): types the barcode into the focused field, never into password fields. Without `scanner.input.permission` or `allowedPackages` any app on the device can send it ([details](integration.md#option-b--the-keyboard-types-it)). |
 | receives | `…action.SHOW_TAB` | Switches the keyboard page |
+| receives | NFC tags (`NDEF_DISCOVERED`, `TECH_DISCOVERED`, `TAG_DISCOVERED`) from Android | Only with `scanner.nfc.enabled`; typed into the field the keyboard is open in, otherwise ignored |
 | receives | `…action.INSTALL_CONFIG` | Installs a configuration; only with the admin password, or on an EMM-managed device while no password is set (then any app can – set a password). After 5 wrong passwords it is locked for 5 minutes |
 
 The links in *Settings → Info* (source code, support, website) open in the browser only when you

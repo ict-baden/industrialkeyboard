@@ -27,6 +27,10 @@ key are hidden.
 - **Remote desktop apps:** Ctrl, Win and Alt are sent as ordinary key events of the input
   method (modifier key down, key, modifier key up). How a remote desktop, VNC or Citrix app
   passes them on is up to that app; they have not yet been tried with one on a device.
+- **OCR and NFC** are new and have not yet been tried with real labels and tags on a device. OCR
+  reads Latin script only, needs good light and sharp print and is slower than barcodes (several
+  pictures per second, not dozens). NFC in the keyboard goes through a small invisible screen:
+  if another app on the device also handles tags, Android may ask which one to use.
 - **Translations:** Spanish, French and Chinese (simplified) are machine translations and have
   not yet been proofread by native speakers. They are marked as such in the language picker.
 

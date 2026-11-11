@@ -17,6 +17,12 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 - **Managed Configuration:** `scan_prefix`, `scan_suffix`, `camera_aim`, `camera_continuous`, `camera_symbologies`.
 - „Nach dem Scan“ (Enter/Tab/nichts) gilt auch für Kamera-Scans, solange kein eigenes Suffix gesetzt ist.
 - Vorlage [`examples/remote-desktop.json`](examples/remote-desktop.json) mit eigenem Tab „RDP“.
+- **Texterkennung (OCR) mit der Kamera** ([#19](https://github.com/ict-baden/industrialkeyboard/issues/19), `scanner.ocr`): Im Kamerabild schaltet ein Umschalter zwischen Barcode und Text. Erkannte Zeilen im Rahmen bekommen Kästchen zum Antippen (`mode: "pick"`), oder die erste Zeile, die zu einem Muster passt, wird automatisch übernommen (`mode: "pattern"`, z. B. Seriennummer oder MHD). Zeichenfilter (nur Ziffern, Buchstaben/Ziffern, groß), Länge, Bestätigung über mehrere Bilder. Der Text läuft durch `scanner.data` mit dem Typ `ocr`. Erkennung mit Google ML Kit (Lateinisch, Modell in der App, läuft auf dem Gerät). Die Tastatur hat weiterhin keine Internet-Berechtigung: Die von ML Kit mitgebrachte wird im Manifest entfernt.
+- **NFC** ([#20](https://github.com/ict-baden/industrialkeyboard/issues/20), `scanner.nfc`): Tag ans Gerät halten, während die Tastatur offen ist – UID (hex oder dezimal, wahlweise umgedreht, mit Trennzeichen) oder der gespeicherte Text (NDEF-Text, URI) wird ins Feld getippt, Typ `nfc` in `scanner.data`. Weil eine Eingabemethode keinen Reader-Modus hat, nimmt eine kleine unsichtbare Activity den Tag an und gibt ihn an die Tastatur weiter. Einstellungen zeigen, ob das Gerät NFC hat und ob es an ist.
+- MDM-Schlüssel `ocr_mode`, `ocr_pattern`, `nfc_enabled`, `nfc_read`.
+
+### Geändert
+- **Release-APK nur noch für ARM** (`arm64-v8a`, `armeabi-v7a`): Robuste Android-Geräte ab Android 8 sind ARM. Ohne x86 ist die APK etwa 30 statt 57 MB groß (die OCR-Bibliothek von ML Kit hat rund 11 MB pro Architektur). Debug-Builds behalten x86 für den Emulator.
 
 ## [2.1.1] – 2026-10-21
 

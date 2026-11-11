@@ -92,6 +92,10 @@ The app ships a schema that every EMM with Android Enterprise support shows:
 | `camera_aim` | Choice | Camera aiming: frame, crosshair (pick list), anywhere |
 | `camera_continuous` | Bool | Camera stays open and types every new code (default off) |
 | `camera_symbologies` | String | Barcode types for the camera, comma-separated, e.g. `ean13,code128,qr`; empty = unchanged |
+| `ocr_mode` | Choice | Text recognition: tap a line or take it automatically by pattern ([`scanner.ocr`](configuration.md#scannerocr--text-recognition-ocr)) |
+| `ocr_pattern` | String | Regular expression for the pattern mode; empty = unchanged. Pattern mode without a pattern is reported as provisioning error |
+| `nfc_enabled` | Bool | Type NFC tags (default on) |
+| `nfc_read` | Choice | NFC: text on the tag, else UID / UID / text on the tag ([`scanner.nfc`](configuration.md#scannernfc--nfc-tags)) |
 | `admin_password` | String | Protects the keyboard settings and configuration broadcasts |
 
 The keys are applied as soon as the EMM changes them and whenever the keyboard opens. The
