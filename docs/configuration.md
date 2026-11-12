@@ -14,6 +14,20 @@ as managed configuration (`config_json`), as a file, as a broadcast, or imported
 - **Settings → Configuration → Export to file** writes the current configuration in exactly
   this format – a good starting point for your own.
 
+## Order of precedence
+
+The keyboard computes the configuration it works with when a field starts and when the
+configuration changes – never per key. From lowest to highest:
+
+1. **Stored configuration.** `config_json` from the MDM, a file, the `INSTALL_CONFIG` broadcast
+   and **Import** replace it as a whole; the single options of the managed configuration and the
+   admin settings change single values in it. Export and the QR code contain exactly this.
+2. **Field rules**, which always win: number, phone and date fields open their pad; password
+   fields get no suggestions, no autocorrection and no key preview.
+
+The page that opens: a `SHOW_TAB` request or [`{SHOW:…}`](#macros) > the field type (number,
+phone, date) > [`tabs.preferred`](#tabs).
+
 ## Complete example with all defaults
 
 ```json

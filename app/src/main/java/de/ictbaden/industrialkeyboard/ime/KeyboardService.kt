@@ -35,6 +35,7 @@ import de.ictbaden.industrialkeyboard.app.MicrophonePermissionActivity
 import de.ictbaden.industrialkeyboard.app.SettingsActivity
 import de.ictbaden.industrialkeyboard.config.Alphabet
 import de.ictbaden.industrialkeyboard.config.ConfigStore
+import de.ictbaden.industrialkeyboard.config.EffectiveConfig
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
 import de.ictbaden.industrialkeyboard.config.OneHanded
 import de.ictbaden.industrialkeyboard.config.Provisioning
@@ -78,6 +79,14 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private lateinit var store: ConfigStore
     private lateinit var feedback: Feedback
     private lateinit var scanner: ScanTrigger
+
+    /** As stored (MDM, file, import, settings): the base that every recomputation starts from. */
+    private var storedConfig = KeyboardConfig()
+
+    /**
+     * Effective: [storedConfig] with the app profile and quick toggles ([EffectiveConfig]), read
+     * everywhere in the keyboard. Never write it to the store, never pass it to [applyConfig].
+     */
     private var config = KeyboardConfig()
     private var root: KeyboardRootView? = null
 
@@ -114,7 +123,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private var tone: ToneGenerator? = null
     /** The camera does not run unattended: it closes after a while without a code. */
     private val closeCameraLater = Runnable { closeCamera() }
-    private val engineListener: () -> Unit = { applyConfig(config) }
+    /** The scan engine answered: recompute from the stored configuration (not from the effective one). */
+    private val engineListener: () -> Unit = { applyConfig(storedConfig) }
 
     private val configListener: (KeyboardConfig) -> Unit = { applyConfig(it) }
 
@@ -176,14 +186,30 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         super.onDestroy()
     }
 
-    private fun applyConfig(updated: KeyboardConfig) {
-        config = updated
-        feedback.settings = updated.feedback
-        scanner.settings = updated.scanner
-        val input = updated.scanner.input.takeIf { it.enabled }
-        if (scanRegistration != input?.let { it.action to it.permission }) registerScanReceiver(input)
-        if (FieldPolicy.pageForTab(page.tab, field, updated, scanner.available) == null) page = FieldPolicy.startPage(field, updated, scanner.available)
+    /** A new stored configuration (store, scan engine detection): recompute the effective one and draw. */
+    private fun applyConfig(stored: KeyboardConfig) {
+        storedConfig = stored
+        useEffective(configChanged = true)
         render()
+    }
+
+    /**
+     * Recomputes [config] from [storedConfig] and applies what depends on it (feedback, scanner, scan
+     * receiver, a page that no longer exists). Runs when a field starts and when the configuration
+     * changes, never per key. Returns true when the effective configuration changed.
+     */
+    private fun useEffective(configChanged: Boolean = false): Boolean {
+        val effective = EffectiveConfig.of(storedConfig)
+        val changed = effective != config
+        config = effective
+        feedback.settings = effective.feedback
+        // The setter drops the resolved trigger type (package queries): on a configuration change as
+        // before, on a new field only when the scanner settings really differ.
+        if (configChanged || scanner.settings != effective.scanner) scanner.settings = effective.scanner
+        val input = effective.scanner.input.takeIf { it.enabled }
+        if (scanRegistration != input?.let { it.action to it.permission }) registerScanReceiver(input)
+        if (FieldPolicy.pageForTab(page.tab, field, effective, scanner.available) == null) page = FieldPolicy.startPage(field, effective, scanner.available)
+        return changed
     }
 
     private fun registerScanReceiver(input: ScanInputSettings?) {
@@ -406,6 +432,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     override fun onStartInputView(info: EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         toolPanel = null
+        // First, so that the dictionary, dictation and the start page see the effective configuration.
+        val effectiveChanged = useEffective()
         watchClipboard(true)
         useSubtype(getSystemService(InputMethodManager::class.java)?.currentInputMethodSubtype)
         findVoiceInput(info)
@@ -413,7 +441,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         emojiOpen = false
         Provisioning.applyAllAsync(this)
         val newField = FieldPolicy.field(info.inputType)
-        if (!restarting || newField != field) {
+        if (!restarting || newField != field || effectiveChanged) {
             field = newField
             page = FieldPolicy.startPage(field, config, scanner.available)
             shift = ShiftState.OFF
@@ -921,7 +949,11 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         render()
     }
 
-    /** The tiles of the ⊞ panel; scan only with a scanner. */
+    /**
+     * The tiles of the ⊞ panel; scan only with a scanner. Fixed order: Fn, Scan, 123, Clipboard,
+     * Snippets, Text editing, One-handed, Languages, Settings, then the quick toggles
+     * ([FeaturesPanelView.Feature.checked]). The panel scrolls when they do not fit.
+     */
     private fun features(): List<FeaturesPanelView.Feature> = buildList {
         add(FeaturesPanelView.Feature(FeaturesPanelView.FUNCTION_KEYS, null, R.string.feature_function, "Fn"))
         if (scanner.available) add(FeaturesPanelView.Feature(FeaturesPanelView.SCAN, R.drawable.kb_scan, R.string.feature_scan))

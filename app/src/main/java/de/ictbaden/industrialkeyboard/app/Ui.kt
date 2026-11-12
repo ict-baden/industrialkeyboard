@@ -234,15 +234,28 @@ class Ui(private val context: Context) {
         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
-    fun textField(hint: String, value: String = "", password: Boolean = false, inputType: Int = InputType.TYPE_CLASS_TEXT, helper: String? = null) =
+    /**
+     * Outlined text field. [multiLine]: 2–4 visible lines, Enter adds a line break (adds
+     * `TYPE_TEXT_FLAG_MULTI_LINE`; not for passwords).
+     */
+    fun textField(hint: String, value: String = "", password: Boolean = false, inputType: Int = InputType.TYPE_CLASS_TEXT, helper: String? = null, multiLine: Boolean = false) =
         TextInputLayout(context, null, com.google.android.material.R.attr.textInputOutlinedStyle).apply {
             this.hint = hint
             helper?.let { helperText = it }
             if (password) endIconMode = TextInputLayout.END_ICON_PASSWORD_TOGGLE
+            val lines = multiLine && !password
             addView(TextInputEditText(this.context).apply {
                 setText(value)
-                isSingleLine = true
-                this.inputType = if (password) InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD else inputType
+                isSingleLine = !lines
+                this.inputType = when {
+                    password -> InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                    lines -> inputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                    else -> inputType
+                }
+                if (lines) {
+                    minLines = MULTI_LINE_MIN
+                    maxLines = MULTI_LINE_MAX
+                }
                 // Password fields switch to monospace, which the floating hint would inherit.
                 if (password) typeface = android.graphics.Typeface.DEFAULT
             })
@@ -264,6 +277,11 @@ class Ui(private val context: Context) {
     private fun ripple(): Int = TypedValue().also {
         context.theme.resolveAttribute(android.R.attr.selectableItemBackground, it, true)
     }.resourceId
+
+    private companion object {
+        const val MULTI_LINE_MIN = 2
+        const val MULTI_LINE_MAX = 4
+    }
 }
 
 val TextInputLayout.value: String get() = editText?.text?.toString().orEmpty()

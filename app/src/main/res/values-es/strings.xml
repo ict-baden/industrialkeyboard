@@ -472,6 +472,8 @@
     <string name="feature_one_handed">Una mano</string>
     <string name="feature_languages">Idiomas</string>
     <string name="feature_settings">Ajustes</string>
+    <string name="state_on">Activado</string>
+    <string name="state_off">Desactivado</string>
     <string name="top_bar">Sobre las teclas</string>
     <string name="top_bar_toolbar">Barra de herramientas como Gboard</string>
     <string name="top_bar_tabs">Pestañas (ABC, 123, Fn …)</string>

@@ -323,6 +323,8 @@ data class KeyboardConfig(
     val adminPasswordHash: String? = null,
     /** `auto` (device language) or one of [Languages.SUPPORTED] (richtlinien/13-sprachen.md). */
     val language: String = Languages.AUTO,
+    // New sections go here, after `language`, in this agreed order: snippets, appProfiles,
+    // quickToggles, accessibility – so that positional calls keep working (ConfigJson uses names).
 ) {
     fun programmable(key: ProgrammableKey): String = keys.programmable[key.id] ?: key.default
 

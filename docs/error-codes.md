@@ -21,6 +21,9 @@ any of the five languages. Source: [`ErrorCodes.kt`](../app/src/main/java/de/ict
 | `IK-0213` | Not understood | Nothing could be recognised; tap 🎤 and speak again |
 | `IK-0106` | The stored configuration cannot be read | Storage error or empty `config.json`: the admin password is unknown, the settings stay locked. Restart; otherwise set the admin password with the EMM (`admin_password`, applied again as long as the file is unreadable) or clear the app's storage |
 
+`IK-0107` and `IK-0108` are allocated for snippets (an invalid snippet in the editor, and an
+unreadable file of the user's own snippets) and are not shown by this version yet.
+
 Validation details of a configuration (e.g. `keys.numeric.p1: unknown token {TABB}`) stay in
 English because they quote JSON field names and tokens. The result text of the
 `INSTALL_CONFIG` broadcast is English too: it is read by scripts, not by people.

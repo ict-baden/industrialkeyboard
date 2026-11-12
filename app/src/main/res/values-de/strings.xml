@@ -471,6 +471,8 @@
     <string name="feature_one_handed">Einhandmodus</string>
     <string name="feature_languages">Sprachen</string>
     <string name="feature_settings">Einstellungen</string>
+    <string name="state_on">An</string>
+    <string name="state_off">Aus</string>
     <string name="top_bar">Über den Tasten</string>
     <string name="top_bar_toolbar">Werkzeugleiste wie Gboard</string>
     <string name="top_bar_tabs">Tabs (ABC, 123, Fn …)</string>
