@@ -402,4 +402,20 @@
     <string name="keyboard_languages_summary">🌐 在其间切换的语言，在 Android 设置中</string>
     <string name="umlaut_keys">变音字母键</string>
     <string name="umlaut_keys_summary">QWERTZ 中 ü、ö、ä 作为独立按键；否则长按 u、o、a</string>
+    <string name="suggestions">单词建议</string>
+    <string name="suggestions_summary">在普通文本框中于按键上方显示三个建议，来自内置词典。不会学习或保存任何输入内容</string>
+    <string name="autocorrect">自动更正</string>
+    <string name="autocorrect_summary">空格键将明显的拼写错误替换为最佳建议；退格键可撤销</string>
+    <string name="emoji_key">表情键</string>
+    <string name="emoji_key_summary">在普通文本框中空格键旁显示 😊</string>
+    <string name="emoji_back">返回字母</string>
+    <string name="emoji_backspace">删除</string>
+    <string name="mc_suggestions_title">单词建议</string>
+    <string name="mc_suggestions_description">按键上方的建议来自内置词典（不学习）。</string>
+    <string name="mc_autocorrect_title">自动更正</string>
+    <string name="mc_autocorrect_description">空格键将明显的拼写错误替换为最佳建议。</string>
+    <string name="mc_emoji_key_title">表情键</string>
+    <string name="mc_emoji_key_description">在普通文本框中空格键旁的表情键。</string>
+    <string name="sample_note">备注</string>
+    <string name="sample_note_helper">带建议和表情的文字</string>
 </resources>

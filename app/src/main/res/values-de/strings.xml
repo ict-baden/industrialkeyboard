@@ -403,4 +403,20 @@
     <string name="keyboard_languages_summary">Sprachen, zwischen denen 🌐 umschaltet, in den Android-Einstellungen</string>
     <string name="umlaut_keys">Umlaut-Tasten</string>
     <string name="umlaut_keys_summary">ü, ö und ä als eigene Tasten bei QWERTZ; sonst per langem Druck auf u, o, a</string>
+    <string name="suggestions">Wortvorschläge</string>
+    <string name="suggestions_summary">Drei Vorschläge über den Tasten in normalen Textfeldern, aus einem eingebauten Wörterbuch. Nichts Getipptes wird gelernt oder gespeichert</string>
+    <string name="autocorrect">Autokorrektur</string>
+    <string name="autocorrect_summary">Leertaste ersetzt einen offensichtlichen Tippfehler durch den besten Vorschlag; Rücktaste macht es rückgängig</string>
+    <string name="emoji_key">Emoji-Taste</string>
+    <string name="emoji_key_summary">😊 neben der Leertaste in normalen Textfeldern</string>
+    <string name="emoji_back">Zurück zu den Buchstaben</string>
+    <string name="emoji_backspace">Löschen</string>
+    <string name="mc_suggestions_title">Wortvorschläge</string>
+    <string name="mc_suggestions_description">Vorschläge über den Tasten aus einem eingebauten Wörterbuch (lernt nicht).</string>
+    <string name="mc_autocorrect_title">Autokorrektur</string>
+    <string name="mc_autocorrect_description">Leertaste ersetzt einen offensichtlichen Tippfehler durch den besten Vorschlag.</string>
+    <string name="mc_emoji_key_title">Emoji-Taste</string>
+    <string name="mc_emoji_key_description">Emoji-Taste neben der Leertaste in normalen Textfeldern.</string>
+    <string name="sample_note">Notiz</string>
+    <string name="sample_note_helper">Wörter mit Vorschlägen und Emoji</string>
 </resources>

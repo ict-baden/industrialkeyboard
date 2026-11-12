@@ -71,6 +71,32 @@ object FieldPolicy {
      * count too (like in AOSP's keyboard): apps switch to them for "show password", and the
      * keyboard cannot tell those from fields that only use the type to turn off suggestions.
      */
+    /**
+     * Normal text where word suggestions help: not passwords, e-mail, web addresses or filters, not
+     * numbers or dates, and not when the app asks for no suggestions (barcode fields usually do).
+     */
+    fun suggestionsAllowed(inputType: Int): Boolean {
+        if (inputType and InputType.TYPE_MASK_CLASS != InputType.TYPE_CLASS_TEXT) return false
+        if (inputType and InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS != 0) return false
+        return (inputType and InputType.TYPE_MASK_VARIATION) !in NO_WORD_VARIATIONS
+    }
+
+    /** Emoji only make sense in normal text: not in passwords, e-mail, web addresses, numbers or dates. */
+    fun emojiAllowed(inputType: Int): Boolean {
+        if (inputType and InputType.TYPE_MASK_CLASS != InputType.TYPE_CLASS_TEXT) return false
+        return (inputType and InputType.TYPE_MASK_VARIATION) !in NO_WORD_VARIATIONS
+    }
+
+    private val NO_WORD_VARIATIONS = setOf(
+        InputType.TYPE_TEXT_VARIATION_PASSWORD,
+        InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD,
+        InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,
+        InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+        InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS,
+        InputType.TYPE_TEXT_VARIATION_URI,
+        InputType.TYPE_TEXT_VARIATION_FILTER,
+    )
+
     fun isPassword(inputType: Int): Boolean {
         val variation = inputType and InputType.TYPE_MASK_VARIATION
         return when (inputType and InputType.TYPE_MASK_CLASS) {

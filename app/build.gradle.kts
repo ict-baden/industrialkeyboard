@@ -109,6 +109,11 @@ dependencies {
         exclude(group = "androidx.media3")
     }
     implementation("io.github.zxing-cpp:android:3.1.1")
+    // Emoji panel like Gboard (issue #21). Without emoji2-bundled: its own emoji font (~10 MB) is not
+    // needed, Android's font draws the emoji.
+    implementation("androidx.emoji2:emoji2-emojipicker:1.7.0") {
+        exclude(group = "androidx.emoji2", module = "emoji2-bundled")
+    }
     // QR code of the configuration (export as barcode). MIT, one class, no dependencies.
     implementation("io.nayuki:qrcodegen:1.8.0")
     // Text recognition (OCR, issues #19): Google ML Kit with the Latin model inside the APK, offline.

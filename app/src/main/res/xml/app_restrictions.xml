@@ -129,4 +129,22 @@
         android:key="admin_password"
         android:restrictionType="string"
         android:title="@string/mc_admin_password_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_suggestions_description"
+        android:key="suggestions"
+        android:restrictionType="bool"
+        android:title="@string/mc_suggestions_title" />
+    <restriction
+        android:defaultValue="false"
+        android:description="@string/mc_autocorrect_description"
+        android:key="autocorrect"
+        android:restrictionType="bool"
+        android:title="@string/mc_autocorrect_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_emoji_key_description"
+        android:key="emoji_key"
+        android:restrictionType="bool"
+        android:title="@string/mc_emoji_key_title" />
 </restrictions>

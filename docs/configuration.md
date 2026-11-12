@@ -150,6 +150,7 @@ every language: [Error codes](error-codes.md).
 | `theme` | `system`, `light`, `dark`, `contrast` | `system` | `system` follows the device's dark mode. `contrast`: black keys with white outlines and yellow highlights, for bright sunlight and low vision |
 | `accentColor` | `#RRGGBB` or `#AARRGGBB` | blue `#2563EB`, yellow `#FFD600` in `contrast` | Selected tab, Enter key, Shift, scan pad and highlights |
 | `dynamicColor` | `true` / `false` | `true` | Android 12+: system colours from the wallpaper (Material You) like Gboard, as long as `accentColor` is not set; not for `contrast` |
+| `emojiKey` | `true` / `false` | `true` | 😊 between comma and space bar in normal text fields (not in passwords, e-mail and web addresses, numbers); opens the emoji panel with categories and skin tones, **ABC** returns. Recently used emoji are kept in memory only; the picker remembers the chosen skin tone per emoji on the device |
 | `keyHeight` | 70–160 (percent) | `100` | Row height; 100 % = 54 dp. Use 120–140 for gloves |
 | `width` | 50–100 (percent) | `100` | Width of the keys, centered – for tablets and landscape |
 | `numberRow` | `true` / `false` | `false` | Row with 1–0 above the letters |
@@ -205,6 +206,8 @@ Phone, date and time fields show fixed keys instead of the numeric ones.
 | `autoCapitalize` | `true` / `false` | `true` | Capital letters where the field asks for them: sentence start, every word, or all capitals (item numbers) |
 | `doubleSpacePeriod` | `true` / `false` | `true` | Two spaces after a word type `. ` |
 | `longPressDelay` | 200–1500 (ms) | `400` | Time until a long press shows the alternatives; 500–700 avoids accidental accents with gloves |
+| `suggestions` | `true` / `false` | `true` | Three word suggestions above the keys while a word is typed, like Gboard: from a built-in dictionary of the keyboard language, best one in the middle; tap one to replace the word and add a space. Only in normal text fields – never in passwords, e-mail and web addresses, numbers, dates or fields that set `textNoSuggestions` (barcode fields usually do). Nothing is learnt or stored |
+| `autocorrect` | `true` / `false` | `false` | Space replaces an obvious typo (one wrong, missing, extra or swapped letter) by the best suggestion; Backspace right after it brings the typed word back. Off by default: in data entry a "corrected" article number is worse than a typo |
 
 Always on: rollover typing with several fingers, key repeat on Backspace, Del and the arrow
 keys, slide on the space bar to move the cursor, long press on the space bar to switch

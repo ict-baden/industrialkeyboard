@@ -30,8 +30,8 @@ object KeyboardRenderer {
         return if (portrait) ideal.coerceIn(BASE_ROW_DP, 70f) else (ideal * 0.75f).coerceIn(48f, BASE_ROW_DP)
     }
 
-    fun layoutFor(page: Page, config: KeyboardConfig, shift: ShiftState = ShiftState.OFF, languageKey: Boolean = false): KeyboardLayout? = when (page) {
-        is Page.Alpha -> Layouts.alpha(config, page.variant, languageKey)
+    fun layoutFor(page: Page, config: KeyboardConfig, shift: ShiftState = ShiftState.OFF, languageKey: Boolean = false, emojiKey: Boolean = false): KeyboardLayout? = when (page) {
+        is Page.Alpha -> Layouts.alpha(config, page.variant, languageKey, emojiKey)
         is Page.Symbols -> Layouts.symbols(config, page.page, page.variant)
         is Page.Numeric -> Layouts.numeric(config, page.variant)
         Page.Function -> Layouts.function(shifted = shift != ShiftState.OFF, modifiers = config.appearance.functionModifiers)
@@ -73,6 +73,12 @@ object KeyboardRenderer {
         camera: Boolean = false,
         /** 🌐 next to the space bar. */
         languageKey: Boolean = false,
+        /** 😊 next to the space bar (the field takes emoji). */
+        emojiKey: Boolean = false,
+        /** Word suggestions, best first; empty = the tab bar. */
+        suggestions: List<String> = emptyList(),
+        /** The emoji panel replaces the keys. */
+        emojiOpen: Boolean = false,
     ): RenderState {
         val appearance = config.appearance
         val rowHeight = (baseRowDp(context) * context.resources.displayMetrics.density * appearance.keyHeight / 100f).toInt()
@@ -82,7 +88,7 @@ object KeyboardRenderer {
             palette = Palette.resolve(context, appearance),
             tabs = tabs(config, scannerName != null),
             selectedTab = page.tab,
-            layout = layoutFor(page, keys, shift, languageKey),
+            layout = layoutFor(page, keys, shift, languageKey, emojiKey),
             shift = shift,
             modifiers = modifiers,
             enterIcon = enterIcon,
@@ -94,6 +100,8 @@ object KeyboardRenderer {
             scannerName = scannerName,
             scanning = scanning,
             camera = camera,
+            suggestions = suggestions,
+            emojiOpen = emojiOpen,
         )
     }
 }

@@ -59,8 +59,9 @@ Please report results on other devices in the
 
 ## Not included, on purpose
 
-- No word prediction, no dictionary, no autocorrect, no swipe typing, no voice input, no emoji
-  picker: nothing that learns or stores what is typed.
+- Word suggestions and autocorrection use fixed built-in word lists: they do not learn names or words
+  you type often, and there is no swipe typing and no voice input. Nothing learns or stores what is typed.
+- The dictionaries are general (Wikipedia-weighted): technical terms and company words are often missing.
 - No internet permission: the keyboard cannot send anything off the device.
 - Camera scan reads one code per tap and has no batch or multi-code mode; a scan engine is faster
   and works in the dark. The camera picture fills only the keyboard area.
