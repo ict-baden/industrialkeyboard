@@ -420,4 +420,8 @@
     <string name="mc_emoji_key_description">Tecla de emoji junto a la barra espaciadora en campos de texto normales.</string>
     <string name="sample_note">Nota</string>
     <string name="sample_note_helper">Palabras con sugerencias y emoji</string>
+    <string name="symbols_key">Tecla de números (?123)</string>
+    <string name="symbols_key_summary">\?123 abajo a la izquierda como en Gboard, también con la barra de pestañas; ABC en la página de símbolos vuelve</string>
+    <string name="mc_symbols_key_title">Tecla de números (?123)</string>
+    <string name="mc_symbols_key_description">Tecla ?123 abajo a la izquierda en las letras, también con la barra de pestañas.</string>
 </resources>

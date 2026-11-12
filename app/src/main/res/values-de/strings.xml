@@ -419,4 +419,8 @@
     <string name="mc_emoji_key_description">Emoji-Taste neben der Leertaste in normalen Textfeldern.</string>
     <string name="sample_note">Notiz</string>
     <string name="sample_note_helper">Wörter mit Vorschlägen und Emoji</string>
+    <string name="symbols_key">Zahlen-Taste (?123)</string>
+    <string name="symbols_key_summary">\?123 unten links wie bei Gboard, auch mit Tab-Leiste; ABC auf der Zeichenseite führt zurück</string>
+    <string name="mc_symbols_key_title">Zahlen-Taste (?123)</string>
+    <string name="mc_symbols_key_description">Taste ?123 unten links bei den Buchstaben, auch mit Tab-Leiste.</string>
 </resources>

@@ -480,4 +480,8 @@
     <string name="mc_emoji_key_description">Emoji key next to the space bar in normal text fields.</string>
     <string name="sample_note">Note</string>
     <string name="sample_note_helper">Words with suggestions and emoji</string>
+    <string name="symbols_key">Number key (?123)</string>
+    <string name="symbols_key_summary">\?123 at the bottom left like Gboard, also with the tab bar; ABC on the symbols page leads back</string>
+    <string name="mc_symbols_key_title">Number key (?123)</string>
+    <string name="mc_symbols_key_description">\?123 key at the bottom left of the letters, also with the tab bar.</string>
 </resources>

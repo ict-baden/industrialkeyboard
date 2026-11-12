@@ -126,6 +126,7 @@ object Provisioning {
             layout = config.layout.copy(
                 alphabet = choice("alphabet", Alphabet.entries.toTypedArray(), config.layout.alphabet),
                 numericOrder = choice("numeric_order", NumericOrder.entries.toTypedArray(), config.layout.numericOrder),
+                symbolsKey = bool("symbols_key", config.layout.symbolsKey),
             ),
             tabs = config.tabs.copy(
                 scan = bool("scan_tab", config.tabs.scan),

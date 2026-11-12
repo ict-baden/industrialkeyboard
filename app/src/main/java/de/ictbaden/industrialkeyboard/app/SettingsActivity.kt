@@ -291,6 +291,13 @@ class SettingsActivity : AppCompatActivity() {
                     ui.switchRow(R.drawable.ic_keyboard, getString(R.string.umlaut_keys), getString(R.string.umlaut_keys_summary), c.layout.umlautKeys) { on ->
                         update { it.copy(layout = it.layout.copy(umlautKeys = on)) }
                     },
+                    ui.switchRow(
+                        R.drawable.ic_keyboard,
+                        getString(R.string.symbols_key),
+                        getString(R.string.symbols_key_summary),
+                        c.layout.symbolsKey || c.layout.navigation == Navigation.KEYS,
+                        enabled = c.layout.navigation == Navigation.TABS,
+                    ) { on -> update { it.copy(layout = it.layout.copy(symbolsKey = on)) } },
                     ui.choiceRow(
                         R.drawable.ic_keyboard,
                         getString(R.string.navigation),

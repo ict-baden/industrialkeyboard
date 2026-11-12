@@ -234,12 +234,14 @@ object Layouts {
         emojiKey: Boolean = false,
     ): KeyRow {
         val classic = config.layout.navigation == Navigation.KEYS
+        // "?123" like Gboard: always in the classic navigation, with tabs when switched on.
+        val switchKey = classic || config.layout.symbolsKey
         val keys = buildList {
-            if (classic) {
+            if (switchKey) {
                 val toSymbols = page == Tabs.ALPHA
                 add(Key(label = if (toSymbols) "?123" else "ABC", output = KeyOutput.ShowTab(if (toSymbols) Tabs.SYMBOLS else Tabs.ALPHA), width = 1.5f, style = KeyStyle.FUNCTION))
             }
-            add(programmable(config.programmable(ProgrammableKey.ALPHA_P1), width = if (classic) 1f else 1.5f))
+            add(programmable(config.programmable(ProgrammableKey.ALPHA_P1), width = if (switchKey) 1f else 1.5f))
             add(
                 when (variant) {
                     AlphaVariant.EMAIL -> textKey("@", listOf(",", "-", "_", "+"))

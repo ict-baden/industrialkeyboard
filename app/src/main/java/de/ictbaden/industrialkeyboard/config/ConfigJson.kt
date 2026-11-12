@@ -66,6 +66,7 @@ object ConfigJson {
             put("navigation", config.layout.navigation.key)
             put("numericOrder", config.layout.numericOrder.key)
             put("umlautKeys", config.layout.umlautKeys)
+            put("symbolsKey", config.layout.symbolsKey)
         })
         root.put("tabs", JSONObject().apply {
             val t = config.tabs
@@ -235,6 +236,7 @@ object ConfigJson {
             navigation = enumValue(json, "navigation", "layout", d.navigation),
             numericOrder = enumValue(json, "numericOrder", "layout", d.numericOrder),
             umlautKeys = json.optBoolean("umlautKeys", d.umlautKeys),
+            symbolsKey = json.optBoolean("symbolsKey", d.symbolsKey),
         )
     }
 
