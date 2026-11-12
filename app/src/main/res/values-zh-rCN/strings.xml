@@ -467,6 +467,7 @@
     <string name="feature_scan">扫描</string>
     <string name="feature_numpad">数字键盘</string>
     <string name="feature_clipboard">剪贴板</string>
+    <string name="feature_text_editing">文本编辑</string>
     <string name="feature_one_handed">单手模式</string>
     <string name="feature_languages">语言</string>
     <string name="feature_settings">设置</string>
@@ -479,6 +480,16 @@
     <string name="next_word_summary">输入空格后显示可能的下一个词——来自固定列表，不会学习</string>
     <string name="clipboard_history">剪贴板历史记录</string>
     <string name="clipboard_history_summary">保存复制的文本 1 小时，最多 20 条，仅在内存中；从不保存密码字段的内容</string>
+    <string name="text_editing">文本编辑面板</string>
+    <string name="text_editing_summary">方向键、选择、剪切、复制和粘贴 – ⊞ 菜单中的磁贴；按键上的 {EDIT} 也可打开</string>
+    <string name="text_edit_select">选择</string>
+    <string name="text_edit_select_all">全选</string>
+    <string name="text_edit_cut">剪切</string>
+    <string name="text_edit_copy">复制</string>
+    <string name="text_edit_paste">粘贴</string>
+    <string name="text_edit_home">行首</string>
+    <string name="text_edit_end">行尾</string>
+    <string name="text_edit_delete">删除</string>
     <string name="one_handed">单手模式</string>
     <string name="one_handed_off">关闭</string>
     <string name="one_handed_left">左侧</string>
@@ -489,6 +500,8 @@
     <string name="mc_next_word_description">空格后显示可能的下一个词（固定列表）。</string>
     <string name="mc_clipboard_history_title">剪贴板历史记录</string>
     <string name="mc_clipboard_history_description">在内存中保留复制的文本 1 小时，供剪贴板面板使用。</string>
+    <string name="mc_text_editing_title">文本编辑面板</string>
+    <string name="mc_text_editing_description">⊞ 菜单中的磁贴，包含方向键、选择、剪切、复制和粘贴。</string>
     <string name="mc_one_handed_title">单手模式</string>
     <string name="mc_one_handed_description">按键变窄并靠左或靠右。</string>
     <string-array name="mc_top_bar_entries">

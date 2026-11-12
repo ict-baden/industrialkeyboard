@@ -180,14 +180,16 @@ class SetupActivity : AppCompatActivity() {
     }
 
     private fun sampleForm(): List<View> {
-        fun field(hint: Int, type: Int, helper: Int) = ui.textField(getString(hint), inputType = type, helper = getString(helper)).also { fields += it }
+        fun field(hint: Int, type: Int, helper: Int, multiLine: Boolean = false) =
+            ui.textField(getString(hint), inputType = type, helper = getString(helper), multiLine = multiLine).also { fields += it }
         return listOf(
             TextView(this).apply {
                 text = getString(R.string.sample_intro)
                 setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
                 setTextColor(ui.color(com.google.android.material.R.attr.colorOnSurfaceVariant))
             },
-            field(R.string.sample_note, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES, R.string.sample_note_helper),
+            // Several lines, so ↑/↓ of the text editing panel can be tried here.
+            field(R.string.sample_note, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES, R.string.sample_note_helper, multiLine = true),
             field(R.string.sample_item, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS, R.string.sample_item_helper),
             field(R.string.sample_quantity, InputType.TYPE_CLASS_NUMBER, R.string.sample_quantity_helper),
             field(R.string.sample_weight, InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL, R.string.sample_weight_helper),

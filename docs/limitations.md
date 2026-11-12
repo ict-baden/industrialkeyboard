@@ -57,6 +57,22 @@ Please report results on other devices in the
 - The admin password protects the settings screen and remote configuration. It is not a device
   lock: whoever can uninstall the app or clear its data gets the defaults.
 
+## Text editing panel
+
+- Select all, Cut, Copy and Paste use the field's own text actions. Apps without them (some
+  Compose, Flutter, React Native or custom editors) ignore Select all, Cut and Copy; Paste then
+  types the current clipboard text instead.
+- Terminal emulators and remote desktop apps (fields without a text editor) get only keys and
+  Paste; Select, Select all, Cut and Copy are dimmed there. There is no Ctrl+C fallback on
+  purpose: in a terminal Ctrl+C interrupts the running program.
+- In single-line fields ↑/↓ act as Home/End (Gboard moves the focus there). Fields that report a
+  wrong input type (some WebViews) may behave differently.
+- ↑/↓ on the first or last line of a multi-line field, and ←/→ when the app does not answer
+  what is next to the cursor, can still move the focus to another view; the panel then closes.
+- In select mode ←/→ set the selection directly; ↑/↓, Home and End send Shift with the key,
+  which an editor may ignore.
+- The panel keys are drawn on a canvas and are not yet readable by TalkBack (issue #9).
+
 ## Not included, on purpose
 
 - Word suggestions and autocorrection use fixed built-in word lists: they do not learn names or words
@@ -67,4 +83,4 @@ Please report results on other devices in the
 - No internet permission: the keyboard cannot send anything off the device.
 - Camera scan reads one code per tap and has no batch or multi-code mode; a scan engine is faster
   and works in the dark. The camera picture fills only the keyboard area.
-- Key labels are not translated (they are what the keys type).
+- Key labels are not translated (they are what the keys type) – except on the text editing panel.

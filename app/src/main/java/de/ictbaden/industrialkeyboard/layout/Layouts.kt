@@ -237,6 +237,68 @@ object Layouts {
         layout.label,
     )
 
+    /** Texts of the text editing panel, in the keyboard's language. */
+    data class TextEditLabels(
+        val home: String,
+        val end: String,
+        val select: String,
+        val selectAll: String,
+        val cut: String,
+        val copy: String,
+        val paste: String,
+        val delete: String,
+        val abc: String = "ABC",
+    )
+
+    /**
+     * The text editing panel (⊞ → Text editing, `{EDIT}`), in place of the keys. Fixed and stable:
+     * equal [labels] give an equal layout, so a new selection does not set a new layout on the view
+     * (that would stop the key repeat). Select lit and Cut/Copy dimmed are drawn from
+     * [TextEditState], not from here.
+     */
+    fun textEditing(labels: TextEditLabels): KeyboardLayout {
+        fun edit(action: EditAction, label: String?, width: Float, style: KeyStyle, icon: KeyIcon? = null, repeat: Boolean = false) =
+            Key(label = label, icon = icon, output = KeyOutput.Edit(action), width = width, style = style, repeat = repeat)
+        val side = 2.2f
+        val rows = listOf(
+            KeyRow(
+                listOf(
+                    edit(EditAction.HOME, labels.home, 1.2f, KeyStyle.NORMAL),
+                    edit(EditAction.UP, null, 1.4f, KeyStyle.NORMAL, KeyIcon.UP, repeat = true),
+                    edit(EditAction.END, labels.end, 1.2f, KeyStyle.NORMAL),
+                    edit(EditAction.SELECT_ALL, labels.selectAll, side, KeyStyle.FUNCTION),
+                ),
+            ),
+            KeyRow(
+                listOf(
+                    edit(EditAction.LEFT, null, 1.2f, KeyStyle.NORMAL, KeyIcon.LEFT, repeat = true),
+                    edit(EditAction.SELECT, labels.select, 1.4f, KeyStyle.NORMAL),
+                    edit(EditAction.RIGHT, null, 1.2f, KeyStyle.NORMAL, KeyIcon.RIGHT, repeat = true),
+                    edit(EditAction.COPY, labels.copy, side, KeyStyle.FUNCTION),
+                ),
+            ),
+            KeyRow(
+                listOf(
+                    edit(EditAction.DELETE, labels.delete, 1.2f, KeyStyle.NORMAL, repeat = true),
+                    edit(EditAction.DOWN, null, 1.4f, KeyStyle.NORMAL, KeyIcon.DOWN, repeat = true),
+                    // The usual Backspace: undo of an autocorrection, delete gesture, deleting a selection.
+                    backspaceKey(width = 1.2f, flex = false),
+                    edit(EditAction.PASTE, labels.paste, side, KeyStyle.FUNCTION),
+                ),
+            ),
+            KeyRow(
+                listOf(
+                    edit(EditAction.CLOSE, labels.abc, 3.8f, KeyStyle.FUNCTION),
+                    edit(EditAction.CUT, labels.cut, side, KeyStyle.FUNCTION),
+                ),
+            ),
+        )
+        return KeyboardLayout(TEXT_EDITING_ID, rows)
+    }
+
+    /** Id of [textEditing]. */
+    const val TEXT_EDITING_ID = "edit"
+
     /** Keys below the scan pad. */
     fun scanRow(): KeyboardLayout = KeyboardLayout(
         "${Tabs.SCAN}-row",

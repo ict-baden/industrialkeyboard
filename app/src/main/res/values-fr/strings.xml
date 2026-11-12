@@ -469,6 +469,7 @@
     <string name="feature_scan">Scanner</string>
     <string name="feature_numpad">Pavé numérique</string>
     <string name="feature_clipboard">Presse-papiers</string>
+    <string name="feature_text_editing">Modifier le texte</string>
     <string name="feature_one_handed">Une main</string>
     <string name="feature_languages">Langues</string>
     <string name="feature_settings">Paramètres</string>
@@ -481,6 +482,16 @@
     <string name="next_word_summary">Après une espace, les mots suivants probables – d’une liste fixe, rien n’est appris</string>
     <string name="clipboard_history">Historique du presse-papiers</string>
     <string name="clipboard_history_summary">Garde le texte copié 1 heure, 20 éléments au plus, en mémoire seulement ; jamais depuis un champ de mot de passe</string>
+    <string name="text_editing">Panneau de modification du texte</string>
+    <string name="text_editing_summary">Flèches, sélectionner, couper, copier et coller – vignette dans le menu ⊞, ou {EDIT} sur une touche</string>
+    <string name="text_edit_select">Sélectionner</string>
+    <string name="text_edit_select_all">Tout sélectionner</string>
+    <string name="text_edit_cut">Couper</string>
+    <string name="text_edit_copy">Copier</string>
+    <string name="text_edit_paste">Coller</string>
+    <string name="text_edit_home">Début</string>
+    <string name="text_edit_end">Fin</string>
+    <string name="text_edit_delete">Suppr</string>
     <string name="one_handed">Mode une main</string>
     <string name="one_handed_off">Désactivé</string>
     <string name="one_handed_left">Gauche</string>
@@ -491,6 +502,8 @@
     <string name="mc_next_word_description">Mots suivants probables après une espace (liste fixe).</string>
     <string name="mc_clipboard_history_title">Historique du presse-papiers</string>
     <string name="mc_clipboard_history_description">Garder le texte copié 1 heure en mémoire pour le presse-papiers.</string>
+    <string name="mc_text_editing_title">Panneau de modification du texte</string>
+    <string name="mc_text_editing_description">Vignette dans le menu ⊞ avec flèches, sélectionner, couper, copier et coller.</string>
     <string name="mc_one_handed_title">Mode une main</string>
     <string name="mc_one_handed_description">Touches plus étroites à gauche ou à droite.</string>
     <string-array name="mc_top_bar_entries">

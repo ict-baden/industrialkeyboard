@@ -534,6 +534,7 @@
     <string name="feature_scan">Scan</string>
     <string name="feature_numpad">Number pad</string>
     <string name="feature_clipboard">Clipboard</string>
+    <string name="feature_text_editing">Text editing</string>
     <string name="feature_one_handed">One-handed</string>
     <string name="feature_languages">Languages</string>
     <string name="feature_settings">Settings</string>
@@ -547,6 +548,16 @@
     <string name="next_word_summary">After a space, likely next words – from a fixed list, nothing is learnt</string>
     <string name="clipboard_history">Clipboard history</string>
     <string name="clipboard_history_summary">Keeps copied text for 1 hour, at most 20 items, only in memory; never from password fields</string>
+    <string name="text_editing">Text editing panel</string>
+    <string name="text_editing_summary">Arrow keys, select, cut, copy and paste – tile in the ⊞ menu; {EDIT} on a key opens it too</string>
+    <string name="text_edit_select">Select</string>
+    <string name="text_edit_select_all">Select all</string>
+    <string name="text_edit_cut">Cut</string>
+    <string name="text_edit_copy">Copy</string>
+    <string name="text_edit_paste">Paste</string>
+    <string name="text_edit_home">Home</string>
+    <string name="text_edit_end">End</string>
+    <string name="text_edit_delete">Del</string>
     <string name="one_handed">One-handed mode</string>
     <string name="one_handed_off">Off</string>
     <string name="one_handed_left">Left</string>
@@ -557,6 +568,8 @@
     <string name="mc_next_word_description">Likely next words after a space (fixed list).</string>
     <string name="mc_clipboard_history_title">Clipboard history</string>
     <string name="mc_clipboard_history_description">Keep copied text for 1 hour in memory for the clipboard panel.</string>
+    <string name="mc_text_editing_title">Text editing panel</string>
+    <string name="mc_text_editing_description">Tile in the ⊞ menu with arrow keys, select, cut, copy and paste.</string>
     <string name="mc_one_handed_title">One-handed mode</string>
     <string name="mc_one_handed_description">Keys narrower at the left or right.</string>
     <string-array name="mc_top_bar_entries">

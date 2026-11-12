@@ -468,6 +468,7 @@
     <string name="feature_scan">Scannen</string>
     <string name="feature_numpad">Ziffernblock</string>
     <string name="feature_clipboard">Zwischenablage</string>
+    <string name="feature_text_editing">Text bearbeiten</string>
     <string name="feature_one_handed">Einhandmodus</string>
     <string name="feature_languages">Sprachen</string>
     <string name="feature_settings">Einstellungen</string>
@@ -480,6 +481,16 @@
     <string name="next_word_summary">Nach einem Leerzeichen wahrscheinliche nächste Wörter – aus einer festen Liste, nichts wird gelernt</string>
     <string name="clipboard_history">Zwischenablage-Verlauf</string>
     <string name="clipboard_history_summary">Merkt sich Kopiertes 1 Stunde, höchstens 20 Einträge, nur im Arbeitsspeicher; nie aus Passwortfeldern</string>
+    <string name="text_editing">Textbearbeitung</string>
+    <string name="text_editing_summary">Pfeiltasten, Auswählen, Ausschneiden, Kopieren und Einfügen – Kachel im ⊞-Menü; {EDIT} auf einer Taste öffnet sie auch</string>
+    <string name="text_edit_select">Auswählen</string>
+    <string name="text_edit_select_all">Alles auswählen</string>
+    <string name="text_edit_cut">Ausschneiden</string>
+    <string name="text_edit_copy">Kopieren</string>
+    <string name="text_edit_paste">Einfügen</string>
+    <string name="text_edit_home" tools:ignore="Typos">Pos1</string>
+    <string name="text_edit_end">Ende</string>
+    <string name="text_edit_delete">Entf</string>
     <string name="one_handed">Einhandmodus</string>
     <string name="one_handed_off">Aus</string>
     <string name="one_handed_left">Links</string>
@@ -490,6 +501,8 @@
     <string name="mc_next_word_description">Wahrscheinliche nächste Wörter nach einem Leerzeichen (feste Liste).</string>
     <string name="mc_clipboard_history_title">Zwischenablage-Verlauf</string>
     <string name="mc_clipboard_history_description">Kopierten Text 1 Stunde im Arbeitsspeicher für die Zwischenablage behalten.</string>
+    <string name="mc_text_editing_title">Textbearbeitung</string>
+    <string name="mc_text_editing_description">Kachel im ⊞-Menü mit Pfeiltasten, Auswählen, Ausschneiden, Kopieren und Einfügen.</string>
     <string name="mc_one_handed_title">Einhandmodus</string>
     <string name="mc_one_handed_description">Tasten schmaler links oder rechts.</string>
     <string-array name="mc_top_bar_entries">

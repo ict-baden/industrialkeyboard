@@ -45,6 +45,7 @@ import de.ictbaden.industrialkeyboard.config.ScanTriggerType
 import de.ictbaden.industrialkeyboard.config.Symbology
 import de.ictbaden.industrialkeyboard.config.Tabs
 import de.ictbaden.industrialkeyboard.config.VoiceInput
+import de.ictbaden.industrialkeyboard.layout.EditAction
 import de.ictbaden.industrialkeyboard.layout.Key
 import de.ictbaden.industrialkeyboard.layout.KeyChords
 import de.ictbaden.industrialkeyboard.layout.KeyCommand
@@ -53,6 +54,8 @@ import de.ictbaden.industrialkeyboard.layout.Layouts
 import de.ictbaden.industrialkeyboard.layout.Macro
 import de.ictbaden.industrialkeyboard.layout.MacroStep
 import de.ictbaden.industrialkeyboard.layout.ModifierKey
+import de.ictbaden.industrialkeyboard.layout.TextEditState
+import de.ictbaden.industrialkeyboard.layout.TextEditing
 import de.ictbaden.industrialkeyboard.scanner.CameraScanner
 import de.ictbaden.industrialkeyboard.scanner.HardwareScanner
 import de.ictbaden.industrialkeyboard.scanner.ScanFormatter
@@ -432,6 +435,9 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     override fun onStartInputView(info: EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         toolPanel = null
+        textSelecting = false
+        selStart = info.initialSelStart
+        selEnd = info.initialSelEnd
         // First, so that the dictionary, dictation and the start page see the effective configuration.
         val effectiveChanged = useEffective()
         watchClipboard(true)
@@ -468,11 +474,18 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         endWord()
         emojiOpen = false
         toolPanel = null
+        textSelecting = false
         watchClipboard(false)
     }
 
     override fun onUpdateSelection(oldSelStart: Int, oldSelEnd: Int, newSelStart: Int, newSelEnd: Int, candidatesStart: Int, candidatesEnd: Int) {
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd)
+        // Positions only, for the text editing panel (Cut/Copy need a selection) – never the text.
+        val hadSelection = selStart != selEnd
+        selStart = newSelStart
+        selEnd = newSelEnd
+        // Same layout, so only the keys are redrawn and a held ← keeps repeating.
+        if (toolPanel == Tabs.TOOL_EDIT && hadSelection != (newSelStart != newSelEnd)) render()
         // Text arrived (typed or scanned): the scan is over.
         if (scanning && newSelStart != oldSelStart) setScanning(false)
         // Our own typing is expected; a tap elsewhere, a selection or the app changing the text ends the word.
@@ -522,7 +535,14 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             is KeyOutput.ShowTab -> showTab(output.tab)
             is KeyOutput.Modifier -> tapModifier(output.modifier)
             KeyOutput.Shift -> toggleShift()
-            KeyOutput.Backspace -> if (held) chordWithModifiers(KeyEvent.KEYCODE_DEL) else backspace()
+            KeyOutput.Backspace -> {
+                if (held) chordWithModifiers(KeyEvent.KEYCODE_DEL) else backspace()
+                // ⌫ on the text editing panel ends the select mode, like Cut and Del.
+                if (toolPanel == Tabs.TOOL_EDIT && textSelecting) {
+                    textSelecting = false
+                    render()
+                }
+            }
             KeyOutput.Enter -> if (held) chordWithModifiers(KeyEvent.KEYCODE_ENTER) else enter()
             KeyOutput.Space -> if (held) chordWithModifiers(KeyEvent.KEYCODE_SPACE) else space()
             KeyOutput.Language -> nextLanguage()
@@ -532,6 +552,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
                 page = Page.Symbols(if (current?.page == 2) 1 else 2, field.alpha)
                 render()
             }
+            is KeyOutput.Edit -> textEdit(output.action)
             KeyOutput.None -> Unit
         }
     }
@@ -665,7 +686,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     private fun suggestionsWanted(): Boolean {
         val info = currentInputEditorInfo ?: return false
-        return config.typing.suggestions && page is Page.Alpha && FieldPolicy.suggestionsAllowed(info.inputType)
+        // Not while a panel replaces the keys: ⌫ on the text editing panel must not bring the strip back.
+        return config.typing.suggestions && page is Page.Alpha && toolPanel == null && FieldPolicy.suggestionsAllowed(info.inputType)
     }
 
     /** New suggestions for the word; fast (tens of dictionary lookups), measured once in the log. */
@@ -819,6 +841,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
                     KeyCommand.HIDE -> requestHideSelf(0)
                     KeyCommand.SETTINGS -> openSettings()
                     KeyCommand.NEXT_KEYBOARD -> nextKeyboard()
+                    KeyCommand.TEXT_EDIT -> setToolPanel(if (toolPanel == Tabs.TOOL_EDIT) null else Tabs.TOOL_EDIT)
                 }
                 is MacroStep.ShowTab -> showTab(step.tab)
             }
@@ -837,11 +860,11 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
      * Key press with modifiers (Shift + F1 = F13, Ctrl + C …). Ctrl, Win and Alt are pressed and
      * released around the key like on a PC keyboard, which remote desktop apps need.
      */
-    private fun sendKey(code: Int, meta: Int) {
+    private fun sendKey(code: Int, meta: Int, pressShift: Boolean = false) {
         val ic = currentInputConnection ?: return
         val time = SystemClock.uptimeMillis()
         val flags = KeyEvent.FLAG_SOFT_KEYBOARD or KeyEvent.FLAG_KEEP_TOUCH_MODE
-        for (e in KeyChords.events(code, meta)) {
+        for (e in KeyChords.events(code, meta, pressShift)) {
             val action = if (e.down) KeyEvent.ACTION_DOWN else KeyEvent.ACTION_UP
             ic.sendKeyEvent(KeyEvent(time, time, action, e.keyCode, 0, e.meta, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, flags))
         }
@@ -902,6 +925,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         closeVoice()
         emojiOpen = false
         toolPanel = null
+        textSelecting = false
         // Shift belongs to the page it was set on (letters vs. F13–F24 on the function keys).
         shift = ShiftState.OFF
         autoShifted = false
@@ -922,7 +946,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     // region toolbar (layout.topBar: toolbar)
 
-    /** Open toolbar panel ([Tabs.TOOL_MENU] or [Tabs.TOOL_CLIPBOARD]) in place of the keys, or null. */
+    /** Open panel ([Tabs.TOOL_MENU], [Tabs.TOOL_CLIPBOARD] or [Tabs.TOOL_EDIT]) in place of the keys, or null. */
     private var toolPanel: String? = null
 
     /** Copied texts, only in memory and only with `typing.clipboardHistory`. */
@@ -944,6 +968,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         closeVoice()
         emojiOpen = false
         if (panel != null) endWord()
+        if (panel != Tabs.TOOL_EDIT) textSelecting = false
         toolPanel = panel
         if (panel == Tabs.TOOL_MENU) root?.featuresPanel?.show(features())
         render()
@@ -959,6 +984,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         if (scanner.available) add(FeaturesPanelView.Feature(FeaturesPanelView.SCAN, R.drawable.kb_scan, R.string.feature_scan))
         add(FeaturesPanelView.Feature(FeaturesPanelView.NUMBER_PAD, R.drawable.kb_numpad, R.string.feature_numpad))
         add(FeaturesPanelView.Feature(FeaturesPanelView.CLIPBOARD, R.drawable.kb_clipboard, R.string.feature_clipboard))
+        if (config.typing.textEditing) add(FeaturesPanelView.Feature(FeaturesPanelView.TEXT_EDITING, R.drawable.kb_text_edit, R.string.feature_text_editing))
         add(FeaturesPanelView.Feature(FeaturesPanelView.ONE_HANDED, R.drawable.kb_onehand, R.string.feature_one_handed))
         add(FeaturesPanelView.Feature(FeaturesPanelView.LANGUAGES, R.drawable.kb_globe, R.string.feature_languages))
         add(FeaturesPanelView.Feature(FeaturesPanelView.SETTINGS, R.drawable.kb_settings, R.string.feature_settings))
@@ -970,6 +996,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             FeaturesPanelView.SCAN -> showTab(Tabs.SCAN)
             FeaturesPanelView.NUMBER_PAD -> showTab(Tabs.NUMERIC)
             FeaturesPanelView.CLIPBOARD -> setToolPanel(Tabs.TOOL_CLIPBOARD)
+            FeaturesPanelView.TEXT_EDITING -> setToolPanel(Tabs.TOOL_EDIT)
             FeaturesPanelView.ONE_HANDED -> {
                 setToolPanel(null)
                 setOneHanded(if (config.appearance.oneHanded == OneHanded.OFF) OneHanded.RIGHT else OneHanded.OFF)
@@ -1026,6 +1053,108 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         }
         return listOfNotNull(currentClip()?.let { ClipItem(0, it, pinned = false, time = 0) })
     }
+
+    // region text editing panel (⊞ → Text editing, {EDIT})
+
+    /** Select mode: arrows extend the selection. In memory only, like the positions below. */
+    private var textSelecting = false
+
+    /** Selection as last reported by the field (positions, never text); -1 = unknown. */
+    private var selStart = -1
+    private var selEnd = -1
+
+    /** The end of the selection that stays put while ← and → extend it in select mode. */
+    private var selAnchor = -1
+
+    private fun editState(): TextEditState {
+        val type = currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL
+        return TextEditState(textSelecting, selStart != selEnd, FieldPolicy.isPassword(type), TextEditing.editor(type))
+    }
+
+    private fun textEdit(action: EditAction) {
+        val ic = currentInputConnection ?: return
+        val type = currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL
+        val before = editState()
+        if (!before.enabled(action)) return
+        endWord()
+        when (action) {
+            EditAction.LEFT, EditAction.RIGHT, EditAction.UP, EditAction.DOWN, EditAction.HOME, EditAction.END, EditAction.DELETE ->
+                moveCursor(ic, action, type, before.hasSelection)
+            EditAction.SELECT -> {
+                textSelecting = !textSelecting
+                // Off keeps the selection; the next arrow collapses it, like TextView and Gboard.
+                if (textSelecting) selAnchor = selStart
+            }
+            EditAction.SELECT_ALL -> if (!ic.performContextMenuAction(android.R.id.selectAll)) {
+                ic.getExtractedText(ExtractedTextRequest(), 0)?.let { extracted ->
+                    ic.setSelection(0, extracted.startOffset + (extracted.text?.length ?: 0))
+                }
+            }
+            // No Ctrl+X/C fallback: in a terminal Ctrl+C is an interrupt. Copy keeps the selection.
+            EditAction.CUT -> {
+                ic.performContextMenuAction(android.R.id.cut)
+                textSelecting = false
+            }
+            EditAction.COPY -> {
+                ic.performContextMenuAction(android.R.id.copy)
+                textSelecting = false
+            }
+            EditAction.PASTE -> {
+                // Some terminals and custom editors have no paste action: type the clip (never a sensitive one).
+                if (!ic.performContextMenuAction(android.R.id.paste)) {
+                    currentClip()?.let { clip ->
+                        ownEdits++
+                        ic.commitText(clip, 1)
+                    }
+                }
+                textSelecting = false
+            }
+            EditAction.CLOSE -> {
+                setToolPanel(null)
+                updateAutoShift()
+                return
+            }
+        }
+        if (editState() != before) render()
+    }
+
+    /** Arrows, Home, End and Del; in select mode they extend the selection. */
+    private fun moveCursor(ic: InputConnection, action: EditAction, type: Int, hasSelection: Boolean) {
+        if (textSelecting && (action == EditAction.LEFT || action == EditAction.RIGHT)) {
+            extendSelection(ic, right = action == EditAction.RIGHT)
+            return
+        }
+        // Asked only for ← and → without a selection: one character, to keep the focus in the field.
+        val before = if (action == EditAction.LEFT && !hasSelection) ic.getTextBeforeCursor(1, 0) else null
+        val after = if (action == EditAction.RIGHT && !hasSelection) ic.getTextAfterCursor(1, 0) else null
+        if (TextEditing.blockedAtEdge(action, type, hasSelection, before, after)) return
+        val code = TextEditing.keyCode(action, type) ?: return
+        if (textSelecting && action != EditAction.DELETE) {
+            // A real Shift press around the key: TextView extends the selection only then.
+            sendKey(code, KeyChords.SHIFT_LEFT, pressShift = true)
+        } else {
+            sendDownUpKeyEvents(code)
+        }
+        if (action == EditAction.DELETE) textSelecting = false
+    }
+
+    /**
+     * Select mode, ← and →: sets the selection one character further from the known positions,
+     * which works the same in TextView, WebView and Compose (a Shift chord depends on the editor).
+     */
+    private fun extendSelection(ic: InputConnection, right: Boolean) {
+        val (anchor, focus) = TextEditing.extend(selAnchor, selStart, selEnd, if (right) 1 else -1) ?: return
+        // Growing at the end of the text: the field ignores positions past it, so stop there.
+        if (right && focus > anchor && ic.getTextAfterCursor(1, 0)?.isEmpty() == true) return
+        selAnchor = anchor
+        if (ic.setSelection(anchor, focus)) {
+            // Right away, so a held key does not repeat from a position the field has not reported yet.
+            selStart = anchor
+            selEnd = focus
+        }
+    }
+
+    // endregion
 
     private fun pasteClip(text: String) {
         feedback.keyDown(null)
@@ -1218,7 +1347,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun render() {
         val root = root ?: return
         val secret = FieldPolicy.isPassword(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)
-        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey(), emojiKey = emojiKey(), suggestions = suggestions.words.map { it.text }, emojiOpen = emojiOpen, mic = voiceEngine != Dictation.Engine.NONE && !voiceOpen, toolPanel = toolPanel, clips = clips(), clipboardHistory = config.typing.clipboardHistory))
+        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey(), emojiKey = emojiKey(), suggestions = suggestions.words.map { it.text }, emojiOpen = emojiOpen, mic = voiceEngine != Dictation.Engine.NONE && !voiceOpen, toolPanel = toolPanel, clips = clips(), clipboardHistory = config.typing.clipboardHistory, textEdit = if (toolPanel == Tabs.TOOL_EDIT) editState() else null))
     }
 
     private fun enterIcon(): Int {

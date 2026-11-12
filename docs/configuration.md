@@ -231,6 +231,7 @@ Phone, date and time fields show fixed keys instead of the numeric ones.
 | `nextWord` | `true` / `false` | `true` | After a space, three likely next words (`vielen ` → Dank, Grüße; `thank ` → you). From a small fixed list per language (German and English so far, `tools/dictionaries/next/`); the AOSP word lists have no word pairs and nothing is learnt from typing |
 | `clipboardHistory` | `true` / `false` | `false` | Clipboard history for the toolbar's 📋 panel: text copied while the keyboard is shown, newest first, at most 20 entries, unpinned ones for 1 hour, **only in memory** (gone when the keyboard restarts). Never from password fields or clips marked sensitive. Off: the panel offers only what is copied right now |
 | `deleteGesture` | `true` / `false` | `true` | Swipe left from Backspace marks whole words (one more per finger width), lifting the finger deletes them – like Gboard |
+| `textEditing` | `true` / `false` | `true` | Tile *Text editing* in the ⊞ menu: a panel in place of the keys with ← ↑ → ↓, Home, End, Select (the arrows then extend the selection, like holding Shift), Select all, Cut, Copy, Paste, Del and ⌫; ABC goes back to the page shown before. In single-line fields ↑/↓ act as Home/End, so the focus stays in the field. Cut and Copy only with a selection and never in password fields. [`{EDIT}`](#macros) opens it from any key, also with `topBar: tabs` (no ⊞ there) and when this option is off. Nothing is stored |
 
 Always on: rollover typing with several fingers, key repeat on Backspace, Del and the arrow
 keys, slide on the space bar to move the cursor, long press on the space bar to switch
@@ -471,7 +472,7 @@ when the configuration is loaded.
 | Key combinations | Modifiers and one key joined with `+`: `{CTRL+C}`, `{ALT+F4}`, `{WIN+R}`, `{CTRL+SHIFT+ESC}`, `{CTRL+ALT+END}`. Modifiers: `CTRL`, `ALT`, `WIN`, `SHIFT`; key: any key name above, `A`–`Z`, `0`–`9` or `SPACE` |
 | More keys | `{PRINT}` (Print Screen), `{PAUSE}`, `{MENU}` (context menu key) |
 | Characters | `{SPACE}`, `{LBRACE}` / `{OPEN-BRACE}` = `{`, `{RBRACE}` / `{CLOSE-BRACE}` = `}`, `{U+20AC}` or `{HEX:20AC}` = any Unicode character (here €) |
-| Commands | `{SCAN}` start/stop the scanner, `{HIDE}` hide the keyboard, `{SETTINGS}` open the settings, `{NEXT-KEYBOARD}` switch to the next keyboard, `{SHOW:tab}` show a tab (`alpha`, `numeric`, `symbols`, `function`, `scan` or a custom layout id) |
+| Commands | `{SCAN}` start/stop the scanner, `{HIDE}` hide the keyboard, `{SETTINGS}` open the settings, `{NEXT-KEYBOARD}` switch to the next keyboard, `{EDIT}` open/close the text editing panel ([`typing.textEditing`](#typing)), `{SHOW:tab}` show a tab (`alpha`, `numeric`, `symbols`, `function`, `scan` or a custom layout id) |
 
 `{ENTER}` behaves like the Enter key: it runs the field's action (next field, search, send …)
 or starts a new line in multi-line fields.

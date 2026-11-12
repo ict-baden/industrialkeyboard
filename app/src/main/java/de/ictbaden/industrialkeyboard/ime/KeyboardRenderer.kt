@@ -2,6 +2,7 @@ package de.ictbaden.industrialkeyboard.ime
 
 import android.content.Context
 import androidx.annotation.DrawableRes
+import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
 import de.ictbaden.industrialkeyboard.config.Navigation
@@ -10,6 +11,7 @@ import de.ictbaden.industrialkeyboard.config.TopBar
 import de.ictbaden.industrialkeyboard.layout.KeyboardLayout
 import de.ictbaden.industrialkeyboard.layout.Layouts
 import de.ictbaden.industrialkeyboard.layout.ModifierKey
+import de.ictbaden.industrialkeyboard.layout.TextEditState
 import de.ictbaden.industrialkeyboard.ui.ClipItem
 import de.ictbaden.industrialkeyboard.ui.Palette
 import de.ictbaden.industrialkeyboard.ui.RenderState
@@ -40,6 +42,23 @@ object KeyboardRenderer {
         Page.Function -> Layouts.function(shifted = shift != ShiftState.OFF, modifiers = config.appearance.functionModifiers)
         Page.Scan -> null
         is Page.Custom -> config.customLayout(page.id)?.let(Layouts::custom) ?: Layouts.alpha(config)
+    }
+
+    /** The text editing panel with its texts in the keyboard's language. */
+    fun textEditingLayout(context: Context): KeyboardLayout {
+        val res = AppLanguage.localized(context)
+        return Layouts.textEditing(
+            Layouts.TextEditLabels(
+                home = res.getString(R.string.text_edit_home),
+                end = res.getString(R.string.text_edit_end),
+                select = res.getString(R.string.text_edit_select),
+                selectAll = res.getString(R.string.text_edit_select_all),
+                cut = res.getString(R.string.text_edit_cut),
+                copy = res.getString(R.string.text_edit_copy),
+                paste = res.getString(R.string.text_edit_paste),
+                delete = res.getString(R.string.text_edit_delete),
+            ),
+        )
     }
 
     /** Every page has the height of the letters, or of the function keys when they have more rows. */
@@ -97,12 +116,14 @@ object KeyboardRenderer {
         emojiOpen: Boolean = false,
         /** Microphone in the tab bar (a voice input method exists). */
         mic: Boolean = false,
-        /** Open toolbar panel: [Tabs.TOOL_MENU] or [Tabs.TOOL_CLIPBOARD], else null. */
+        /** Open toolbar panel: [Tabs.TOOL_MENU], [Tabs.TOOL_CLIPBOARD] or [Tabs.TOOL_EDIT], else null. */
         toolPanel: String? = null,
         /** Clipboard items for the clipboard panel, newest first. */
         clips: List<ClipItem> = emptyList(),
         /** Clipboard history is switched on (otherwise the panel explains how). */
         clipboardHistory: Boolean = false,
+        /** Select lit, Cut/Copy dimmed on the text editing panel ([Tabs.TOOL_EDIT]). */
+        textEdit: TextEditState? = null,
     ): RenderState {
         val appearance = config.appearance
         val rowHeight = (baseRowDp(context) * context.resources.displayMetrics.density * appearance.keyHeight / 100f).toInt()
@@ -113,7 +134,8 @@ object KeyboardRenderer {
             tabs = tabs(config, scannerName != null),
             // The toolbar marks an open panel or a page it leads to; ABC needs no mark there.
             selectedTab = if (toolbar(config)) toolPanel ?: page.tab.takeIf { it != Tabs.ALPHA } else page.tab,
-            layout = layoutFor(page, keys, shift, languageKey, emojiKey),
+            // The text editing panel takes the place of the keys, in the same height (heightRows stays).
+            layout = if (toolPanel == Tabs.TOOL_EDIT) textEditingLayout(context) else layoutFor(page, keys, shift, languageKey, emojiKey),
             shift = shift,
             modifiers = modifiers,
             enterIcon = enterIcon,
@@ -135,6 +157,7 @@ object KeyboardRenderer {
             clips = clips,
             clipboardHistory = clipboardHistory,
             oneHanded = config.appearance.oneHanded,
+            textEdit = textEdit.takeIf { toolPanel == Tabs.TOOL_EDIT },
         )
     }
 }

@@ -61,4 +61,14 @@ class MacroTest {
         assertEquals(KeyIcon.SCAN, Macro.icon(Macro.parse("{SCAN}")))
         assertNull(Macro.icon(Macro.parse("A{TAB}")))
     }
+
+    @Test
+    fun `edit opens the text editing panel`() {
+        assertEquals(listOf(MacroStep.Command(KeyCommand.TEXT_EDIT)), Macro.parse("{EDIT}"))
+        assertEquals(listOf(MacroStep.Command(KeyCommand.TEXT_EDIT)), Macro.parse("{edit}"))
+        assertEquals(KeyIcon.TEXT_EDIT, Macro.icon(Macro.parse("{EDIT}")))
+        assertEquals("Edit", Macro.label(Macro.parse("{EDIT}")))
+        val error = assertThrows(IllegalArgumentException::class.java) { Macro.parse("{EDITT}") }
+        assertEquals("unknown token {EDITT}", error.message)
+    }
 }

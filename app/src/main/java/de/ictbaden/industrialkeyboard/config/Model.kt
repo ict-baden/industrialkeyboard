@@ -245,6 +245,8 @@ data class TypingSettings(
     val nextWord: Boolean = true,
     /** Remember copied text (max. 20 items, 1 h, in memory only) for the clipboard panel; off = only the current item. */
     val clipboardHistory: Boolean = false,
+    /** Tile "Text editing" in the ⊞ grid (arrows, select, cut/copy/paste in place of the keys); `{EDIT}` works regardless. */
+    val textEditing: Boolean = true,
 )
 
 data class FeedbackSettings(
@@ -350,4 +352,7 @@ object Tabs {
     const val TOOL_MENU = "tool:menu"
     const val TOOL_CLIPBOARD = "tool:clipboard"
     const val TOOL_SETTINGS = "tool:settings"
+
+    /** The text editing panel (⊞ → Text editing, `{EDIT}`); a panel, not a page, like [TOOL_CLIPBOARD]. */
+    const val TOOL_EDIT = "tool:edit"
 }

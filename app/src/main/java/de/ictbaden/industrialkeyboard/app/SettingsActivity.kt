@@ -412,6 +412,10 @@ class SettingsActivity : AppCompatActivity() {
                     ui.switchRow(R.drawable.ic_keyboard, getString(R.string.clipboard_history), getString(R.string.clipboard_history_summary), c.typing.clipboardHistory) { on ->
                         update { it.copy(typing = it.typing.copy(clipboardHistory = on)) }
                     },
+                    // Always switchable: an app profile can bring the toolbar (and ⊞) to a configuration with tabs.
+                    ui.switchRow(R.drawable.ic_text, getString(R.string.text_editing), getString(R.string.text_editing_summary), c.typing.textEditing) { on ->
+                        update { it.copy(typing = it.typing.copy(textEditing = on)) }
+                    },
                     ui.choiceRow(
                         R.drawable.ic_mic,
                         getString(R.string.voice_input),

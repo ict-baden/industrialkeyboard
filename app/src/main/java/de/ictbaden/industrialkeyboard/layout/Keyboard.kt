@@ -2,7 +2,7 @@ package de.ictbaden.industrialkeyboard.layout
 
 import de.ictbaden.industrialkeyboard.config.KeyStyle
 
-enum class KeyIcon { SHIFT, BACKSPACE, ENTER, TAB, SPACE, SCAN, HIDE, LEFT, RIGHT, UP, DOWN, SETTINGS, GLOBE, EMOJI }
+enum class KeyIcon { SHIFT, BACKSPACE, ENTER, TAB, SPACE, SCAN, HIDE, LEFT, RIGHT, UP, DOWN, SETTINGS, GLOBE, EMOJI, TEXT_EDIT }
 
 /** What a key does when it is released. */
 sealed interface KeyOutput {
@@ -29,6 +29,9 @@ sealed interface KeyOutput {
 
     /** Toggles between the two symbol pages. */
     data object SymbolsPage : KeyOutput
+
+    /** A key of the text editing panel ([Layouts.textEditing]). */
+    data class Edit(val action: EditAction) : KeyOutput
 
     /** Empty space (indentation). */
     data object None : KeyOutput

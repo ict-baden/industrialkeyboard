@@ -4,6 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
+import org.junit.Assert.assertFalse
 import org.junit.Test
 
 class ConfigJsonTest {
@@ -146,5 +147,23 @@ class ConfigJsonTest {
             assertNotNull(e.message)
             assertTrue("\"${e.message}\" should mention $expected", e.message!!.contains(expected))
         }
+    }
+
+    @Test
+    fun `text editing tile is on by default and survives saving`() {
+        assertTrue(ConfigJson.parse("{}").typing.textEditing)
+        assertTrue(ConfigJson.parse("""{"typing":{"clipboardHistory":true}}""").typing.textEditing)
+        val off = ConfigJson.parse("""{"typing":{"textEditing":false}}""")
+        assertFalse(off.typing.textEditing)
+        assertEquals(off, ConfigJson.parse(ConfigJson.write(off)))
+        assertTrue(ConfigJson.parse(ConfigJson.write(KeyboardConfig())).typing.textEditing)
+        // Lenient like the other typing switches: anything else keeps the default.
+        assertTrue(ConfigJson.parse("""{"typing":{"textEditing":"maybe"}}""").typing.textEditing)
+    }
+
+    @Test
+    fun `a misspelt edit macro is rejected with its path`() {
+        rejected("""{"keys":{"alpha.p1":"{EDITT}"}}""", "keys.alpha.p1: unknown token {EDITT}")
+        assertEquals("{EDIT}", ConfigJson.parse("""{"keys":{"alpha.p1":"{EDIT}"}}""").programmable(ProgrammableKey.ALPHA_P1))
     }
 }

@@ -135,4 +135,43 @@ class ModifierKeysTest {
         assertEquals("Strg", custom.rows[0].keys[0].label)
         assertEquals(KeyOutput.Macro(listOf(MacroStep.Key(KeyEvent.KEYCODE_ESCAPE, ctrl or KeyEvent.META_SHIFT_ON))), custom.rows[0].keys[1].output)
     }
+
+    @Test
+    fun `select mode presses the shift key itself around the arrow`() {
+        val shift = KeyChords.SHIFT_LEFT
+        assertEquals(
+            listOf(
+                ChordEvent(true, KeyEvent.KEYCODE_SHIFT_LEFT, shift),
+                ChordEvent(true, KeyEvent.KEYCODE_DPAD_LEFT, shift),
+                ChordEvent(false, KeyEvent.KEYCODE_DPAD_LEFT, shift),
+                ChordEvent(false, KeyEvent.KEYCODE_SHIFT_LEFT, 0),
+            ),
+            KeyChords.events(KeyEvent.KEYCODE_DPAD_LEFT, shift, pressShift = true),
+        )
+    }
+
+    @Test
+    fun `with ctrl the shift key goes down inside ctrl`() {
+        val shift = KeyChords.SHIFT_LEFT
+        assertEquals(
+            listOf(
+                ChordEvent(true, KeyEvent.KEYCODE_CTRL_LEFT, ctrl),
+                ChordEvent(true, KeyEvent.KEYCODE_SHIFT_LEFT, ctrl or shift),
+                ChordEvent(true, KeyEvent.KEYCODE_MOVE_END, ctrl or shift),
+                ChordEvent(false, KeyEvent.KEYCODE_MOVE_END, ctrl or shift),
+                ChordEvent(false, KeyEvent.KEYCODE_SHIFT_LEFT, ctrl),
+                ChordEvent(false, KeyEvent.KEYCODE_CTRL_LEFT, 0),
+            ),
+            KeyChords.events(KeyEvent.KEYCODE_MOVE_END, ctrl or shift, pressShift = true),
+        )
+    }
+
+    @Test
+    fun `without pressShift the events stay as before`() {
+        val shift = KeyEvent.META_SHIFT_ON
+        for ((code, meta) in listOf(KeyEvent.KEYCODE_F1 to shift, KeyEvent.KEYCODE_ESCAPE to (ctrl or shift), KeyEvent.KEYCODE_FORWARD_DEL to (ctrl or alt), KeyEvent.KEYCODE_TAB to 0)) {
+            assertEquals(KeyChords.events(code, meta), KeyChords.events(code, meta, pressShift = false))
+        }
+        assertEquals(2, KeyChords.events(KeyEvent.KEYCODE_F1, shift).size)
+    }
 }
