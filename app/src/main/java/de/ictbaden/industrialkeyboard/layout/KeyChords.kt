@@ -52,6 +52,14 @@ object KeyChords {
     fun meta(modifiers: Collection<ModifierKey>): Int = modifiers.fold(0) { acc, m -> acc or m.meta }
 
     /**
+     * Meta state the keyboard adds to every key of a macro: the armed or locked Ctrl, Win and Alt
+     * and a Shift tapped by hand ([manualShift]). None for a [snippet]: its `{TAB}` and `{ENTER}`
+     * stay plain keys (no Shift+Tab or Ctrl+Enter), and chords only come from its own `{CTRL+…}`.
+     */
+    fun heldMeta(modifiers: Collection<ModifierKey>, manualShift: Boolean, snippet: Boolean): Int =
+        if (snippet) 0 else meta(modifiers) or (if (manualShift) KeyEvent.META_SHIFT_ON else 0)
+
+    /**
      * Events for [keyCode] pressed with [meta]; Ctrl, Win and Alt in [meta] are pressed around it.
      * [pressShift]: Shift is pressed as a key too (inside Ctrl, Win and Alt), not only sent as meta
      * state – TextView extends a selection only when the Shift key itself went down. Otherwise Shift

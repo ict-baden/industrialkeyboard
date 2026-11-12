@@ -536,7 +536,7 @@
     <string name="snippets_empty_admin">Votre organisation n’a configuré aucun texte type.</string>
     <string name="section_snippets">Textes types</string>
     <string name="snippets_enabled">Textes types</string>
-    <string name="snippets_enabled_summary">Textes prêts à l’emploi dans ⊞ et en suggestion</string>
+    <string name="snippets_enabled_summary">Textes prêts à l’emploi dans le clavier et en suggestion</string>
     <string name="snippets_shortcuts">Raccourcis</string>
     <string name="snippets_shortcuts_summary">Taper un raccourci comme « mfg » propose son texte type</string>
     <string name="snippets_button">Textes types dans la barre</string>
@@ -574,6 +574,7 @@
         <item quantity="other">%1$d textes types maximum</item>
     </plurals>
     <string name="user_snippets_reset">Vos textes types étaient illisibles et ont été réinitialisés.</string>
+    <string name="snippet_save_failed">Impossible d’enregistrer le texte type.</string>
     <string name="mc_snippets_enabled_title">Textes types</string>
     <string name="mc_snippets_enabled_description">Textes prêts à l’emploi dans le clavier (activé par défaut).</string>
     <string name="mc_snippets_shortcuts_title">Raccourcis des textes types</string>

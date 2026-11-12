@@ -89,18 +89,21 @@ class UserSnippets @VisibleForTesting internal constructor(private val file: Fil
             ConfigJson.parseSnippetItems(array, FILE_WHERE, Snippets.MAX_USER, user = true)
         } catch (e: Exception) {
             if (e !is IOException && e !is JSONException && e !is ConfigException) throw e
-            broken(if (e is JSONException) "invalid JSON" else e.message.orEmpty())
+            broken(if (e is JSONException) "invalid JSON" else e.message.orEmpty(), e.javaClass.simpleName)
         }
     }
 
-    /** Keeps the broken file as `.invalid` (one copy, the latest) and starts empty. Never logs the texts. */
-    private fun broken(reason: String): List<Snippet> {
+    /**
+     * Keeps the broken file as `.invalid` (one copy, the latest) and starts empty. Logs only the kind
+     * of error ([kind]), never [reason]: it may quote a shortcut or other content of the file.
+     */
+    private fun broken(reason: String, kind: String): List<Snippet> {
         val backup = File(file.parentFile, "${file.name}.invalid")
         val kept = runCatching {
             file.copyTo(backup, overwrite = true)
             file.delete()
         }.isSuccess
-        Log.e(TAG, "Own snippets could not be read, starting empty${if (kept) "; kept as ${backup.name}" else ""}: $reason")
+        Log.e(TAG, "Own snippets could not be read ($kind), starting empty${if (kept) "; kept as ${backup.name}" else ""}")
         loadError = reason
         return emptyList()
     }

@@ -665,7 +665,7 @@ class SettingsActivity : AppCompatActivity() {
                     ui.switchRow(R.drawable.ic_snippets, getString(R.string.snippets_button), getString(R.string.snippets_button_summary), s.button, enabled = s.enabled) { on ->
                         set { it.copy(button = on) }
                     },
-                    ui.switchRow(R.drawable.ic_snippets, getString(R.string.snippets_allow_user), getString(R.string.snippets_allow_user_summary), s.allowUser) { on ->
+                    ui.switchRow(R.drawable.ic_snippets, getString(R.string.snippets_allow_user), getString(R.string.snippets_allow_user_summary), s.allowUser, enabled = s.enabled) { on ->
                         set { it.copy(allowUser = on) }
                     },
                     ui.row(R.drawable.ic_snippets, getString(R.string.snippets_org), resources.getQuantityString(R.plurals.snippets_count, s.items.size, s.items.size)) {
