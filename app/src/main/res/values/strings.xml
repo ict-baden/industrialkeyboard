@@ -541,6 +541,23 @@
     <!-- State of an on/off tile for screen readers ("Gloves, On"); shared by quick toggles and accessibility. -->
     <string name="state_on">On</string>
     <string name="state_off">Off</string>
+    <string name="feature_glove">Gloves</string>
+    <string name="feature_contrast">Contrast</string>
+    <string name="feature_scanner">Scan keys</string>
+    <string name="feature_sound">Sound</string>
+    <string name="section_quick_toggles">Quick toggles</string>
+    <string name="quick_toggles_intro">Apply to this device only and can also be switched with ⊞ on the keyboard. The configuration stays as it is, so the settings above keep showing it.</string>
+    <string name="glove_mode">Glove mode</string>
+    <string name="glove_mode_summary">Keys at least %1$d %%, long press %2$d ms, no key preview, stronger vibration</string>
+    <string name="quick_contrast_summary">Black keys, white outlines, yellow highlights</string>
+    <string name="quick_scanner">Scanner in the keyboard</string>
+    <string name="quick_scanner_summary">Off: no scan button, scan key or camera in the keyboard. The device\'s scan trigger, NFC and barcode broadcasts keep working.</string>
+    <string name="quick_sound_summary">Click sound on every key</string>
+    <string name="quick_toggles_allowed">Allowed for users</string>
+    <string name="quick_toggles_allowed_summary">Not allowed: hidden in ⊞, a setting made on the device is ignored (and applies again once allowed)</string>
+    <string name="quick_toggles_locked">Locked by the administrator</string>
+    <string name="quick_toggles_reset">Reset quick toggles</string>
+    <string name="quick_toggles_reset_summary">Back to the configuration</string>
     <string name="top_bar">Above the keys</string>
     <string name="top_bar_toolbar">Toolbar like Gboard</string>
     <string name="top_bar_tabs">Tabs (ABC, 123, Fn …)</string>
@@ -570,6 +587,8 @@
     <string name="mc_clipboard_history_description">Keep copied text for 1 hour in memory for the clipboard panel.</string>
     <string name="mc_text_editing_title">Text editing panel</string>
     <string name="mc_text_editing_description">Tile in the ⊞ menu with arrow keys, select, cut, copy and paste.</string>
+    <string name="mc_quick_toggles_title">Quick toggles for users</string>
+    <string name="mc_quick_toggles_description">Comma-separated: glove, contrast, scanner, sound; none = no quick toggles; empty = keep the current setting. Default: glove, contrast, sound.</string>
     <string name="mc_one_handed_title">One-handed mode</string>
     <string name="mc_one_handed_description">Keys narrower at the left or right.</string>
     <string-array name="mc_top_bar_entries">

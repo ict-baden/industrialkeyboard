@@ -475,6 +475,23 @@
     <string name="feature_settings">Ajustes</string>
     <string name="state_on">Activado</string>
     <string name="state_off">Desactivado</string>
+    <string name="feature_glove">Guantes</string>
+    <string name="feature_contrast">Contraste</string>
+    <string name="feature_scanner">Teclas de escaneo</string>
+    <string name="feature_sound">Sonido</string>
+    <string name="section_quick_toggles">Interruptores rápidos</string>
+    <string name="quick_toggles_intro">Solo se aplican a este dispositivo y también se pueden cambiar con ⊞ en el teclado. La configuración no cambia; los ajustes de arriba la siguen mostrando.</string>
+    <string name="glove_mode">Modo guantes</string>
+    <string name="glove_mode_summary">Teclas al menos %1$d %%, pulsación larga %2$d ms, sin vista previa de teclas, vibración más fuerte</string>
+    <string name="quick_contrast_summary">Teclas negras, contornos blancos, resaltes amarillos</string>
+    <string name="quick_scanner">Escáner en el teclado</string>
+    <string name="quick_scanner_summary">Desactivado: sin botón de escaneo, tecla de escaneo ni cámara en el teclado. El gatillo de escaneo del dispositivo, NFC y los broadcasts de códigos siguen funcionando.</string>
+    <string name="quick_sound_summary">Clic en cada tecla</string>
+    <string name="quick_toggles_allowed">Permitidos para los usuarios</string>
+    <string name="quick_toggles_allowed_summary">No permitido: oculto en ⊞, se ignora un ajuste hecho en el dispositivo (y vuelve a aplicarse al permitirlo)</string>
+    <string name="quick_toggles_locked">Bloqueado por el administrador</string>
+    <string name="quick_toggles_reset">Restablecer interruptores rápidos</string>
+    <string name="quick_toggles_reset_summary">Volver a la configuración</string>
     <string name="top_bar">Sobre las teclas</string>
     <string name="top_bar_toolbar">Barra de herramientas como Gboard</string>
     <string name="top_bar_tabs">Pestañas (ABC, 123, Fn …)</string>
@@ -504,6 +521,8 @@
     <string name="mc_clipboard_history_description">Guardar el texto copiado 1 hora en memoria para el portapapeles.</string>
     <string name="mc_text_editing_title">Panel de edición de texto</string>
     <string name="mc_text_editing_description">Mosaico en el menú ⊞ con flechas, seleccionar, cortar, copiar y pegar.</string>
+    <string name="mc_quick_toggles_title">Interruptores rápidos para usuarios</string>
+    <string name="mc_quick_toggles_description">Separados por comas: glove, contrast, scanner, sound; none = ninguno; vacío = se mantiene el ajuste actual. Predeterminado: glove, contrast, sound.</string>
     <string name="mc_one_handed_title">Modo de una mano</string>
     <string name="mc_one_handed_description">Teclas más estrechas a la izquierda o a la derecha.</string>
     <string-array name="mc_top_bar_entries">

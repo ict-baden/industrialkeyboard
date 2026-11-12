@@ -161,6 +161,23 @@ object Provisioning {
                     read = choice("nfc_read", NfcRead.entries.toTypedArray(), config.scanner.nfc.read),
                 ),
             ),
+            quickToggles = values.getString("quick_toggles")?.takeIf { it.isNotBlank() }?.let(::quickToggleList) ?: config.quickToggles,
+        )
+    }
+
+    /**
+     * `glove, sound` → those two; `none` → none. Unknown names and `none` with others are errors, so
+     * typos surface in the EMM instead of silently locking or unlocking toggles.
+     */
+    private fun quickToggleList(value: String): QuickToggleSettings {
+        val names = value.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+        val choices = QuickToggle.entries.joinToString { it.key } + ", none"
+        if (names.any { it.equals("none", ignoreCase = true) }) {
+            if (names.size > 1) throw ConfigException("quick_toggles: none cannot be combined")
+            return QuickToggleSettings(emptySet())
+        }
+        return QuickToggleSettings(
+            names.map { name -> QuickToggle.byKey(name) ?: throw ConfigException("quick_toggles: unknown toggle \"$name\" ($choices)") }.toSet(),
         )
     }
 

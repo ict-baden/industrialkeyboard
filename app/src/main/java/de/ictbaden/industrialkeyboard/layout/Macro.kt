@@ -1,6 +1,7 @@
 package de.ictbaden.industrialkeyboard.layout
 
 import android.view.KeyEvent
+import de.ictbaden.industrialkeyboard.config.QuickToggle
 
 /** One step of a key macro. */
 sealed interface MacroStep {
@@ -9,13 +10,15 @@ sealed interface MacroStep {
     data class Key(val keyCode: Int, val meta: Int = 0) : MacroStep
     data class Command(val command: KeyCommand) : MacroStep
     data class ShowTab(val tab: String) : MacroStep
+    /** `{TOGGLE:glove}`: switches a quick toggle, as far as `quickToggles.allowed` lets users. */
+    data class Toggle(val toggle: QuickToggle) : MacroStep
 }
 
 enum class KeyCommand { SCAN, HIDE, SETTINGS, NEXT_KEYBOARD, TEXT_EDIT }
 
 /**
  * Key macros: plain text plus tokens in braces, case-insensitive, e.g. `OK{ENTER}`, `{F1}`,
- * `{U+00E4}`, `{SCAN}`, `{EDIT}`, `{SHOW:numeric}`. Unknown tokens are rejected so typos surface on import.
+ * `{U+00E4}`, `{SCAN}`, `{EDIT}`, `{SHOW:numeric}`, `{TOGGLE:glove}`. Unknown tokens are rejected so typos surface on import.
  *
  * Key combinations join modifiers and one key with `+`: `{CTRL+C}`, `{ALT+F4}`, `{WIN+R}`,
  * `{CTRL+ALT+END}`. `{CTRL}`, `{ALT}` and `{WIN}` alone press that key; a key whose whole macro is
@@ -141,6 +144,10 @@ object Macro {
                         '+' in token -> combo(token, original)
                         token.startsWith("SHOW:") && token.length > 5 ->
                             MacroStep.ShowTab(macro.substring(i + 1, end).trim().substringAfter(':').trim())
+                        token.startsWith("TOGGLE:") -> MacroStep.Toggle(
+                            QuickToggle.byKey(token.substringAfter(':'))
+                                ?: throw IllegalArgumentException("unknown quick toggle $original (${QuickToggle.entries.joinToString { it.key }})"),
+                        )
                         else -> throw IllegalArgumentException("unknown token $original")
                     }
                 }
@@ -161,6 +168,7 @@ object Macro {
             is MacroStep.Key -> keyName(first)
             is MacroStep.Command -> if (first.command == KeyCommand.TEXT_EDIT) "Edit" else first.command.name.lowercase().replaceFirstChar { it.uppercase() }.replace('_', ' ')
             is MacroStep.ShowTab -> first.tab.uppercase()
+            is MacroStep.Toggle -> first.toggle.key.replaceFirstChar { it.uppercase() }
             is MacroStep.Text -> first.text
             null -> ""
         }

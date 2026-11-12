@@ -49,6 +49,10 @@ import de.ictbaden.industrialkeyboard.config.OcrSettings
 import de.ictbaden.industrialkeyboard.config.OneHanded
 import de.ictbaden.industrialkeyboard.config.ProgrammableKey
 import de.ictbaden.industrialkeyboard.config.Provisioning
+import de.ictbaden.industrialkeyboard.config.QuickToggle
+import de.ictbaden.industrialkeyboard.config.QuickToggleSettings
+import de.ictbaden.industrialkeyboard.config.QuickToggleStore
+import de.ictbaden.industrialkeyboard.config.QuickToggles
 import de.ictbaden.industrialkeyboard.config.ScanSuffix
 import de.ictbaden.industrialkeyboard.config.ScanTriggerType
 import de.ictbaden.industrialkeyboard.config.Symbology
@@ -88,6 +92,10 @@ class SettingsActivity : AppCompatActivity() {
     private var previewShift = ShiftState.OFF
     private var unlocked = false
     private val listener: (KeyboardConfig) -> Unit = { render() }
+
+    /** Quick toggles of this device: shown and switched here, never written to the configuration. */
+    private val toggles by lazy { QuickToggleStore.get(this) }
+    private val togglesListener: (Map<QuickToggle, Boolean>) -> Unit = { render() }
 
     private val importFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(::readText)?.let(::confirmImport)
@@ -153,6 +161,7 @@ class SettingsActivity : AppCompatActivity() {
         toolbar.setBackgroundColor(ui.color(com.google.android.material.R.attr.colorSurfaceContainer))
         toolbar.navigationIcon?.setTint(ui.color(com.google.android.material.R.attr.colorOnSurface))
         store.addListener(listener)
+        toggles.addListener(togglesListener)
         // Only a successful unlock survives a rotation; a recreated activity must not skip the password.
         unlocked = savedInstanceState?.getBoolean(KEY_UNLOCKED) == true
         val hash = store.config.adminPasswordHash
@@ -181,6 +190,7 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         store.removeListener(listener)
+        toggles.removeListener(togglesListener)
         super.onDestroy()
     }
 
@@ -213,8 +223,11 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun renderPreview() {
-        val config = store.config
-        scanner.settings = config.scanner
+        // What the keyboard shows: with the quick toggles of this device (the rows show the stored values).
+        val stored = store.config
+        scanner.settings = stored.scanner
+        val config = QuickToggles.apply(stored, toggles.overrides, scanner.available)
+        if (config.scanner != stored.scanner) scanner.settings = config.scanner
         if (FieldPolicy.pageForTab(previewPage.tab, field, config, scanner.available) == null) previewPage = Page.Alpha(AlphaVariant.TEXT)
         preview.render(KeyboardRenderer.state(this, config, previewPage, previewShift, scanner.name).copy(keyPopups = false))
     }
@@ -485,6 +498,8 @@ class SettingsActivity : AppCompatActivity() {
             ),
         )
 
+        renderQuickToggles(c)
+
         content.addView(ui.section(getString(R.string.section_scanner)))
         scanner.settings = c.scanner
         content.addView(
@@ -566,7 +581,7 @@ class SettingsActivity : AppCompatActivity() {
                     },
                     ui.row(R.drawable.ic_restart, getString(R.string.reset_defaults), getString(R.string.reset_defaults_summary)) {
                         dialogs.confirm(getString(R.string.reset_confirm_title), getString(R.string.reset_confirm_message), getString(R.string.button_reset)) {
-                            update { KeyboardConfig(adminPasswordHash = it.adminPasswordHash) }
+                            resetToDefaults(store, toggles)
                         }
                     },
                     ui.row(R.drawable.ic_key, getString(R.string.admin_password), getString(if (c.adminPasswordHash == null) R.string.password_not_set else R.string.password_set)) {
@@ -621,6 +636,75 @@ class SettingsActivity : AppCompatActivity() {
                 ),
             ),
         )
+    }
+
+    /**
+     * Quick toggles: switches for this device (effective state, like ⊞ on the keyboard), the admin
+     * part (which ones users may switch, written to the configuration) and a reset.
+     */
+    private fun renderQuickToggles(c: KeyboardConfig) {
+        scanner.settings = c.scanner
+        val scanBase = scanner.available
+        val overrides = toggles.overrides
+        val allowed = c.quickToggles.allowed
+        fun toggleRow(t: QuickToggle, icon: Int, title: String, summary: String, enabled: Boolean = true): View {
+            val usable = QuickToggles.usable(t, allowed, scanBase) && enabled
+            return ui.switchRow(
+                icon,
+                title,
+                if (t in allowed) summary else getString(R.string.quick_toggles_locked),
+                QuickToggles.effective(t, c, overrides, scanBase),
+                enabled = usable,
+            ) { on ->
+                if (on != QuickToggles.effective(t, c, toggles.overrides, scanBase)) toggles.replace(QuickToggles.toggled(t, c, toggles.overrides, scanBase))
+            }
+        }
+        content.addView(ui.section(getString(R.string.section_quick_toggles)))
+        content.addView(
+            ui.card(
+                listOf(
+                    ui.row(R.drawable.ic_info, getString(R.string.section_quick_toggles), getString(R.string.quick_toggles_intro), onClick = null),
+                    toggleRow(
+                        QuickToggle.GLOVE,
+                        R.drawable.ic_keyboard,
+                        getString(R.string.glove_mode),
+                        getString(R.string.glove_mode_summary, QuickToggles.GLOVE_KEY_HEIGHT, QuickToggles.GLOVE_LONG_PRESS_MS),
+                    ),
+                    toggleRow(QuickToggle.CONTRAST, R.drawable.ic_palette, getString(R.string.theme_contrast), getString(R.string.quick_contrast_summary)),
+                    toggleRow(
+                        QuickToggle.SCANNER,
+                        R.drawable.ic_scan,
+                        getString(R.string.quick_scanner),
+                        if (scanBase) getString(R.string.quick_scanner_summary) else getString(R.string.scanner_none_found),
+                    ),
+                    toggleRow(QuickToggle.SOUND, R.drawable.ic_keyboard, getString(R.string.sound), getString(R.string.quick_sound_summary)),
+                    ui.multiChoiceRow(
+                        R.drawable.ic_lock,
+                        getString(R.string.quick_toggles_allowed),
+                        getString(R.string.quick_toggles_allowed_summary),
+                        QuickToggle.entries.map { Triple(it, getString(toggleLabel(it)), it in allowed) },
+                    ) { t, on ->
+                        update { it.copy(quickToggles = QuickToggleSettings(if (on) it.quickToggles.allowed + t else it.quickToggles.allowed - t)) }
+                    },
+                    ui.row(
+                        R.drawable.ic_restart,
+                        getString(R.string.quick_toggles_reset),
+                        getString(R.string.quick_toggles_reset_summary),
+                        onClick = if (overrides.isNotEmpty()) ({ toggles.clear() }) else null,
+                    ).apply {
+                        isEnabled = overrides.isNotEmpty()
+                        alpha = if (overrides.isNotEmpty()) 1f else 0.5f
+                    },
+                ),
+            ),
+        )
+    }
+
+    private fun toggleLabel(t: QuickToggle) = when (t) {
+        QuickToggle.GLOVE -> R.string.feature_glove
+        QuickToggle.CONTRAST -> R.string.feature_contrast
+        QuickToggle.SCANNER -> R.string.feature_scanner
+        QuickToggle.SOUND -> R.string.feature_sound
     }
 
     private fun percent(value: Int) = getString(R.string.value_percent, value)
@@ -953,12 +1037,20 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private companion object {
-        const val KEY_UNLOCKED = "unlocked"
-        const val SOURCE = "https://github.com/ict-baden/industrialkeyboard"
-        const val WEBSITE = "https://ict-baden.de/produkte/industrial-keyboard/"
-        const val IMPRESSUM = "https://ict-baden.de/impressum/"
-        const val PRIVACY = "https://ict-baden.de/datenschutz/industrialkeyboard/"
+    internal companion object {
+        private const val KEY_UNLOCKED = "unlocked"
+
+        /** "Reset to defaults": the configuration (admin password kept) and the quick toggles of this device. */
+        @VisibleForTesting
+        internal fun resetToDefaults(store: ConfigStore, toggles: QuickToggleStore) {
+            store.update { KeyboardConfig(adminPasswordHash = it.adminPasswordHash) }
+            toggles.clear()
+        }
+
+        private const val SOURCE = "https://github.com/ict-baden/industrialkeyboard"
+        private const val WEBSITE = "https://ict-baden.de/produkte/industrial-keyboard/"
+        private const val IMPRESSUM = "https://ict-baden.de/impressum/"
+        private const val PRIVACY = "https://ict-baden.de/datenschutz/industrialkeyboard/"
     }
 }
 

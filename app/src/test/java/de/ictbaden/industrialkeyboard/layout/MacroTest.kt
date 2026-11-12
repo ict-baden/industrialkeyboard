@@ -1,6 +1,7 @@
 package de.ictbaden.industrialkeyboard.layout
 
 import android.view.KeyEvent
+import de.ictbaden.industrialkeyboard.config.QuickToggle
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -9,6 +10,15 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class MacroTest {
+
+    @Test
+    fun `quick toggle macros`() {
+        assertEquals(listOf(MacroStep.Toggle(QuickToggle.GLOVE)), Macro.parse("{TOGGLE:glove}"))
+        assertEquals(listOf(MacroStep.Toggle(QuickToggle.SCANNER)), Macro.parse("{toggle: Scanner }"))
+        assertEquals("Sound", Macro.label(Macro.parse("{TOGGLE:sound}")))
+        assertFalse(Macro.isValid("{TOGGLE:torch}"))
+        assertFalse(Macro.isValid("{TOGGLE:}"))
+    }
 
     @Test
     fun `text and keys`() {

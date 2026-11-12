@@ -39,6 +39,9 @@ import de.ictbaden.industrialkeyboard.config.EffectiveConfig
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
 import de.ictbaden.industrialkeyboard.config.OneHanded
 import de.ictbaden.industrialkeyboard.config.Provisioning
+import de.ictbaden.industrialkeyboard.config.QuickToggle
+import de.ictbaden.industrialkeyboard.config.QuickToggleStore
+import de.ictbaden.industrialkeyboard.config.QuickToggles
 import de.ictbaden.industrialkeyboard.config.ScanInputSettings
 import de.ictbaden.industrialkeyboard.config.ScanSuffix
 import de.ictbaden.industrialkeyboard.config.ScanTriggerType
@@ -83,6 +86,12 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private lateinit var feedback: Feedback
     private lateinit var scanner: ScanTrigger
 
+    /** Quick toggles switched on this device; overrides on top of the configuration, never in it. */
+    private lateinit var toggles: QuickToggleStore
+
+    /** The scanner of the configuration below the quick toggles: whether the scanner toggle can be on. */
+    private lateinit var scannerBelowToggles: ScanTrigger
+
     /** As stored (MDM, file, import, settings): the base that every recomputation starts from. */
     private var storedConfig = KeyboardConfig()
 
@@ -91,6 +100,12 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
      * everywhere in the keyboard. Never write it to the store, never pass it to [applyConfig].
      */
     private var config = KeyboardConfig()
+
+    /** [storedConfig] with the layers below the quick toggles: what the toggles start from. */
+    private var belowToggles = KeyboardConfig()
+
+    /** A scanner exists without the quick toggles (the scanner toggle is shown and can be on). */
+    private var scanAvailableBase = false
     private var root: KeyboardRootView? = null
 
     private var field = Field(de.ictbaden.industrialkeyboard.layout.AlphaVariant.TEXT, null)
@@ -131,6 +146,13 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     private val configListener: (KeyboardConfig) -> Unit = { applyConfig(it) }
 
+    /** A quick toggle changed (⊞, settings, macro): recompute from the stored configuration. */
+    private val togglesListener: (Map<QuickToggle, Boolean>) -> Unit = {
+        useEffective()
+        refreshFeatures()
+        render()
+    }
+
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
@@ -154,6 +176,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         store = ConfigStore.get(this)
         feedback = Feedback(this)
         scanner = ScanTrigger(this)
+        scannerBelowToggles = ScanTrigger(this)
+        toggles = QuickToggleStore.get(this)
         dictionaries = Dictionaries(this)
         HardwareScanner.addListener(engineListener)
         HardwareScanner.detect(this)
@@ -165,6 +189,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         ContextCompat.registerReceiver(this, receiver, filter, ContextCompat.RECEIVER_EXPORTED)
         applyConfig(store.config)
         store.addListener(configListener)
+        toggles.addListener(togglesListener)
         KeyboardBus.onShowTab = { tab -> root?.isShown == true && showTab(tab) }
         KeyboardBus.onNfc = ::typeNfc
     }
@@ -173,6 +198,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         watchClipboard(false)
         clipboard.clear()
         store.removeListener(configListener)
+        toggles.removeListener(togglesListener)
         KeyboardBus.onShowTab = null
         KeyboardBus.onNfc = null
         KeyboardBus.keyboardShown = false
@@ -193,6 +219,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun applyConfig(stored: KeyboardConfig) {
         storedConfig = stored
         useEffective(configChanged = true)
+        refreshFeatures()
         render()
     }
 
@@ -202,13 +229,28 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
      * changes, never per key. Returns true when the effective configuration changed.
      */
     private fun useEffective(configChanged: Boolean = false): Boolean {
-        val effective = EffectiveConfig.of(storedConfig)
+        // The app profile layer comes here (both computations below use it).
+        val profile = EffectiveConfig.NONE
+        val below = EffectiveConfig.of(storedConfig, profile)
+        // The setter drops the resolved trigger type (package queries): on a configuration change as
+        // before, on a new field only when the scanner settings really differ.
+        if (configChanged || scannerBelowToggles.settings != below.scanner) scannerBelowToggles.settings = below.scanner
+        belowToggles = below
+        scanAvailableBase = scannerBelowToggles.available
+        val effective = EffectiveConfig.of(storedConfig, profile, QuickToggles.layer(storedConfig, toggles.overrides, scanAvailableBase))
         val changed = effective != config
         config = effective
         feedback.settings = effective.feedback
-        // The setter drops the resolved trigger type (package queries): on a configuration change as
-        // before, on a new field only when the scanner settings really differ.
-        if (configChanged || scanner.settings != effective.scanner) scanner.settings = effective.scanner
+        if (configChanged || scanner.settings != effective.scanner) {
+            if (scanning && scanner.settings != effective.scanner) {
+                // Stopped with the old trigger, before it is gone (scanner toggle off).
+                scanner.stop()
+                handler.removeCallbacks(stopScanAnimation)
+                scanning = false
+            }
+            scanner.settings = effective.scanner
+        }
+        if (camera?.isOpen == true && scanner.type != ScanTriggerType.CAMERA) closeCamera()
         val input = effective.scanner.input.takeIf { it.enabled }
         if (scanRegistration != input?.let { it.action to it.permission }) registerScanReceiver(input)
         if (FieldPolicy.pageForTab(page.tab, field, effective, scanner.available) == null) page = FieldPolicy.startPage(field, effective, scanner.available)
@@ -850,6 +892,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
                     KeyCommand.TEXT_EDIT -> setToolPanel(if (toolPanel == Tabs.TOOL_EDIT) null else Tabs.TOOL_EDIT)
                 }
                 is MacroStep.ShowTab -> showTab(step.tab)
+                is MacroStep.Toggle -> toggleQuick(step.toggle)
             }
         }
         // A one-shot shift (e.g. F13–F24 on the function keys) applies to one key only.
@@ -986,6 +1029,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
      * ([FeaturesPanelView.Feature.checked]). The panel scrolls when they do not fit.
      */
     private fun features(): List<FeaturesPanelView.Feature> = buildList {
+        val overrides = toggles.overrides
+        val allowed = storedConfig.quickToggles.allowed
         add(FeaturesPanelView.Feature(FeaturesPanelView.FUNCTION_KEYS, null, R.string.feature_function, "Fn"))
         if (scanner.available) add(FeaturesPanelView.Feature(FeaturesPanelView.SCAN, R.drawable.kb_scan, R.string.feature_scan))
         add(FeaturesPanelView.Feature(FeaturesPanelView.NUMBER_PAD, R.drawable.kb_numpad, R.string.feature_numpad))
@@ -994,9 +1039,48 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         add(FeaturesPanelView.Feature(FeaturesPanelView.ONE_HANDED, R.drawable.kb_onehand, R.string.feature_one_handed))
         add(FeaturesPanelView.Feature(FeaturesPanelView.LANGUAGES, R.drawable.kb_globe, R.string.feature_languages))
         add(FeaturesPanelView.Feature(FeaturesPanelView.SETTINGS, R.drawable.kb_settings, R.string.feature_settings))
+        for (t in QuickToggles.visible(belowToggles, scanAvailableBase, allowed)) {
+            val checked = QuickToggles.effective(t, belowToggles, overrides, scanAvailableBase, allowed)
+            add(FeaturesPanelView.Feature(FeaturesPanelView.toggleId(t), toggleIcon(t), toggleLabel(t), checked = checked))
+        }
+    }
+
+    /** Fixed per toggle, so that switching changes the tile in place (screen-reader focus stays). */
+    private fun toggleIcon(t: QuickToggle): Int = when (t) {
+        QuickToggle.GLOVE -> R.drawable.kb_glove
+        QuickToggle.CONTRAST -> R.drawable.kb_contrast
+        QuickToggle.SCANNER -> R.drawable.kb_scan_toggle
+        QuickToggle.SOUND -> R.drawable.kb_sound
+    }
+
+    private fun toggleLabel(t: QuickToggle): Int = when (t) {
+        QuickToggle.GLOVE -> R.string.feature_glove
+        QuickToggle.CONTRAST -> R.string.feature_contrast
+        QuickToggle.SCANNER -> R.string.feature_scanner
+        QuickToggle.SOUND -> R.string.feature_sound
+    }
+
+    /** The open ⊞ panel shows the current tiles (a toggle's state, the scan tile, text editing). */
+    private fun refreshFeatures() {
+        if (toolPanel == Tabs.TOOL_MENU) root?.featuresPanel?.show(features())
+    }
+
+    /**
+     * One tap on a quick toggle (tile or `{TOGGLE:…}`): stored on the device only; the store's
+     * listener recomputes and draws. A toggle users may not switch does nothing. The ⊞ panel stays
+     * open, so the tile shows the new state and glove mode or contrast are visible right away.
+     */
+    private fun toggleQuick(t: QuickToggle) {
+        val allowed = storedConfig.quickToggles.allowed
+        if (!QuickToggles.usable(t, allowed, scanAvailableBase)) return
+        toggles.replace(QuickToggles.toggled(t, belowToggles, toggles.overrides, scanAvailableBase, allowed))
     }
 
     private fun onFeature(id: String) {
+        FeaturesPanelView.toggleOf(id)?.let { t ->
+            toggleQuick(t)
+            return
+        }
         when (id) {
             FeaturesPanelView.FUNCTION_KEYS -> showTab(Tabs.FUNCTION)
             FeaturesPanelView.SCAN -> showTab(Tabs.SCAN)

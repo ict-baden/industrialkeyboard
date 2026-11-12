@@ -475,6 +475,23 @@
     <string name="feature_settings">Paramètres</string>
     <string name="state_on">Activé</string>
     <string name="state_off">Désactivé</string>
+    <string name="feature_glove">Gants</string>
+    <string name="feature_contrast">Contraste</string>
+    <string name="feature_scanner">Touches scan</string>
+    <string name="feature_sound">Son</string>
+    <string name="section_quick_toggles">Bascules rapides</string>
+    <string name="quick_toggles_intro">Valables uniquement sur cet appareil et modifiables aussi avec ⊞ sur le clavier. La configuration ne change pas ; les réglages ci-dessus continuent de l’afficher.</string>
+    <string name="glove_mode">Mode gants</string>
+    <string name="glove_mode_summary">Touches d’au moins %1$d %%, appui long %2$d ms, sans aperçu des touches, vibration plus forte</string>
+    <string name="quick_contrast_summary">Touches noires, contours blancs, surlignage jaune</string>
+    <string name="quick_scanner">Scanner dans le clavier</string>
+    <string name="quick_scanner_summary">Désactivé : ni bouton de scan, ni touche de scan, ni caméra dans le clavier. La gâchette de l’appareil, le NFC et les broadcasts de codes-barres continuent de fonctionner.</string>
+    <string name="quick_sound_summary">Clic à chaque touche</string>
+    <string name="quick_toggles_allowed">Autorisées pour les utilisateurs</string>
+    <string name="quick_toggles_allowed_summary">Non autorisée : masquée dans ⊞, un réglage fait sur l’appareil est ignoré (et s’applique de nouveau une fois autorisée)</string>
+    <string name="quick_toggles_locked">Verrouillé par l’administrateur</string>
+    <string name="quick_toggles_reset">Réinitialiser les bascules rapides</string>
+    <string name="quick_toggles_reset_summary">Retour à la configuration</string>
     <string name="top_bar">Au-dessus des touches</string>
     <string name="top_bar_toolbar">Barre d’outils comme Gboard</string>
     <string name="top_bar_tabs">Onglets (ABC, 123, Fn …)</string>
@@ -504,6 +521,8 @@
     <string name="mc_clipboard_history_description">Garder le texte copié 1 heure en mémoire pour le presse-papiers.</string>
     <string name="mc_text_editing_title">Panneau de modification du texte</string>
     <string name="mc_text_editing_description">Vignette dans le menu ⊞ avec flèches, sélectionner, couper, copier et coller.</string>
+    <string name="mc_quick_toggles_title">Bascules rapides pour les utilisateurs</string>
+    <string name="mc_quick_toggles_description">Séparées par des virgules : glove, contrast, scanner, sound ; none = aucune ; vide = le réglage actuel reste. Par défaut : glove, contrast, sound.</string>
     <string name="mc_one_handed_title">Mode une main</string>
     <string name="mc_one_handed_description">Touches plus étroites à gauche ou à droite.</string>
     <string-array name="mc_top_bar_entries">

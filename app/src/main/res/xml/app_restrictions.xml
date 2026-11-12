@@ -213,4 +213,11 @@
         android:key="one_handed"
         android:restrictionType="choice"
         android:title="@string/mc_one_handed_title" />
+    <!-- A string like camera_symbologies: multi-select is poorly supported by EMMs. -->
+    <restriction
+        android:defaultValue=""
+        android:description="@string/mc_quick_toggles_description"
+        android:key="quick_toggles"
+        android:restrictionType="string"
+        android:title="@string/mc_quick_toggles_title" />
 </restrictions>

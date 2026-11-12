@@ -306,6 +306,35 @@ data class CustomKey(
     val style: KeyStyle = KeyStyle.NORMAL,
 )
 
+/**
+ * Quick toggles in ⊞, the settings and `{TOGGLE:…}`: device-local overrides on top of the
+ * configuration, stored apart from it ([QuickToggleStore], [QuickToggles]).
+ */
+enum class QuickToggle(override val key: String) : Keyed {
+    GLOVE("glove"),
+    CONTRAST("contrast"),
+    SCANNER("scanner"),
+    SOUND("sound"),
+    ;
+
+    companion object {
+        fun byKey(key: String): QuickToggle? = entries.firstOrNull { it.key.equals(key.trim(), ignoreCase = true) }
+    }
+}
+
+data class QuickToggleSettings(
+    /**
+     * Toggles users may change; not allowed = hidden in ⊞, locked in the settings, and an override
+     * made on the device is ignored (but kept). `scanner` is opt-in: switching the soft scanner off
+     * in a warehouse is a support call.
+     */
+    val allowed: Set<QuickToggle> = DEFAULT_ALLOWED,
+) {
+    companion object {
+        val DEFAULT_ALLOWED: Set<QuickToggle> = setOf(QuickToggle.GLOVE, QuickToggle.CONTRAST, QuickToggle.SOUND)
+    }
+}
+
 /** A layout of the administrator's own keys, shown as an extra tab. */
 data class CustomLayout(
     val id: String,
@@ -327,6 +356,8 @@ data class KeyboardConfig(
     val language: String = Languages.AUTO,
     // New sections go here, after `language`, in this agreed order: snippets, appProfiles,
     // quickToggles, accessibility – so that positional calls keep working (ConfigJson uses names).
+    /** Which quick toggles users may switch on the device (⊞, settings, `{TOGGLE:…}`). */
+    val quickToggles: QuickToggleSettings = QuickToggleSettings(),
 ) {
     fun programmable(key: ProgrammableKey): String = keys.programmable[key.id] ?: key.default
 

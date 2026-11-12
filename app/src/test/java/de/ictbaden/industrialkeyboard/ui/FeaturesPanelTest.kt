@@ -8,6 +8,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
+import de.ictbaden.industrialkeyboard.config.QuickToggle
 import de.ictbaden.industrialkeyboard.config.Tabs
 import de.ictbaden.industrialkeyboard.ime.KeyboardRenderer
 import de.ictbaden.industrialkeyboard.ime.Page
@@ -122,6 +123,14 @@ class FeaturesPanelTest {
         root.render(open)
         layout(root)
         assertEquals(0, root.featuresScroll.scrollY)
+    }
+
+    @Test
+    fun `quick toggle tiles have their own ids`() {
+        for (t in QuickToggle.entries) assertEquals(t, FeaturesPanelView.toggleOf(FeaturesPanelView.toggleId(t)))
+        assertEquals("toggle:glove", FeaturesPanelView.toggleId(QuickToggle.GLOVE))
+        assertNull(FeaturesPanelView.toggleOf(FeaturesPanelView.SCAN))
+        assertNull(FeaturesPanelView.toggleOf("toggle:torch"))
     }
 
     @Test

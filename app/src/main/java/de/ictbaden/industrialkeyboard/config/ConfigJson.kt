@@ -39,6 +39,7 @@ object ConfigJson {
             customLayouts = custom,
             adminPasswordHash = passwordHash(root),
             language = language(root.optNonBlank("language")),
+            quickToggles = parseQuickToggles(root.optJSONObject("quickToggles"), defaults.quickToggles),
         )
     }
 
@@ -189,6 +190,10 @@ object ConfigJson {
                 put("vibrate", n.vibrate)
             })
         })
+        // Always the array, `[]` included, so that "none" survives a round trip.
+        root.put("quickToggles", JSONObject().apply {
+            put("allowed", JSONArray(config.quickToggles.allowed.sortedBy { it.ordinal }.map { it.key }))
+        })
         if (config.customLayouts.isNotEmpty()) {
             root.put("customLayouts", JSONArray().apply {
                 config.customLayouts.forEach { layout ->
@@ -215,6 +220,20 @@ object ConfigJson {
             })
         }
         return root.toString(2)
+    }
+
+    /** `allowed`: a list of toggle names; `[]` = none, missing = the default. */
+    private fun parseQuickToggles(json: JSONObject?, d: QuickToggleSettings): QuickToggleSettings {
+        json ?: return d
+        if (!json.has("allowed") || json.isNull("allowed")) return d
+        val array = json.opt("allowed") as? JSONArray ?: throw ConfigException("quickToggles.allowed: array expected")
+        return QuickToggleSettings(
+            (0 until array.length()).map { i ->
+                val name = array.optString(i, "").trim()
+                QuickToggle.byKey(name)
+                    ?: throw ConfigException("quickToggles.allowed[$i]: unknown toggle \"$name\" (${QuickToggle.entries.joinToString { it.key }})")
+            }.toSet(),
+        )
     }
 
     private fun parseAppearance(json: JSONObject?, d: Appearance): Appearance {
