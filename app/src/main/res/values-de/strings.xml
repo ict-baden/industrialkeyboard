@@ -456,4 +456,5 @@
     <string name="voice_engine_on_device">Hier: Erkennung auf dem Gerät</string>
     <string name="voice_engine_service">Hier: Sprachdienst des Geräts (ggf. online)</string>
     <string name="voice_engine_none">Auf diesem Gerät nicht verfügbar</string>
+    <string name="dictation_error_language_pack">Das Sprachpaket für die Erkennung auf dem Gerät wird geladen. In ein paar Minuten noch einmal versuchen oder Diktat auf „Automatisch“ stellen.</string>
 </resources>

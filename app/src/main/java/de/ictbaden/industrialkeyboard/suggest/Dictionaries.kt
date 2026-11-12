@@ -9,7 +9,7 @@ import java.util.Locale
 import java.util.concurrent.Executors
 
 /**
- * Loads the built-in word list of the keyboard language (assets/dict/<tag>.txt.gz) on a background
+ * Loads the built-in word list of the keyboard language (assets/dict/<tag>.dic, gzip) on a background
  * thread and keeps only that one in memory. Read only: nothing typed is stored.
  */
 class Dictionaries(context: Context) {
@@ -64,6 +64,7 @@ class Dictionaries(context: Context) {
     private companion object {
         const val TAG = "Suggestions"
         const val DIR = "dict"
-        const val SUFFIX = ".txt.gz"
+        // Not ".txt.gz": the Android build unpacks .gz assets and drops the extension (seen on a Pixel 9 Pro).
+        const val SUFFIX = ".dic"
     }
 }

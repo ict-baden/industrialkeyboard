@@ -285,6 +285,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         panel.listening = true
         panel.visibility = View.VISIBLE
         feedback.keyDown(null)
+        dictation.fallbackToService = config.typing.voice == VoiceInput.AUTO
         dictation.start(voiceEngine, Alphabet.keyboardLocale())
         render()
     }
@@ -334,6 +335,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
                 DictationController.State.ERROR_NETWORK -> "${voiceText(R.string.dictation_error_network)} (${ErrorCodes.DICTATION_NETWORK})"
                 DictationController.State.ERROR_UNAVAILABLE -> "${voiceText(R.string.dictation_error_unavailable)} (${ErrorCodes.DICTATION_UNAVAILABLE})"
                 DictationController.State.ERROR_NO_MATCH -> "${voiceText(R.string.dictation_error_no_match)} (${ErrorCodes.DICTATION_NOT_UNDERSTOOD})"
+                DictationController.State.ERROR_LANGUAGE_PACK -> "${voiceText(R.string.dictation_error_language_pack)} (${ErrorCodes.DICTATION_UNAVAILABLE})"
             }
             if (state != DictationController.State.LISTENING && state != DictationController.State.PROCESSING) {
                 currentInputConnection?.finishComposingText()

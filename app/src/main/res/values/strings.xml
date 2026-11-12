@@ -522,4 +522,5 @@
     <string name="voice_engine_on_device">Used here: recognition on the device</string>
     <string name="voice_engine_service">Used here: the device\'s speech service (may work online)</string>
     <string name="voice_engine_none">Not available on this device</string>
+    <string name="dictation_error_language_pack">The language pack for on-device recognition is being downloaded. Try again in a few minutes, or set dictation to "Automatic".</string>
 </resources>

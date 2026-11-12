@@ -4,7 +4,7 @@
 Source: https://android.googlesource.com/platform/packages/inputmethods/LatinIME/+/refs/heads/main/dictionaries/
 (Apache License 2.0). Run from the repository root:  python tools/dictionaries/convert.py
 
-Output per language: <tag>.txt.gz, UTF-8 lines "word<TAB>frequency" (0-255), most frequent first,
+Output per language: <tag>.dic (gzip; not .gz, because the Android build unpacks .gz assets and drops the extension), UTF-8 lines "word<TAB>frequency" (0-255), most frequent first,
 at most MAX_WORDS words. Words marked not_a_word, possibly_offensive and shortcuts are left out.
 """
 import base64
@@ -43,7 +43,7 @@ def convert(name: str, tag: str) -> None:
         words.append((freq, word))
     words.sort(key=lambda w: (-w[0], w[1]))
     text = "".join(f"{w}\t{f}\n" for f, w in words[:MAX_WORDS])
-    path = os.path.join(OUT, tag + ".txt.gz")
+    path = os.path.join(OUT, tag + ".dic")
     with gzip.GzipFile(path, "wb", compresslevel=9, mtime=0) as out:
         out.write(text.encode("utf-8"))
     print(f"{tag}: {min(len(words), MAX_WORDS)} words, {os.path.getsize(path) // 1024} KB")

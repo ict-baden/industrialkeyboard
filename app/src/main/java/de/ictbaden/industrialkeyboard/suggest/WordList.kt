@@ -62,7 +62,12 @@ class WordList private constructor(
     companion object {
         /** Reads "word<TAB>frequency" lines (gzip). */
         fun read(input: InputStream, locale: Locale): WordList {
-            val entries = GZIPInputStream(input).bufferedReader(Charsets.UTF_8).useLines { lines ->
+            // gzip as built by tools/dictionaries; plain text too, in case a build step unpacked it.
+            val buffered = java.io.BufferedInputStream(input).apply { mark(2) }
+            val gzip = buffered.read() == 0x1f && buffered.read() == 0x8b
+            buffered.reset()
+            val stream = if (gzip) GZIPInputStream(buffered) else buffered
+            val entries = stream.bufferedReader(Charsets.UTF_8).useLines { lines ->
                 lines.mapNotNull { line ->
                     val tab = line.indexOf('\t')
                     if (tab <= 0) null else Triple(line.substring(0, tab).lowercase(locale), line.substring(0, tab), line.substring(tab + 1).toIntOrNull() ?: 0)
