@@ -217,6 +217,8 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         featuresScroll.setBackgroundColor(p.background)
         clipboardPanel.palette = p
         featuresScroll.isVisible = panelOpen == Tabs.TOOL_MENU
+        // Like Gboard: ⊞ opens at the top; while it stays open (a toggle tap) it keeps its place.
+        if (panelOpen == Tabs.TOOL_MENU && previous?.toolPanel != Tabs.TOOL_MENU) featuresScroll.scrollTo(0, 0)
         clipboardPanel.isVisible = panelOpen == Tabs.TOOL_CLIPBOARD
         if (panelOpen == Tabs.TOOL_CLIPBOARD) clipboardPanel.show(state.clips, state.clipboardHistory)
         listOf(keyboard, scanRow).forEach {

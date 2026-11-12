@@ -6,19 +6,26 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.View
 import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Switch
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
 
 /**
  * The ⊞ panel of the toolbar, like Gboard's: tiles for the keyboard's other features. It grows with
  * its tiles; [KeyboardRootView.featuresScroll] scrolls it when they are taller than the keys.
+ *
+ * The tiles are only built anew when tiles come or go; a switched tile or a new palette changes the
+ * existing views, so a screen reader keeps its focus on the tapped tile and says the new state.
  */
 @SuppressLint("ViewConstructor")
 class FeaturesPanelView(context: Context) : GridLayout(context) {
@@ -40,71 +47,105 @@ class FeaturesPanelView(context: Context) : GridLayout(context) {
 
     var palette: Palette = Palette.light(Palette.DEFAULT_ACCENT)
         set(value) {
+            // Set on every render of the keyboard: only a new palette touches the tiles.
+            if (value == field) return
             field = value
-            rebuild()
+            update()
         }
 
     private var features: List<Feature> = emptyList()
 
+    /** The views of one tile, to change them in place. */
+    private class Tile(val view: LinearLayout, val icon: ImageView?, val glyph: TextView?, val label: TextView)
+
+    private val tiles = mutableListOf<Tile>()
+
     init {
         columnCount = COLUMNS
         setPadding(dp(8), dp(8), dp(8), dp(8))
+        update()
     }
 
     fun show(features: List<Feature>) {
-        if (features == this.features) return
+        val sameTiles = features.size == this.features.size &&
+            features.zip(this.features).all { (new, old) -> new.copy(checked = null) == old.copy(checked = null) && (new.checked == null) == (old.checked == null) }
         this.features = features
-        rebuild()
+        if (!sameTiles) rebuild()
+        update()
     }
 
     private fun rebuild() {
-        // Opaque: the panel lies over the keys.
-        setBackgroundColor(palette.background)
         removeAllViews()
-        val res = AppLanguage.localized(context)
-        features.forEach { feature ->
-            val on = feature.checked == true
-            val foreground = if (on) palette.accentText else palette.keyText
-            val tile = LinearLayout(context).apply {
+        tiles.clear()
+        features.forEachIndexed { index, feature ->
+            val view = LinearLayout(context).apply {
                 orientation = LinearLayout.VERTICAL
                 gravity = Gravity.CENTER
-                background = GradientDrawable().apply {
-                    setColor(if (on) palette.accent else palette.key)
-                    cornerRadius = dp(14).toFloat()
-                }
                 isClickable = true
                 setOnClickListener { onFeature?.invoke(feature.id) }
-                contentDescription = res.getString(feature.label)
-                feature.checked?.let { checked ->
-                    isSelected = checked
-                    ViewCompat.setStateDescription(this, res.getString(if (checked) R.string.state_on else R.string.state_off))
-                }
-                if (feature.icon != null) {
-                    addView(ImageView(context).apply {
-                        setImageResource(feature.icon)
-                        imageTintList = ColorStateList.valueOf(foreground)
-                    }, LinearLayout.LayoutParams(dp(28), dp(28)))
-                } else {
-                    addView(TextView(context).apply {
-                        text = feature.text
-                        setTextColor(foreground)
-                        setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-                        gravity = Gravity.CENTER
-                    }, LinearLayout.LayoutParams(dp(48), dp(28)))
-                }
-                addView(TextView(context).apply {
-                    text = res.getString(feature.label)
-                    setTextColor(if (on) palette.accentText else palette.keyHint)
-                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-                    gravity = Gravity.CENTER
-                    maxLines = 2
-                }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(4) })
             }
-            addView(tile, LayoutParams(spec(UNDEFINED, 1f), spec(UNDEFINED, 1f)).apply {
+            if (feature.checked != null) {
+                // A switch for screen readers ("Gloves, On, switch"), not a selected item.
+                ViewCompat.setAccessibilityDelegate(view, object : AccessibilityDelegateCompat() {
+                    override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
+                        super.onInitializeAccessibilityNodeInfo(host, info)
+                        info.className = Switch::class.java.name
+                        info.isCheckable = true
+                        info.isChecked = features.getOrNull(index)?.checked == true
+                        info.isSelected = false
+                    }
+                })
+            }
+            val icon = feature.icon?.let { res ->
+                ImageView(context).apply { setImageResource(res) }.also { view.addView(it, LinearLayout.LayoutParams(dp(28), dp(28))) }
+            }
+            val glyph = if (feature.icon == null) {
+                TextView(context).apply {
+                    text = feature.text
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+                    gravity = Gravity.CENTER
+                }.also { view.addView(it, LinearLayout.LayoutParams(dp(48), dp(28))) }
+            } else {
+                null
+            }
+            val label = TextView(context).apply {
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+                gravity = Gravity.CENTER
+                maxLines = 2
+            }
+            view.addView(label, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(4) })
+            addView(view, LayoutParams(spec(UNDEFINED, 1f), spec(UNDEFINED, 1f)).apply {
                 width = 0
                 height = dp(84)
                 setMargins(dp(4), dp(4), dp(4), dp(4))
             })
+            tiles += Tile(view, icon, glyph, label)
+        }
+    }
+
+    /** Colours, texts and on/off state of the existing tiles. */
+    private fun update() {
+        // Opaque: the panel lies over the keys.
+        setBackgroundColor(palette.background)
+        val res = AppLanguage.localized(context)
+        features.zip(tiles).forEach { (feature, tile) ->
+            val on = feature.checked == true
+            val foreground = if (on) palette.accentText else palette.keyText
+            tile.view.background = GradientDrawable().apply {
+                setColor(if (on) palette.accent else palette.key)
+                cornerRadius = dp(14).toFloat()
+            }
+            val label = res.getString(feature.label)
+            tile.view.contentDescription = label
+            tile.icon?.imageTintList = ColorStateList.valueOf(foreground)
+            tile.glyph?.setTextColor(foreground)
+            tile.label.text = label
+            tile.label.setTextColor(if (on) palette.accentText else palette.keyHint)
+            feature.checked?.let { checked ->
+                tile.view.isSelected = checked
+                // Unchanged text sends nothing; a new one is spoken on the focused tile.
+                ViewCompat.setStateDescription(tile.view, res.getString(if (checked) R.string.state_on else R.string.state_off))
+            }
         }
     }
 
