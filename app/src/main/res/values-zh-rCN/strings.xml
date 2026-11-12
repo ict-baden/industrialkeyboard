@@ -473,6 +473,23 @@
     <string name="feature_settings">设置</string>
     <string name="state_on">已开启</string>
     <string name="state_off">已关闭</string>
+    <string name="feature_glove">手套</string>
+    <string name="feature_contrast">对比度</string>
+    <string name="feature_scanner">扫描按键</string>
+    <string name="feature_sound">声音</string>
+    <string name="section_quick_toggles">快捷开关</string>
+    <string name="quick_toggles_intro">仅适用于此设备，也可在键盘上用 ⊞ 切换。配置保持不变，上方的设置仍显示配置的值。</string>
+    <string name="glove_mode">手套模式</string>
+    <string name="glove_mode_summary">按键至少 %1$d %%，长按 %2$d 毫秒，无按键预览，更强振动</string>
+    <string name="quick_contrast_summary">黑色按键、白色轮廓、黄色高亮</string>
+    <string name="quick_scanner">键盘中的扫描器</string>
+    <string name="quick_scanner_summary">关闭：键盘中没有扫描按钮、扫描键和相机。设备的扫描扳机、NFC 和条码广播仍然有效。</string>
+    <string name="quick_sound_summary">每次按键发出点击声</string>
+    <string name="quick_toggles_allowed">允许用户使用</string>
+    <string name="quick_toggles_allowed_summary">不允许：在 ⊞ 中隐藏，设备上的设置被忽略（再次允许后重新生效）</string>
+    <string name="quick_toggles_locked">已被管理员锁定</string>
+    <string name="quick_toggles_reset">重置快捷开关</string>
+    <string name="quick_toggles_reset_summary">恢复为配置</string>
     <string name="top_bar">按键上方</string>
     <string name="top_bar_toolbar">与 Gboard 相同的工具栏</string>
     <string name="top_bar_tabs">标签（ABC、123、Fn …）</string>
@@ -502,6 +519,8 @@
     <string name="mc_clipboard_history_description">在内存中保留复制的文本 1 小时，供剪贴板面板使用。</string>
     <string name="mc_text_editing_title">文本编辑面板</string>
     <string name="mc_text_editing_description">⊞ 菜单中的磁贴，包含方向键、选择、剪切、复制和粘贴。</string>
+    <string name="mc_quick_toggles_title">用户可用的快捷开关</string>
+    <string name="mc_quick_toggles_description">用逗号分隔：glove, contrast, scanner, sound；none = 无快捷开关；留空 = 保留当前设置。默认：glove, contrast, sound。</string>
     <string name="mc_one_handed_title">单手模式</string>
     <string name="mc_one_handed_description">按键变窄并靠左或靠右。</string>
     <string-array name="mc_top_bar_entries">

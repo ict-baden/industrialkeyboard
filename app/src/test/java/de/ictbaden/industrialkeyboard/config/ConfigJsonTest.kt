@@ -41,8 +41,28 @@ class ConfigJsonTest {
                 CustomLayout("wms", "WMS", listOf(listOf(CustomKey("OK", "OK{ENTER}", 2f, KeyStyle.ACCENT), CustomKey("", "{TAB}"), CustomKey("", " ", 3f), CustomKey(" ", " "), CustomKey("Sp", " ")))),
             ),
             adminPasswordHash = PasswordHasher.hash("secret"),
+            quickToggles = QuickToggleSettings(setOf(QuickToggle.GLOVE, QuickToggle.SOUND)),
         )
         assertEquals(config, ConfigJson.parse(ConfigJson.write(config)))
+    }
+
+    @Test
+    fun `quick toggles default to glove contrast and sound and survive an empty list`() {
+        assertEquals(setOf(QuickToggle.GLOVE, QuickToggle.CONTRAST, QuickToggle.SOUND), ConfigJson.parse("{}").quickToggles.allowed)
+        assertEquals(QuickToggleSettings(), ConfigJson.parse("""{"quickToggles":{}}""").quickToggles)
+        assertEquals(QuickToggleSettings(), ConfigJson.parse("""{"quickToggles":{"allowed":null}}""").quickToggles)
+        val none = KeyboardConfig(quickToggles = QuickToggleSettings(emptySet()))
+        assertEquals(none, ConfigJson.parse(ConfigJson.write(none)))
+        // Names case-insensitive, duplicates collapse.
+        assertEquals(
+            setOf(QuickToggle.SCANNER, QuickToggle.GLOVE),
+            ConfigJson.parse("""{"quickToggles":{"allowed":["Scanner","glove","glove"]}}""").quickToggles.allowed,
+        )
+        // Also in the compact form of the QR code, an empty list included.
+        val defaults = ConfigJson.write(KeyboardConfig())
+        for (config in listOf(none, KeyboardConfig(quickToggles = QuickToggleSettings(QuickToggle.entries.toSet())), KeyboardConfig())) {
+            assertEquals(config, ConfigJson.parse(ConfigCodec.compact(ConfigJson.write(config), defaults)))
+        }
     }
 
     @Test
@@ -137,6 +157,11 @@ class ConfigJsonTest {
         rejected("""{"customLayouts":[{"id":"a","rows":[[""]]}]}""", "customLayouts[0].rows[0][0]")
         rejected("""{"customLayouts":[{"id":"a","rows":[[{"label":"","output":""}]]}]}""", "label or output")
         rejected("""{"scanner":{"input":{"allowedPackages":["not a package"]}}}""", "scanner.input.allowedPackages[0]")
+        rejected("""{"quickToggles":{"allowed":["torch"]}}""", "quickToggles.allowed[0]")
+        rejected("""{"quickToggles":{"allowed":"glove"}}""", "quickToggles.allowed")
+        rejected("""{"quickToggles":{"allowed":["glove","sound","torch"]}}""", "quickToggles.allowed[2]: unknown toggle \"torch\" (glove, contrast, scanner, sound)")
+        rejected("""{"quickToggles":{"allowed":"glove"}}""", "quickToggles.allowed: array expected")
+        rejected("""{"keys":{"alpha.p1":"{TOGGLE:torch}"}}""", "keys.alpha.p1: unknown quick toggle {TOGGLE:torch}")
     }
 
     private fun rejected(json: String, expected: String) {

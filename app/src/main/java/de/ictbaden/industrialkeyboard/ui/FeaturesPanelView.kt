@@ -19,6 +19,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
+import de.ictbaden.industrialkeyboard.config.QuickToggle
 
 /**
  * The ⊞ panel of the toolbar, like Gboard's: tiles for the keyboard's other features. It grows with
@@ -161,5 +162,12 @@ class FeaturesPanelView(context: Context) : GridLayout(context) {
         const val ONE_HANDED = "feature:onehanded"
         const val LANGUAGES = "feature:languages"
         const val SETTINGS = "feature:settings"
+
+        /** Quick toggle tiles: `toggle:glove` … */
+        const val TOGGLE_PREFIX = "toggle:"
+
+        fun toggleId(t: QuickToggle) = TOGGLE_PREFIX + t.key
+
+        fun toggleOf(id: String): QuickToggle? = QuickToggle.entries.firstOrNull { toggleId(it) == id }
     }
 }

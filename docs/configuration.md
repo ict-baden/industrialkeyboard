@@ -22,7 +22,11 @@ configuration changes – never per key. From lowest to highest:
 1. **Stored configuration.** `config_json` from the MDM, a file, the `INSTALL_CONFIG` broadcast
    and **Import** replace it as a whole; the single options of the managed configuration and the
    admin settings change single values in it. Export and the QR code contain exactly this.
-2. **Field rules**, which always win: number, phone and date fields open their pad; password
+2. **[Quick toggles](#quicktoggles--quick-toggles-on-the-device)** switched on the device (glove
+   mode, contrast, scanner, sound), only those in `quickToggles.allowed` of the stored
+   configuration. Stored apart from the configuration; where a future layer below sets the same
+   field, the toggle wins. What users may change (`quickToggles.allowed`) is an admin gate.
+3. **Field rules**, which always win: number, phone and date fields open their pad; password
    fields get no suggestions, no autocorrection and no key preview.
 
 The page that opens: a `SHOW_TAB` request or [`{SHOW:…}`](#macros) > the field type (number,
@@ -132,7 +136,8 @@ phone, date) > [`tabs.preferred`](#tabs).
       "beep": true,
       "vibrate": true
     }
-  }
+  },
+  "quickToggles": { "allowed": ["glove", "contrast", "sound"] }
 }
 ```
 
@@ -167,7 +172,7 @@ every language: [Error codes](error-codes.md).
 | `emojiKey` | `true` / `false` | `true` | 😊 between comma and space bar in normal text fields (not in passwords, e-mail and web addresses, numbers); opens the emoji panel with categories and skin tones, **ABC** returns. Recently used emoji are kept in memory only; the picker remembers the chosen skin tone per emoji on the device |
 | `oneHanded` | `off`, `left`, `right` | `off` | One-handed mode like Gboard: the keys about 80 % wide at that side; the free side shows ⇄ (other side) and ⤢ (full width). Also from the toolbar ⊞ |
 | `keyBorders` | `true` / `false` | `true` | Letter keys drawn as tiles. `false`: only the letters on the keyboard background, like Gboard with "Key borders" off. Enter and `?123` are pills like in Gboard either way |
-| `keyHeight` | 70–160 (percent) | `100` | Row height; 100 % = 54 dp. Use 120–140 for gloves |
+| `keyHeight` | 70–160 (percent) | `100` | Row height; 100 % = 54 dp. Use 120–140 for gloves, or let users switch on [glove mode](#quicktoggles--quick-toggles-on-the-device) (at least 130 %) |
 | `width` | 50–100 (percent) | `100` | Width of the keys, centered – for tablets and landscape |
 | `numberRow` | `true` / `false` | `false` | Row with 1–0 above the letters |
 | `functionRow` | `true` / `false` | `false` | Row with F1–F12 above the letters (and above the number row) |
@@ -246,6 +251,42 @@ keyboards, double tap on Shift for caps lock, long press on the hide button for 
 | `soundVolume` | 0–100 | not set = default volume | Click volume |
 | `vibrate` | `true` / `false` | `true` | Short vibration on every key |
 | `vibrationMs` | 5–100 (ms) | not set = the system's keyboard haptic | Vibration length; 30–40 can be felt through gloves. Not set: the device's tuned keyboard tick, like Gboard |
+
+## `quickToggles` – quick toggles on the device
+
+Users can switch four things on their device without changing the configuration: as tiles at
+the end of the toolbar's ⊞ menu (lit while on), under **Settings → Quick toggles**, and with the
+macro [`{TOGGLE:name}`](#macros) on any key.
+
+| Option | Values | Default | Effect |
+|---|---|---|---|
+| `allowed` | list of `glove`, `contrast`, `scanner`, `sound` | `["glove", "contrast", "sound"]` | Toggles users may switch. Not in the list: hidden in ⊞, locked in the settings, `{TOGGLE:…}` does nothing, and an override made on the device is ignored. `[]` = none. `scanner` is opt-in, because switching the soft scanner off is a support call in most warehouses |
+
+| Toggle | Without an override (follows the configuration) | On | Off |
+|---|---|---|---|
+| `glove` | off | Keys at least 130 % (`keyHeight`), long press at least 600 ms, no key preview, vibration on with at least 40 ms – it only raises values, never lowers them | the configuration |
+| `contrast` | on if `appearance.theme` is `contrast` | `theme: contrast` without `accentColor`, so the yellow highlights are guaranteed | `theme: system` if the configuration says `contrast`, otherwise the configuration |
+| `scanner` | on if a scanner is available (scan engine or camera); not shown without one | the configuration | No scan button, scan tab, scan key, Scan tile or camera in the keyboard (`trigger: none`, `scanKey: false`). **Still active:** the device's own scan trigger with DataWedge keystroke output, barcode broadcasts (`scanner.input`) and NFC (`scanner.nfc`) – the keyboard has no control over the trigger, and the other two are switched by the administrator |
+| `sound` | `feedback.sound` | click sound on (`soundVolume` as configured) | click sound off |
+
+How they layer:
+
+- The toggles are stored on the device only (`shared_prefs/quick_toggles.xml`, on/off per
+  toggle), never in the configuration. An MDM push, an import or `INSTALL_CONFIG` does not remove
+  them, and they never change a configured value: export and QR code contain only the
+  configuration.
+- A tap stores the opposite of what is shown; a toggle switched back to what the configuration
+  says is removed again, so it then follows the configuration once more.
+- A toggle that is no longer allowed is ignored but **kept**: when the administrator allows it
+  again, the user's choice applies again.
+- Reset: **Settings → Quick toggles → Reset quick toggles**, **Reset to defaults**, or *Clear
+  storage* of the app.
+- The settings rows for theme, sound, key height … keep showing the configuration; the preview at
+  the top shows what the keyboard shows.
+- ⊞ exists only with the toolbar (`layout.topBar: toolbar` and `navigation: tabs`). Configurations
+  stored by 2.1 or older keep the tabs and therefore have no ⊞: there, use **Settings → Quick
+  toggles** or put `{TOGGLE:glove}` … on a [programmable key](#keys--programmable-keys) or a
+  [custom layout](#custom-layouts).
 
 ## `scanner`
 
@@ -472,7 +513,7 @@ when the configuration is loaded.
 | Key combinations | Modifiers and one key joined with `+`: `{CTRL+C}`, `{ALT+F4}`, `{WIN+R}`, `{CTRL+SHIFT+ESC}`, `{CTRL+ALT+END}`. Modifiers: `CTRL`, `ALT`, `WIN`, `SHIFT`; key: any key name above, `A`–`Z`, `0`–`9` or `SPACE` |
 | More keys | `{PRINT}` (Print Screen), `{PAUSE}`, `{MENU}` (context menu key) |
 | Characters | `{SPACE}`, `{LBRACE}` / `{OPEN-BRACE}` = `{`, `{RBRACE}` / `{CLOSE-BRACE}` = `}`, `{U+20AC}` or `{HEX:20AC}` = any Unicode character (here €) |
-| Commands | `{SCAN}` start/stop the scanner, `{HIDE}` hide the keyboard, `{SETTINGS}` open the settings, `{NEXT-KEYBOARD}` switch to the next keyboard, `{EDIT}` open/close the text editing panel ([`typing.textEditing`](#typing)), `{SHOW:tab}` show a tab (`alpha`, `numeric`, `symbols`, `function`, `scan` or a custom layout id) |
+| Commands | `{SCAN}` start/stop the scanner, `{HIDE}` hide the keyboard, `{SETTINGS}` open the settings, `{NEXT-KEYBOARD}` switch to the next keyboard, `{EDIT}` open/close the text editing panel ([`typing.textEditing`](#typing)), `{TOGGLE:glove}` / `{TOGGLE:contrast}` / `{TOGGLE:scanner}` / `{TOGGLE:sound}` switch a [quick toggle](#quicktoggles--quick-toggles-on-the-device) (only if allowed), `{SHOW:tab}` show a tab (`alpha`, `numeric`, `symbols`, `function`, `scan` or a custom layout id) |
 
 `{ENTER}` behaves like the Enter key: it runs the field's action (next field, search, send …)
 or starts a new line in multi-line fields.

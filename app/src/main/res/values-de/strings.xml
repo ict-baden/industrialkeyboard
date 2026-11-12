@@ -474,6 +474,23 @@
     <string name="feature_settings">Einstellungen</string>
     <string name="state_on">An</string>
     <string name="state_off">Aus</string>
+    <string name="feature_glove">Handschuhe</string>
+    <string name="feature_contrast">Kontrast</string>
+    <string name="feature_scanner">Scan-Tasten</string>
+    <string name="feature_sound">Ton</string>
+    <string name="section_quick_toggles">Schnellschalter</string>
+    <string name="quick_toggles_intro">Gelten nur auf diesem Gerät und lassen sich auch mit ⊞ auf der Tastatur umschalten. Die Konfiguration bleibt unverändert; die Einstellungen oben zeigen sie weiterhin.</string>
+    <string name="glove_mode">Handschuh-Modus</string>
+    <string name="glove_mode_summary">Tasten mindestens %1$d %%, langes Drücken %2$d ms, keine Tastenvorschau, stärkere Vibration</string>
+    <string name="quick_contrast_summary">Schwarze Tasten, weiße Umrandung, gelbe Hervorhebung</string>
+    <string name="quick_scanner">Scanner in der Tastatur</string>
+    <string name="quick_scanner_summary">Aus: kein Scan-Knopf, keine Scan-Taste und keine Kamera in der Tastatur. Die Scantaste des Geräts, NFC und Barcode-Broadcasts funktionieren weiter.</string>
+    <string name="quick_sound_summary">Klickton bei jeder Taste</string>
+    <string name="quick_toggles_allowed">Für Benutzer erlaubt</string>
+    <string name="quick_toggles_allowed_summary">Nicht erlaubt: in ⊞ ausgeblendet, eine Einstellung auf dem Gerät wird ignoriert (und gilt wieder, sobald erlaubt)</string>
+    <string name="quick_toggles_locked">Vom Administrator gesperrt</string>
+    <string name="quick_toggles_reset">Schnellschalter zurücksetzen</string>
+    <string name="quick_toggles_reset_summary">Zurück zur Konfiguration</string>
     <string name="top_bar">Über den Tasten</string>
     <string name="top_bar_toolbar">Werkzeugleiste wie Gboard</string>
     <string name="top_bar_tabs">Tabs (ABC, 123, Fn …)</string>
@@ -503,6 +520,8 @@
     <string name="mc_clipboard_history_description">Kopierten Text 1 Stunde im Arbeitsspeicher für die Zwischenablage behalten.</string>
     <string name="mc_text_editing_title">Textbearbeitung</string>
     <string name="mc_text_editing_description">Kachel im ⊞-Menü mit Pfeiltasten, Auswählen, Ausschneiden, Kopieren und Einfügen.</string>
+    <string name="mc_quick_toggles_title">Schnellschalter für Benutzer</string>
+    <string name="mc_quick_toggles_description">Durch Kommas getrennt: glove, contrast, scanner, sound; none = keine Schnellschalter; leer = aktuelle Einstellung bleibt. Standard: glove, contrast, sound.</string>
     <string name="mc_one_handed_title">Einhandmodus</string>
     <string name="mc_one_handed_description">Tasten schmaler links oder rechts.</string>
     <string-array name="mc_top_bar_entries">

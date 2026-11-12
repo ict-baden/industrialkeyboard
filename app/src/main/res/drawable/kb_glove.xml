@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Own drawing: a gloved hand (four fingers, thumb, palm), in the style of the Material kb_* icons. -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M6.5,12V6a1,1 0,0 1,2,0V12zM9.25,12V3.75a1,1 0,0 1,2,0V12zM12,12V3.5a1,1 0,0 1,2,0V12zM14.75,12V6a1,1 0,0 1,2,0V12zM6.5,11.5H16.75V16a4.5,4.5 0,0 1,-4.5,4.5H11a4.5,4.5 0,0 1,-4.5,-4.5zM6.5,17L2.6,12.4a1.1,1.1 0,0 1,1.6,-1.5L6.8,13.5z" />
+</vector>

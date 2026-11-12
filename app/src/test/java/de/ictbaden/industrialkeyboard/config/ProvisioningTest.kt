@@ -32,6 +32,8 @@ class ProvisioningTest {
         ConfigStore.reset()
         PasswordGuard.reset()
         File(context.filesDir, "config.json").delete()
+        QuickToggleStore.reset()
+        context.getSharedPreferences(QuickToggleStore.PREFS, Context.MODE_PRIVATE).edit().clear().commit()
     }
 
     private fun write(json: String, time: Long) {
@@ -274,6 +276,59 @@ class ProvisioningTest {
         write("""{"scanner":{"input":{"enabled":true}}}""", 1_000_000)
         Migrations.run(context)
         assertEquals(true, store.config.scanner.input.enabled)
+    }
+
+    @Test
+    fun `managed quick toggles`() {
+        restrict("quick_toggles" to "glove, sound")
+        Provisioning.applyAll(context)
+        assertEquals(setOf(QuickToggle.GLOVE, QuickToggle.SOUND), store.config.quickToggles.allowed)
+
+        restrict("quick_toggles" to "none")
+        Provisioning.applyAll(context)
+        assertTrue(store.config.quickToggles.allowed.isEmpty())
+
+        // Empty: unchanged.
+        restrict("quick_toggles" to "", "theme" to "dark")
+        Provisioning.applyAll(context)
+        assertTrue(store.config.quickToggles.allowed.isEmpty())
+
+        restrict("quick_toggles" to "Scanner,contrast")
+        Provisioning.applyAll(context)
+        assertEquals(setOf(QuickToggle.SCANNER, QuickToggle.CONTRAST), store.config.quickToggles.allowed)
+    }
+
+    @Test
+    fun `unknown quick toggles are reported`() {
+        restrict("quick_toggles" to "glove, x")
+        Provisioning.applyAll(context)
+        assertEquals(QuickToggleSettings(), store.config.quickToggles)
+        assertTrue(
+            Provisioning.lastError(context).orEmpty(),
+            Provisioning.lastError(context).orEmpty().contains("quick_toggles: unknown toggle \"x\" (glove, contrast, scanner, sound, none)"),
+        )
+
+        restrict("quick_toggles" to "none, glove")
+        Provisioning.applyAll(context)
+        assertTrue(Provisioning.lastError(context).orEmpty().contains("quick_toggles: none cannot be combined"))
+        assertEquals(QuickToggleSettings(), store.config.quickToggles)
+    }
+
+    @Test
+    fun `a managed configuration keeps device overrides`() {
+        val toggles = QuickToggleStore.get(context)
+        toggles.set(QuickToggle.CONTRAST, true)
+        restrict("theme" to "dark")
+        Provisioning.applyAll(context)
+        assertEquals(ThemeMode.DARK, store.config.appearance.theme)
+        assertEquals(mapOf(QuickToggle.CONTRAST to true), QuickToggleStore.get(context).overrides)
+        assertEquals(ThemeMode.CONTRAST, QuickToggles.apply(store.config, toggles.overrides, scanAvailable = true).appearance.theme)
+
+        // A complete configuration (config_json) does not remove them either; locked, they are ignored but kept.
+        restrict("config_json" to """{"appearance":{"theme":"dark"},"quickToggles":{"allowed":["glove"]}}""")
+        Provisioning.applyAll(context)
+        assertEquals(mapOf(QuickToggle.CONTRAST to true), toggles.overrides)
+        assertEquals(ThemeMode.DARK, QuickToggles.apply(store.config, toggles.overrides, scanAvailable = true).appearance.theme)
     }
 
     @Test

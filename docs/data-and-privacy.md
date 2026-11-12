@@ -56,6 +56,7 @@ read it):
 | `shared_prefs/provisioning.xml` | Which configuration sources were applied already (time stamp and size of the file, a hash of the managed configuration) and the last provisioning error. |
 | `shared_prefs/password_guard_settings.xml`, `password_guard_remote.xml` | Number of wrong admin passwords in a row and the end of the 5-minute lock – one file for the settings screen, one for broadcasts and files. No passwords. |
 | `shared_prefs/migrations.xml` | Which one-time changes after an update were done. |
+| `shared_prefs/quick_toggles.xml` | Quick toggles switched on this device (glove mode, contrast, scanner, sound) – on/off only, no text. Not part of the configuration, export or QR code; *Reset quick toggles* or *Clear storage* removes it. |
 
 All of it is excluded from Android backup and device transfer, because the configuration is
 provisioned per device and contains the password hash.
