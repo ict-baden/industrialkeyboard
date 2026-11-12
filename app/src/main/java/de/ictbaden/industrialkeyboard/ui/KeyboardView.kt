@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.RectF
 import android.graphics.Typeface
+import android.os.Build
 import android.graphics.drawable.Drawable
 import android.os.SystemClock
 import android.util.TypedValue
@@ -141,7 +142,8 @@ class KeyboardView(context: Context) : View(context) {
         strokeWidth = dp(1.5f)
     }
     private val text = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER }
-    private val regular = Typeface.create("sans-serif", Typeface.NORMAL)
+    /** Letters a little heavier than Roboto Regular, closer to Gboard's Google Sans. */
+    private val regular = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) Typeface.create(Typeface.DEFAULT, 500, false) else Typeface.create("sans-serif-medium", Typeface.NORMAL)
     private val medium = Typeface.create("sans-serif-medium", Typeface.NORMAL)
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -303,11 +305,12 @@ class KeyboardView(context: Context) : View(context) {
         val base = when {
             key.output == KeyOutput.Space -> 13f
             label.length == 1 && layout?.id?.startsWith("numeric") == true -> 26f
-            label.length == 1 -> 22f
+            // Like Gboard (measured on a Pixel 9 Pro: capitals 19 dp high): 27 sp instead of 22 sp.
+            label.length == 1 -> 27f
             label.length <= 3 -> 16f
             else -> 13f
         }
-        text.textSize = min(sp(base), r.height() * if (label.length == 1) 0.5f else 0.36f)
+        text.textSize = min(sp(base), r.height() * if (label.length == 1) 0.56f else 0.36f)
         text.typeface = typeface(key, label)
         val maxWidth = r.width() - dp(8f)
         while (text.measureText(label) > maxWidth && text.textSize > sp(9f)) text.textSize -= 1f
