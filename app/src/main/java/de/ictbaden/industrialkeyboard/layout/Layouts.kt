@@ -147,7 +147,8 @@ object Layouts {
             KeyRow(source[0].map(::textKey)),
             KeyRow(source[1].map(::textKey)),
             KeyRow(listOf(pageKey) + source[2].map(::textKey) + backspaceKey()),
-            bottomRow(config, variant, "${Tabs.SYMBOLS}-$page", ""),
+            // The space bar names the language here too, like Gboard.
+            bottomRow(config, variant, "${Tabs.SYMBOLS}-$page", spaceLabel(config, config.layout.alphabet.resolve())),
         )
         return KeyboardLayout("${Tabs.SYMBOLS}-$page", rows)
     }

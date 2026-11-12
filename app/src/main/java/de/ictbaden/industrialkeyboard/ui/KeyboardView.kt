@@ -279,9 +279,8 @@ class KeyboardView(context: Context) : View(context) {
         }
     }
 
-    /** ?123 / ABC and the symbol page key: pills like Gboard. */
-    private fun isSwitchKey(key: Key) = key.output == KeyOutput.SymbolsPage ||
-        (key.output is KeyOutput.ShowTab && key.label != null && key.style == KeyStyle.FUNCTION)
+    /** ?123 / ABC at the bottom left: a pill like Gboard (the =\< page key stays a tile, as there). */
+    private fun isSwitchKey(key: Key) = key.output is KeyOutput.ShowTab && key.label != null && key.style == KeyStyle.FUNCTION
 
     private fun iconColor(key: Key, foreground: Int): Int =
         if (key.icon == KeyIcon.SHIFT && shift != ShiftState.OFF && key.style != KeyStyle.ACCENT) palette.accent else foreground
