@@ -517,7 +517,7 @@
     <string name="one_handed_left">Gauche</string>
     <string name="one_handed_right">Droite</string>
     <string name="mc_top_bar_title">Au-dessus des touches</string>
-    <string name="mc_top_bar_description">Barre d’outils comme Gboard ou les onglets ABC, 123, Fn.</string>
+    <string name="mc_top_bar_description">Barre d’outils comme Gboard ou les onglets ABC, 123, Fn. Par défaut : le réglage actuel reste (une configuration enregistrée par 2.1 garde les onglets).</string>
     <string name="mc_next_word_title">Suggestions du mot suivant</string>
     <string name="mc_next_word_description">Mots suivants probables après une espace (liste fixe).</string>
     <string name="mc_clipboard_history_title">Historique du presse-papiers</string>
@@ -590,6 +590,7 @@
         <item quantity="other">%1$d textes types</item>
     </plurals>
     <string-array name="mc_top_bar_entries">
+        <item>Conserver le réglage actuel</item>
         <item>Barre d’outils comme Gboard</item>
         <item>Onglets (ABC, 123, Fn)</item>
     </string-array>

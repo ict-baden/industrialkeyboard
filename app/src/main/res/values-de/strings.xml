@@ -516,7 +516,7 @@
     <string name="one_handed_left">Links</string>
     <string name="one_handed_right">Rechts</string>
     <string name="mc_top_bar_title">Über den Tasten</string>
-    <string name="mc_top_bar_description">Werkzeugleiste wie Gboard oder die Tabs ABC, 123, Fn.</string>
+    <string name="mc_top_bar_description">Werkzeugleiste wie Gboard oder die Tabs ABC, 123, Fn. Standard: aktuelle Einstellung bleibt (eine von 2.1 gespeicherte Konfiguration behält die Tabs).</string>
     <string name="mc_next_word_title">Vorschläge fürs nächste Wort</string>
     <string name="mc_next_word_description">Wahrscheinliche nächste Wörter nach einem Leerzeichen (feste Liste).</string>
     <string name="mc_clipboard_history_title">Zwischenablage-Verlauf</string>
@@ -586,6 +586,7 @@
         <item quantity="other">%1$d Bausteine</item>
     </plurals>
     <string-array name="mc_top_bar_entries">
+        <item>Aktuelle Einstellung beibehalten</item>
         <item>Werkzeugleiste wie Gboard</item>
         <item>Tabs (ABC, 123, Fn)</item>
     </string-array>

@@ -38,8 +38,11 @@ object AppLanguage {
      * service asks for a localized context.
      */
     fun localized(context: Context): Context {
+        // First: from Android 13 AppCompat asks the LocaleManager (a call to the system) – the render
+        // path uses this on every keystroke.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) return context
         val locales = AppCompatDelegate.getApplicationLocales()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU || locales.isEmpty) return context
+        if (locales.isEmpty) return context
         // The scan pad asks on every frame while scanning: reuse the last one.
         cached?.let { (base, tags, localized) -> if (base === context && tags == locales.toLanguageTags()) return localized }
         val config = Configuration(context.resources.configuration).apply { setLocale(locales[0]) }

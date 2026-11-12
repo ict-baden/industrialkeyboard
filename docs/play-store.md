@@ -84,7 +84,8 @@ sharing of user content: no. Internet access: no (the app has no internet permis
 
 - *Does the app collect or share user data?* **No.** The app has no internet permission, so it
   cannot send anything off the device. It keeps no dictionary and stores nothing that is typed;
-  only its own configuration is stored on the device ([data-and-privacy.md](data-and-privacy.md)).
+  only its own configuration and the snippets users enter in the app's snippet screen are stored
+  on the device ([data-and-privacy.md](data-and-privacy.md)).
 - Data deletion: no account, nothing to delete on our side; *Clear storage* removes everything
   on the device.
 

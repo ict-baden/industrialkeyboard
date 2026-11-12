@@ -517,7 +517,7 @@
     <string name="one_handed_left">Izquierda</string>
     <string name="one_handed_right">Derecha</string>
     <string name="mc_top_bar_title">Sobre las teclas</string>
-    <string name="mc_top_bar_description">Barra de herramientas como Gboard o las pestañas ABC, 123, Fn.</string>
+    <string name="mc_top_bar_description">Barra de herramientas como Gboard o las pestañas ABC, 123, Fn. Predeterminado: se mantiene el ajuste actual (una configuración guardada por 2.1 conserva las pestañas).</string>
     <string name="mc_next_word_title">Sugerencias de la siguiente palabra</string>
     <string name="mc_next_word_description">Palabras probables tras un espacio (lista fija).</string>
     <string name="mc_clipboard_history_title">Historial del portapapeles</string>
@@ -590,6 +590,7 @@
         <item quantity="other">%1$d fragmentos</item>
     </plurals>
     <string-array name="mc_top_bar_entries">
+        <item>Mantener el ajuste actual</item>
         <item>Barra de herramientas como Gboard</item>
         <item>Pestañas (ABC, 123, Fn)</item>
     </string-array>

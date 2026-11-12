@@ -180,7 +180,7 @@
         android:restrictionType="bool"
         android:title="@string/mc_delete_gesture_title" />
     <restriction
-        android:defaultValue="toolbar"
+        android:defaultValue="unchanged"
         android:description="@string/mc_top_bar_description"
         android:entries="@array/mc_top_bar_entries"
         android:entryValues="@array/mc_top_bar_values"
