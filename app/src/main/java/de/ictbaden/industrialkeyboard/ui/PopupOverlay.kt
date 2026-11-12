@@ -67,28 +67,38 @@ class PopupOverlay(context: Context) : View(context), PopupHost {
         }
     }
 
+    /** Top of the keyboard panel: only the keys are dimmed, not the app above. */
+    var dimTop = 0f
+
     override fun showAlternatives(source: View, key: RectF, options: List<String>) {
         val r = toLocal(source, key)
         this.options = options
-        val perRow = min(options.size, MAX_PER_ROW)
-        val rows = ceil(options.size / perRow.toFloat()).toInt()
+        // Like Gboard: at most five per row (eight give 4 × 2); the first option sits in the bottom
+        // row right above the key and is preselected, so a long press plus release types it.
+        val rows = ceil(options.size / MAX_PER_ROW.toFloat()).toInt().coerceAtLeast(1)
+        val perRow = ceil(options.size / rows.toFloat()).toInt()
         val cellW = max(r.width() * 0.92f, dp(38f))
         val cellH = max(r.height() * 0.92f, dp(42f))
         val pad = dp(6f)
         val width = perRow * cellW + pad * 2
         val height = rows * cellH + pad * 2
-        val left = clampLeft(r.centerX() - cellW / 2 - pad, width)
+        // Starts at the key and grows to the right; near the right edge it grows to the left.
+        val growLeft = r.centerX() > this.width / 2f && r.centerX() + width - cellW / 2 - pad > this.width
+        val preferred = if (growLeft) r.centerX() + cellW / 2 + pad - width else r.centerX() - cellW / 2 - pad
+        val left = clampLeft(preferred, width)
         val top = max(r.top - height - dp(4f), dp(2f))
         panel.set(left, top, left + width, top + height)
         cells.clear()
         options.indices.forEach { i ->
             val row = i / perRow
-            val col = i % perRow
+            val inRow = i % perRow
+            val col = if (growLeft) perRow - 1 - inRow else inRow
             val x = left + pad + col * cellW
-            val y = top + pad + row * cellH
+            // Row 0 at the bottom, nearest to the finger.
+            val y = top + pad + (rows - 1 - row) * cellH
             cells += RectF(x, y, x + cellW, y + cellH)
         }
-        selected = cells.indices.minByOrNull { abs(cells[it].centerX() - r.centerX()) + abs(cells[it].centerY() - r.top) } ?: 0
+        selected = 0
         invalidate()
     }
 
@@ -140,7 +150,10 @@ class PopupOverlay(context: Context) : View(context), PopupHost {
     }
 
     private fun drawAlternatives(canvas: Canvas) {
-        val radius = dp(12f)
+        // Dims the keyboard behind the choices, like Gboard.
+        fill.color = SCRIM
+        canvas.drawRect(0f, dimTop, width.toFloat(), height.toFloat(), fill)
+        val radius = dp(24f)
         fill.color = palette.popup
         fill.setShadowLayer(dp(10f), 0f, dp(4f), 0x66000000)
         canvas.drawRoundRect(panel, radius, radius, fill)
@@ -149,7 +162,8 @@ class PopupOverlay(context: Context) : View(context), PopupHost {
             val active = i == selected
             if (active) {
                 fill.color = palette.accent
-                canvas.drawRoundRect(cell, dp(9f), dp(9f), fill)
+                val d = min(cell.width(), cell.height()) / 2f
+                canvas.drawCircle(cell.centerX(), cell.centerY(), d, fill)
             }
             text.color = if (active) palette.accentText else palette.popupText
             val option = options[i]
@@ -173,7 +187,8 @@ class PopupOverlay(context: Context) : View(context), PopupHost {
     private fun sp(value: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, value, resources.displayMetrics)
 
     private companion object {
-        const val MAX_PER_ROW = 8
+        const val MAX_PER_ROW = 5
+        const val SCRIM = 0x66000000
         const val POP_MS = 70L
     }
 }

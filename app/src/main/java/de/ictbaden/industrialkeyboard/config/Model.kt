@@ -154,7 +154,7 @@ data class Appearance(
     /** 😊 next to the space bar in normal text fields; opens the emoji panel. */
     val emojiKey: Boolean = true,
     /** Symbols in the corner of letter keys (a @, s # …) that a long press types, like Gboard. */
-    val symbolHints: Boolean = true,
+    val symbolHints: Boolean = false,
     /** Letter keys drawn as tiles; off: only the labels on the keyboard background (Gboard "Key borders" off). */
     val keyBorders: Boolean = true,
 )

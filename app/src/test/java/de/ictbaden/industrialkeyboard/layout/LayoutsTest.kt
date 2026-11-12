@@ -29,16 +29,20 @@ class LayoutsTest {
         assertEquals("asdfghjkl".map { it.toString() }, labels(layout.rows[1]))
         assertEquals("1", layout.rows[0].keys[0].hint)
         assertEquals(listOf("1"), layout.rows[0].keys[0].popup)
-        // u carries the digit 7 first, then ü; a and s carry their symbol (@, #) first, then ä and ß.
-        assertEquals(listOf("7", "ü"), layout.rows[0].keys[6].popup.take(2))
-        assertEquals(listOf("@", "ä"), layout.rows[1].keys[0].popup.take(2))
-        assertEquals(listOf("#", "ß"), layout.rows[1].keys[1].popup.take(2))
+        // German: ü before the digit 7; a and s start with ä and ß (symbol hints are off by default).
+        assertEquals(listOf("ü", "7"), layout.rows[0].keys[6].popup.take(2))
+        assertEquals("ä", layout.rows[1].keys[0].popup.first())
+        assertEquals("ß", layout.rows[1].keys[1].popup.first())
+        // With symbol hints the umlaut stays first, the symbol follows.
+        val hinted = Layouts.alpha(KeyboardConfig(layout = LayoutSettings(alphabet = Alphabet.QWERTZ), appearance = Appearance(symbolHints = true)))
+        assertEquals(listOf("ä", "@"), hinted.rows[1].keys[0].popup.take(2))
         assertEquals(10f, layout.units)
     }
 
     @Test
     fun `symbol hints on all letters like Gboard`() {
-        val layout = Layouts.alpha(KeyboardConfig(layout = LayoutSettings(alphabet = Alphabet.QWERTZ)))
+        // Off by default like Gboard's "long press for symbols"; switched on here.
+        val layout = Layouts.alpha(KeyboardConfig(layout = LayoutSettings(alphabet = Alphabet.QWERTZ), appearance = Appearance(symbolHints = true)))
         assertEquals(listOf("@", "#", Layouts.currency(), "_", "&", "-", "+", "(", ")"), layout.rows[1].keys.map { it.hint })
         // Third row: shift, y x c v b n m, backspace.
         assertEquals(listOf("*", "\"", "'", ":", ";", "!", "?"), layout.rows[2].keys.drop(1).dropLast(1).map { it.hint })
