@@ -44,6 +44,8 @@ class FeaturesPanelView(context: Context) : GridLayout(context) {
     }
 
     private fun rebuild() {
+        // Opaque: the panel lies over the keys.
+        setBackgroundColor(palette.background)
         removeAllViews()
         val res = AppLanguage.localized(context)
         features.forEach { feature ->
