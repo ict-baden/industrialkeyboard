@@ -86,7 +86,7 @@ object Layouts {
     /** Second page, close to Gboard's "=\<" page. */
     private val SYMBOLS_2 = listOf(
         listOf("~", "`", "|", "•", "√", "π", "÷", "×", "§", "Δ"),
-        listOf("£", "¥", "$", "¢", "^", "°", "=", "{", "}", "\\"),
+        listOf("£", "¢", "€", "¥", "^", "°", "=", "{", "}", "\\"),
         listOf("%", "©", "®", "™", "✓", "[", "]"),
     )
 
@@ -147,7 +147,7 @@ object Layouts {
             KeyRow(source[0].map(::textKey)),
             KeyRow(source[1].map(::textKey)),
             KeyRow(listOf(pageKey) + source[2].map(::textKey) + backspaceKey()),
-            bottomRow(config, variant, Tabs.SYMBOLS, ""),
+            bottomRow(config, variant, "${Tabs.SYMBOLS}-$page", ""),
         )
         return KeyboardLayout("${Tabs.SYMBOLS}-$page", rows)
     }
@@ -269,24 +269,31 @@ object Layouts {
                 add(Key(label = if (toSymbols) "?123" else "ABC", output = KeyOutput.ShowTab(if (toSymbols) Tabs.SYMBOLS else Tabs.ALPHA), width = 1.5f, style = KeyStyle.FUNCTION))
             }
             add(programmable(config.programmable(ProgrammableKey.ALPHA_P1), width = if (switchKey) 1f else 1.5f))
+            val secondSymbols = page == "${Tabs.SYMBOLS}-2"
             add(
-                when (variant) {
-                    AlphaVariant.EMAIL -> textKey("@", listOf(",", "-", "_", "+"))
-                    AlphaVariant.URL -> textKey("/", listOf(",", ":", "-", "_", "?", "="))
+                // Like Gboard: comma and period in the colour of the function keys.
+                when {
+                    secondSymbols -> textKey("<")
+                    variant == AlphaVariant.EMAIL -> textKey("@", listOf(",", "-", "_", "+"))
+                    variant == AlphaVariant.URL -> textKey("/", listOf(",", ":", "-", "_", "?", "="))
                     // Like Gboard: a long press on the comma offers the settings and emoji first.
-                    AlphaVariant.TEXT -> textKey(",", listOf(COMMA_SETTINGS, COMMA_EMOJI, ";", ":", "_", "-"))
-                },
+                    else -> textKey(",", listOf(COMMA_SETTINGS, COMMA_EMOJI, ";", ":", "_", "-"))
+                }.copy(style = KeyStyle.FUNCTION),
             )
+            // On the symbol pages Gboard offers the number pad ("1234") instead of emoji.
+            val numberPad = page != Tabs.ALPHA && page.startsWith(Tabs.SYMBOLS)
+            if (numberPad) add(Key(label = "1234", output = KeyOutput.ShowTab(Tabs.NUMERIC)))
             // Like Gboard: 😊 between the comma and the space bar.
-            if (emojiKey) add(Key(icon = KeyIcon.EMOJI, output = KeyOutput.Emoji, style = KeyStyle.FUNCTION))
+            if (emojiKey && !numberPad) add(Key(icon = KeyIcon.EMOJI, output = KeyOutput.Emoji))
             if (languageKey) add(Key(icon = KeyIcon.GLOBE, output = KeyOutput.Language, style = KeyStyle.FUNCTION))
-            add(Key(label = spaceLabel, output = KeyOutput.Space, width = 3f - (if (languageKey) 1f else 0f) - (if (emojiKey) 1f else 0f), flex = true))
+            val narrowing = (if (languageKey) 1f else 0f) + (if ((emojiKey && !numberPad) || numberPad) 1f else 0f)
+            add(Key(label = spaceLabel, output = KeyOutput.Space, width = 3f - narrowing, flex = true))
             add(
-                if (variant == AlphaVariant.URL) {
-                    textKey(".", listOf(".com", ".de", ".org", ".net", "www."))
-                } else {
-                    textKey(".", listOf(",", "?", "!", "'", "\"", ":", ";", "-"))
-                },
+                when {
+                    secondSymbols -> textKey(">")
+                    variant == AlphaVariant.URL -> textKey(".", listOf(".com", ".de", ".org", ".net", "www."))
+                    else -> textKey(".", listOf(",", "?", "!", "'", "\"", ":", ";", "-"))
+                }.copy(style = KeyStyle.FUNCTION),
             )
             if (config.scanner.scanKey) add(Key(icon = KeyIcon.SCAN, output = KeyOutput.Macro(listOf(MacroStep.Command(KeyCommand.SCAN))), width = 1.25f, style = KeyStyle.FUNCTION))
             // 1.5 like Gboard: the space bar gets the rest.
@@ -312,8 +319,9 @@ object Layouts {
             label = c.toString(),
             output = KeyOutput.Text(c.toString()),
             hint = digit?.toString() ?: symbol,
-            // The hint comes first: a long press types it, like Gboard.
-            popup = listOfNotNull(digit?.toString(), symbol) + alternatives,
+            // German: ä, ö, ü, ß first and preselected (what people long-press a, o, u, s for);
+            // otherwise the hint first, like Gboard.
+            popup = if (first != null) alternatives.take(1) + listOfNotNull(digit?.toString(), symbol) + alternatives.drop(1) else listOfNotNull(digit?.toString(), symbol) + alternatives,
             letter = true,
         )
     }

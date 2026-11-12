@@ -93,6 +93,7 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         addView(panel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM).apply { topMargin = headroom })
         addView(overlay, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         keyboard.popupHost = overlay
+        overlay.dimTop = headroom.toFloat()
         scanRow.popupHost = overlay
         scanRow.layout = Layouts.scanRow()
         keyboard.setPadding(dp(3), dp(4), dp(3), dp(4))
