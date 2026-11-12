@@ -12,15 +12,29 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.view.ViewCompat
 import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
 
-/** The ⊞ panel of the toolbar, like Gboard's: tiles for the keyboard's other features. */
+/**
+ * The ⊞ panel of the toolbar, like Gboard's: tiles for the keyboard's other features. It grows with
+ * its tiles; [KeyboardRootView.featuresScroll] scrolls it when they are taller than the keys.
+ */
 @SuppressLint("ViewConstructor")
 class FeaturesPanelView(context: Context) : GridLayout(context) {
 
-    /** One tile; [id] goes back to the keyboard service. */
-    data class Feature(val id: String, @param:DrawableRes val icon: Int?, @param:StringRes val label: Int, val text: String? = null)
+    /**
+     * One tile; [id] goes back to the keyboard service. [checked]: `null` = an action tile, otherwise
+     * an on/off switch (quick toggles) – lit in the accent colour while on, with "On"/"Off" for
+     * screen readers.
+     */
+    data class Feature(
+        val id: String,
+        @param:DrawableRes val icon: Int?,
+        @param:StringRes val label: Int,
+        val text: String? = null,
+        val checked: Boolean? = null,
+    )
 
     var onFeature: ((String) -> Unit)? = null
 
@@ -49,32 +63,38 @@ class FeaturesPanelView(context: Context) : GridLayout(context) {
         removeAllViews()
         val res = AppLanguage.localized(context)
         features.forEach { feature ->
+            val on = feature.checked == true
+            val foreground = if (on) palette.accentText else palette.keyText
             val tile = LinearLayout(context).apply {
                 orientation = LinearLayout.VERTICAL
                 gravity = Gravity.CENTER
                 background = GradientDrawable().apply {
-                    setColor(palette.key)
+                    setColor(if (on) palette.accent else palette.key)
                     cornerRadius = dp(14).toFloat()
                 }
                 isClickable = true
                 setOnClickListener { onFeature?.invoke(feature.id) }
                 contentDescription = res.getString(feature.label)
+                feature.checked?.let { checked ->
+                    isSelected = checked
+                    ViewCompat.setStateDescription(this, res.getString(if (checked) R.string.state_on else R.string.state_off))
+                }
                 if (feature.icon != null) {
                     addView(ImageView(context).apply {
                         setImageResource(feature.icon)
-                        imageTintList = ColorStateList.valueOf(palette.keyText)
+                        imageTintList = ColorStateList.valueOf(foreground)
                     }, LinearLayout.LayoutParams(dp(28), dp(28)))
                 } else {
                     addView(TextView(context).apply {
                         text = feature.text
-                        setTextColor(palette.keyText)
+                        setTextColor(foreground)
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
                         gravity = Gravity.CENTER
                     }, LinearLayout.LayoutParams(dp(48), dp(28)))
                 }
                 addView(TextView(context).apply {
                     text = res.getString(feature.label)
-                    setTextColor(palette.keyHint)
+                    setTextColor(if (on) palette.accentText else palette.keyHint)
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
                     gravity = Gravity.CENTER
                     maxLines = 2

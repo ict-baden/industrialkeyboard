@@ -470,6 +470,8 @@
     <string name="feature_one_handed">单手模式</string>
     <string name="feature_languages">语言</string>
     <string name="feature_settings">设置</string>
+    <string name="state_on">已开启</string>
+    <string name="state_off">已关闭</string>
     <string name="top_bar">按键上方</string>
     <string name="top_bar_toolbar">与 Gboard 相同的工具栏</string>
     <string name="top_bar_tabs">标签（ABC、123、Fn …）</string>

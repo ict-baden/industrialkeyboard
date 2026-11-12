@@ -537,6 +537,9 @@
     <string name="feature_one_handed">One-handed</string>
     <string name="feature_languages">Languages</string>
     <string name="feature_settings">Settings</string>
+    <!-- State of an on/off tile for screen readers ("Gloves, On"); shared by quick toggles and accessibility. -->
+    <string name="state_on">On</string>
+    <string name="state_off">Off</string>
     <string name="top_bar">Above the keys</string>
     <string name="top_bar_toolbar">Toolbar like Gboard</string>
     <string name="top_bar_tabs">Tabs (ABC, 123, Fn …)</string>

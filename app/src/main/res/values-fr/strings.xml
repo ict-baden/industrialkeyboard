@@ -472,6 +472,8 @@
     <string name="feature_one_handed">Une main</string>
     <string name="feature_languages">Langues</string>
     <string name="feature_settings">Paramètres</string>
+    <string name="state_on">Activé</string>
+    <string name="state_off">Désactivé</string>
     <string name="top_bar">Au-dessus des touches</string>
     <string name="top_bar_toolbar">Barre d’outils comme Gboard</string>
     <string name="top_bar_tabs">Onglets (ABC, 123, Fn …)</string>

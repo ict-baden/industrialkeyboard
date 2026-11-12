@@ -98,9 +98,29 @@ class ProvisioningTest {
         assertTrue(Provisioning.lastError(context).orEmpty().contains("password"))
     }
 
-    private fun restrict(vararg values: Pair<String, String>) {
-        val bundle = Bundle().apply { values.forEach { (k, v) -> putString(k, v) } }
+    /** Managed configuration with string and boolean keys, as an EMM sends them (bool keys are real booleans). */
+    private fun restrict(vararg values: Pair<String, Any>) {
+        val bundle = Bundle().apply {
+            values.forEach { (k, v) ->
+                when (v) {
+                    is String -> putString(k, v)
+                    is Boolean -> putBoolean(k, v)
+                    else -> error("unsupported restriction type for $k: ${v::class.simpleName}")
+                }
+            }
+        }
         Shadow.extract<ShadowRestrictionsManager>(context.getSystemService(RestrictionsManager::class.java)).setApplicationRestrictions(bundle)
+    }
+
+    @Test
+    fun `managed boolean options`() {
+        restrict("clipboard_history" to true, "next_word" to false, "theme" to "dark")
+        Provisioning.applyAll(context)
+        assertTrue(store.config.typing.clipboardHistory)
+        assertFalse(store.config.typing.nextWord)
+        assertEquals(ThemeMode.DARK, store.config.appearance.theme)
+        // A key that is not sent keeps the current value.
+        assertTrue(store.config.typing.autocorrect)
     }
 
     @Test

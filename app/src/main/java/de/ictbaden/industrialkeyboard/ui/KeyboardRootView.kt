@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import androidx.annotation.DrawableRes
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -82,8 +83,18 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
     /** Dictation in place of the keys (issue #23); gone otherwise. */
     val voicePanel = VoicePanelView(context).apply { visibility = GONE }
 
-    /** Toolbar ⊞: tiles for the keyboard's features, in place of the keys. */
-    val featuresPanel = FeaturesPanelView(context).apply { visibility = GONE }
+    /** Toolbar ⊞: tiles for the keyboard's features, in place of the keys (inside [featuresScroll]). */
+    val featuresPanel = FeaturesPanelView(context)
+
+    /**
+     * Scrolls the ⊞ tiles when there are more rows than fit into the height of the keys; shown and
+     * hidden instead of [featuresPanel] (screen-reader pane titles belong here, too).
+     */
+    val featuresScroll = ScrollView(context).apply {
+        isFillViewport = true
+        visibility = GONE
+        addView(featuresPanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+    }
 
     /** Toolbar 📋: clipboard entries in place of the keys. */
     val clipboardPanel = ClipboardPanelView(context).apply { visibility = GONE }
@@ -118,7 +129,7 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         content.addView(camera, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         content.addView(emojiPanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         content.addView(voicePanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-        content.addView(featuresPanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        content.addView(featuresScroll, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         content.addView(clipboardPanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         addView(panel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM).apply { topMargin = headroom })
         addView(overlay, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
@@ -203,8 +214,9 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         content.updatePadding(left = sidePadding, right = sidePadding)
         val panelOpen = state.toolPanel
         featuresPanel.palette = p
+        featuresScroll.setBackgroundColor(p.background)
         clipboardPanel.palette = p
-        featuresPanel.isVisible = panelOpen == Tabs.TOOL_MENU
+        featuresScroll.isVisible = panelOpen == Tabs.TOOL_MENU
         clipboardPanel.isVisible = panelOpen == Tabs.TOOL_CLIPBOARD
         if (panelOpen == Tabs.TOOL_CLIPBOARD) clipboardPanel.show(state.clips, state.clipboardHistory)
         listOf(keyboard, scanRow).forEach {
@@ -236,9 +248,9 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         (camera.layoutParams as LayoutParams).height = state.rowHeight * state.heightRows + keyboard.paddingTop + keyboard.paddingBottom
         (emojiPanel.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
         (voicePanel.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
-        (featuresPanel.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
+        (featuresScroll.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
         (clipboardPanel.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
-        featuresPanel.requestLayout()
+        featuresScroll.requestLayout()
         clipboardPanel.requestLayout()
         contentRow.requestLayout()
         voicePanel.palette = p
