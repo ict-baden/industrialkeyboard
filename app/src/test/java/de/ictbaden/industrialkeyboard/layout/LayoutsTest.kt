@@ -29,11 +29,44 @@ class LayoutsTest {
         assertEquals("asdfghjkl".map { it.toString() }, labels(layout.rows[1]))
         assertEquals("1", layout.rows[0].keys[0].hint)
         assertEquals(listOf("1"), layout.rows[0].keys[0].popup)
-        // u carries the digit 7 first, then ü; a, o and s start with ä, ö, ß.
+        // u carries the digit 7 first, then ü; a and s carry their symbol (@, #) first, then ä and ß.
         assertEquals(listOf("7", "ü"), layout.rows[0].keys[6].popup.take(2))
-        assertEquals("ä", layout.rows[1].keys[0].popup.first())
-        assertEquals("ß", layout.rows[1].keys[1].popup.first())
+        assertEquals(listOf("@", "ä"), layout.rows[1].keys[0].popup.take(2))
+        assertEquals(listOf("#", "ß"), layout.rows[1].keys[1].popup.take(2))
         assertEquals(10f, layout.units)
+    }
+
+    @Test
+    fun `symbol hints on all letters like Gboard`() {
+        val layout = Layouts.alpha(KeyboardConfig(layout = LayoutSettings(alphabet = Alphabet.QWERTZ)))
+        assertEquals(listOf("@", "#", Layouts.currency(), "_", "&", "-", "+", "(", ")"), layout.rows[1].keys.map { it.hint })
+        // Third row: shift, y x c v b n m, backspace.
+        assertEquals(listOf("*", "\"", "'", ":", ";", "!", "?"), layout.rows[2].keys.drop(1).dropLast(1).map { it.hint })
+        val off = Layouts.alpha(KeyboardConfig(appearance = Appearance(symbolHints = false)))
+        assertTrue(off.rows[1].keys.all { it.hint == null })
+    }
+
+    @Test
+    fun `currency follows the keyboard language`() {
+        assertEquals("€", Layouts.currency(java.util.Locale.GERMANY))
+        assertEquals("$", Layouts.currency(java.util.Locale.US))
+        assertEquals("£", Layouts.currency(java.util.Locale.UK))
+    }
+
+    @Test
+    fun `symbols page in Gboard order`() {
+        val page = Layouts.symbols(KeyboardConfig())
+        assertEquals("1234567890".map { it.toString() }, labels(page.rows[0]))
+        assertEquals(listOf("@", "#", Layouts.currency(), "_", "&", "-", "+", "(", ")", "/"), labels(page.rows[1]))
+        assertEquals("=\\<", page.rows[2].keys.first().label)
+        assertEquals(listOf("*", "\"", "'", ":", ";", "!", "?"), labels(page.rows[2]).drop(1))
+        assertEquals("?123", Layouts.symbols(KeyboardConfig(), page = 2).rows[2].keys.first().label)
+    }
+
+    @Test
+    fun `comma offers settings and emoji first`() {
+        val comma = Layouts.alpha(KeyboardConfig()).rows.last().keys.first { it.label == "," }
+        assertEquals(listOf(Layouts.COMMA_SETTINGS, Layouts.COMMA_EMOJI), comma.popup.take(2))
     }
 
     @Test

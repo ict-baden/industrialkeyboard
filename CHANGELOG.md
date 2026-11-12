@@ -15,6 +15,14 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
   - Enter 1,5 statt 2 Tasten breit.
   - Zahlen-Taste `?123` unten links wie bei Gboard, auch mit Tab-Leiste (`layout.symbolsKey`, Einstellung „Zahlen-Taste“, MDM `symbols_key`; Standard aus).
   - Buchstaben größer und kräftiger (27 sp, Strichstärke 500).
+- **Diktat** ([#23](https://github.com/ict-baden/industrialkeyboard/issues/23)): Mikrofon rechts in der Tab-Leiste schaltet auf die Spracheingabe des Geräts (z. B. Google Voice Typing), die danach zurückwechselt. Keine Mikrofon-Berechtigung für die Tastatur. `typing.voice` (`auto`, `system`, `off`; `offline` ist für #24 vorgesehen), Einstellung „Diktat“, MDM `voice`.
+- **Weiter wie Gboard:**
+  - Symbole bei langem Drücken auf allen Buchstaben (a @, s #, d €/$ …), als Hinweis in der Ecke (`appearance.symbolHints`, Standard an).
+  - Enter und `?123` als Pillen, Buchstaben mit 6 dp Rundung wie bei Gboard; „Tastenränder“ (`appearance.keyBorders`) aus zeigt nur die Buchstaben.
+  - Tastenvorschau beim Drücken standardmäßig aus (`feedback.keyPopup`; gespeicherte Konfigurationen behalten ihren Wert).
+  - Langes Drücken auf das Komma bietet zuerst ⚙ Einstellungen und 😊 Emoji.
+  - Zeichenseite in Gboards Reihenfolge (1–0 · @ # € _ & - + ( ) / · =\< * " ' : ; ! ?), zweite Seite ähnlich Gboards; Währung nach Tastatursprache.
+  - Wischen zum Löschen: von der Rücktaste nach links wischen markiert ganze Wörter, Loslassen löscht sie (`typing.deleteGesture`, Standard an).
 - **Wortvorschläge** wie bei Gboard ([#22](https://github.com/ict-baden/industrialkeyboard/issues/22)): drei Vorschläge an Stelle der Tab-Leiste, solange ein Wort getippt wird, aus eingebauten Wortlisten (AOSP-Wörterbücher, 21 Sprachen, je bis 80 000 Wörter), Vervollständigung und ein Tippfehler (Nachbartaste, fehlender, überzähliger oder vertauschter Buchstabe). Nur in normalen Textfeldern, nie in Passwort-, E-Mail-, Adress-, Zahlen- und Datumsfeldern oder bei `textNoSuggestions`. Nichts wird gelernt oder gespeichert. `typing.suggestions` (Standard an), `typing.autocorrect` (Standard aus; Rücktaste macht die Korrektur rückgängig), auch per MDM (`suggestions`, `autocorrect`).
 - **Emoji-Taste und Emoji-Auswahl** wie bei Gboard: 😊 zwischen Komma und Leertaste in normalen Textfeldern, Auswahl mit Kategorien und Hauttönen an Stelle der Tasten (AndroidX Emoji Picker 1.7.0, ohne eigene Emoji-Schrift), zuletzt benutzte Emoji nur im Speicher. `appearance.emojiKey` (Standard an), MDM `emoji_key`.
 - Feld „Notiz“ unter „Ausprobieren“ in der App, zum Testen von Vorschlägen und Emoji.

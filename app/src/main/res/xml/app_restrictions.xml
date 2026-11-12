@@ -153,4 +153,30 @@
         android:key="symbols_key"
         android:restrictionType="bool"
         android:title="@string/mc_symbols_key_title" />
+    <restriction
+        android:defaultValue="auto"
+        android:description="@string/mc_voice_description"
+        android:entries="@array/mc_voice_entries"
+        android:entryValues="@array/mc_voice_values"
+        android:key="voice"
+        android:restrictionType="choice"
+        android:title="@string/mc_voice_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_symbol_hints_description"
+        android:key="symbol_hints"
+        android:restrictionType="bool"
+        android:title="@string/mc_symbol_hints_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_key_borders_description"
+        android:key="key_borders"
+        android:restrictionType="bool"
+        android:title="@string/mc_key_borders_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_delete_gesture_description"
+        android:key="delete_gesture"
+        android:restrictionType="bool"
+        android:title="@string/mc_delete_gesture_title" />
 </restrictions>

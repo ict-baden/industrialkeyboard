@@ -118,10 +118,14 @@ object Provisioning {
             appearance = config.appearance.copy(
                 theme = choice("theme", ThemeMode.entries.toTypedArray(), config.appearance.theme),
                 emojiKey = bool("emoji_key", config.appearance.emojiKey),
+                symbolHints = bool("symbol_hints", config.appearance.symbolHints),
+                keyBorders = bool("key_borders", config.appearance.keyBorders),
             ),
             typing = config.typing.copy(
                 suggestions = bool("suggestions", config.typing.suggestions),
                 autocorrect = bool("autocorrect", config.typing.autocorrect),
+                voice = choice("voice", VoiceInput.entries.toTypedArray(), config.typing.voice),
+                deleteGesture = bool("delete_gesture", config.typing.deleteGesture),
             ),
             layout = config.layout.copy(
                 alphabet = choice("alphabet", Alphabet.entries.toTypedArray(), config.layout.alphabet),

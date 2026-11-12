@@ -54,6 +54,7 @@ import de.ictbaden.industrialkeyboard.config.Symbology
 import de.ictbaden.industrialkeyboard.config.Tabs
 import de.ictbaden.industrialkeyboard.config.TextCase
 import de.ictbaden.industrialkeyboard.config.ThemeMode
+import de.ictbaden.industrialkeyboard.config.VoiceInput
 import de.ictbaden.industrialkeyboard.config.UidFormat
 import de.ictbaden.industrialkeyboard.ime.Field
 import de.ictbaden.industrialkeyboard.ime.FieldPolicy
@@ -273,6 +274,12 @@ class SettingsActivity : AppCompatActivity() {
                     ui.switchRow(R.drawable.ic_info, getString(R.string.key_hints), getString(R.string.key_hints_summary), c.appearance.keyHints) { on ->
                         update { it.copy(appearance = it.appearance.copy(keyHints = on)) }
                     },
+                    ui.switchRow(R.drawable.ic_info, getString(R.string.symbol_hints), getString(R.string.symbol_hints_summary), c.appearance.symbolHints) { on ->
+                        update { it.copy(appearance = it.appearance.copy(symbolHints = on)) }
+                    },
+                    ui.switchRow(R.drawable.ic_palette, getString(R.string.key_borders), getString(R.string.key_borders_summary), c.appearance.keyBorders) { on ->
+                        update { it.copy(appearance = it.appearance.copy(keyBorders = on)) }
+                    },
                 ),
             ),
         )
@@ -377,6 +384,19 @@ class SettingsActivity : AppCompatActivity() {
                     },
                     ui.switchRow(R.drawable.ic_keyboard, getString(R.string.autocorrect), getString(R.string.autocorrect_summary), c.typing.autocorrect, enabled = c.typing.suggestions) { on ->
                         update { it.copy(typing = it.typing.copy(autocorrect = on)) }
+                    },
+                    ui.choiceRow(
+                        R.drawable.ic_mic,
+                        getString(R.string.voice_input),
+                        listOf(
+                            VoiceInput.AUTO to getString(R.string.automatic),
+                            VoiceInput.SYSTEM to getString(R.string.voice_system),
+                            VoiceInput.OFF to getString(R.string.scan_trigger_off),
+                        ),
+                        if (c.typing.voice == VoiceInput.OFFLINE) VoiceInput.OFF else c.typing.voice,
+                    ) { voice -> update { it.copy(typing = it.typing.copy(voice = voice)) } },
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.delete_gesture), getString(R.string.delete_gesture_summary), c.typing.deleteGesture) { on ->
+                        update { it.copy(typing = it.typing.copy(deleteGesture = on)) }
                     },
                     ui.switchRow(R.drawable.ic_keyboard, getString(R.string.auto_capitalization), getString(R.string.auto_capitalization_summary), c.typing.autoCapitalize) { on ->
                         update { it.copy(typing = it.typing.copy(autoCapitalize = on)) }

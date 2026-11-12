@@ -54,6 +54,12 @@ class KeyboardView(context: Context) : View(context) {
 
         /** Long press without alternatives (space, shift …); true when handled. */
         fun onKeyLongPress(key: Key): Boolean
+
+        /**
+         * Swipe left from Backspace (Gboard's delete gesture): [words] before the cursor are marked;
+         * [done] = finger lifted, delete them (0 = nothing).
+         */
+        fun onDeleteSwipe(words: Int, done: Boolean) = Unit
     }
 
     var listener: Listener? = null
@@ -87,6 +93,16 @@ class KeyboardView(context: Context) : View(context) {
             invalidate()
         }
     var keyPopups = true
+
+    /** Swipe left from Backspace deletes words (`typing.deleteGesture`). */
+    var deleteGesture = true
+
+    /** Letter keys as tiles; false: like Gboard with "Key borders" off. */
+    var keyBorders = true
+        set(value) {
+            field = value
+            invalidate()
+        }
     var longPressDelay = 400L
 
     /** The view is sized for this many rows so that every page has the same height. */
@@ -113,12 +129,13 @@ class KeyboardView(context: Context) : View(context) {
         var labelSize = 0f
     }
 
-    private enum class Mode { NORMAL, ALTERNATIVES, CURSOR, REPEAT }
+    private enum class Mode { NORMAL, ALTERNATIVES, CURSOR, REPEAT, DELETE }
 
     private inner class Pointer(val id: Int, var box: KeyBox?, val downX: Float) {
         var mode = Mode.NORMAL
         var consumed = false
         var cursorAnchor = 0f
+        var deleteWords = 0
         val longPress = Runnable { onLongPress(this) }
         val repeat: Runnable = object : Runnable {
             override fun run() {
@@ -226,22 +243,28 @@ class KeyboardView(context: Context) : View(context) {
             }
         }
         val r = box.rect
-        val radius = min(dp(9f), r.height() * 0.2f)
+        // Like Gboard: letters rounded by about 6 dp, Enter and ?123/ABC as pills.
+        val pill = key.style == KeyStyle.ACCENT || isSwitchKey(key)
+        val radius = if (pill) min(r.height(), r.width()) / 2f else min(dp(6f), r.height() * 0.2f)
+        // "Key borders" off: letter keys are drawn without a tile, only the label (and the press).
+        val tile = keyBorders || key.style != KeyStyle.NORMAL
         canvas.withSave {
             if (pressed) canvas.scale(PRESS_SCALE, PRESS_SCALE, r.centerX(), r.centerY())
-            if (p.shadow != 0 && !pressed) {
+            if (p.shadow != 0 && !pressed && tile) {
                 fill.color = p.shadow
                 tmp.set(r)
                 tmp.offset(0f, dp(1.4f))
                 canvas.drawRoundRect(tmp, radius, radius, fill)
             }
-            fill.color = background
-            canvas.drawRoundRect(r, radius, radius, fill)
+            if (tile) {
+                fill.color = background
+                canvas.drawRoundRect(r, radius, radius, fill)
+            }
             if (overlay > 0f) {
                 fill.color = ColorUtils.setAlphaComponent(p.pressed, (android.graphics.Color.alpha(p.pressed) * overlay).toInt())
                 canvas.drawRoundRect(r, radius, radius, fill)
             }
-            if (p.border != 0) {
+            if (p.border != 0 && tile) {
                 stroke.color = if (key.style == KeyStyle.ACCENT) p.accent else p.border
                 tmp.set(r)
                 tmp.inset(stroke.strokeWidth / 2, stroke.strokeWidth / 2)
@@ -255,6 +278,10 @@ class KeyboardView(context: Context) : View(context) {
             key.hint?.let { drawHint(canvas, it, r, if (key.style == KeyStyle.ACCENT) p.accentText else p.keyHint) }
         }
     }
+
+    /** ?123 / ABC and the symbol page key: pills like Gboard. */
+    private fun isSwitchKey(key: Key) = key.output == KeyOutput.SymbolsPage ||
+        (key.output is KeyOutput.ShowTab && key.label != null && key.style == KeyStyle.FUNCTION)
 
     private fun iconColor(key: Key, foreground: Int): Int =
         if (key.icon == KeyIcon.SHIFT && shift != ShiftState.OFF && key.style != KeyStyle.ACCENT) palette.accent else foreground
@@ -388,9 +415,25 @@ class KeyboardView(context: Context) : View(context) {
                 }
             }
             Mode.REPEAT -> Unit
+            Mode.DELETE -> {
+                // One more word per step to the left, fewer when moving back.
+                val words = ((pointer.downX - x) / dp(DELETE_STEP_DP)).toInt().coerceAtLeast(0)
+                if (words != pointer.deleteWords) {
+                    pointer.deleteWords = words
+                    listener?.onDeleteSwipe(words, done = false)
+                }
+            }
             Mode.NORMAL -> {
                 if (pointer.consumed) return
                 val box = pointer.box
+                if (deleteGesture && box?.key?.output == KeyOutput.Backspace && pointer.downX - x > dp(CURSOR_SLOP_DP)) {
+                    pointer.mode = Mode.DELETE
+                    stopTimers(pointer)
+                    popupHost?.hidePreview()
+                    pointer.deleteWords = 0
+                    move(id, x, y)
+                    return
+                }
                 if (box?.key?.output == KeyOutput.Space && abs(x - pointer.downX) > dp(CURSOR_SLOP_DP)) {
                     pointer.mode = Mode.CURSOR
                     pointer.cursorAnchor = x
@@ -424,6 +467,7 @@ class KeyboardView(context: Context) : View(context) {
                 if (choice != null && box != null) listener?.onKey(box.key, choice)
             }
             Mode.NORMAL -> if (!pointer.consumed && box != null) listener?.onKey(box.key, null)
+            Mode.DELETE -> listener?.onDeleteSwipe(pointer.deleteWords, done = true)
             Mode.CURSOR, Mode.REPEAT -> Unit
         }
         box?.let { released[it] = SystemClock.uptimeMillis() }
@@ -459,6 +503,8 @@ class KeyboardView(context: Context) : View(context) {
     }
 
     private fun cancelAll() {
+        // A cancelled delete gesture deletes nothing.
+        if (pointers.values.any { it.mode == Mode.DELETE }) listener?.onDeleteSwipe(0, done = true)
         pointers.values.forEach(::stopTimers)
         pointers.clear()
         popupHost?.hidePreview()
@@ -497,5 +543,6 @@ class KeyboardView(context: Context) : View(context) {
         const val REPEAT_INTERVAL = 55L
         const val CURSOR_SLOP_DP = 18f
         const val CURSOR_STEP_DP = 14f
+        const val DELETE_STEP_DP = 24f
     }
 }

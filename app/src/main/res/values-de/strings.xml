@@ -423,4 +423,26 @@
     <string name="symbols_key_summary">\?123 unten links wie bei Gboard, auch mit Tab-Leiste; ABC auf der Zeichenseite führt zurück</string>
     <string name="mc_symbols_key_title">Zahlen-Taste (?123)</string>
     <string name="mc_symbols_key_description">Taste ?123 unten links bei den Buchstaben, auch mit Tab-Leiste.</string>
+    <string name="symbol_hints">Symbole bei langem Drücken</string>
+    <string name="symbol_hints_summary">Kleine Symbole auf den Buchstaben (a @, s # …), die langes Drücken tippt, wie bei Gboard</string>
+    <string name="key_borders">Tastenränder</string>
+    <string name="key_borders_summary">Buchstaben als Kacheln; aus: nur die Buchstaben, wie Gboard ohne Tastenränder</string>
+    <string name="voice_input">Diktat (Mikrofon)</string>
+    <string name="voice_system">Spracheingabe des Geräts</string>
+    <string name="delete_gesture">Wischen zum Löschen</string>
+    <string name="delete_gesture_summary">Von der Rücktaste nach links wischen löscht ganze Wörter</string>
+    <string name="mc_voice_title">Diktat</string>
+    <string name="mc_voice_description">Mikrofon-Knopf: Spracheingabe des Geräts (auto/system) oder aus. „offline“ ist geplant.</string>
+    <string name="mc_symbol_hints_title">Symbole bei langem Drücken</string>
+    <string name="mc_symbol_hints_description">Symbole auf den Buchstabentasten, die langes Drücken tippt.</string>
+    <string name="mc_key_borders_title">Tastenränder</string>
+    <string name="mc_key_borders_description">Buchstabentasten als Kacheln.</string>
+    <string name="mc_delete_gesture_title">Wischen zum Löschen</string>
+    <string name="mc_delete_gesture_description">Von der Rücktaste nach links wischen löscht Wörter.</string>
+    <string-array name="mc_voice_entries">
+        <item>Automatisch</item>
+        <item>Spracheingabe des Geräts</item>
+        <item>Offline (geplant)</item>
+        <item>Aus</item>
+    </string-array>
 </resources>

@@ -42,6 +42,11 @@ field; nothing is kept.
 The operator of the devices (your company) is responsible for the data typed with the keyboard;
 ICT-Baden processes none of it.
 
+**Dictation:** the microphone button switches to the voice input of the device (e.g. Google Voice
+Typing). That app records and recognises the speech under its own privacy terms; Industrial
+Keyboard has no microphone permission and never receives audio, only the text the voice input
+types. Switch it off with `typing.voice: "off"` (MDM key `voice`).
+
 ## What is stored on the device
 
 Only the configuration and what belongs to it, in the app's private storage (other apps cannot

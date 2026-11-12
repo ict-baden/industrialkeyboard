@@ -76,6 +76,19 @@ enum class Alphabet(override val key: String, val label: String) : Keyed {
     }
 }
 
+/** Where dictation comes from (microphone button). */
+enum class VoiceInput(override val key: String) : Keyed {
+    /** The system voice input if there is one (later: the offline engine, issue #24). */
+    AUTO("auto"),
+
+    /** Only the voice input method installed on the device (e.g. Google Voice Typing). */
+    SYSTEM("system"),
+
+    /** Speech recognition inside the keyboard, on the device – planned (issue #24), until then off. */
+    OFFLINE("offline"),
+    OFF("off"),
+}
+
 enum class NumericOrder(override val key: String) : Keyed {
     /** 1-2-3 in the top row, like a telephone. */
     PHONE("phone"),
@@ -140,6 +153,10 @@ data class Appearance(
     val dynamicColor: Boolean = true,
     /** 😊 next to the space bar in normal text fields; opens the emoji panel. */
     val emojiKey: Boolean = true,
+    /** Symbols in the corner of letter keys (a @, s # …) that a long press types, like Gboard. */
+    val symbolHints: Boolean = true,
+    /** Letter keys drawn as tiles; off: only the labels on the keyboard background (Gboard "Key borders" off). */
+    val keyBorders: Boolean = true,
 )
 
 data class LayoutSettings(
@@ -189,10 +206,15 @@ data class TypingSettings(
     val suggestions: Boolean = true,
     /** Space replaces an obvious typo by the best suggestion; Backspace right after undoes it. */
     val autocorrect: Boolean = false,
+    /** Microphone button for dictation. */
+    val voice: VoiceInput = VoiceInput.AUTO,
+    /** Swipe left from Backspace deletes word by word, like Gboard. */
+    val deleteGesture: Boolean = true,
 )
 
 data class FeedbackSettings(
-    val keyPopup: Boolean = true,
+    /** Enlarged preview above a pressed key; off by default like current Gboard. */
+    val keyPopup: Boolean = false,
     val sound: Boolean = false,
     /** 0–100, `null` = system default volume. */
     val soundVolume: Int? = null,

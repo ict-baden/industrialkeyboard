@@ -17,6 +17,7 @@ import android.view.KeyCharacterMap
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodSubtype
@@ -43,6 +44,7 @@ import de.ictbaden.industrialkeyboard.layout.ModifierKey
 import de.ictbaden.industrialkeyboard.app.CameraPermissionActivity
 import de.ictbaden.industrialkeyboard.app.ErrorCodes
 import de.ictbaden.industrialkeyboard.config.ScanTriggerType
+import de.ictbaden.industrialkeyboard.config.VoiceInput
 import de.ictbaden.industrialkeyboard.config.Symbology
 import de.ictbaden.industrialkeyboard.scanner.CameraScanner
 import de.ictbaden.industrialkeyboard.scanner.HardwareScanner
@@ -195,6 +197,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         view.scanPad.listener = this
         view.tabBar.onTab = { showTab(it) }
         view.tabBar.onHide = { requestHideSelf(0) }
+        view.tabBar.onMic = { startVoice() }
         view.tabBar.onHideLongPress = { openSettings() }
         view.tabBar.onPress = { feedback.keyDown(null) }
         root = view
@@ -243,6 +246,37 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         return imm.getEnabledInputMethodSubtypeList(me, true).size > 1
     }
 
+    /** Voice input method the microphone switches to; looked up when a field starts, not per key. */
+    private var voiceTarget: Pair<String, InputMethodSubtype>? = null
+
+    private fun findVoiceInput(info: EditorInfo?) {
+        voiceTarget = null
+        if (config.typing.voice == VoiceInput.OFF || FieldPolicy.isPassword(info?.inputType ?: InputType.TYPE_NULL)) return
+        val imm = getSystemService(InputMethodManager::class.java) ?: return
+        val subtypes = HashMap<Pair<String, Int>, InputMethodSubtype>()
+        val candidates = runCatching {
+            imm.enabledInputMethodList.flatMap { imi ->
+                imm.getEnabledInputMethodSubtypeList(imi, true).mapIndexed { i, subtype ->
+                    subtypes[imi.id to i] = subtype
+                    VoiceInputs.Candidate(imi.id, imi.packageName, subtype.mode, i)
+                }
+            }
+        }.getOrDefault(emptyList())
+        val pick = VoiceInputs.pick(config.typing.voice, packageName, candidates) ?: return
+        voiceTarget = pick.imeId to subtypes.getValue(pick.imeId to pick.subtypeIndex)
+    }
+
+    private fun startVoice() {
+        val (id, subtype) = voiceTarget ?: return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            switchInputMethod(id, subtype)
+        } else {
+            val token = window?.window?.attributes?.token ?: return
+            @Suppress("DEPRECATION")
+            getSystemService(InputMethodManager::class.java)?.setInputMethodAndSubtype(token, id, subtype)
+        }
+    }
+
     private fun nextLanguage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             // Only within this keyboard: cycles through its languages.
@@ -255,6 +289,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     override fun onStartInputView(info: EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         useSubtype(getSystemService(InputMethodManager::class.java)?.currentInputMethodSubtype)
+        findVoiceInput(info)
         endWord()
         emojiOpen = false
         Provisioning.applyAllAsync(this)
@@ -320,6 +355,11 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     override fun onKeyDown(key: Key) = feedback.keyDown(key)
 
     override fun onKey(key: Key, alternative: String?) {
+        when (alternative) {
+            Layouts.COMMA_SETTINGS -> return openSettings()
+            // Emoji from the comma also when the emoji key is switched off, but only where emoji fit.
+            Layouts.COMMA_EMOJI -> return if (currentInputEditorInfo?.let { FieldPolicy.emojiAllowed(it.inputType) } == true) setEmojiOpen(true) else Unit
+        }
         if (alternative != null) {
             commit(alternative)
             releaseModifiers()
@@ -363,6 +403,33 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             true
         }
         else -> false
+    }
+
+    /** Cursor position and text before it when a delete gesture started; `null` = none running. */
+    private var deleteAnchor: Pair<Int, String>? = null
+
+    override fun onDeleteSwipe(words: Int, done: Boolean) {
+        val ic = currentInputConnection ?: return
+        val (cursor, before) = deleteAnchor ?: run {
+            val extracted = ic.getExtractedText(ExtractedTextRequest(), 0) ?: return
+            val position = extracted.startOffset + extracted.selectionStart
+            (position to (ic.getTextBeforeCursor(DELETE_LOOKBACK, 0)?.toString().orEmpty())).also { deleteAnchor = it }
+        }
+        val start = cursor - (before.length - DeleteGesture.start(before, words))
+        if (done) {
+            deleteAnchor = null
+            if (words > 0 && start < cursor) {
+                // The marked words go at once, like Gboard on lifting the finger.
+                ic.setSelection(start, cursor)
+                ic.commitText("", 1)
+                endWord()
+            } else {
+                ic.setSelection(cursor, cursor)
+            }
+            render()
+        } else {
+            ic.setSelection(start, cursor)
+        }
     }
 
     override fun onCursorMove(steps: Int) {
@@ -860,7 +927,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun render() {
         val root = root ?: return
         val secret = FieldPolicy.isPassword(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)
-        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey(), emojiKey = emojiKey(), suggestions = suggestions.words.map { it.text }, emojiOpen = emojiOpen))
+        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey(), emojiKey = emojiKey(), suggestions = suggestions.words.map { it.text }, emojiOpen = emojiOpen, mic = voiceTarget != null))
     }
 
     private fun enterIcon(): Int {
@@ -882,6 +949,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         const val DOUBLE_TAP_MS = 350L
         const val HOLD_TO_SCAN_MS = 600L
         const val SCAN_ANIMATION_MS = 5_000L
+        const val DELETE_LOOKBACK = 1000
         const val BEEP_MS = 120
         const val BEEP_VOLUME = 80
         const val EXTRA_DATAWEDGE_LABEL_TYPE = "com.symbol.datawedge.label_type"

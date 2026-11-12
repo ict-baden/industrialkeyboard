@@ -151,11 +151,13 @@ every language: [Error codes](error-codes.md).
 | `accentColor` | `#RRGGBB` or `#AARRGGBB` | blue `#2563EB`, yellow `#FFD600` in `contrast` | Selected tab, Enter key, Shift, scan pad and highlights |
 | `dynamicColor` | `true` / `false` | `true` | Android 12+: system colours from the wallpaper (Material You) like Gboard, as long as `accentColor` is not set; not for `contrast` |
 | `emojiKey` | `true` / `false` | `true` | 😊 between comma and space bar in normal text fields (not in passwords, e-mail and web addresses, numbers); opens the emoji panel with categories and skin tones, **ABC** returns. Recently used emoji are kept in memory only; the picker remembers the chosen skin tone per emoji on the device |
+| `keyBorders` | `true` / `false` | `true` | Letter keys drawn as tiles. `false`: only the letters on the keyboard background, like Gboard with "Key borders" off. Enter and `?123` are pills like in Gboard either way |
 | `keyHeight` | 70–160 (percent) | `100` | Row height; 100 % = 54 dp. Use 120–140 for gloves |
 | `width` | 50–100 (percent) | `100` | Width of the keys, centered – for tablets and landscape |
 | `numberRow` | `true` / `false` | `false` | Row with 1–0 above the letters |
 | `functionRow` | `true` / `false` | `false` | Row with F1–F12 above the letters (and above the number row) |
 | `keyHints` | `true` / `false` | `true` | Small digits on the top letter row – long press types them (only without number row) |
+| `symbolHints` | `true` / `false` | `true` | Small symbols on the second and third letter row like Gboard ("Long press for symbols"): a @, s #, d € (or $ / £ by keyboard language), f _, g &, h -, j +, k (, l ), y *, x ", c ', v :, b ;, n !, m ?. A long press types the symbol first |
 | `modifierRow` | `true` / `false` | `false` | Row with **Ctrl, Win, Alt**, Esc, Tab and Del above the letters (above the number and function rows) – for remote desktop and PC shortcuts, see [Ctrl, Win and Alt](#ctrl-win-and-alt) |
 | `functionModifiers` | `true` / `false` | `false` | Extra row on the Fn tab with Ctrl, Win, Alt, Menu (context menu key), Print (Print Screen) and Pause (Alt+F4, Ctrl+Home …). All pages then get the height of five rows |
 
@@ -209,6 +211,8 @@ Phone, date and time fields show fixed keys instead of the numeric ones.
 | `longPressDelay` | 200–1500 (ms) | `400` | Time until a long press shows the alternatives; 500–700 avoids accidental accents with gloves |
 | `suggestions` | `true` / `false` | `true` | Three word suggestions above the keys while a word is typed, like Gboard: from a built-in dictionary of the keyboard language, best one in the middle; tap one to replace the word and add a space. Only in normal text fields – never in passwords, e-mail and web addresses, numbers, dates or fields that set `textNoSuggestions` (barcode fields usually do). Nothing is learnt or stored |
 | `autocorrect` | `true` / `false` | `false` | Space replaces an obvious typo (one wrong, missing, extra or swapped letter) by the best suggestion; Backspace right after it brings the typed word back. Off by default: in data entry a "corrected" article number is worse than a typo |
+| `voice` | `auto`, `system`, `offline`, `off` | `auto` | Microphone button at the right of the tab bar (before ⌄). `auto` / `system`: switches to the voice input of the device (e.g. Google Voice Typing), which returns to this keyboard when done – the keyboard itself never records audio and needs no microphone permission. Hidden when the device has no voice input, in password fields and without tab bar. `offline` (speech recognition inside the keyboard for devices without Google, issue #24) is planned; until then it means `off` |
+| `deleteGesture` | `true` / `false` | `true` | Swipe left from Backspace marks whole words (one more per finger width), lifting the finger deletes them – like Gboard |
 
 Always on: rollover typing with several fingers, key repeat on Backspace, Del and the arrow
 keys, slide on the space bar to move the cursor, long press on the space bar to switch
@@ -218,7 +222,7 @@ keyboards, double tap on Shift for caps lock, long press on the hide button for 
 
 | Option | Values | Default | Effect |
 |---|---|---|---|
-| `keyPopup` | `true` / `false` | `true` | Preview bubble above the pressed key; never in password fields (visible ones included) |
+| `keyPopup` | `true` / `false` | `false` | Preview bubble above the pressed key (off by default like current Gboard); never in password fields (visible ones included) |
 | `sound` | `true` / `false` | `false` | Click sound (independent of the system's touch sounds) |
 | `soundVolume` | 0–100 | not set = default volume | Click volume |
 | `vibrate` | `true` / `false` | `true` | Short vibration on every key |

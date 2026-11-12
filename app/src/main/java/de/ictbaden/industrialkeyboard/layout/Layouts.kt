@@ -59,6 +59,8 @@ object Layouts {
         "3" to listOf("³", "¾"),
         "0" to listOf("°", "∅"),
         "$" to listOf("€", "£", "¥", "¢"),
+        "€" to listOf("$", "£", "¥", "¢"),
+        "£" to listOf("€", "$", "¥", "¢"),
         "-" to listOf("–", "—", "_"),
         "+" to listOf("±"),
         "(" to listOf("<", "[", "{"),
@@ -74,17 +76,39 @@ object Layouts {
         "#" to listOf("№"),
     )
 
+    /** First symbol page in Gboard's order; [CURRENCY] is replaced by the currency of the keyboard language. */
     private val SYMBOLS = listOf(
         listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0"),
-        listOf("@", "#", "$", "%", "&", "-", "+", "(", ")", "/"),
+        listOf("@", "#", CURRENCY, "_", "&", "-", "+", "(", ")", "/"),
         listOf("*", "\"", "'", ":", ";", "!", "?"),
     )
 
+    /** Second page, close to Gboard's "=\<" page. */
     private val SYMBOLS_2 = listOf(
-        listOf("~", "`", "|", "\\", "^", "_", "=", "{", "}", "°"),
-        listOf("€", "£", "¥", "¢", "§", "<", ">", "[", "]", "©"),
-        listOf("•", "×", "÷", "¶", "®", "™", "✓"),
+        listOf("~", "`", "|", "•", "√", "π", "÷", "×", "§", "Δ"),
+        listOf("£", "¥", "$", "¢", "^", "°", "=", "{", "}", "\\"),
+        listOf("%", "©", "®", "™", "✓", "[", "]"),
     )
+
+    private const val CURRENCY = "¤"
+
+    /** Long-press choices on the comma that are commands, not text. */
+    const val COMMA_SETTINGS = "⚙"
+    const val COMMA_EMOJI = "😊"
+
+    /** Symbols a long press on the letters types, by position, like Gboard ("Long press for symbols"). */
+    private val ROW2_SYMBOLS = listOf("@", "#", CURRENCY, "_", "&", "-", "+", "(", ")")
+    private val ROW3_SYMBOLS = listOf("*", "\"", "'", ":", ";", "!", "?")
+
+    /** € for most languages; $ where Gboard shows it (US English and other dollar countries), £ for the UK. */
+    fun currency(locale: java.util.Locale = Alphabet.keyboardLocale()): String = when (locale.country.uppercase(java.util.Locale.ROOT)) {
+        "US", "CA", "MX", "AU", "NZ", "SG", "HK" -> "$"
+        "GB" -> "£"
+        "" -> if (locale.language == "en") "$" else "€"
+        else -> "€"
+    }
+
+    private fun withCurrency(symbol: String) = if (symbol == CURRENCY) currency() else symbol
 
     /**
      * Letters. [languageKey]: show 🌐 next to the space bar (several keyboard languages and no
@@ -105,8 +129,10 @@ object Layouts {
             if (config.appearance.modifierRow) add(modifierRow(letters[0].length.toFloat()))
             if (config.appearance.numberRow) add(KeyRow(DIGITS.map { textKey(it.toString()) }))
             add(KeyRow(letters[0].mapIndexed { i, c -> letterKey(c, digit = if (hints && i < DIGITS.length) DIGITS[i] else null, first = firstAlternatives[c]) }))
-            add(KeyRow(letters[1].map { letterKey(it, first = firstAlternatives[it]) }))
-            add(KeyRow(listOf(shiftKey()) + letters[2].map { letterKey(it, first = firstAlternatives[it]) } + backspaceKey()))
+            val symbols = config.appearance.symbolHints
+            fun symbolAt(row: List<String>, i: Int) = if (symbols) row.getOrNull(i)?.let(::withCurrency) else null
+            add(KeyRow(letters[1].mapIndexed { i, c -> letterKey(c, first = firstAlternatives[c], symbol = symbolAt(ROW2_SYMBOLS, i)) }))
+            add(KeyRow(listOf(shiftKey()) + letters[2].mapIndexed { i, c -> letterKey(c, first = firstAlternatives[c], symbol = symbolAt(ROW3_SYMBOLS, i)) } + backspaceKey()))
             add(bottomRow(config, variant, Tabs.ALPHA, spaceLabel(config, alphabet), languageKey, emojiKey))
         }
         return KeyboardLayout(Tabs.ALPHA, rows, alphabet.label)
@@ -114,8 +140,9 @@ object Layouts {
 
     /** Symbols in two pages ([page] 1 or 2). */
     fun symbols(config: KeyboardConfig, page: Int = 1, variant: AlphaVariant = AlphaVariant.TEXT): KeyboardLayout {
-        val source = if (page == 2) SYMBOLS_2 else SYMBOLS
-        val pageKey = Key(label = if (page == 2) "2/2" else "1/2", output = KeyOutput.SymbolsPage, width = 1.5f, style = KeyStyle.FUNCTION, flex = true)
+        val source = (if (page == 2) SYMBOLS_2 else SYMBOLS).map { row -> row.map(::withCurrency) }
+        // Labels like Gboard: "=\<" leads to the second page, "?123" back to the first.
+        val pageKey = Key(label = if (page == 2) "?123" else "=\\<", output = KeyOutput.SymbolsPage, width = 1.5f, style = KeyStyle.FUNCTION, flex = true)
         val rows = listOf(
             KeyRow(source[0].map(::textKey)),
             KeyRow(source[1].map(::textKey)),
@@ -246,7 +273,8 @@ object Layouts {
                 when (variant) {
                     AlphaVariant.EMAIL -> textKey("@", listOf(",", "-", "_", "+"))
                     AlphaVariant.URL -> textKey("/", listOf(",", ":", "-", "_", "?", "="))
-                    AlphaVariant.TEXT -> textKey(",", listOf(";", ":", "_", "-"))
+                    // Like Gboard: a long press on the comma offers the settings and emoji first.
+                    AlphaVariant.TEXT -> textKey(",", listOf(COMMA_SETTINGS, COMMA_EMOJI, ";", ":", "_", "-"))
                 },
             )
             // Like Gboard: 😊 between the comma and the space bar.
@@ -277,14 +305,15 @@ object Layouts {
     fun modifierKey(modifier: ModifierKey, width: Float = 1f, style: KeyStyle = KeyStyle.FUNCTION) =
         Key(label = modifier.label, output = KeyOutput.Modifier(modifier), width = width, style = style)
 
-    private fun letterKey(c: Char, digit: Char? = null, first: Char? = null): Key {
+    private fun letterKey(c: Char, digit: Char? = null, first: Char? = null, symbol: String? = null): Key {
         if (!c.isLetter()) return textKey(c.toString())
         val alternatives = (listOfNotNull(first) + LETTER_ALTERNATIVES[c].orEmpty().toList().filter { it != first }).map { it.toString() }
         return Key(
             label = c.toString(),
             output = KeyOutput.Text(c.toString()),
-            hint = digit?.toString(),
-            popup = listOfNotNull(digit?.toString()) + alternatives,
+            hint = digit?.toString() ?: symbol,
+            // The hint comes first: a long press types it, like Gboard.
+            popup = listOfNotNull(digit?.toString(), symbol) + alternatives,
             letter = true,
         )
     }
