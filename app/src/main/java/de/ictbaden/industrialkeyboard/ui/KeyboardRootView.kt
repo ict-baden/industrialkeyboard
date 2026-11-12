@@ -69,6 +69,9 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
     /** Emoji in place of the keys. */
     val emojiPanel = EmojiPanelView(context).apply { visibility = GONE }
 
+    /** Dictation in place of the keys (issue #23); gone otherwise. */
+    val voicePanel = VoicePanelView(context).apply { visibility = GONE }
+
     /** Camera picture over the keys while scanning with the camera; gone otherwise. */
     val camera = CameraScanView(context).apply { visibility = GONE }
 
@@ -90,6 +93,7 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         // Same size as the keys: the frame keeps its height, the tab bar stays in place.
         content.addView(camera, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         content.addView(emojiPanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        content.addView(voicePanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         addView(panel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM).apply { topMargin = headroom })
         addView(overlay, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         keyboard.popupHost = overlay
@@ -154,6 +158,7 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         suggestionStrip.isVisible = suggesting
         suggestionStrip.palette = p
         suggestionStrip.words = state.suggestions
+        suggestionStrip.showMic = state.mic
         emojiPanel.palette = p
         if (state.emojiOpen) emojiPanel.open()
         emojiPanel.isVisible = state.emojiOpen
@@ -189,6 +194,9 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         // The camera picture takes exactly the place of the keys, not the whole screen.
         (camera.layoutParams as LayoutParams).height = state.rowHeight * state.heightRows + keyboard.paddingTop + keyboard.paddingBottom
         (emojiPanel.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
+        (voicePanel.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
+        voicePanel.palette = p
+        voicePanel.requestLayout()
         emojiPanel.requestLayout()
         camera.requestLayout()
         if (previous?.widthPercent != state.widthPercent) post { requestLayout() }

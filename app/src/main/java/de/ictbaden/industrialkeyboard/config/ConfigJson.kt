@@ -290,7 +290,9 @@ object ConfigJson {
             longPressDelay = json.optInt("longPressDelay", d.longPressDelay).coerceIn(200, 1500),
             suggestions = json.optBoolean("suggestions", d.suggestions),
             autocorrect = json.optBoolean("autocorrect", d.autocorrect),
-            voice = enumValue(json, "voice", "typing", d.voice),
+            voice = json.optNonBlank("voice")?.let { raw ->
+                VoiceInput.parse(raw) ?: throw ConfigException("typing.voice: unknown value \"$raw\" (auto, offline, off)")
+            } ?: d.voice,
             deleteGesture = json.optBoolean("deleteGesture", d.deleteGesture),
         )
     }

@@ -427,11 +427,10 @@
     <string name="key_borders">按键边框</string>
     <string name="key_borders_summary">字母键显示为方块；关闭时只显示字母，与无边框的 Gboard 相同</string>
     <string name="voice_input">语音输入（麦克风）</string>
-    <string name="voice_system">设备的语音输入</string>
     <string name="delete_gesture">滑动删除</string>
     <string name="delete_gesture_summary">从退格键向左滑动可删除整个单词</string>
     <string name="mc_voice_title">语音输入</string>
-    <string name="mc_voice_description">麦克风按钮：设备的语音输入法（auto/system）或关闭。“offline”在计划中。</string>
+    <string name="mc_voice_description">麦克风按钮：在键盘中使用设备的语音识别进行听写。auto = 尽量在设备上识别，否则使用语音服务（可能联网）；offline = 仅在设备上；off = 关闭。</string>
     <string name="mc_symbol_hints_title">长按输入符号</string>
     <string name="mc_symbol_hints_description">字母键上长按即可输入的符号。</string>
     <string name="mc_key_borders_title">按键边框</string>
@@ -440,9 +439,20 @@
     <string name="mc_delete_gesture_description">从退格键向左滑动删除单词。</string>
     <string-array name="mc_voice_entries">
         <item>自动</item>
-        <item>设备的语音输入</item>
-        <item>离线（计划中）</item>
+        <item>仅在设备上</item>
         <item>关闭</item>
     </string-array>
     <string name="key_none">无（不显示按键）</string>
+    <string name="voice_offline">仅在设备上</string>
+    <string name="dictation_speak">请说话</string>
+    <string name="dictation_processing">正在识别…</string>
+    <string name="dictation_paused">已暂停 – 点按麦克风</string>
+    <string name="dictation_error_network">语音识别需要网络连接，但当前不可用。</string>
+    <string name="dictation_error_unavailable">此语言没有可用的语音识别。</string>
+    <string name="dictation_error_no_match">未能识别 – 点按麦克风后再说一次。</string>
+    <string name="mic_permission_granted">已允许使用麦克风。请再次点按麦克风。</string>
+    <string name="mic_permission_denied">没有麦克风权限，键盘无法听写。</string>
+    <string name="voice_engine_on_device">此处：设备上识别</string>
+    <string name="voice_engine_service">此处：设备的语音服务（可能联网）</string>
+    <string name="voice_engine_none">此设备不可用</string>
 </resources>

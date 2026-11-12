@@ -42,6 +42,7 @@ import de.ictbaden.industrialkeyboard.layout.Macro
 import de.ictbaden.industrialkeyboard.layout.MacroStep
 import de.ictbaden.industrialkeyboard.layout.ModifierKey
 import de.ictbaden.industrialkeyboard.app.CameraPermissionActivity
+import de.ictbaden.industrialkeyboard.app.MicrophonePermissionActivity
 import de.ictbaden.industrialkeyboard.app.ErrorCodes
 import de.ictbaden.industrialkeyboard.config.ScanTriggerType
 import de.ictbaden.industrialkeyboard.config.VoiceInput
@@ -155,6 +156,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         HardwareScanner.removeListener(engineListener)
         camera?.destroy()
         camera = null
+        if (voiceOpen) dictation.stop()
         dictionaries.close()
         tone?.release()
         tone = null
@@ -198,6 +200,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         view.tabBar.onTab = { showTab(it) }
         view.tabBar.onHide = { requestHideSelf(0) }
         view.tabBar.onMic = { startVoice() }
+        view.suggestionStrip.onMic = { startVoice() }
         view.tabBar.onHideLongPress = { openSettings() }
         view.tabBar.onPress = { feedback.keyDown(null) }
         root = view
@@ -246,36 +249,120 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         return imm.getEnabledInputMethodSubtypeList(me, true).size > 1
     }
 
-    /** Voice input method the microphone switches to; looked up when a field starts, not per key. */
-    private var voiceTarget: Pair<String, InputMethodSubtype>? = null
+    // region dictation (issue #23): Android's speech recognition inside the keyboard, like Gboard
+
+    private val dictation by lazy { DictationController(this, dictationListener) }
+
+    /** Engine for the current field; asked when a field starts, not per key. */
+    private var voiceEngine = Dictation.Engine.NONE
+    private var voiceOpen = false
+
+    /** Text left of the cursor when the current utterance began (for the space and capital letter). */
+    private var voiceBefore: CharSequence? = null
 
     private fun findVoiceInput(info: EditorInfo?) {
-        voiceTarget = null
+        voiceEngine = Dictation.Engine.NONE
         if (config.typing.voice == VoiceInput.OFF || FieldPolicy.isPassword(info?.inputType ?: InputType.TYPE_NULL)) return
-        val imm = getSystemService(InputMethodManager::class.java) ?: return
-        val subtypes = HashMap<Pair<String, Int>, InputMethodSubtype>()
-        val candidates = runCatching {
-            imm.enabledInputMethodList.flatMap { imi ->
-                imm.getEnabledInputMethodSubtypeList(imi, true).mapIndexed { i, subtype ->
-                    subtypes[imi.id to i] = subtype
-                    VoiceInputs.Candidate(imi.id, imi.packageName, subtype.mode, i)
-                }
-            }
-        }.getOrDefault(emptyList())
-        val pick = VoiceInputs.pick(config.typing.voice, packageName, candidates) ?: return
-        voiceTarget = pick.imeId to subtypes.getValue(pick.imeId to pick.subtypeIndex)
+        voiceEngine = dictation.engineFor(config.typing.voice)
     }
 
     private fun startVoice() {
-        val (id, subtype) = voiceTarget ?: return
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            switchInputMethod(id, subtype)
-        } else {
-            val token = window?.window?.attributes?.token ?: return
-            @Suppress("DEPRECATION")
-            getSystemService(InputMethodManager::class.java)?.setInputMethodAndSubtype(token, id, subtype)
+        if (voiceEngine == Dictation.Engine.NONE) return
+        if (!MicrophonePermissionActivity.granted(this)) {
+            MicrophonePermissionActivity.start(this)
+            return
+        }
+        val panel = root?.voicePanel ?: return
+        endWord()
+        closeCamera()
+        emojiOpen = false
+        voiceOpen = true
+        voiceBefore = null
+        panel.onMic = { if (dictation.isActive) dictation.pause() else dictation.start(voiceEngine, Alphabet.keyboardLocale()) }
+        panel.onKeyboard = { closeVoice() }
+        panel.onBackspace = { voiceBackspace() }
+        panel.status = voiceText(R.string.dictation_speak)
+        panel.listening = true
+        panel.visibility = View.VISIBLE
+        feedback.keyDown(null)
+        dictation.start(voiceEngine, Alphabet.keyboardLocale())
+        render()
+    }
+
+    private fun closeVoice() {
+        if (!voiceOpen) return
+        voiceOpen = false
+        dictation.stop()
+        currentInputConnection?.finishComposingText()
+        voiceBefore = null
+        root?.voicePanel?.visibility = View.GONE
+        render()
+    }
+
+    private fun voiceBackspace() {
+        val ic = currentInputConnection ?: return
+        ic.finishComposingText()
+        voiceBefore = null
+        sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+    }
+
+    private fun voiceText(id: Int, vararg args: Any) = AppLanguage.localized(this).getString(id, *args)
+
+    private fun preparedVoice(text: String, before: CharSequence?) =
+        Dictation.prepare(text, before, config.typing.autoCapitalize && sentenceField(), Alphabet.keyboardLocale())
+
+    /** Plain text (not e-mail, URL, user name …): dictated sentences start with a capital letter. */
+    private fun sentenceField(): Boolean {
+        val type = currentInputEditorInfo?.inputType ?: return false
+        if (type and InputType.TYPE_MASK_CLASS != InputType.TYPE_CLASS_TEXT) return false
+        return when (type and InputType.TYPE_MASK_VARIATION) {
+            InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS,
+            InputType.TYPE_TEXT_VARIATION_URI, InputType.TYPE_TEXT_VARIATION_FILTER -> false
+            else -> true
         }
     }
+
+    private val dictationListener = object : DictationController.Listener {
+        override fun onDictationState(state: DictationController.State) {
+            val panel = root?.voicePanel ?: return
+            panel.listening = state == DictationController.State.LISTENING || state == DictationController.State.PROCESSING
+            panel.status = when (state) {
+                DictationController.State.LISTENING -> voiceText(R.string.dictation_speak)
+                DictationController.State.PROCESSING -> voiceText(R.string.dictation_processing)
+                DictationController.State.PAUSED -> voiceText(R.string.dictation_paused)
+                DictationController.State.ERROR_PERMISSION -> "${voiceText(R.string.mic_permission_denied)} (${ErrorCodes.MIC_PERMISSION})"
+                DictationController.State.ERROR_NETWORK -> "${voiceText(R.string.dictation_error_network)} (${ErrorCodes.DICTATION_NETWORK})"
+                DictationController.State.ERROR_UNAVAILABLE -> "${voiceText(R.string.dictation_error_unavailable)} (${ErrorCodes.DICTATION_UNAVAILABLE})"
+                DictationController.State.ERROR_NO_MATCH -> "${voiceText(R.string.dictation_error_no_match)} (${ErrorCodes.DICTATION_NOT_UNDERSTOOD})"
+            }
+            if (state != DictationController.State.LISTENING && state != DictationController.State.PROCESSING) {
+                currentInputConnection?.finishComposingText()
+                voiceBefore = null
+            }
+        }
+
+        override fun onPartial(text: String) {
+            if (!voiceOpen) return
+            val ic = currentInputConnection ?: return
+            val before = voiceBefore ?: ic.getTextBeforeCursor(BEFORE_CHARS, 0).also { voiceBefore = it ?: "" }
+            ic.setComposingText(preparedVoice(text, before), 1)
+        }
+
+        override fun onFinal(text: String) {
+            if (!voiceOpen) return
+            val ic = currentInputConnection ?: return
+            val before = voiceBefore ?: ic.getTextBeforeCursor(BEFORE_CHARS, 0)
+            ownEdits++
+            ic.commitText(preparedVoice(text, before), 1)
+            voiceBefore = null
+        }
+
+        override fun onLevel(level: Float) {
+            root?.voicePanel?.level = level
+        }
+    }
+
+    // endregion
 
     private fun nextLanguage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -317,6 +404,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             setScanning(false)
         }
         closeCamera()
+        closeVoice()
         endWord()
         emojiOpen = false
     }
@@ -624,8 +712,10 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
                 shift = ShiftState.OFF
                 autoShifted = false
             }
-            else -> return
+            else -> Unit
         }
+        // Always: after a capital typed by hand the service already went back to lower case – without
+        // this the keys stayed upper case while lower case was typed.
         root?.keyboard?.shift = shift
     }
 
@@ -727,6 +817,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         val target = FieldPolicy.pageForTab(tab, field, config, scanner.available) ?: return false
         page = target
         closeCamera()
+        closeVoice()
         emojiOpen = false
         // Shift belongs to the page it was set on (letters vs. F13–F24 on the function keys).
         shift = ShiftState.OFF
@@ -927,7 +1018,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun render() {
         val root = root ?: return
         val secret = FieldPolicy.isPassword(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)
-        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey(), emojiKey = emojiKey(), suggestions = suggestions.words.map { it.text }, emojiOpen = emojiOpen, mic = voiceTarget != null))
+        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey(), emojiKey = emojiKey(), suggestions = suggestions.words.map { it.text }, emojiOpen = emojiOpen, mic = voiceEngine != Dictation.Engine.NONE && !voiceOpen))
     }
 
     private fun enterIcon(): Int {
@@ -945,6 +1036,9 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     private companion object {
         const val TAG = "KeyboardService"
+
+        /** Text before the cursor asked for when dictation starts an utterance. */
+        const val BEFORE_CHARS = 64
         const val DOUBLE_SPACE_MS = 450L
         const val DOUBLE_TAP_MS = 350L
         const val HOLD_TO_SCAN_MS = 600L

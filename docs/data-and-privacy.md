@@ -42,10 +42,7 @@ field; nothing is kept.
 The operator of the devices (your company) is responsible for the data typed with the keyboard;
 ICT-Baden processes none of it.
 
-**Dictation:** the microphone button switches to the voice input of the device (e.g. Google Voice
-Typing). That app records and recognises the speech under its own privacy terms; Industrial
-Keyboard has no microphone permission and never receives audio, only the text the voice input
-types. Switch it off with `typing.voice: "off"` (MDM key `voice`).
+**Dictation:** the microphone records only while the dictation panel is open, and the audio goes only to the speech recognition of the device (Android `SpeechRecognizer`); Industrial Keyboard neither stores nor sends it and has no internet permission. With `typing.voice: "auto"` the keyboard uses on-device recognition where the device has it (Android 12+, e.g. Pixel phones) – then nothing leaves the device. Without it, the device's speech service is used (e.g. Google), which may process the audio online under its own privacy terms. `typing.voice: "offline"` allows on-device recognition only; `"off"` removes the microphone (MDM key `voice`). The microphone permission is asked the first time 🎤 is tapped.
 
 ## What is stored on the device
 

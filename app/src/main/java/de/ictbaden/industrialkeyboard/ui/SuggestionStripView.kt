@@ -10,6 +10,8 @@ import android.text.TextPaint
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.content.ContextCompat
+import de.ictbaden.industrialkeyboard.R
 
 /**
  * Three word suggestions in place of the tab bar, like Gboard: the best one in the middle, bold.
@@ -26,6 +28,17 @@ class SuggestionStripView(context: Context) : View(context) {
 
     var onPick: ((String) -> Unit)? = null
     var onPress: (() -> Unit)? = null
+    var onMic: (() -> Unit)? = null
+
+    /** Microphone at the right end, like Gboard's suggestion row. */
+    var showMic = false
+        set(value) {
+            if (field == value) return
+            field = value
+            invalidate()
+        }
+
+    private val micArea get() = if (showMic) dp(52f) else 0f
 
     /** Suggestions, best first; shown as [second, best, third]. */
     var words: List<String> = emptyList()
@@ -53,7 +66,7 @@ class SuggestionStripView(context: Context) : View(context) {
 
     override fun onDraw(canvas: Canvas) {
         canvas.drawColor(palette.tabBar)
-        val slot = width / 3f
+        val slot = (width - micArea) / 3f
         text.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 17f, resources.displayMetrics)
         divider.color = palette.keyHint
         divider.alpha = 70
@@ -73,22 +86,36 @@ class SuggestionStripView(context: Context) : View(context) {
                 canvas.drawRect(i * slot - dp(0.5f), height * 0.3f, i * slot + dp(0.5f), height * 0.7f, divider)
             }
         }
+        if (showMic) {
+            val cx = width - micArea / 2
+            val cy = height / 2f
+            pressedPaint.color = if (pressedSlot == MIC_SLOT) palette.pressed else palette.key
+            canvas.drawCircle(cx, cy, dp(18f), pressedPaint)
+            ContextCompat.getDrawable(context, R.drawable.kb_mic)?.mutate()?.let { icon ->
+                val half = dp(11f).toInt()
+                icon.setBounds(cx.toInt() - half, cy.toInt() - half, cx.toInt() + half, cy.toInt() + half)
+                icon.setTint(palette.tabText)
+                icon.draw(canvas)
+            }
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        val slot = (event.x / (width / 3f)).toInt().coerceIn(0, 2)
+        val slot = if (showMic && event.x >= width - micArea) MIC_SLOT else (event.x / ((width - micArea) / 3f)).toInt().coerceIn(0, 2)
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                if (wordAt(slot) == null) return false
+                if (slot != MIC_SLOT && wordAt(slot) == null) return false
                 pressedSlot = slot
                 onPress?.invoke()
                 invalidate()
             }
             MotionEvent.ACTION_UP -> {
-                val word = if (slot == pressedSlot) wordAt(slot) else null
+                val mic = slot == MIC_SLOT && pressedSlot == MIC_SLOT
+                val word = if (slot == pressedSlot && slot != MIC_SLOT) wordAt(slot) else null
                 pressedSlot = -1
                 invalidate()
+                if (mic) onMic?.invoke()
                 word?.let { onPick?.invoke(it) }
             }
             MotionEvent.ACTION_CANCEL -> {
@@ -100,4 +127,8 @@ class SuggestionStripView(context: Context) : View(context) {
     }
 
     private fun dp(value: Float) = value * resources.displayMetrics.density
+
+    private companion object {
+        const val MIC_SLOT = 9
+    }
 }

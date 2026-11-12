@@ -429,11 +429,10 @@
     <string name="key_borders">Bordes de teclas</string>
     <string name="key_borders_summary">Letras como mosaicos; desactivado: solo las letras, como Gboard sin bordes</string>
     <string name="voice_input">Dictado (micrófono)</string>
-    <string name="voice_system">Entrada de voz del dispositivo</string>
     <string name="delete_gesture">Deslizar para borrar</string>
     <string name="delete_gesture_summary">Deslizar a la izquierda desde Retroceso borra palabras enteras</string>
     <string name="mc_voice_title">Dictado</string>
-    <string name="mc_voice_description">Botón de micrófono: entrada de voz del dispositivo (auto/system) o desactivado. «offline» está previsto.</string>
+    <string name="mc_voice_description">Botón de micrófono: dictado en el teclado con el reconocimiento de voz del dispositivo. auto = en el dispositivo si es posible, si no el servicio de voz (puede ser en línea); offline = solo en el dispositivo; off = desactivado.</string>
     <string name="mc_symbol_hints_title">Símbolos con pulsación larga</string>
     <string name="mc_symbol_hints_description">Símbolos en las teclas de letras que escribe una pulsación larga.</string>
     <string name="mc_key_borders_title">Bordes de teclas</string>
@@ -442,9 +441,20 @@
     <string name="mc_delete_gesture_description">Deslizar a la izquierda desde Retroceso borra palabras.</string>
     <string-array name="mc_voice_entries">
         <item>Automático</item>
-        <item>Entrada de voz del dispositivo</item>
-        <item>Sin conexión (previsto)</item>
+        <item>Solo en el dispositivo</item>
         <item>Desactivado</item>
     </string-array>
     <string name="key_none">ninguna (sin tecla)</string>
+    <string name="voice_offline">Solo en el dispositivo</string>
+    <string name="dictation_speak">Hable ahora</string>
+    <string name="dictation_processing">Reconociendo…</string>
+    <string name="dictation_paused">En pausa: toque el micrófono</string>
+    <string name="dictation_error_network">El reconocimiento de voz necesita una conexión que no está disponible.</string>
+    <string name="dictation_error_unavailable">No hay reconocimiento de voz para este idioma.</string>
+    <string name="dictation_error_no_match">No se entendió: toque el micrófono y hable de nuevo.</string>
+    <string name="mic_permission_granted">Micrófono permitido. Toque de nuevo el micrófono.</string>
+    <string name="mic_permission_denied">Sin permiso de micrófono, el teclado no puede tomar dictado.</string>
+    <string name="voice_engine_on_device">Aquí: reconocimiento en el dispositivo</string>
+    <string name="voice_engine_service">Aquí: servicio de voz del dispositivo (puede ser en línea)</string>
+    <string name="voice_engine_none">No disponible en este dispositivo</string>
 </resources>

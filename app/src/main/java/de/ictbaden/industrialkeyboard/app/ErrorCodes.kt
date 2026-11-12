@@ -14,4 +14,8 @@ object ErrorCodes {
     const val CONFIG_UNREADABLE = "IK-0106"
     const val CAMERA_PERMISSION = "IK-0200"
     const val CAMERA_FAILED = "IK-0201"
+    const val MIC_PERMISSION = "IK-0210"
+    const val DICTATION_UNAVAILABLE = "IK-0211"
+    const val DICTATION_NETWORK = "IK-0212"
+    const val DICTATION_NOT_UNDERSTOOD = "IK-0213"
 }

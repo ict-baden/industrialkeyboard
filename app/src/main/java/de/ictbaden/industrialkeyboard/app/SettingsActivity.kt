@@ -55,6 +55,8 @@ import de.ictbaden.industrialkeyboard.config.Tabs
 import de.ictbaden.industrialkeyboard.config.TextCase
 import de.ictbaden.industrialkeyboard.config.ThemeMode
 import de.ictbaden.industrialkeyboard.config.VoiceInput
+import de.ictbaden.industrialkeyboard.ime.Dictation
+import de.ictbaden.industrialkeyboard.ime.DictationController
 import de.ictbaden.industrialkeyboard.config.UidFormat
 import de.ictbaden.industrialkeyboard.ime.Field
 import de.ictbaden.industrialkeyboard.ime.FieldPolicy
@@ -391,11 +393,23 @@ class SettingsActivity : AppCompatActivity() {
                         getString(R.string.voice_input),
                         listOf(
                             VoiceInput.AUTO to getString(R.string.automatic),
-                            VoiceInput.SYSTEM to getString(R.string.voice_system),
+                            VoiceInput.OFFLINE to getString(R.string.voice_offline),
                             VoiceInput.OFF to getString(R.string.scan_trigger_off),
                         ),
-                        if (c.typing.voice == VoiceInput.OFFLINE) VoiceInput.OFF else c.typing.voice,
+                        c.typing.voice,
                     ) { voice -> update { it.copy(typing = it.typing.copy(voice = voice)) } },
+                    ui.row(
+                        R.drawable.ic_mic,
+                        getString(R.string.voice_input),
+                        getString(
+                            when (DictationController(this, NoDictation).engineFor(c.typing.voice)) {
+                                Dictation.Engine.ON_DEVICE -> R.string.voice_engine_on_device
+                                Dictation.Engine.SERVICE -> R.string.voice_engine_service
+                                Dictation.Engine.NONE -> R.string.voice_engine_none
+                            },
+                        ),
+                        onClick = null,
+                    ),
                     ui.switchRow(R.drawable.ic_keyboard, getString(R.string.delete_gesture), getString(R.string.delete_gesture_summary), c.typing.deleteGesture) { on ->
                         update { it.copy(typing = it.typing.copy(deleteGesture = on)) }
                     },
@@ -918,4 +932,12 @@ class SettingsActivity : AppCompatActivity() {
         const val IMPRESSUM = "https://ict-baden.de/impressum/"
         const val PRIVACY = "https://ict-baden.de/datenschutz/industrialkeyboard/"
     }
+}
+
+/** Only to ask which dictation engine the device offers (settings summary). */
+private object NoDictation : DictationController.Listener {
+    override fun onDictationState(state: DictationController.State) = Unit
+    override fun onPartial(text: String) = Unit
+    override fun onFinal(text: String) = Unit
+    override fun onLevel(level: Float) = Unit
 }
