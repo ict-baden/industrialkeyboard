@@ -118,7 +118,7 @@ lib/ und Modelldateien in assets/). Teil 12 und 13 sind nicht quelloffen (siehe 
    Copyright The JSR-330 Expert Group
    Licence: Apache-2.0 (section A)
 
-16. AOSP LatinIME word lists - the built-in dictionaries for word suggestions (assets/dict/*.txt.gz)
+16. AOSP LatinIME word lists - the built-in dictionaries for word suggestions (assets/dict/*.dic, gzip)
    Source: https://android.googlesource.com/platform/packages/inputmethods/LatinIME/+/refs/heads/main/dictionaries/
    Copyright The Android Open Source Project
    Licence: Apache-2.0 (section A). Converted (most frequent words, offensive and non-words left out) by

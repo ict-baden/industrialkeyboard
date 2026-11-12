@@ -27,7 +27,10 @@ class DictationController(private val context: Context, private val listener: Li
         fun onLevel(level: Float)
     }
 
-    enum class State { LISTENING, PROCESSING, PAUSED, ERROR_PERMISSION, ERROR_NETWORK, ERROR_UNAVAILABLE, ERROR_NO_MATCH }
+    enum class State { LISTENING, PROCESSING, PAUSED, ERROR_PERMISSION, ERROR_NETWORK, ERROR_UNAVAILABLE, ERROR_NO_MATCH, ERROR_LANGUAGE_PACK }
+
+    /** `typing.voice: auto`: a missing on-device language pack falls back to the speech service. */
+    var fallbackToService = true
 
     private val main = Handler(Looper.getMainLooper())
     private var recognizer: SpeechRecognizer? = null
@@ -96,7 +99,15 @@ class DictationController(private val context: Context, private val listener: Li
     }.onFailure { Log.w(TAG, "No speech recognizer", it) }.getOrNull()
 
     private fun listen() {
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+        val intent = recognizeIntent()
+        runCatching { recognizer?.startListening(intent) }.onFailure {
+            Log.w(TAG, "startListening failed", it)
+            isActive = false
+            listener.onDictationState(State.ERROR_UNAVAILABLE)
+        }
+    }
+
+    private fun recognizeIntent() = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, locale.toLanguageTag())
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
@@ -105,12 +116,6 @@ class DictationController(private val context: Context, private val listener: Li
             putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, Dictation.PAUSE_MS)
             putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
         }
-        runCatching { recognizer?.startListening(intent) }.onFailure {
-            Log.w(TAG, "startListening failed", it)
-            isActive = false
-            listener.onDictationState(State.ERROR_UNAVAILABLE)
-        }
-    }
 
     private val callbacks = object : RecognitionListener {
         override fun onReadyForSpeech(params: Bundle?) = listener.onDictationState(State.LISTENING)
@@ -139,6 +144,10 @@ class DictationController(private val context: Context, private val listener: Li
 
         override fun onError(error: Int) {
             Log.i(TAG, "Recognition error $error")
+            if ((error == ERROR_LANGUAGE_UNAVAILABLE || error == ERROR_LANGUAGE_NOT_SUPPORTED) && engine == Dictation.Engine.ON_DEVICE) {
+                languagePackMissing()
+                return
+            }
             when (error) {
                 // Nothing said in this round: keep listening while active.
                 SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT ->
@@ -152,6 +161,31 @@ class DictationController(private val context: Context, private val listener: Li
         }
 
         override fun onEvent(eventType: Int, params: Bundle?) = Unit
+    }
+
+    /**
+     * The on-device recogniser has no language pack for [locale] (seen on a Pixel 9 Pro for German):
+     * ask Android to download it, and with `auto` continue right away with the device's speech
+     * service – like Gboard, which does not make the user wait.
+     */
+    private fun languagePackMissing() {
+        val service = runCatching { SpeechRecognizer.isRecognitionAvailable(context) }.getOrDefault(false)
+        // Only for "on the device only": the download opens a system dialog over the app, which would
+        // interrupt dictation that can go on with the speech service anyway (seen on a Pixel 9 Pro).
+        if (!(fallbackToService && service) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            runCatching { recognizer?.triggerModelDownload(recognizeIntent()) }.onFailure { Log.w(TAG, "Language pack download not possible", it) }
+        }
+        if (fallbackToService && service) {
+            Log.i(TAG, "No on-device language pack for ${locale.toLanguageTag()}: using the speech service")
+            release()
+            recognizer = create(Dictation.Engine.SERVICE)?.also { it.setRecognitionListener(callbacks) }
+            engine = Dictation.Engine.SERVICE
+            if (recognizer != null && isActive) {
+                listen()
+                return
+            }
+        }
+        fail(State.ERROR_LANGUAGE_PACK)
     }
 
     private fun fail(state: State) {

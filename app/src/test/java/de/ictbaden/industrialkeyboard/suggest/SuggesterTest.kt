@@ -81,8 +81,8 @@ class SuggesterTest {
     @Test
     fun `real German and English dictionaries, fast enough`() {
         val dir = File("src/main/assets/dict")
-        val de = dir.resolve("de.txt.gz").inputStream().use { WordList.read(it, Locale.GERMAN) }
-        val en = dir.resolve("en-US.txt.gz").inputStream().use { WordList.read(it, Locale.US) }
+        val de = dir.resolve("de.dic").inputStream().use { WordList.read(it, Locale.GERMAN) }
+        val en = dir.resolve("en-US.dic").inputStream().use { WordList.read(it, Locale.US) }
         assertTrue("sizes ${de.size} ${en.size}", de.size > 20000 && en.size > 20000)
         val german = Suggester(de, Locale.GERMAN, qwertz)
         val english = Suggester(en, Locale.US, qwerty)

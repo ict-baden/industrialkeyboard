@@ -457,4 +457,5 @@
     <string name="voice_engine_on_device">Aquí: reconocimiento en el dispositivo</string>
     <string name="voice_engine_service">Aquí: servicio de voz del dispositivo (puede ser en línea)</string>
     <string name="voice_engine_none">No disponible en este dispositivo</string>
+    <string name="dictation_error_language_pack">Se está descargando el paquete de idioma para el reconocimiento en el dispositivo. Inténtelo de nuevo en unos minutos o ponga el dictado en «Automático».</string>
 </resources>

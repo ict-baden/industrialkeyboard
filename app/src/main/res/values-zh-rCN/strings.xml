@@ -455,4 +455,5 @@
     <string name="voice_engine_on_device">此处：设备上识别</string>
     <string name="voice_engine_service">此处：设备的语音服务（可能联网）</string>
     <string name="voice_engine_none">此设备不可用</string>
+    <string name="dictation_error_language_pack">正在下载设备端识别所需的语言包。请几分钟后重试，或将听写设置为“自动”。</string>
 </resources>
