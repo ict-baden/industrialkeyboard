@@ -3,6 +3,7 @@ package de.ictbaden.industrialkeyboard.ui
 import android.content.Context
 import android.view.View
 import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.ictbaden.industrialkeyboard.R
@@ -14,6 +15,7 @@ import de.ictbaden.industrialkeyboard.layout.AlphaVariant
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -62,6 +64,64 @@ class FeaturesPanelTest {
         val last = root.featuresPanel.getChildAt(features.lastIndex)
         assertTrue("last tile fully visible", last.bottom - scroll.scrollY <= scroll.height)
         assertTrue(last.top - scroll.scrollY >= 0)
+    }
+
+    @Test
+    fun `a switched tile keeps its view and says the new state`() {
+        val panel = FeaturesPanelView(context)
+        panel.show(listOf(feature(0), feature(1, checked = false)))
+        val tile = panel.getChildAt(1)
+        assertEquals("Off", ViewCompat.getStateDescription(tile))
+
+        panel.show(listOf(feature(0), feature(1, checked = true)))
+        assertSame("no rebuild for a toggle", tile, panel.getChildAt(1))
+        assertEquals("On", ViewCompat.getStateDescription(tile))
+        assertTrue(tile.isSelected)
+
+        panel.palette = Palette.light(Palette.CONTRAST_ACCENT)
+        assertSame("no rebuild for a new palette", tile, panel.getChildAt(1))
+
+        panel.show(listOf(feature(0), feature(1, checked = true), feature(2)))
+        assertEquals(3, panel.childCount)
+    }
+
+    @Test
+    fun `switch tiles are switches for screen readers`() {
+        val panel = FeaturesPanelView(context)
+        panel.show(listOf(feature(0), feature(1, checked = true)))
+        val action = AccessibilityNodeInfoCompat.wrap(panel.getChildAt(0).createAccessibilityNodeInfo())
+        assertFalse(action.isCheckable)
+
+        val tile = panel.getChildAt(1)
+        var info = AccessibilityNodeInfoCompat.wrap(tile.createAccessibilityNodeInfo())
+        assertTrue(info.isCheckable)
+        assertTrue(info.isChecked)
+        assertFalse("not also \"selected\"", info.isSelected)
+
+        panel.show(listOf(feature(0), feature(1, checked = false)))
+        info = AccessibilityNodeInfoCompat.wrap(tile.createAccessibilityNodeInfo())
+        assertFalse(info.isChecked)
+    }
+
+    @Test
+    fun `the panel opens at the top again`() {
+        val root = KeyboardRootView(context)
+        root.featuresPanel.show((1..13).map { feature(it) })
+        val open = KeyboardRenderer.state(context, KeyboardConfig(), Page.Alpha(AlphaVariant.TEXT), ShiftState.OFF, null, toolPanel = Tabs.TOOL_MENU)
+        val closed = KeyboardRenderer.state(context, KeyboardConfig(), Page.Alpha(AlphaVariant.TEXT), ShiftState.OFF, null)
+        root.render(open)
+        layout(root)
+        root.featuresScroll.scrollTo(0, root.featuresPanel.height)
+        val scrolled = root.featuresScroll.scrollY
+        assertTrue(scrolled > 0)
+
+        root.render(open)
+        assertEquals("stays in place while open", scrolled, root.featuresScroll.scrollY)
+
+        root.render(closed)
+        root.render(open)
+        layout(root)
+        assertEquals(0, root.featuresScroll.scrollY)
     }
 
     @Test
