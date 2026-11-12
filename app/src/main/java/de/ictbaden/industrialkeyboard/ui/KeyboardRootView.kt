@@ -18,6 +18,7 @@ import de.ictbaden.industrialkeyboard.config.OneHanded
 import de.ictbaden.industrialkeyboard.layout.KeyboardLayout
 import de.ictbaden.industrialkeyboard.layout.Layouts
 import de.ictbaden.industrialkeyboard.layout.ModifierKey
+import de.ictbaden.industrialkeyboard.layout.TextEditState
 
 /** Everything the keyboard frame shows; built by the keyboard service (or a preview). */
 data class RenderState(
@@ -52,12 +53,14 @@ data class RenderState(
     val emojiOpen: Boolean = false,
     /** Gboard's toolbar instead of the tabs (icons evenly spread). */
     val toolbar: Boolean = false,
-    /** Open toolbar panel (features ⊞ or clipboard) in place of the keys. */
+    /** Open toolbar panel (features ⊞, clipboard or text editing) in place of the keys. */
     val toolPanel: String? = null,
     val clips: List<ClipItem> = emptyList(),
     val clipboardHistory: Boolean = false,
     /** One-handed mode: keys narrower at one side. */
     val oneHanded: OneHanded = OneHanded.OFF,
+    /** Text editing panel open ([Tabs.TOOL_EDIT], drawn as [layout]): Select lit, Cut/Copy dimmed. */
+    val textEdit: TextEditState? = null,
 )
 
 /**
@@ -233,6 +236,8 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
             it.longPressDelay = state.longPressDelay
         }
         keyboard.heightRows = state.heightRows
+        // Separate from the layout: a new layout would stop the key repeat of a held ←.
+        keyboard.editState = state.textEdit
         val scan = state.layout == null
         keyboard.isVisible = !scan
         scanPage.isVisible = scan

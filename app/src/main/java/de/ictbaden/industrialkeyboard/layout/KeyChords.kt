@@ -46,19 +46,37 @@ object KeyChords {
         else -> PUNCTUATION.indexOf(c).takeIf { it >= 0 }?.let { MacroStep.Key(PUNCTUATION_CODES[it]) }
     }
 
+    /** Meta state of the left Shift key held down. */
+    const val SHIFT_LEFT = KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON
+
     fun meta(modifiers: Collection<ModifierKey>): Int = modifiers.fold(0) { acc, m -> acc or m.meta }
 
-    /** Events for [keyCode] pressed with [meta]; Ctrl, Win and Alt in [meta] are pressed around it. */
-    fun events(keyCode: Int, meta: Int): List<ChordEvent> {
+    /**
+     * Events for [keyCode] pressed with [meta]; Ctrl, Win and Alt in [meta] are pressed around it.
+     * [pressShift]: Shift is pressed as a key too (inside Ctrl, Win and Alt), not only sent as meta
+     * state – TextView extends a selection only when the Shift key itself went down. Otherwise Shift
+     * stays a meta state, as F13–F24 and remote desktop apps expect.
+     */
+    fun events(keyCode: Int, meta: Int, pressShift: Boolean = false): List<ChordEvent> {
         val held = ModifierKey.of(meta).filter { it.keyCode != keyCode }
+        val shiftKey = pressShift && keyCode != KeyEvent.KEYCODE_SHIFT_LEFT
         val events = mutableListOf<ChordEvent>()
-        var state = meta and held.fold(0) { acc, m -> acc or m.meta }.inv()
+        val pressed = held.fold(0) { acc, m -> acc or m.meta } or if (shiftKey) KeyEvent.META_SHIFT_MASK else 0
+        var state = meta and pressed.inv()
         for (m in held) {
             state = state or m.meta
             events += ChordEvent(true, m.keyCode, state)
         }
+        if (shiftKey) {
+            state = state or SHIFT_LEFT
+            events += ChordEvent(true, KeyEvent.KEYCODE_SHIFT_LEFT, state)
+        }
         events += ChordEvent(true, keyCode, meta)
         events += ChordEvent(false, keyCode, meta)
+        if (shiftKey) {
+            state = state and KeyEvent.META_SHIFT_MASK.inv()
+            events += ChordEvent(false, KeyEvent.KEYCODE_SHIFT_LEFT, state)
+        }
         for (m in held.asReversed()) {
             state = state and m.meta.inv()
             events += ChordEvent(false, m.keyCode, state)

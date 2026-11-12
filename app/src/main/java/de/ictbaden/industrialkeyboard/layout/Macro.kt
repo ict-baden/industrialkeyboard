@@ -11,11 +11,11 @@ sealed interface MacroStep {
     data class ShowTab(val tab: String) : MacroStep
 }
 
-enum class KeyCommand { SCAN, HIDE, SETTINGS, NEXT_KEYBOARD }
+enum class KeyCommand { SCAN, HIDE, SETTINGS, NEXT_KEYBOARD, TEXT_EDIT }
 
 /**
  * Key macros: plain text plus tokens in braces, case-insensitive, e.g. `OK{ENTER}`, `{F1}`,
- * `{U+00E4}`, `{SCAN}`, `{SHOW:numeric}`. Unknown tokens are rejected so typos surface on import.
+ * `{U+00E4}`, `{SCAN}`, `{EDIT}`, `{SHOW:numeric}`. Unknown tokens are rejected so typos surface on import.
  *
  * Key combinations join modifiers and one key with `+`: `{CTRL+C}`, `{ALT+F4}`, `{WIN+R}`,
  * `{CTRL+ALT+END}`. `{CTRL}`, `{ALT}` and `{WIN}` alone press that key; a key whose whole macro is
@@ -80,6 +80,7 @@ object Macro {
         "HIDE" to KeyCommand.HIDE,
         "SETTINGS" to KeyCommand.SETTINGS,
         "NEXT-KEYBOARD" to KeyCommand.NEXT_KEYBOARD,
+        "EDIT" to KeyCommand.TEXT_EDIT,
     )
 
     /** Display names of keys and commands, used for key labels. */
@@ -158,7 +159,7 @@ object Macro {
         if (text.isNotEmpty()) return text
         return when (val first = steps.firstOrNull()) {
             is MacroStep.Key -> keyName(first)
-            is MacroStep.Command -> first.command.name.lowercase().replaceFirstChar { it.uppercase() }.replace('_', ' ')
+            is MacroStep.Command -> if (first.command == KeyCommand.TEXT_EDIT) "Edit" else first.command.name.lowercase().replaceFirstChar { it.uppercase() }.replace('_', ' ')
             is MacroStep.ShowTab -> first.tab.uppercase()
             is MacroStep.Text -> first.text
             null -> ""
@@ -184,6 +185,7 @@ object Macro {
                 KeyCommand.HIDE -> KeyIcon.HIDE
                 KeyCommand.SETTINGS -> KeyIcon.SETTINGS
                 KeyCommand.NEXT_KEYBOARD -> null
+                KeyCommand.TEXT_EDIT -> KeyIcon.TEXT_EDIT
             }
             else -> null
         }

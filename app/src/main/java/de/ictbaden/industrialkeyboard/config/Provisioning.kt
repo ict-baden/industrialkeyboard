@@ -129,6 +129,7 @@ object Provisioning {
                 deleteGesture = bool("delete_gesture", config.typing.deleteGesture),
                 nextWord = bool("next_word", config.typing.nextWord),
                 clipboardHistory = bool("clipboard_history", config.typing.clipboardHistory),
+                textEditing = bool("text_editing", config.typing.textEditing),
             ),
             layout = config.layout.copy(
                 alphabet = choice("alphabet", Alphabet.entries.toTypedArray(), config.layout.alphabet),

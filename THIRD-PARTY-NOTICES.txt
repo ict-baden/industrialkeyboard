@@ -124,6 +124,12 @@ lib/ und Modelldateien in assets/). Teil 12 und 13 sind nicht quelloffen (siehe 
    Licence: Apache-2.0 (section A). Converted (most frequent words, offensive and non-words left out) by
    tools/dictionaries/convert.py.
 
+17. Material Icons - the key, toolbar and settings icons (res/drawable/kb_*.xml, ic_*.xml); kb_text_edit.xml is
+   our own drawing in the same style
+   Source: https://github.com/google/material-design-icons
+   Copyright Google LLC
+   Licence: Apache-2.0 (section A)
+
 -------------------------------------------------------------------------------
 A. Apache License, Version 2.0
 -------------------------------------------------------------------------------

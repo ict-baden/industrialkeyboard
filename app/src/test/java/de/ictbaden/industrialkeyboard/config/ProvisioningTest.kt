@@ -275,4 +275,18 @@ class ProvisioningTest {
         Migrations.run(context)
         assertEquals(true, store.config.scanner.input.enabled)
     }
+
+    @Test
+    fun `managed text editing tile`() {
+        restrict("text_editing" to false)
+        Provisioning.applyAll(context)
+        assertFalse(store.config.typing.textEditing)
+        // Not sent: the current value stays.
+        restrict("next_word" to false)
+        Provisioning.applyAll(context)
+        assertFalse(store.config.typing.textEditing)
+        restrict("text_editing" to true)
+        Provisioning.applyAll(context)
+        assertTrue(store.config.typing.textEditing)
+    }
 }

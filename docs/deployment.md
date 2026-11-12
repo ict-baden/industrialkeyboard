@@ -92,6 +92,7 @@ The app ships a schema that every EMM with Android Enterprise support shows:
 | `suggestions` | Bool | Word suggestions (default on) |
 | `next_word` | Bool | Next-word suggestions after a space (default on) |
 | `clipboard_history` | Bool | Clipboard history in memory for the 📋 panel (default off) |
+| `text_editing` | Bool | Tile *Text editing* in the ⊞ menu: arrows, select, cut, copy and paste (default on) |
 | `top_bar` | Choice | Above the keys: toolbar like Gboard or tabs |
 | `one_handed` | Choice | One-handed mode: off, left, right |
 | `autocorrect` | Bool | Autocorrection on space (default off) |

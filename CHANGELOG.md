@@ -13,6 +13,7 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 - **Vorschläge fürs nächste Wort** nach einem Leerzeichen (`typing.nextWord`), aus einer kleinen festen Liste für Deutsch und Englisch – die AOSP-Wortlisten haben keine Wortpaare, gelernt wird nichts.
 - **Einhandmodus** (`appearance.oneHanded`: `left`/`right`), Tasten etwa 80 % breit, mit ⇄ und ⤢ auf der freien Seite.
 - Wortvorschläge auch in **Suchfeldern** (ohne Autokorrektur); Alltagswörter wie „Hallo“, Wochentage und Grüße weiter oben; ein getipptes Wort aus dem Wörterbuch bleibt in der Mitte.
+- **Text bearbeiten** wie bei Gboard (⊞ → Text bearbeiten, Makro `{EDIT}`, `typing.textEditing`, MDM `text_editing`): Pfeiltasten, Auswählen, Alles auswählen, Pos1/Ende, Ausschneiden, Kopieren, Einfügen, Entf und ⌫ anstelle der Tasten. In einzeiligen Feldern wirken ↑/↓ wie Pos1/Ende, damit der Fokus im Feld bleibt; Ausschneiden und Kopieren nur mit Auswahl und nie in Passwortfeldern. Es wird nichts gespeichert. Das Feld „Notiz“ unter „Ausprobieren“ ist jetzt mehrzeilig.
 - MDM: `top_bar`, `next_word`, `clipboard_history`, `one_handed`.
 - **Wie Gboard** (gemessen auf einem Pixel 9 Pro):
   - Tastengröße folgt der Bildschirmhöhe (etwa 6,8 % je Reihe, 54–70 dp), Lücken 5,5 dp zwischen Tasten und 12 dp zwischen Reihen; der Regler „Tastenhöhe“ wirkt weiter.

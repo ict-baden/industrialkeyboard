@@ -168,4 +168,54 @@ class LayoutsTest {
         assertEquals(KeyOutput.Text("A"), keys[2].output)
         assertEquals("WMS", layout.name)
     }
+
+    private val editLabels = Layouts.TextEditLabels(
+        home = "Pos1",
+        end = "Ende",
+        select = "Auswählen",
+        selectAll = "Alles auswählen",
+        cut = "Ausschneiden",
+        copy = "Kopieren",
+        paste = "Einfügen",
+        delete = "Entf",
+    )
+
+    @Test
+    fun `text editing panel - four rows of six units with every action once`() {
+        val layout = Layouts.textEditing(editLabels)
+        assertEquals("edit", layout.id)
+        assertEquals(4, layout.rows.size)
+        layout.rows.forEach { assertEquals(6f, it.units, 0.001f) }
+        val keys = layout.rows.flatMap { it.keys }
+        val actions = keys.mapNotNull { (it.output as? KeyOutput.Edit)?.action }
+        assertEquals(EditAction.entries.toSet(), actions.toSet())
+        assertEquals(EditAction.entries.size, actions.size)
+        assertEquals(1, keys.count { it.output == KeyOutput.Backspace })
+        assertEquals(EditAction.entries.size + 1, keys.size)
+        assertEquals("ABC", keys.single { it.output == KeyOutput.Edit(EditAction.CLOSE) }.label)
+    }
+
+    @Test
+    fun `text editing panel - arrows, del and backspace repeat`() {
+        val keys = Layouts.textEditing(editLabels).rows.flatMap { it.keys }
+        val repeating = keys.filter { it.repeat }.map { it.output }.toSet()
+        assertEquals(
+            setOf(
+                KeyOutput.Edit(EditAction.LEFT),
+                KeyOutput.Edit(EditAction.RIGHT),
+                KeyOutput.Edit(EditAction.UP),
+                KeyOutput.Edit(EditAction.DOWN),
+                KeyOutput.Edit(EditAction.DELETE),
+                KeyOutput.Backspace,
+            ),
+            repeating,
+        )
+        val arrows = keys.filter { (it.output as? KeyOutput.Edit)?.action in setOf(EditAction.LEFT, EditAction.RIGHT, EditAction.UP, EditAction.DOWN) }
+        assertTrue(arrows.all { it.icon != null && it.style == KeyStyle.NORMAL })
+    }
+
+    @Test
+    fun `text editing panel is stable, so a selection does not reset the keys`() {
+        assertEquals(Layouts.textEditing(editLabels), Layouts.textEditing(editLabels.copy()))
+    }
 }

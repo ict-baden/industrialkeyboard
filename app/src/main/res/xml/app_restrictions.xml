@@ -200,6 +200,12 @@
         android:restrictionType="bool"
         android:title="@string/mc_clipboard_history_title" />
     <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_text_editing_description"
+        android:key="text_editing"
+        android:restrictionType="bool"
+        android:title="@string/mc_text_editing_title" />
+    <restriction
         android:defaultValue="off"
         android:description="@string/mc_one_handed_description"
         android:entries="@array/mc_one_handed_entries"

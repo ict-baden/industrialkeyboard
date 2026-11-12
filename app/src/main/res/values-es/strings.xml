@@ -469,6 +469,7 @@
     <string name="feature_scan">Escanear</string>
     <string name="feature_numpad">Teclado numérico</string>
     <string name="feature_clipboard">Portapapeles</string>
+    <string name="feature_text_editing">Edición de texto</string>
     <string name="feature_one_handed">Una mano</string>
     <string name="feature_languages">Idiomas</string>
     <string name="feature_settings">Ajustes</string>
@@ -481,6 +482,16 @@
     <string name="next_word_summary">Tras un espacio, palabras probables – de una lista fija, no se aprende nada</string>
     <string name="clipboard_history">Historial del portapapeles</string>
     <string name="clipboard_history_summary">Guarda lo copiado 1 hora, máx. 20 elementos, solo en memoria; nunca de campos de contraseña</string>
+    <string name="text_editing">Panel de edición de texto</string>
+    <string name="text_editing_summary">Flechas, seleccionar, cortar, copiar y pegar – mosaico en el menú ⊞; {EDIT} en una tecla también lo abre</string>
+    <string name="text_edit_select">Seleccionar</string>
+    <string name="text_edit_select_all">Seleccionar todo</string>
+    <string name="text_edit_cut">Cortar</string>
+    <string name="text_edit_copy">Copiar</string>
+    <string name="text_edit_paste">Pegar</string>
+    <string name="text_edit_home">Inicio</string>
+    <string name="text_edit_end">Fin</string>
+    <string name="text_edit_delete">Supr</string>
     <string name="one_handed">Modo de una mano</string>
     <string name="one_handed_off">Desactivado</string>
     <string name="one_handed_left">Izquierda</string>
@@ -491,6 +502,8 @@
     <string name="mc_next_word_description">Palabras probables tras un espacio (lista fija).</string>
     <string name="mc_clipboard_history_title">Historial del portapapeles</string>
     <string name="mc_clipboard_history_description">Guardar el texto copiado 1 hora en memoria para el portapapeles.</string>
+    <string name="mc_text_editing_title">Panel de edición de texto</string>
+    <string name="mc_text_editing_description">Mosaico en el menú ⊞ con flechas, seleccionar, cortar, copiar y pegar.</string>
     <string name="mc_one_handed_title">Modo de una mano</string>
     <string name="mc_one_handed_description">Teclas más estrechas a la izquierda o a la derecha.</string>
     <string-array name="mc_top_bar_entries">

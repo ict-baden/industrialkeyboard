@@ -68,6 +68,7 @@ or rejected – never typed text or barcodes.
 - The **managed configuration** of your EMM (Android Enterprise app restrictions).
 - `industrialkeyboard.json` in `Android/data/<package>/files/` and in Zebra's `/enterprise/usr/`, if present ([Deployment](deployment.md)).
 - The **input type** of the focused field (number, e-mail, password …) to choose the matching keys.
+- The **cursor position** (and, for ← and → on the text editing panel, the one character next to the cursor, to keep the focus in the field) – in memory only, never stored or logged.
 - The **clipboard**, only while the keyboard is shown and only to offer it in the 📋 panel. With `typing.clipboardHistory` (off by default) copied texts are kept **in memory only** – at most 20, unpinned ones for 1 hour, nothing from password fields or clips marked sensitive – and are gone when the keyboard process ends. Nothing is written to storage.
 
 ## Connections and broadcasts

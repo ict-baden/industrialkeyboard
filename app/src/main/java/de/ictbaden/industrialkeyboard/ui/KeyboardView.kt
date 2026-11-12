@@ -20,11 +20,13 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.withSave
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.config.KeyStyle
+import de.ictbaden.industrialkeyboard.layout.EditAction
 import de.ictbaden.industrialkeyboard.layout.Key
 import de.ictbaden.industrialkeyboard.layout.KeyIcon
 import de.ictbaden.industrialkeyboard.layout.KeyOutput
 import de.ictbaden.industrialkeyboard.layout.KeyboardLayout
 import de.ictbaden.industrialkeyboard.layout.ModifierKey
+import de.ictbaden.industrialkeyboard.layout.TextEditState
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.min
@@ -79,6 +81,15 @@ class KeyboardView(context: Context) : View(context) {
 
     /** Ctrl, Win and Alt that apply to the next key (ONCE) or stay on (LOCKED). */
     var modifiers: Map<ModifierKey, ShiftState> = emptyMap()
+        set(value) {
+            if (field != value) {
+                field = value
+                invalidate()
+            }
+        }
+
+    /** Text editing panel: Select lit while selecting, Cut/Copy dimmed and inactive without a selection. */
+    var editState: TextEditState? = null
         set(value) {
             if (field != value) {
                 field = value
@@ -197,7 +208,8 @@ class KeyboardView(context: Context) : View(context) {
             }
             // Words in one row share a size (F1 … F12, Esc / Home / PgUp), and so do single characters
             // (narrow keys would otherwise shrink W and M but not I), so the row looks even.
-            rowBoxes.filter { it.key.icon == null && !it.key.label.isNullOrEmpty() && it.key.output != KeyOutput.Space }
+            // Not the text editing keys: "Alles auswählen" would shrink "Pos1" and "Ende".
+            rowBoxes.filter { it.key.icon == null && !it.key.label.isNullOrEmpty() && it.key.output != KeyOutput.Space && it.key.output !is KeyOutput.Edit }
                 .groupBy { it.key.label!!.length == 1 }.values.forEach { group ->
                     val size = group.minOf { fitLabel(it.key, measureLabel(it.key), it.rect) }
                     group.forEach { it.labelSize = size }
@@ -225,8 +237,12 @@ class KeyboardView(context: Context) : View(context) {
         val p = palette
         // An armed modifier shows its label in the accent color, a locked one is filled with it.
         val modifier = (key.output as? KeyOutput.Modifier)?.let { modifiers[it.modifier] } ?: ShiftState.OFF
+        // Select on the text editing panel is lit like a locked modifier while selecting.
+        val edit = (key.output as? KeyOutput.Edit)?.action
+        val lit = edit == EditAction.SELECT && editState?.selecting == true
+        val disabled = edit != null && !editEnabled(edit)
         val background = when {
-            modifier == ShiftState.LOCKED -> p.accent
+            modifier == ShiftState.LOCKED || lit -> p.accent
             else -> when (key.style) {
                 KeyStyle.NORMAL -> p.key
                 KeyStyle.FUNCTION -> p.function
@@ -234,7 +250,8 @@ class KeyboardView(context: Context) : View(context) {
             }
         }
         val foreground = when {
-            modifier == ShiftState.LOCKED -> p.accentText
+            modifier == ShiftState.LOCKED || lit -> p.accentText
+            disabled -> p.keyHint
             modifier == ShiftState.ONCE && key.style != KeyStyle.ACCENT -> p.accent
             else -> when (key.style) {
                 KeyStyle.NORMAL -> p.keyText
@@ -247,7 +264,7 @@ class KeyboardView(context: Context) : View(context) {
         val pill = key.style == KeyStyle.ACCENT || isSwitchKey(key)
         val radius = if (pill) min(r.height(), r.width()) / 2f else min(dp(6f), r.height() * 0.2f)
         // "Key borders" off: letter keys are drawn without a tile, only the label (and the press).
-        val tile = keyBorders || key.style != KeyStyle.NORMAL
+        val tile = keyBorders || key.style != KeyStyle.NORMAL || lit
         canvas.withSave {
             if (pressed) canvas.scale(PRESS_SCALE, PRESS_SCALE, r.centerX(), r.centerY())
             if (p.shadow != 0 && !pressed && tile) {
@@ -279,6 +296,11 @@ class KeyboardView(context: Context) : View(context) {
         }
     }
 
+    /** A text editing key that can act now (without a state, e.g. in a preview: all). */
+    private fun editEnabled(action: EditAction) = editState?.enabled(action) ?: true
+
+    private fun disabled(key: Key) = (key.output as? KeyOutput.Edit)?.let { !editEnabled(it.action) } == true
+
     /** ?123 / ABC at the bottom left: a pill like Gboard (the =\< page key stays a tile, as there). */
     private fun isSwitchKey(key: Key) = key.output is KeyOutput.ShowTab && key.label != null && key.style == KeyStyle.FUNCTION
 
@@ -305,6 +327,7 @@ class KeyboardView(context: Context) : View(context) {
             KeyIcon.UP -> R.drawable.kb_up
             KeyIcon.DOWN -> R.drawable.kb_down
             KeyIcon.SETTINGS -> R.drawable.ic_settings
+            KeyIcon.TEXT_EDIT -> R.drawable.kb_text_edit
         }
         val drawable = icon(res)
         val size = min(dp(26f), r.height() * 0.5f).toInt()
@@ -394,6 +417,8 @@ class KeyboardView(context: Context) : View(context) {
 
     private fun press(id: Int, x: Float, y: Float) {
         val box = boxAt(x, y) ?: return
+        // Dimmed Cut/Copy: no press, no click, no sound.
+        if (disabled(box.key)) return
         val pointer = Pointer(id, box, x)
         pointers[id] = pointer
         listener?.onKeyDown(box.key)
@@ -442,7 +467,7 @@ class KeyboardView(context: Context) : View(context) {
                     return
                 }
                 val target = boxAt(x, y)
-                if (target !== box && target != null && box?.cell?.contains(x, y) != true) {
+                if (target !== box && target != null && box?.cell?.contains(x, y) != true && !disabled(target.key)) {
                     // Sliding to another key moves the press (and restarts the long-press timer).
                     stopTimers(pointer)
                     box?.let { released[it] = SystemClock.uptimeMillis() }

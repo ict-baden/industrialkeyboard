@@ -92,6 +92,7 @@ object ConfigJson {
             put("deleteGesture", config.typing.deleteGesture)
             put("nextWord", config.typing.nextWord)
             put("clipboardHistory", config.typing.clipboardHistory)
+            put("textEditing", config.typing.textEditing)
         })
         root.put("feedback", JSONObject().apply {
             val f = config.feedback
@@ -302,6 +303,7 @@ object ConfigJson {
             deleteGesture = json.optBoolean("deleteGesture", d.deleteGesture),
             nextWord = json.optBoolean("nextWord", d.nextWord),
             clipboardHistory = json.optBoolean("clipboardHistory", d.clipboardHistory),
+            textEditing = json.optBoolean("textEditing", d.textEditing),
         )
     }
 
