@@ -74,6 +74,17 @@ Please report results on other devices in the
   which an editor may ignore.
 - The panel keys are drawn on a canvas and are not yet readable by TalkBack (issue #9).
 
+## App profiles
+
+- Browsers and WebView apps report the browser's package name for every page, so one profile
+  covers all sites opened in it. For SAP ITSmobile use a dedicated browser (for example Zebra
+  Enterprise Browser) and give that one the profile.
+- `hints` match the hint of Material/AndroidX text fields and the native `android:hint`. Whether
+  a web page's placeholder reaches the keyboard depends on the browser (not verified for Chrome
+  or Enterprise Browser), so `hints` rules may never match in web apps.
+- `scanSuffix` does not change DataWedge or Honeywell keystroke output; set the suffix there.
+- Profiles match by app, field type and hint only – not by activity, screen or web address.
+
 ## Not included, on purpose
 
 - Word suggestions and autocorrection use fixed built-in word lists: they do not learn names or words

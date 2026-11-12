@@ -22,15 +22,20 @@ configuration changes – never per key. From lowest to highest:
 1. **Stored configuration.** `config_json` from the MDM, a file, the `INSTALL_CONFIG` broadcast
    and **Import** replace it as a whole; the single options of the managed configuration and the
    admin settings change single values in it. Export and the QR code contain exactly this.
-2. **[Quick toggles](#quicktoggles--quick-toggles-on-the-device)** switched on the device (glove
+2. **[App profile](#appprofiles--app-profiles)**: the first entry of `appProfiles` that matches
+   the focused field (app, field type, hint) overrides a few values. Never stored, never exported.
+3. **[Quick toggles](#quicktoggles--quick-toggles-on-the-device)** switched on the device (glove
    mode, contrast, scanner, sound), only those in `quickToggles.allowed` of the stored
-   configuration. Stored apart from the configuration; where a future layer below sets the same
-   field, the toggle wins. What users may change (`quickToggles.allowed`) is an admin gate.
-3. **Field rules**, which always win: number, phone and date fields open their pad; password
+   configuration. Stored apart from the configuration; where the app profile sets the same
+   field, the toggle wins.
+4. **Field rules**, which always win: number, phone and date fields open their pad; password
    fields get no suggestions, no autocorrection and no key preview.
 
+Admin gates – what users may change (`quickToggles.allowed`, `typing.textEditing`) – are read from
+the stored configuration only; an app profile cannot change them.
+
 The page that opens: a `SHOW_TAB` request or [`{SHOW:…}`](#macros) > the field type (number,
-phone, date) > [`tabs.preferred`](#tabs).
+phone, date) > the app profile's `page` > [`tabs.preferred`](#tabs).
 
 ## Complete example with all defaults
 
@@ -137,9 +142,12 @@ phone, date) > [`tabs.preferred`](#tabs).
       "vibrate": true
     }
   },
-  "quickToggles": { "allowed": ["glove", "contrast", "sound"] }
+  "quickToggles": { "allowed": ["glove", "contrast", "sound"] },
+  "appProfiles": []
 }
 ```
+
+`appProfiles` is left out of an export while it is empty.
 
 `version` is `1`. A configuration with a higher version is rejected, so an old app never
 misreads a newer file.
@@ -199,7 +207,7 @@ every language: [Error codes](error-codes.md).
 | Option | Values | Default | Effect |
 |---|---|---|---|
 | `alpha`, `numeric`, `symbols`, `function`, `scan` | `true` / `false` | `true` | Show the tab. The scan tab only appears when a scanner is available ([`scanner.trigger`](#scanner)). If every tab is off, ABC stays |
-| `preferred` | `auto`, `alpha`, `numeric`, `symbols`, `function`, `scan` or the id of a [custom layout](#custom-layouts) | `auto` | Page that opens in text fields. `auto` = letters |
+| `preferred` | `auto`, `alpha`, `numeric`, `symbols`, `function`, `scan` or the id of a [custom layout](#custom-layouts) | `auto` | Page that opens in text fields. `auto` = letters. Also per app: [app profiles](#appprofiles--app-profiles) |
 
 The page always follows the field first: number, phone, date and time fields open the
 numeric pad, whatever is configured here.
@@ -507,6 +515,84 @@ A key is either a **string** – a [macro](#macros); the key shows its text, key
 
 The rows share the height of the letter page, so a layout with three rows gets taller keys –
 ideal for a handful of big buttons.
+
+## `appProfiles` – app profiles
+
+Rules that change a few options for one app, a kind of field or a field with a certain hint –
+for example the number pad with 7-8-9 for quantity fields of the warehouse app, or the function
+keys and no suggestions in the terminal emulation. Only in the JSON configuration (there is no
+editor and no single managed configuration option); **Settings → Configuration → App profiles**
+lists them.
+
+```json
+{
+  "customLayouts": [ { "id": "host", "label": "Host", "rows": [ ["{F13}", "{F14}", "{F15}", "{F16}"] ] } ],
+  "appProfiles": [
+    { "name": "WMS quantity", "apps": ["com.example.wms"], "hints": ["*menge*", "*qty*", "*quantity*"], "page": "numeric", "numericOrder": "calculator" },
+    { "name": "WMS", "apps": ["com.example.wms"], "suggestions": false, "autocorrect": false, "emojiKey": false, "alphabet": "qwertz", "scanSuffix": "{TAB}" },
+    { "name": "SAP ITSmobile", "apps": ["com.symbol.enterprisebrowser", "com.android.chrome"], "fields": ["text", "none"], "page": "alpha", "topBar": "tabs", "suggestions": false, "autocorrect": false, "emojiKey": false, "scanSuffix": "{ENTER}" },
+    { "name": "Terminal emulation", "apps": ["com.wavelink.*", "com.staylinked.*"], "page": "function", "topBar": "tabs", "alphabet": "qwerty", "suggestions": false, "autocorrect": false, "emojiKey": false, "scanSuffix": "{ENTER}" }
+  ]
+}
+```
+
+The whole file: [`examples/app-profiles.json`](../examples/app-profiles.json). Put the specific
+rules (with `hints`) before the general rule for the same app. ITSmobile gets `topBar: tabs`, so
+`Fn` (F1–F12 = the ITSmobile buttons) is one tap away. The terminal package names are examples –
+check them on your devices.
+
+**Conditions** – at least one per profile:
+
+| Option | Values | Default | Matches |
+|---|---|---|---|
+| `apps` | up to 20 package names or patterns (letters, digits, `_`, `.`, `*`, `?`) | `[]` = any app | The package of the app with the focused field, as a whole and case-sensitive. `*` = any characters, dots included; `?` = one character. `com.sap.*` matches `com.sap.mobile`, not `com.sapx`; `de.ictbaden.industrialkeyboard*` matches the release and the `.debug` build |
+| `fields` | up to 20 of `text`, `number`, `phone`, `datetime`, `email`, `url`, `none` | `[]` = any field | The field type (Android input type). `none` = fields that want raw key events (`TYPE_NULL`, terminal emulators). Password fields (text and PIN) have **no** type: a rule with `fields` never matches them |
+| `hints` | up to 20 patterns, 1–100 characters each | `[]` = no condition | The hint of the field (placeholder or floating label), as a whole, **not** case-sensitive, with `*` and `?` as above. `*menge*` matches "Menge (Stk)". A field without a hint does not match |
+
+**Overrides** – at least one per profile; what a profile leaves out stays as configured:
+
+| Option | Values | Replaces |
+|---|---|---|
+| `name` | text, up to 40 characters | – (label for the settings and logcat) |
+| `page` | `auto`, `alpha`, `numeric`, `symbols`, `function`, `scan` or a [custom layout](#custom-layouts) id | [`tabs.preferred`](#tabs) |
+| `alphabet` | as [`layout.alphabet`](#layout) | `layout.alphabet` |
+| `numericOrder` | `phone`, `calculator` | `layout.numericOrder` |
+| `topBar` | `toolbar`, `tabs` | `layout.topBar` |
+| `emojiKey` | `true` / `false` | `appearance.emojiKey` |
+| `suggestions` | `true` / `false` | `typing.suggestions` |
+| `autocorrect` | `true` / `false` | `typing.autocorrect` |
+| `scanSuffix` | [macro](#macros), `""` = nothing | [`scanner.data.suffix`](#scannerdata--scan-data-formatting) (and so also the old `scanner.input.suffix`); a matching `scanner.data.rules[].suffix` still wins |
+
+How profiles are matched:
+
+- When a field gets the focus (and when the configuration changes), the keyboard checks the
+  profiles from top to bottom. **The first profile that matches applies**; profiles are not
+  merged.
+- All conditions of a profile must match (AND); inside one list any entry may match (OR).
+- The page: a `SHOW_TAB` request > the field type (number, phone and date fields always open
+  their pad) > the profile's `page` > `tabs.preferred`. `page: scan` without a scanner (or with
+  the scanner quick toggle off) opens the letters.
+- `scanSuffix` applies to the scans the keyboard types itself: camera, NFC, the scan broadcast
+  (`scanner.input`, also DataWedge intent output). DataWedge or Honeywell **keystroke** output
+  keeps the suffix set in DataWedge or the Honeywell settings.
+- `topBar` changes per app whether the toolbar (with ⊞) or the tabs are shown, and so whether
+  the ⊞ tiles (text editing, quick toggles) are reachable there. Switching between apps with a
+  different `topBar` or `alphabet` can change the keyboard height.
+- Booleans in a profile are strict: `true`, `false` or the texts `"true"` and `"false"`. Elsewhere
+  in the format a wrong value counts as the default; in a profile a missing value means "keep the
+  configured value", so a typo must not silently switch something off.
+- Unknown options inside a profile are ignored, so newer files work with older versions. A typo
+  such as `"Page"` is caught only when the profile then sets nothing at all
+  (`appProfiles[0]: sets nothing (…)`).
+- To find the package of an app: `adb shell dumpsys window | grep mCurrentFocus`, or
+  `adb logcat -s KeyboardService` – the keyboard logs `App profile 2 "WMS" for com.example.wms`
+  or `No app profile for …` when the profile changes. It never logs the hint.
+- Browsers report their own package for every web page; see [Limitations](limitations.md).
+
+Mistakes are rejected like everywhere else, with the position, e.g.
+`appProfiles[0].page: unknown tab "fnkeys" (auto, alpha, numeric, symbols, function, scan or a custom layout id)`
+or `appProfiles[2].apps[0]: "com sap" is not a package name or pattern (letters, digits, _, ., * and ?)`.
+At most 50 profiles.
 
 ## Macros
 

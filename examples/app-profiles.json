@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "customLayouts": [
+    {
+      "id": "host",
+      "label": "Host",
+      "rows": [
+        ["{F13}", "{F14}", "{F15}", "{F16}"],
+        ["{F17}", "{F18}", "{F19}", "{F20}"],
+        [ { "label": "Send", "output": "{ENTER}", "width": 4, "style": "accent" } ]
+      ]
+    }
+  ],
+  "appProfiles": [
+    { "name": "WMS quantity", "apps": ["com.example.wms"], "hints": ["*menge*", "*qty*", "*quantity*"], "page": "numeric", "numericOrder": "calculator" },
+    { "name": "WMS", "apps": ["com.example.wms"], "suggestions": false, "autocorrect": false, "emojiKey": false, "alphabet": "qwertz", "scanSuffix": "{TAB}" },
+    { "name": "SAP ITSmobile", "apps": ["com.symbol.enterprisebrowser", "com.android.chrome"], "fields": ["text", "none"], "page": "alpha", "topBar": "tabs", "suggestions": false, "autocorrect": false, "emojiKey": false, "scanSuffix": "{ENTER}" },
+    { "name": "Terminal emulation", "apps": ["com.wavelink.*", "com.staylinked.*"], "page": "function", "topBar": "tabs", "alphabet": "qwerty", "suggestions": false, "autocorrect": false, "emojiKey": false, "scanSuffix": "{ENTER}" }
+  ]
+}

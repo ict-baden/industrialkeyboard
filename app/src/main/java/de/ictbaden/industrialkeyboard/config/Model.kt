@@ -335,6 +335,52 @@ data class QuickToggleSettings(
     }
 }
 
+/** Field types an app profile can match (`appProfiles[].fields`); password fields have none. */
+enum class FieldKind(override val key: String) : Keyed {
+    TEXT("text"),
+    NUMBER("number"),
+    PHONE("phone"),
+    DATETIME("datetime"),
+    EMAIL("email"),
+    URL("url"),
+
+    /** `TYPE_NULL`: the app asks for raw key events (terminal emulators). */
+    NONE("none"),
+}
+
+/**
+ * Overrides for one app or kind of field (`appProfiles`); `null` = keep the stored value. Matched
+ * when a field starts, first match wins, never merged. Never written back into the stored
+ * configuration (`ime/AppProfiles`, [EffectiveConfig]).
+ */
+data class AppProfile(
+    /** Label for the settings and logcat. */
+    val name: String = "",
+    /** Package globs (`*`, `?`) for `EditorInfo.packageName`, case-sensitive; empty = any app. */
+    val apps: List<String> = emptyList(),
+    /** Kinds of field; empty = any field. */
+    val fields: Set<FieldKind> = emptySet(),
+    /** Globs for the field's hint (placeholder, floating label), case-insensitive; empty = no condition. */
+    val hints: List<String> = emptyList(),
+    /** Replaces `tabs.preferred`. */
+    val page: String? = null,
+    val alphabet: Alphabet? = null,
+    val numericOrder: NumericOrder? = null,
+    val topBar: TopBar? = null,
+    val emojiKey: Boolean? = null,
+    val suggestions: Boolean? = null,
+    val autocorrect: Boolean? = null,
+    /** Replaces `scanner.data.suffix` (macro, `""` = nothing) for scans the keyboard types. */
+    val scanSuffix: String? = null,
+) {
+    companion object {
+        const val MAX_PROFILES = 50
+        const val MAX_PATTERNS = 20
+        const val MAX_PATTERN_LENGTH = 100
+        const val MAX_NAME = 40
+    }
+}
+
 /** A layout of the administrator's own keys, shown as an extra tab. */
 data class CustomLayout(
     val id: String,
@@ -356,6 +402,8 @@ data class KeyboardConfig(
     val language: String = Languages.AUTO,
     // New sections go here, after `language`, in this agreed order: snippets, appProfiles,
     // quickToggles, accessibility – so that positional calls keep working (ConfigJson uses names).
+    /** Per-app overrides (first match wins); applied on top of this configuration, never stored into it. */
+    val appProfiles: List<AppProfile> = emptyList(),
     /** Which quick toggles users may switch on the device (⊞, settings, `{TOGGLE:…}`). */
     val quickToggles: QuickToggleSettings = QuickToggleSettings(),
 ) {

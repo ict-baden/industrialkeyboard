@@ -231,6 +231,10 @@
     <string name="password_not_set">未设置</string>
     <string name="password_set">已设置，用于保护这些设置</string>
     <string name="last_provisioning_error">上次部署错误</string>
+    <string name="app_profiles">应用配置文件</string>
+    <string name="app_profiles_none">无 – 仅可在 JSON 配置中设置</string>
+    <string name="app_profile_unnamed">配置文件 %1$d</string>
+    <string name="app_profiles_first_wins">使用第一个匹配的配置文件。数字、电话和日期字段仍会打开数字键盘。</string>
     <string name="config_file_for_emm">用于 EMM 的配置文件</string>
     <string name="config_exported">配置已导出</string>
     <string name="export_failed">导出失败：%1$s</string>

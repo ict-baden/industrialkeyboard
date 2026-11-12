@@ -16,9 +16,16 @@ class ScanTrigger(private val context: Context) {
 
     var settings = ScannerSettings()
         set(value) {
+            // Only these decide the type; other changes (an app profile's scan suffix when the
+            // focus moves) keep it, so a new field causes no package queries.
+            if (value.trigger != field.trigger || value.intentAction != field.intentAction) resolved = null
             field = value
-            resolved = null
         }
+
+    /** Resolves the type again on next use (a new configuration: apps may have been installed meanwhile). */
+    fun refresh() {
+        resolved = null
+    }
 
     private var resolved: ScanTriggerType? = null
     private var resolvedFor: HardwareScanner.State? = null

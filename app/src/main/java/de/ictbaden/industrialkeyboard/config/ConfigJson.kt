@@ -15,6 +15,7 @@ object ConfigJson {
     private val ID = Regex("[a-z0-9][a-z0-9_-]{0,23}")
     private val PACKAGE = Regex("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+")
     private val JSON_POSITION = Regex("at character (\\d+)")
+    private val APP_PATTERN = Regex("[A-Za-z0-9_.*?]{1,100}")
 
     fun parse(text: String): KeyboardConfig {
         val root = try {
@@ -39,6 +40,7 @@ object ConfigJson {
             customLayouts = custom,
             adminPasswordHash = passwordHash(root),
             language = language(root.optNonBlank("language")),
+            appProfiles = parseAppProfiles(root.opt("appProfiles"), custom),
             quickToggles = parseQuickToggles(root.optJSONObject("quickToggles"), defaults.quickToggles),
         )
     }
@@ -219,7 +221,120 @@ object ConfigJson {
                 }
             })
         }
+        // Left out when empty, so files of older versions stay as they were.
+        if (config.appProfiles.isNotEmpty()) {
+            root.put("appProfiles", JSONArray().apply { config.appProfiles.forEach { put(writeAppProfile(it)) } })
+        }
         return root.toString(2)
+    }
+
+    /** Only what the profile sets, in the documented order; `scanSuffix: ""` is kept (= nothing). */
+    private fun writeAppProfile(p: AppProfile) = JSONObject().apply {
+        if (p.name.isNotEmpty()) put("name", p.name)
+        if (p.apps.isNotEmpty()) put("apps", JSONArray(p.apps))
+        if (p.fields.isNotEmpty()) put("fields", JSONArray(p.fields.sortedBy { it.ordinal }.map { it.key }))
+        if (p.hints.isNotEmpty()) put("hints", JSONArray(p.hints))
+        putOpt("page", p.page)
+        putOpt("alphabet", p.alphabet?.key)
+        putOpt("numericOrder", p.numericOrder?.key)
+        putOpt("topBar", p.topBar?.key)
+        putOpt("emojiKey", p.emojiKey)
+        putOpt("suggestions", p.suggestions)
+        putOpt("autocorrect", p.autocorrect)
+        putOpt("scanSuffix", p.scanSuffix)
+    }
+
+    /** `appProfiles`: missing or null = none. */
+    private fun parseAppProfiles(value: Any?, custom: List<CustomLayout>): List<AppProfile> {
+        if (value == null || value == JSONObject.NULL) return emptyList()
+        val array = value as? JSONArray ?: throw ConfigException("appProfiles: array expected")
+        if (array.length() > AppProfile.MAX_PROFILES) throw ConfigException("appProfiles: at most ${AppProfile.MAX_PROFILES} profiles")
+        return (0 until array.length()).map { i ->
+            val where = "appProfiles[$i]"
+            parseAppProfile(array.opt(i) as? JSONObject ?: throw ConfigException("$where: object expected"), where, custom)
+        }
+    }
+
+    private fun parseAppProfile(json: JSONObject, where: String, custom: List<CustomLayout>): AppProfile {
+        val name = json.optNonBlank("name").orEmpty()
+        if (name.length > AppProfile.MAX_NAME) throw ConfigException("$where.name: at most ${AppProfile.MAX_NAME} characters")
+        val apps = stringList(json, "apps", where, AppProfile.MAX_PATTERNS).onEachIndexed { j, app ->
+            if (!app.matches(APP_PATTERN)) throw ConfigException("$where.apps[$j]: \"$app\" is not a package name or pattern (letters, digits, _, ., * and ?)")
+        }.distinct()
+        val fields = stringList(json, "fields", where, AppProfile.MAX_PATTERNS).mapIndexed { j, kind ->
+            FieldKind.entries.firstOrNull { it.key.equals(kind, ignoreCase = true) }
+                ?: throw ConfigException("$where.fields[$j]: unknown field type \"$kind\" (${FieldKind.entries.joinToString { it.key }})")
+        }.toSet()
+        val hints = stringList(json, "hints", where, AppProfile.MAX_PATTERNS).onEachIndexed { j, hint ->
+            if (hint.isEmpty() || hint.length > AppProfile.MAX_PATTERN_LENGTH) {
+                throw ConfigException("$where.hints[$j]: 1–${AppProfile.MAX_PATTERN_LENGTH} characters expected")
+            }
+        }.distinct()
+        if (apps.isEmpty() && fields.isEmpty() && hints.isEmpty()) throw ConfigException("$where: needs at least one of apps, fields or hints")
+        val page = json.optNonBlank("page")?.also { checkTab(it, "$where.page", custom) }
+        val scanSuffix = if (json.has("scanSuffix") && !json.isNull("scanSuffix")) {
+            json.optString("scanSuffix").also { if (it.isNotEmpty()) checkMacro(it, "$where.scanSuffix") }
+        } else {
+            null
+        }
+        val profile = AppProfile(
+            name = name,
+            apps = apps,
+            fields = fields,
+            hints = hints,
+            page = page,
+            alphabet = optEnum<Alphabet>(json, "alphabet", where),
+            numericOrder = optEnum<NumericOrder>(json, "numericOrder", where),
+            topBar = optEnum<TopBar>(json, "topBar", where),
+            emojiKey = optBool(json, "emojiKey", where),
+            suggestions = optBool(json, "suggestions", where),
+            autocorrect = optBool(json, "autocorrect", where),
+            scanSuffix = scanSuffix,
+        )
+        if (profile == AppProfile(name = name, apps = apps, fields = fields, hints = hints)) {
+            throw ConfigException("$where: sets nothing (page, alphabet, numericOrder, topBar, emojiKey, suggestions, autocorrect or scanSuffix)")
+        }
+        return profile
+    }
+
+    /** Trimmed texts of the array [name]; missing or null = empty, at most [max] entries. */
+    private fun stringList(json: JSONObject, name: String, where: String, max: Int): List<String> {
+        if (!json.has(name) || json.isNull(name)) return emptyList()
+        val array = json.opt(name) as? JSONArray ?: throw ConfigException("$where.$name: array expected")
+        if (array.length() > max) throw ConfigException("$where.$name: at most $max entries")
+        return (0 until array.length()).map { j ->
+            (array.opt(j) as? String ?: throw ConfigException("$where.$name[$j]: text expected")).trim()
+        }
+    }
+
+    /**
+     * Strict, unlike the lenient `optBoolean` of the other sections: in a profile a missing value
+     * means "inherit", so a typo such as `"flase"` must not silently become `false`.
+     */
+    private fun optBool(json: JSONObject, name: String, where: String): Boolean? {
+        if (!json.has(name) || json.isNull(name)) return null
+        return when (val value = json.opt(name)) {
+            is Boolean -> value
+            is String -> when (value.trim().lowercase()) {
+                "true" -> true
+                "false" -> false
+                else -> null
+            }
+            else -> null
+        } ?: throw ConfigException("$where.$name: true or false expected")
+    }
+
+    /** Like [enumValue], `null` when missing. */
+    private inline fun <reified T> optEnum(json: JSONObject, name: String, where: String): T? where T : Enum<T>, T : Keyed {
+        json.optNonBlank(name) ?: return null
+        return enumValue(json, name, where, enumValues<T>().first())
+    }
+
+    /** `auto`, a built-in tab or a custom layout id (`tabs.preferred`, `appProfiles[].page`). */
+    private fun checkTab(tab: String, where: String, custom: List<CustomLayout>) {
+        if (tab != Tabs.AUTO && tab !in Tabs.BUILT_IN && custom.none { it.id == tab }) {
+            throw ConfigException("$where: unknown tab \"$tab\" (auto, ${Tabs.BUILT_IN.joinToString()} or a custom layout id)")
+        }
     }
 
     /** `allowed`: a list of toggle names; `[]` = none, missing = the default. */
@@ -275,9 +390,7 @@ object ConfigJson {
     private fun parseTabs(json: JSONObject?, d: TabSettings, custom: List<CustomLayout>): TabSettings {
         json ?: return d
         val preferred = json.optNonBlank("preferred") ?: d.preferred
-        if (preferred != Tabs.AUTO && preferred !in Tabs.BUILT_IN && custom.none { it.id == preferred }) {
-            throw ConfigException("tabs.preferred: unknown tab \"$preferred\" (auto, ${Tabs.BUILT_IN.joinToString()} or a custom layout id)")
-        }
+        checkTab(preferred, "tabs.preferred", custom)
         return TabSettings(
             alpha = json.optBoolean("alpha", d.alpha),
             numeric = json.optBoolean("numeric", d.numeric),
