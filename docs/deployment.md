@@ -87,6 +87,9 @@ The app ships a schema that every EMM with Android Enterprise support shows:
 | `function_tab` | Bool | Show the function key tab (default on) |
 | `sound` | Bool | Click sound (default off) |
 | `vibrate` | Bool | Vibration (default on) |
+| `suggestions` | Bool | Word suggestions (default on) |
+| `autocorrect` | Bool | Autocorrection on space (default off) |
+| `emoji_key` | Bool | Emoji key next to the space bar (default on) |
 | `scan_prefix` | String | Macro typed before every barcode ([`scanner.data.prefix`](configuration.md#scannerdata--scan-data-formatting)); empty = unchanged |
 | `scan_suffix` | String | Macro typed after every barcode instead of Enter/Tab (`scanner.data.suffix`); empty = unchanged |
 | `camera_aim` | Choice | Camera aiming: frame, crosshair (pick list), anywhere |

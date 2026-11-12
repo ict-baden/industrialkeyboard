@@ -81,4 +81,27 @@ class FieldPolicyTest {
         assertEquals(Page.Numeric(NumericVariant.PHONE), FieldPolicy.pageForTab(Tabs.NUMERIC, field, KeyboardConfig(), true))
         assertNull(FieldPolicy.pageForTab("unknown", field, KeyboardConfig(), true))
     }
+
+    @Test
+    fun `suggestions and emoji only in normal text`() {
+        val sentence = text or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+        assertEquals(true, FieldPolicy.suggestionsAllowed(sentence))
+        assertEquals(true, FieldPolicy.emojiAllowed(sentence))
+        val no = listOf(
+            text or InputType.TYPE_TEXT_VARIATION_PASSWORD,
+            text or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,
+            text or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+            text or InputType.TYPE_TEXT_VARIATION_URI,
+            InputType.TYPE_CLASS_NUMBER,
+            InputType.TYPE_CLASS_PHONE,
+            InputType.TYPE_CLASS_DATETIME,
+            InputType.TYPE_NULL,
+        )
+        no.forEach {
+            assertEquals("suggestions for $it", false, FieldPolicy.suggestionsAllowed(it))
+            assertEquals("emoji for $it", false, FieldPolicy.emojiAllowed(it))
+        }
+        // Barcode fields usually ask for no suggestions; emoji are still fine there.
+        assertEquals(false, FieldPolicy.suggestionsAllowed(text or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS))
+    }
 }

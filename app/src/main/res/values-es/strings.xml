@@ -404,4 +404,20 @@
     <string name="keyboard_languages_summary">Idiomas entre los que cambia 🌐, en los ajustes de Android</string>
     <string name="umlaut_keys">Teclas de diéresis</string>
     <string name="umlaut_keys_summary">ü, ö y ä como teclas propias en QWERTZ; si no, con pulsación larga en u, o, a</string>
+    <string name="suggestions">Sugerencias de palabras</string>
+    <string name="suggestions_summary">Tres sugerencias sobre las teclas en campos de texto normales, de un diccionario integrado. No se aprende ni se guarda nada de lo escrito</string>
+    <string name="autocorrect">Autocorrección</string>
+    <string name="autocorrect_summary">El espacio sustituye un error evidente por la mejor sugerencia; Retroceso lo deshace</string>
+    <string name="emoji_key">Tecla de emoji</string>
+    <string name="emoji_key_summary">😊 junto a la barra espaciadora en campos de texto normales</string>
+    <string name="emoji_back">Volver a las letras</string>
+    <string name="emoji_backspace">Borrar</string>
+    <string name="mc_suggestions_title">Sugerencias de palabras</string>
+    <string name="mc_suggestions_description">Sugerencias sobre las teclas de un diccionario integrado (sin aprendizaje).</string>
+    <string name="mc_autocorrect_title">Autocorrección</string>
+    <string name="mc_autocorrect_description">El espacio sustituye un error evidente por la mejor sugerencia.</string>
+    <string name="mc_emoji_key_title">Tecla de emoji</string>
+    <string name="mc_emoji_key_description">Tecla de emoji junto a la barra espaciadora en campos de texto normales.</string>
+    <string name="sample_note">Nota</string>
+    <string name="sample_note_helper">Palabras con sugerencias y emoji</string>
 </resources>

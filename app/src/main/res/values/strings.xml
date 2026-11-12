@@ -4,6 +4,8 @@
     <string name="ime_name" translatable="false">Industrial Keyboard</string>
     <!-- Subtype label: Android puts in the language name of the subtype. -->
     <string name="subtype_generic" translatable="false">%s</string>
+    <!-- Key label like on the keys themselves, not translated. -->
+    <string name="label_abc" translatable="false">ABC</string>
     <string name="settings_title">Keyboard settings</string>
     <string name="message_with_code">%1$s (%2$s)</string>
     <string name="value_percent">%1$d %%</string>
@@ -462,4 +464,20 @@
     <string name="keyboard_languages_summary">Languages the 🌐 button switches between, from the Android settings</string>
     <string name="umlaut_keys">Umlaut keys</string>
     <string name="umlaut_keys_summary">ü, ö and ä as own keys in QWERTZ; otherwise on long press of u, o, a</string>
+    <string name="suggestions">Word suggestions</string>
+    <string name="suggestions_summary">Three suggestions above the keys in normal text fields, from a built-in dictionary. Nothing typed is learnt or stored</string>
+    <string name="autocorrect">Autocorrection</string>
+    <string name="autocorrect_summary">Space replaces an obvious typo by the best suggestion; Backspace undoes it</string>
+    <string name="emoji_key">Emoji key</string>
+    <string name="emoji_key_summary">😊 next to the space bar in normal text fields</string>
+    <string name="emoji_back">Back to the letters</string>
+    <string name="emoji_backspace">Delete</string>
+    <string name="mc_suggestions_title">Word suggestions</string>
+    <string name="mc_suggestions_description">Suggestions above the keys from a built-in dictionary (no learning).</string>
+    <string name="mc_autocorrect_title">Autocorrection</string>
+    <string name="mc_autocorrect_description">Space replaces an obvious typo by the best suggestion.</string>
+    <string name="mc_emoji_key_title">Emoji key</string>
+    <string name="mc_emoji_key_description">Emoji key next to the space bar in normal text fields.</string>
+    <string name="sample_note">Note</string>
+    <string name="sample_note_helper">Words with suggestions and emoji</string>
 </resources>

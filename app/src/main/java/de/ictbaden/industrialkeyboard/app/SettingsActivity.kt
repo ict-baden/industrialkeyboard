@@ -285,6 +285,9 @@ class SettingsActivity : AppCompatActivity() {
                         update { it.copy(layout = it.layout.copy(alphabet = alphabet)) }
                     },
                     ui.row(R.drawable.ic_globe, getString(R.string.keyboard_languages), getString(R.string.keyboard_languages_summary)) { openLanguageSettings() },
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.emoji_key), getString(R.string.emoji_key_summary), c.appearance.emojiKey) { on ->
+                        update { it.copy(appearance = it.appearance.copy(emojiKey = on)) }
+                    },
                     ui.switchRow(R.drawable.ic_keyboard, getString(R.string.umlaut_keys), getString(R.string.umlaut_keys_summary), c.layout.umlautKeys) { on ->
                         update { it.copy(layout = it.layout.copy(umlautKeys = on)) }
                     },
@@ -362,6 +365,12 @@ class SettingsActivity : AppCompatActivity() {
         content.addView(
             ui.card(
                 listOf(
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.suggestions), getString(R.string.suggestions_summary), c.typing.suggestions) { on ->
+                        update { it.copy(typing = it.typing.copy(suggestions = on)) }
+                    },
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.autocorrect), getString(R.string.autocorrect_summary), c.typing.autocorrect, enabled = c.typing.suggestions) { on ->
+                        update { it.copy(typing = it.typing.copy(autocorrect = on)) }
+                    },
                     ui.switchRow(R.drawable.ic_keyboard, getString(R.string.auto_capitalization), getString(R.string.auto_capitalization_summary), c.typing.autoCapitalize) { on ->
                         update { it.copy(typing = it.typing.copy(autoCapitalize = on)) }
                     },

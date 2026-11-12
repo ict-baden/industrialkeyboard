@@ -17,6 +17,12 @@ no crash reporting, no update check and no account.
 What you type is passed to the focused app and **not stored**: there is no dictionary, no word
 learning, no history and no clipboard access.
 
+**Word suggestions** come from built-in word lists (AOSP dictionaries) of the keyboard language. Only
+the word being typed is held in memory to look it up; it is dropped when the word ends. Nothing is
+learnt, no personal dictionary is built, nothing is written to storage. **Emoji:** the emoji panel keeps
+recently used emoji in memory only; the AndroidX picker stores the preferred skin tone per emoji on the
+device (no text).
+
 **Camera:** on devices without a scan engine the keyboard can read barcodes with the camera
 ([`scanner.trigger`](configuration.md#scanner)). The camera runs only while its picture is shown in
 the keyboard (after a tap on scan, at most one minute) and stops after the first code. The pictures

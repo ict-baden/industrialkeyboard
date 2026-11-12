@@ -67,7 +67,8 @@
 | 🖥️ **Remote desktop ready** | Optional **Ctrl, Win and Alt** – sticky, so they work with gloves – above the letters or on the Fn tab, and combinations such as `{CTRL+ALT+END}` or `{WIN+R}` for your own keys ([details](docs/configuration.md#ctrl-win-and-alt)) |
 | 🧩 **Programmable keys & macros** | Five free keys and custom layouts with macros such as `{TAB}`, `{F13}`, `OK{ENTER}`, `{SCAN}` or `{SHOW:numeric}` |
 | 🗂️ **Custom layouts** | Your own keyboards (e.g. *OK / Skip / Damaged*) as extra tabs – defined in JSON, no app update needed |
-| 🌍 **Alphabets** | Follows the system language, or QWERTY, QWERTZ, AZERTY, Nordic and Spanish; accents on long press, optional number row |
+| 🌍 **Languages** | Keyboard languages like Gboard (switch with 🌐), letters follow the language, or fixed QWERTY, QWERTZ, AZERTY, Nordic and Spanish; accents on long press, optional number row |
+| 💬 **Suggestions and emoji** | Word suggestions from built-in dictionaries (no learning, nothing stored), optional autocorrection, emoji panel |
 | 🎨 **Looks good** | Light, dark, high contrast or follow the system; custom accent color; smooth animations |
 | 📡 **Central configuration** | Managed configuration (SOTI, Intune, Workspace ONE …), configuration file (also Zebra `/enterprise/usr`), broadcast intent (StageNow, only with the admin password or on EMM-managed devices), admin password |
 | 🔒 **Private by design** | No internet permission, no dictionary, nothing you type is stored or learned; configuration excluded from backups |

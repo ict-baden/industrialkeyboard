@@ -52,6 +52,7 @@ object ConfigJson {
             put("theme", a.theme.key)
             putOpt("accentColor", a.accentColor)
             put("dynamicColor", a.dynamicColor)
+            put("emojiKey", a.emojiKey)
             put("keyHeight", a.keyHeight)
             put("width", a.width)
             put("numberRow", a.numberRow)
@@ -80,6 +81,8 @@ object ConfigJson {
             put("autoCapitalize", config.typing.autoCapitalize)
             put("doubleSpacePeriod", config.typing.doubleSpacePeriod)
             put("longPressDelay", config.typing.longPressDelay)
+            put("suggestions", config.typing.suggestions)
+            put("autocorrect", config.typing.autocorrect)
         })
         root.put("feedback", JSONObject().apply {
             val f = config.feedback
@@ -221,6 +224,7 @@ object ConfigJson {
             modifierRow = json.optBoolean("modifierRow", d.modifierRow),
             functionModifiers = json.optBoolean("functionModifiers", d.functionModifiers),
             dynamicColor = json.optBoolean("dynamicColor", d.dynamicColor),
+            emojiKey = json.optBoolean("emojiKey", d.emojiKey),
         )
     }
 
@@ -271,6 +275,8 @@ object ConfigJson {
             autoCapitalize = json.optBoolean("autoCapitalize", d.autoCapitalize),
             doubleSpacePeriod = json.optBoolean("doubleSpacePeriod", d.doubleSpacePeriod),
             longPressDelay = json.optInt("longPressDelay", d.longPressDelay).coerceIn(200, 1500),
+            suggestions = json.optBoolean("suggestions", d.suggestions),
+            autocorrect = json.optBoolean("autocorrect", d.autocorrect),
         )
     }
 

@@ -2,7 +2,7 @@ package de.ictbaden.industrialkeyboard.layout
 
 import de.ictbaden.industrialkeyboard.config.KeyStyle
 
-enum class KeyIcon { SHIFT, BACKSPACE, ENTER, TAB, SPACE, SCAN, HIDE, LEFT, RIGHT, UP, DOWN, SETTINGS, GLOBE }
+enum class KeyIcon { SHIFT, BACKSPACE, ENTER, TAB, SPACE, SCAN, HIDE, LEFT, RIGHT, UP, DOWN, SETTINGS, GLOBE, EMOJI }
 
 /** What a key does when it is released. */
 sealed interface KeyOutput {
@@ -23,6 +23,9 @@ sealed interface KeyOutput {
 
     /** Next keyboard language (tap) or the list of keyboards (long press), like 🌐 in Gboard. */
     data object Language : KeyOutput
+
+    /** Opens the emoji panel. */
+    data object Emoji : KeyOutput
 
     /** Toggles between the two symbol pages. */
     data object SymbolsPage : KeyOutput

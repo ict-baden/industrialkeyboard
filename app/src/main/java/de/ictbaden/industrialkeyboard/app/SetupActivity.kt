@@ -187,6 +187,7 @@ class SetupActivity : AppCompatActivity() {
                 setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyMedium)
                 setTextColor(ui.color(com.google.android.material.R.attr.colorOnSurfaceVariant))
             },
+            field(R.string.sample_note, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES, R.string.sample_note_helper),
             field(R.string.sample_item, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS, R.string.sample_item_helper),
             field(R.string.sample_quantity, InputType.TYPE_CLASS_NUMBER, R.string.sample_quantity_helper),
             field(R.string.sample_weight, InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL, R.string.sample_weight_helper),

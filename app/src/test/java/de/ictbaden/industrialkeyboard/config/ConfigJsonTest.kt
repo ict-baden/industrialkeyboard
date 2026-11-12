@@ -16,11 +16,11 @@ class ConfigJsonTest {
     @Test
     fun `round trip keeps every setting`() {
         val config = KeyboardConfig(
-            appearance = Appearance(ThemeMode.CONTRAST, "#FF8F00", keyHeight = 130, width = 80, numberRow = true, functionRow = true, keyHints = false, modifierRow = true, functionModifiers = true, dynamicColor = false),
+            appearance = Appearance(ThemeMode.CONTRAST, "#FF8F00", keyHeight = 130, width = 80, numberRow = true, functionRow = true, keyHints = false, modifierRow = true, functionModifiers = true, dynamicColor = false, emojiKey = false),
             layout = LayoutSettings(Alphabet.AZERTY, Navigation.KEYS, NumericOrder.CALCULATOR, umlautKeys = true),
             tabs = TabSettings(alpha = true, numeric = false, symbols = true, function = true, scan = false, preferred = "wms"),
             keys = KeySettings(ProgrammableKey.DEFAULTS + ("numeric.p1" to "{F13}") + ("alpha.p1" to "OK{ENTER}")),
-            typing = TypingSettings(autoCapitalize = false, doubleSpacePeriod = false, longPressDelay = 650),
+            typing = TypingSettings(autoCapitalize = false, doubleSpacePeriod = false, longPressDelay = 650, suggestions = false, autocorrect = true),
             feedback = FeedbackSettings(keyPopup = false, sound = true, soundVolume = 40, vibrate = false, vibrationMs = 30),
             scanner = ScannerSettings(
                 trigger = ScanTriggerType.INTENT,

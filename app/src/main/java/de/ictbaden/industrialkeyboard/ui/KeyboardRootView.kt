@@ -37,6 +37,10 @@ data class RenderState(
     val scanning: Boolean,
     /** The scanner is the camera (tap opens the picture, no hold-to-scan). */
     val camera: Boolean = false,
+    /** Word suggestions, best first: shown instead of the tab bar while not empty. */
+    val suggestions: List<String> = emptyList(),
+    /** The emoji panel replaces the keys. */
+    val emojiOpen: Boolean = false,
 )
 
 /**
@@ -53,6 +57,12 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
     val scanRow = KeyboardView(context).apply { heightRows = 1 }
     val overlay = PopupOverlay(context)
 
+    /** Word suggestions in place of the tab bar while typing a word. */
+    val suggestionStrip = SuggestionStripView(context).apply { visibility = GONE }
+
+    /** Emoji in place of the keys. */
+    val emojiPanel = EmojiPanelView(context).apply { visibility = GONE }
+
     /** Camera picture over the keys while scanning with the camera; gone otherwise. */
     val camera = CameraScanView(context).apply { visibility = GONE }
 
@@ -65,6 +75,7 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
     init {
         clipChildren = false
         panel.addView(tabBar, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        panel.addView(suggestionStrip, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         panel.addView(content, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         content.addView(keyboard, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
         scanPage.addView(scanPad, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0))
@@ -72,6 +83,7 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         content.addView(scanPage, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
         // Same size as the keys: the frame keeps its height, the tab bar stays in place.
         content.addView(camera, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        content.addView(emojiPanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         addView(panel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM).apply { topMargin = headroom })
         addView(overlay, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         keyboard.popupHost = overlay
@@ -128,7 +140,15 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         panel.setBackgroundColor(p.background)
         overlay.palette = p
         tabBar.palette = p
-        tabBar.isVisible = state.tabs != null
+        // Like Gboard: while a word is typed, suggestions take the place of the tab bar.
+        val suggesting = state.suggestions.isNotEmpty() && !state.emojiOpen
+        tabBar.isVisible = state.tabs != null && !suggesting
+        suggestionStrip.isVisible = suggesting
+        suggestionStrip.palette = p
+        suggestionStrip.words = state.suggestions
+        emojiPanel.palette = p
+        if (state.emojiOpen) emojiPanel.open()
+        emojiPanel.isVisible = state.emojiOpen
         state.tabs?.let { tabBar.setTabs(it, state.selectedTab, animate = previous != null) }
 
         val sidePadding = if (state.widthPercent < 100) (width * (100 - state.widthPercent) / 200) else 0
@@ -158,6 +178,8 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         scanPad.requestLayout()
         // The camera picture takes exactly the place of the keys, not the whole screen.
         (camera.layoutParams as LayoutParams).height = state.rowHeight * state.heightRows + keyboard.paddingTop + keyboard.paddingBottom
+        (emojiPanel.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
+        emojiPanel.requestLayout()
         camera.requestLayout()
         if (previous?.widthPercent != state.widthPercent) post { requestLayout() }
     }

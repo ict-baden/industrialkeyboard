@@ -404,4 +404,20 @@
     <string name="keyboard_languages_summary">Langues entre lesquelles 🌐 bascule, dans les paramètres Android</string>
     <string name="umlaut_keys">Touches à tréma</string>
     <string name="umlaut_keys_summary">ü, ö et ä comme touches propres en QWERTZ ; sinon par appui long sur u, o, a</string>
+    <string name="suggestions">Suggestions de mots</string>
+    <string name="suggestions_summary">Trois suggestions au-dessus des touches dans les champs de texte normaux, issues d’un dictionnaire intégré. Rien de ce qui est tapé n’est appris ni enregistré</string>
+    <string name="autocorrect">Correction automatique</string>
+    <string name="autocorrect_summary">Espace remplace une faute évidente par la meilleure suggestion ; Retour arrière l’annule</string>
+    <string name="emoji_key">Touche emoji</string>
+    <string name="emoji_key_summary">😊 à côté de la barre d’espace dans les champs de texte normaux</string>
+    <string name="emoji_back">Retour aux lettres</string>
+    <string name="emoji_backspace">Supprimer</string>
+    <string name="mc_suggestions_title">Suggestions de mots</string>
+    <string name="mc_suggestions_description">Suggestions au-dessus des touches issues d’un dictionnaire intégré (sans apprentissage).</string>
+    <string name="mc_autocorrect_title">Correction automatique</string>
+    <string name="mc_autocorrect_description">Espace remplace une faute évidente par la meilleure suggestion.</string>
+    <string name="mc_emoji_key_title">Touche emoji</string>
+    <string name="mc_emoji_key_description">Touche emoji à côté de la barre d’espace dans les champs de texte normaux.</string>
+    <string name="sample_note">Note</string>
+    <string name="sample_note_helper">Mots avec suggestions et emoji</string>
 </resources>

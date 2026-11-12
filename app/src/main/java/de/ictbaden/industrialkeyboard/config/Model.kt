@@ -138,6 +138,8 @@ data class Appearance(
      * [accentColor] is set. Not for the contrast theme.
      */
     val dynamicColor: Boolean = true,
+    /** 😊 next to the space bar in normal text fields; opens the emoji panel. */
+    val emojiKey: Boolean = true,
 )
 
 data class LayoutSettings(
@@ -181,6 +183,10 @@ data class TypingSettings(
     val doubleSpacePeriod: Boolean = true,
     /** Milliseconds until a held key shows its alternatives (200–1500). */
     val longPressDelay: Int = 400,
+    /** Three word suggestions above the keys in normal text fields, from a built-in dictionary (no learning). */
+    val suggestions: Boolean = true,
+    /** Space replaces an obvious typo by the best suggestion; Backspace right after undoes it. */
+    val autocorrect: Boolean = false,
 )
 
 data class FeedbackSettings(

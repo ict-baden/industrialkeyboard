@@ -17,6 +17,7 @@ import android.view.KeyCharacterMap
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodSubtype
 import android.widget.Toast
@@ -47,6 +48,11 @@ import de.ictbaden.industrialkeyboard.scanner.CameraScanner
 import de.ictbaden.industrialkeyboard.scanner.HardwareScanner
 import de.ictbaden.industrialkeyboard.scanner.ScanFormatter
 import de.ictbaden.industrialkeyboard.scanner.ScanTrigger
+import de.ictbaden.industrialkeyboard.suggest.Dictionaries
+import de.ictbaden.industrialkeyboard.suggest.Suggester
+import de.ictbaden.industrialkeyboard.suggest.Suggestions
+import de.ictbaden.industrialkeyboard.suggest.WordList
+import de.ictbaden.industrialkeyboard.layout.Layouts
 import de.ictbaden.industrialkeyboard.scanner.Symbologies
 import de.ictbaden.industrialkeyboard.ui.Feedback
 import de.ictbaden.industrialkeyboard.ui.KeyboardRootView
@@ -80,6 +86,19 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private val handler = Handler(Looper.getMainLooper())
     private val stopScanAnimation = Runnable { setScanning(false) }
     private var camera: CameraScanner? = null
+
+    // Word suggestions: only the word being typed is kept, in memory, until it ends.
+    private lateinit var dictionaries: Dictionaries
+    private var suggester: Suggester? = null
+    private var suggesterFor: Pair<WordList, List<String>>? = null
+    private val word = StringBuilder()
+    private var suggestions = Suggestions.NONE
+    /** Edits of our own that onUpdateSelection still has to report; any other move ends the word. */
+    private var ownEdits = 0
+    /** Last autocorrection (typed, replacement + space): Backspace right after it undoes it. */
+    private var autocorrected: Pair<String, String>? = null
+    private var timedLookup = false
+    private var emojiOpen = false
     private var cameraCount = 0
     private var tone: ToneGenerator? = null
     /** The camera does not run unattended: it closes after a while without a code. */
@@ -111,6 +130,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         store = ConfigStore.get(this)
         feedback = Feedback(this)
         scanner = ScanTrigger(this)
+        dictionaries = Dictionaries(this)
         HardwareScanner.addListener(engineListener)
         HardwareScanner.detect(this)
         // Exported: other apps request tabs; the restrictions broadcast is sent by the system only.
@@ -133,6 +153,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         HardwareScanner.removeListener(engineListener)
         camera?.destroy()
         camera = null
+        dictionaries.close()
         tone?.release()
         tone = null
         runCatching { unregisterReceiver(receiver) }
@@ -178,6 +199,19 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         view.tabBar.onPress = { feedback.keyDown(null) }
         root = view
         view.onSystemImeButtonsChanged = { render() }
+        view.suggestionStrip.onPress = { feedback.keyDown(null) }
+        view.suggestionStrip.onPick = ::pickSuggestion
+        view.emojiPanel.onEmoji = { emoji ->
+            feedback.keyDown(null)
+            endWord()
+            ownEdits++
+            currentInputConnection?.commitText(emoji, 1)
+        }
+        view.emojiPanel.onBack = { setEmojiOpen(false) }
+        view.emojiPanel.onBackspace = {
+            feedback.keyDown(null)
+            backspace()
+        }
         feedback.hapticView = view.keyboard
         render()
         return view
@@ -197,6 +231,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         Alphabet.subtypeLocale = tag?.let(Locale::forLanguageTag)
         // Asked here and not on every key: it is a call into the system.
         multipleLanguages = severalLanguages()
+        if (config.typing.suggestions) dictionaries.use(Alphabet.keyboardLocale()) { refreshSuggestions() }
     }
 
     private var multipleLanguages = false
@@ -220,6 +255,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     override fun onStartInputView(info: EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         useSubtype(getSystemService(InputMethodManager::class.java)?.currentInputMethodSubtype)
+        endWord()
+        emojiOpen = false
         Provisioning.applyAllAsync(this)
         val newField = FieldPolicy.field(info.inputType)
         if (!restarting || newField != field) {
@@ -245,12 +282,21 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             setScanning(false)
         }
         closeCamera()
+        endWord()
+        emojiOpen = false
     }
 
     override fun onUpdateSelection(oldSelStart: Int, oldSelEnd: Int, newSelStart: Int, newSelEnd: Int, candidatesStart: Int, candidatesEnd: Int) {
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd)
         // Text arrived (typed or scanned): the scan is over.
         if (scanning && newSelStart != oldSelStart) setScanning(false)
+        // Our own typing is expected; a tap elsewhere, a selection or the app changing the text ends the word.
+        if (ownEdits > 0 && newSelStart == newSelEnd) {
+            ownEdits--
+        } else if (word.isNotEmpty() || autocorrected != null) {
+            endWord()
+            render()
+        }
         updateAutoShift()
     }
 
@@ -290,6 +336,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             KeyOutput.Enter -> if (held) chordWithModifiers(KeyEvent.KEYCODE_ENTER) else enter()
             KeyOutput.Space -> if (held) chordWithModifiers(KeyEvent.KEYCODE_SPACE) else space()
             KeyOutput.Language -> nextLanguage()
+            KeyOutput.Emoji -> setEmojiOpen(true)
             KeyOutput.SymbolsPage -> {
                 val current = page as? Page.Symbols
                 page = Page.Symbols(if (current?.page == 2) 1 else 2, field.alpha)
@@ -325,6 +372,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     private fun commit(text: String) {
         currentInputConnection?.commitText(text, 1) ?: return
+        ownEdits++
+        trackWord(text)
         if (shift == ShiftState.ONCE) {
             shift = ShiftState.OFF
             autoShifted = false
@@ -345,14 +394,132 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             }
         }
         lastSpace = now
+        if (autocorrect(ic)) return
         commit(" ")
     }
 
     private fun backspace() {
         val ic = currentInputConnection ?: return
-        if (!ic.getSelectedText(0).isNullOrEmpty()) ic.commitText("", 1) else sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+        if (undoAutocorrect(ic)) return
+        if (!ic.getSelectedText(0).isNullOrEmpty()) {
+            ic.commitText("", 1)
+            endWord()
+        } else {
+            sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
+            ownEdits++
+            if (word.isNotEmpty()) word.setLength(word.length - 1)
+            refreshSuggestions()
+        }
         updateAutoShift()
     }
+
+    // region suggestions
+
+    /** Letters (and ' or - inside a word) extend the word; anything else ends it. */
+    private fun trackWord(text: String) {
+        autocorrected = null
+        val c = text.singleOrNull()
+        if (c != null && (c.isLetter() || ((c == '\'' || c == '-') && word.isNotEmpty()))) word.append(c) else word.setLength(0)
+        refreshSuggestions()
+    }
+
+    private fun endWord() {
+        word.setLength(0)
+        autocorrected = null
+        suggestions = Suggestions.NONE
+    }
+
+    private fun suggestionsWanted(): Boolean {
+        val info = currentInputEditorInfo ?: return false
+        return config.typing.suggestions && page is Page.Alpha && FieldPolicy.suggestionsAllowed(info.inputType)
+    }
+
+    /** New suggestions for the word; fast (tens of dictionary lookups), measured once in the log. */
+    private fun refreshSuggestions() {
+        val before = suggestions
+        suggestions = if (word.isEmpty() || !suggestionsWanted()) {
+            Suggestions.NONE
+        } else {
+            suggesterNow()?.let { s ->
+                val started = System.nanoTime()
+                s.suggest(word.toString()).also {
+                    if (!timedLookup) {
+                        timedLookup = true
+                        Log.i(TAG, "Suggestion lookup took ${(System.nanoTime() - started) / 1000} µs")
+                    }
+                }
+            } ?: Suggestions.NONE
+        }
+        if (before.words != suggestions.words) render()
+    }
+
+    private fun suggesterNow(): Suggester? {
+        val list = dictionaries.current ?: return null
+        val rows = Layouts.letterRows(config, config.layout.alphabet.resolve())
+        if (suggesterFor != list to rows) {
+            suggester = Suggester(list, Alphabet.keyboardLocale(), rows)
+            suggesterFor = list to rows
+        }
+        return suggester
+    }
+
+    /** Replaces the word being typed by [choice] and adds a space, like tapping a suggestion in Gboard. */
+    private fun pickSuggestion(choice: String) {
+        val ic = currentInputConnection ?: return
+        val typed = word.toString()
+        val before = ic.getTextBeforeCursor(typed.length, 0)?.toString()
+        ic.beginBatchEdit()
+        if (typed.isNotEmpty() && before == typed) ic.deleteSurroundingText(typed.length, 0)
+        ic.commitText("$choice ", 1)
+        ic.endBatchEdit()
+        ownEdits++
+        endWord()
+        if (shift == ShiftState.ONCE && !autoShifted) shift = ShiftState.OFF
+        updateAutoShift()
+        render()
+    }
+
+    /** Space after an obvious typo: the best suggestion instead (`typing.autocorrect`). */
+    private fun autocorrect(ic: InputConnection): Boolean {
+        val replacement = suggestions.autocorrection?.takeIf { config.typing.autocorrect && suggestionsWanted() } ?: return false
+        val typed = word.toString()
+        if (ic.getTextBeforeCursor(typed.length, 0)?.toString() != typed) return false
+        ic.beginBatchEdit()
+        ic.deleteSurroundingText(typed.length, 0)
+        ic.commitText("$replacement ", 1)
+        ic.endBatchEdit()
+        ownEdits++
+        endWord()
+        autocorrected = typed to "$replacement "
+        updateAutoShift()
+        render()
+        return true
+    }
+
+    private fun undoAutocorrect(ic: InputConnection): Boolean {
+        val (typed, replaced) = autocorrected ?: return false
+        autocorrected = null
+        if (ic.getTextBeforeCursor(replaced.length, 0)?.toString() != replaced) return false
+        ic.beginBatchEdit()
+        ic.deleteSurroundingText(replaced.length, 0)
+        ic.commitText(typed, 1)
+        ic.endBatchEdit()
+        ownEdits++
+        word.setLength(0)
+        word.append(typed)
+        refreshSuggestions()
+        updateAutoShift()
+        return true
+    }
+
+    private fun setEmojiOpen(open: Boolean) {
+        if (emojiOpen == open) return
+        emojiOpen = open
+        if (open) endWord()
+        render()
+    }
+
+    // endregion
 
     /** Runs the field's editor action (Done, Next, Go …) or sends Enter. */
     private fun enter() {
@@ -493,6 +660,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         val target = FieldPolicy.pageForTab(tab, field, config, scanner.available) ?: return false
         page = target
         closeCamera()
+        emojiOpen = false
         // Shift belongs to the page it was set on (letters vs. F13–F24 on the function keys).
         shift = ShiftState.OFF
         autoShifted = false
@@ -685,10 +853,14 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun languageKey(): Boolean =
         config.layout.alphabet == Alphabet.AUTO && root?.systemImeButtons != true && multipleLanguages
 
+    /** 😊 next to the space bar in fields that take emoji. */
+    private fun emojiKey(): Boolean =
+        config.appearance.emojiKey && currentInputEditorInfo?.let { FieldPolicy.emojiAllowed(it.inputType) } == true
+
     private fun render() {
         val root = root ?: return
         val secret = FieldPolicy.isPassword(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)
-        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey()))
+        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey(), emojiKey = emojiKey(), suggestions = suggestions.words.map { it.text }, emojiOpen = emojiOpen))
     }
 
     private fun enterIcon(): Int {

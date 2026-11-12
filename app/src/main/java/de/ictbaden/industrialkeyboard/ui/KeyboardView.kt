@@ -270,6 +270,7 @@ class KeyboardView(context: Context) : View(context) {
             KeyIcon.SPACE -> R.drawable.kb_space
             KeyIcon.SCAN -> R.drawable.kb_scan
             KeyIcon.GLOBE -> R.drawable.kb_globe
+            KeyIcon.EMOJI -> R.drawable.kb_emoji
             KeyIcon.HIDE -> R.drawable.kb_hide
             KeyIcon.LEFT -> R.drawable.kb_left
             KeyIcon.RIGHT -> R.drawable.kb_right

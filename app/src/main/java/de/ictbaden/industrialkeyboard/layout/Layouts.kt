@@ -90,7 +90,7 @@ object Layouts {
      * Letters. [languageKey]: show 🌐 next to the space bar (several keyboard languages and no
      * switch button of Android below the keyboard).
      */
-    fun alpha(config: KeyboardConfig, variant: AlphaVariant = AlphaVariant.TEXT, languageKey: Boolean = false): KeyboardLayout {
+    fun alpha(config: KeyboardConfig, variant: AlphaVariant = AlphaVariant.TEXT, languageKey: Boolean = false, emojiKey: Boolean = false): KeyboardLayout {
         val alphabet = config.layout.alphabet.resolve()
         val letters = if (alphabet == Alphabet.QWERTZ && config.layout.umlautKeys) QWERTZ_UMLAUTS else ROWS.getValue(alphabet)
         // German like Gboard: ä, ö, ü and ß first on long press of a, o, u and s.
@@ -107,7 +107,7 @@ object Layouts {
             add(KeyRow(letters[0].mapIndexed { i, c -> letterKey(c, digit = if (hints && i < DIGITS.length) DIGITS[i] else null, first = firstAlternatives[c]) }))
             add(KeyRow(letters[1].map { letterKey(it, first = firstAlternatives[it]) }))
             add(KeyRow(listOf(shiftKey()) + letters[2].map { letterKey(it, first = firstAlternatives[it]) } + backspaceKey()))
-            add(bottomRow(config, variant, Tabs.ALPHA, spaceLabel(config, alphabet), languageKey))
+            add(bottomRow(config, variant, Tabs.ALPHA, spaceLabel(config, alphabet), languageKey, emojiKey))
         }
         return KeyboardLayout(Tabs.ALPHA, rows, alphabet.label)
     }
@@ -221,7 +221,18 @@ object Layouts {
     private fun spaceLabel(config: KeyboardConfig, alphabet: Alphabet): String =
         if (config.layout.alphabet == Alphabet.AUTO) Alphabet.languageName(Alphabet.keyboardLocale()) else alphabet.label
 
-    private fun bottomRow(config: KeyboardConfig, variant: AlphaVariant, page: String, spaceLabel: String, languageKey: Boolean = false): KeyRow {
+    /** The letter rows of [alphabet] as shown (for the typo model of the suggestions). */
+    fun letterRows(config: KeyboardConfig, alphabet: Alphabet): List<String> =
+        if (alphabet == Alphabet.QWERTZ && config.layout.umlautKeys) QWERTZ_UMLAUTS else ROWS.getValue(alphabet)
+
+    private fun bottomRow(
+        config: KeyboardConfig,
+        variant: AlphaVariant,
+        page: String,
+        spaceLabel: String,
+        languageKey: Boolean = false,
+        emojiKey: Boolean = false,
+    ): KeyRow {
         val classic = config.layout.navigation == Navigation.KEYS
         val keys = buildList {
             if (classic) {
@@ -236,8 +247,10 @@ object Layouts {
                     AlphaVariant.TEXT -> textKey(",", listOf(";", ":", "_", "-"))
                 },
             )
+            // Like Gboard: 😊 between the comma and the space bar.
+            if (emojiKey) add(Key(icon = KeyIcon.EMOJI, output = KeyOutput.Emoji, style = KeyStyle.FUNCTION))
             if (languageKey) add(Key(icon = KeyIcon.GLOBE, output = KeyOutput.Language, style = KeyStyle.FUNCTION))
-            add(Key(label = spaceLabel, output = KeyOutput.Space, width = if (languageKey) 2f else 3f, flex = true))
+            add(Key(label = spaceLabel, output = KeyOutput.Space, width = 3f - (if (languageKey) 1f else 0f) - (if (emojiKey) 1f else 0f), flex = true))
             add(
                 if (variant == AlphaVariant.URL) {
                     textKey(".", listOf(".com", ".de", ".org", ".net", "www."))

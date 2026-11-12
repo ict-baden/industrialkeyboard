@@ -115,7 +115,14 @@ object Provisioning {
         fun bool(key: String, current: Boolean) = if (values.containsKey(key)) values.getBoolean(key, current) else current
         return config.copy(
             language = values.getString("language")?.let { v -> (listOf(Languages.AUTO) + Languages.SUPPORTED).firstOrNull { it == v } } ?: config.language,
-            appearance = config.appearance.copy(theme = choice("theme", ThemeMode.entries.toTypedArray(), config.appearance.theme)),
+            appearance = config.appearance.copy(
+                theme = choice("theme", ThemeMode.entries.toTypedArray(), config.appearance.theme),
+                emojiKey = bool("emoji_key", config.appearance.emojiKey),
+            ),
+            typing = config.typing.copy(
+                suggestions = bool("suggestions", config.typing.suggestions),
+                autocorrect = bool("autocorrect", config.typing.autocorrect),
+            ),
             layout = config.layout.copy(
                 alphabet = choice("alphabet", Alphabet.entries.toTypedArray(), config.layout.alphabet),
                 numericOrder = choice("numeric_order", NumericOrder.entries.toTypedArray(), config.layout.numericOrder),
