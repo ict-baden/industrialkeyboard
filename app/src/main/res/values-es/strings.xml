@@ -231,6 +231,10 @@
     <string name="password_not_set">Sin definir</string>
     <string name="password_set">Definida: protege esta configuración</string>
     <string name="last_provisioning_error">Último error de aprovisionamiento</string>
+    <string name="app_profiles">Perfiles de app</string>
+    <string name="app_profiles_none">Ninguno – solo en la configuración JSON</string>
+    <string name="app_profile_unnamed">Perfil %1$d</string>
+    <string name="app_profiles_first_wins">Se aplica el primer perfil que coincida. Los campos de números, teléfono y fecha siguen abriendo su teclado numérico.</string>
     <string name="config_file_for_emm">Archivo de configuración para el EMM</string>
     <string name="config_exported">Configuración exportada</string>
     <string name="export_failed">Error en la exportación: %1$s</string>

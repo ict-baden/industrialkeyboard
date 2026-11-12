@@ -587,6 +587,13 @@ class SettingsActivity : AppCompatActivity() {
                     ui.row(R.drawable.ic_key, getString(R.string.admin_password), getString(if (c.adminPasswordHash == null) R.string.password_not_set else R.string.password_set)) {
                         dialogs.changePassword { hash -> update { it.copy(adminPasswordHash = hash) } }
                     },
+                    // Read-only: profiles come only from the JSON configuration.
+                    ui.row(
+                        R.drawable.ic_info,
+                        getString(R.string.app_profiles),
+                        if (c.appProfiles.isEmpty()) getString(R.string.app_profiles_none) else resources.getQuantityString(R.plurals.json_only_count, c.appProfiles.size, c.appProfiles.size),
+                        onClick = if (c.appProfiles.isEmpty()) null else ({ dialogs.message(getString(R.string.app_profiles), AppProfilesText.describe(this, c.appProfiles)) }),
+                    ),
                     Provisioning.lastError(this)?.let { ui.row(R.drawable.ic_info, getString(R.string.last_provisioning_error), dialogs.withCode(it, ErrorCodes.PROVISIONING), onClick = null) },
                     ui.row(
                         R.drawable.ic_download,

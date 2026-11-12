@@ -231,6 +231,10 @@
     <string name="password_not_set">Nicht gesetzt</string>
     <string name="password_set">Gesetzt – schützt diese Einstellungen</string>
     <string name="last_provisioning_error">Letzter Fehler bei der Verteilung</string>
+    <string name="app_profiles">App-Profile</string>
+    <string name="app_profiles_none">Keine – nur in der JSON-Konfiguration</string>
+    <string name="app_profile_unnamed">Profil %1$d</string>
+    <string name="app_profiles_first_wins">Es gilt das erste passende Profil. Zahlen-, Telefon- und Datumsfelder öffnen weiter ihren Ziffernblock.</string>
     <string name="config_file_for_emm">Konfigurationsdatei für das EMM</string>
     <string name="config_exported">Konfiguration exportiert</string>
     <string name="export_failed">Export fehlgeschlagen: %1$s</string>

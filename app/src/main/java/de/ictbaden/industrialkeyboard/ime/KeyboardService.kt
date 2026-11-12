@@ -106,6 +106,9 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     /** A scanner exists without the quick toggles (the scanner toggle is shown and can be on). */
     private var scanAvailableBase = false
+
+    /** Index of the app profile in use (`appProfiles`), -1 = none; only for the log line on a change. */
+    private var profileIndex = -1
     private var root: KeyboardRootView? = null
 
     private var field = Field(de.ictbaden.industrialkeyboard.layout.AlphaVariant.TEXT, null)
@@ -227,14 +230,24 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
      * Recomputes [config] from [storedConfig] and applies what depends on it (feedback, scanner, scan
      * receiver, a page that no longer exists). Runs when a field starts and when the configuration
      * changes, never per key. Returns true when the effective configuration changed.
+     *
+     * [info] is the focused field: its package name, input type and hint pick the app profile
+     * (read here, never kept or logged beyond the package name).
      */
-    private fun useEffective(configChanged: Boolean = false): Boolean {
-        // The app profile layer comes here (both computations below use it).
-        val profile = EffectiveConfig.NONE
+    private fun useEffective(configChanged: Boolean = false, info: EditorInfo? = currentInputEditorInfo): Boolean {
+        val hit = AppProfiles.match(storedConfig.appProfiles, info?.packageName, info?.inputType ?: InputType.TYPE_NULL, info?.hintText)
+        if ((hit?.index ?: -1) != profileIndex) {
+            val pkg = info?.packageName ?: "?"
+            // Never the hint: it is the app's text, and may name what is typed.
+            if (hit != null) Log.i(TAG, "App profile ${hit.index + 1} \"${hit.profile.name}\" for $pkg") else Log.i(TAG, "No app profile for $pkg")
+            profileIndex = hit?.index ?: -1
+        }
+        val profile = AppProfiles.layer(hit?.profile)
         val below = EffectiveConfig.of(storedConfig, profile)
-        // The setter drops the resolved trigger type (package queries): on a configuration change as
-        // before, on a new field only when the scanner settings really differ.
+        // On a configuration change the trigger type is resolved again (package queries); on a new
+        // field only when the trigger itself differs – a profile's scan suffix keeps it.
         if (configChanged || scannerBelowToggles.settings != below.scanner) scannerBelowToggles.settings = below.scanner
+        if (configChanged) scannerBelowToggles.refresh()
         belowToggles = below
         scanAvailableBase = scannerBelowToggles.available
         val effective = EffectiveConfig.of(storedConfig, profile, QuickToggles.layer(storedConfig, toggles.overrides, scanAvailableBase))
@@ -242,13 +255,15 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         config = effective
         feedback.settings = effective.feedback
         if (configChanged || scanner.settings != effective.scanner) {
-            if (scanning && scanner.settings != effective.scanner) {
+            // Formatting (a profile's scan suffix) is read from [config] when the code arrives: no reason to stop.
+            if (scanning && scanner.settings.copy(data = effective.scanner.data) != effective.scanner) {
                 // Stopped with the old trigger, before it is gone (scanner toggle off).
                 scanner.stop()
                 handler.removeCallbacks(stopScanAnimation)
                 scanning = false
             }
             scanner.settings = effective.scanner
+            if (configChanged) scanner.refresh()
         }
         if (camera?.isOpen == true && scanner.type != ScanTriggerType.CAMERA) closeCamera()
         val input = effective.scanner.input.takeIf { it.enabled }
@@ -486,8 +501,9 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         super.onStartInputView(info, restarting)
         toolPanel = null
         textSelecting = false
-        // First, so that the dictionary, dictation and the start page see the effective configuration.
-        val effectiveChanged = useEffective()
+        // First, so that the dictionary, dictation and the start page see the effective configuration
+        // (with the app profile of this field).
+        val effectiveChanged = useEffective(info = info)
         watchClipboard(true)
         useSubtype(getSystemService(InputMethodManager::class.java)?.currentInputMethodSubtype)
         findVoiceInput(info)

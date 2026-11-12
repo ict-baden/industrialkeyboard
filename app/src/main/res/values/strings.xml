@@ -244,6 +244,10 @@
     <string name="password_not_set">Not set</string>
     <string name="password_set">Set – protects these settings</string>
     <string name="last_provisioning_error">Last provisioning error</string>
+    <string name="app_profiles">App profiles</string>
+    <string name="app_profiles_none">None – set in the JSON configuration only</string>
+    <string name="app_profile_unnamed">Profile %1$d</string>
+    <string name="app_profiles_first_wins">The first matching profile applies. Number, phone and date fields still open their pad.</string>
     <string name="config_file_for_emm">Configuration file for EMM</string>
     <string name="config_exported">Configuration exported</string>
     <string name="export_failed">Export failed: %1$s</string>

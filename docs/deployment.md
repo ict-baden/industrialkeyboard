@@ -111,6 +111,8 @@ The app ships a schema that every EMM with Android Enterprise support shows:
 
 The keys are applied as soon as the EMM changes them and whenever the keyboard opens. The
 single keys only change their own option; `config_json` replaces the whole configuration.
+[App profiles](configuration.md#appprofiles--app-profiles) (`appProfiles`) need `config_json` (or a
+file, the broadcast or an import); the single keys cannot carry them.
 Changes made on the device stay until the EMM sends a changed configuration. Errors (such as
 invalid JSON) appear in the keyboard settings under **Configuration → Last provisioning
 error**.

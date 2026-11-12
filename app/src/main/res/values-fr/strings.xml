@@ -231,6 +231,10 @@
     <string name="password_not_set">Non défini</string>
     <string name="password_set">Défini – protège ces paramètres</string>
     <string name="last_provisioning_error">Dernière erreur de déploiement</string>
+    <string name="app_profiles">Profils d\'app</string>
+    <string name="app_profiles_none">Aucun – uniquement dans la configuration JSON</string>
+    <string name="app_profile_unnamed">Profil %1$d</string>
+    <string name="app_profiles_first_wins">Le premier profil correspondant s\'applique. Les champs de nombre, de téléphone et de date ouvrent toujours leur pavé numérique.</string>
     <string name="config_file_for_emm">Fichier de configuration pour l\'EMM</string>
     <string name="config_exported">Configuration exportée</string>
     <string name="export_failed">Échec de l\'exportation : %1$s</string>
