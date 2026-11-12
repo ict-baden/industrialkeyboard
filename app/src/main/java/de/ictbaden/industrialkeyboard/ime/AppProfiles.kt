@@ -53,6 +53,18 @@ object AppProfiles {
         return null
     }
 
+    /**
+     * What the log line depends on: package and profile. The keyboard logs when it changes, so the
+     * first field of each app shows its package – also while no profile matches (or none exists).
+     */
+    fun logKey(packageName: String?, hit: Hit?): Pair<String?, Int> = packageName to (hit?.index ?: -1)
+
+    /** The log line for [logKey]: package name and profile name, never the hint (the app's text). */
+    fun logLine(packageName: String?, hit: Hit?): String {
+        val pkg = packageName ?: "?"
+        return if (hit != null) "App profile ${hit.index + 1} \"${hit.profile.name}\" for $pkg" else "No app profile for $pkg"
+    }
+
     /** The configuration with the profile's overrides; [config] itself (same instance) for `null`. */
     fun apply(config: KeyboardConfig, profile: AppProfile?): KeyboardConfig {
         profile ?: return config

@@ -107,8 +107,11 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     /** A scanner exists without the quick toggles (the scanner toggle is shown and can be on). */
     private var scanAvailableBase = false
 
-    /** Index of the app profile in use (`appProfiles`), -1 = none; only for the log line on a change. */
-    private var profileIndex = -1
+    /**
+     * Package of the last field and index of its app profile (-1 = none), see [AppProfiles.logKey];
+     * only for the log line, written when either changes (once per app, never per key).
+     */
+    private var profileLogKey: Pair<String?, Int> = AppProfiles.logKey(null, null)
     private var root: KeyboardRootView? = null
 
     private var field = Field(de.ictbaden.industrialkeyboard.layout.AlphaVariant.TEXT, null)
@@ -236,11 +239,11 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
      */
     private fun useEffective(configChanged: Boolean = false, info: EditorInfo? = currentInputEditorInfo): Boolean {
         val hit = AppProfiles.match(storedConfig.appProfiles, info?.packageName, info?.inputType ?: InputType.TYPE_NULL, info?.hintText)
-        if ((hit?.index ?: -1) != profileIndex) {
-            val pkg = info?.packageName ?: "?"
+        val logKey = AppProfiles.logKey(info?.packageName, hit)
+        if (logKey != profileLogKey) {
             // Never the hint: it is the app's text, and may name what is typed.
-            if (hit != null) Log.i(TAG, "App profile ${hit.index + 1} \"${hit.profile.name}\" for $pkg") else Log.i(TAG, "No app profile for $pkg")
-            profileIndex = hit?.index ?: -1
+            Log.i(TAG, AppProfiles.logLine(info?.packageName, hit))
+            profileLogKey = logKey
         }
         val profile = AppProfiles.layer(hit?.profile)
         val below = EffectiveConfig.of(storedConfig, profile)
