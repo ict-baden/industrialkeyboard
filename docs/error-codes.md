@@ -22,6 +22,7 @@ any of the five languages. Source: [`ErrorCodes.kt`](../app/src/main/java/de/ict
 | `IK-0106` | The stored configuration cannot be read | Storage error or empty `config.json`: the admin password is unknown, the settings stay locked. Restart; otherwise set the admin password with the EMM (`admin_password`, applied again as long as the file is unreadable) or clear the app's storage |
 | `IK-0107` | Invalid snippet (e.g. "Enter a name", "“mfg” is already used by “…”", "At most 50 snippets") | In the [snippet](configuration.md#snippets--snippets) editor: name or text missing or too long (40 / 2000 characters), shortcut not 2–16 letters or already used by another snippet, an own snippet with more than text, `{TAB}` and `{ENTER}`, or the list is full (100 of the organisation, 50 own). Macro errors in the text show `IK-0105` |
 | `IK-0108` | Your snippets could not be read and were reset | The file of the user's own snippets (`files/user-snippets.json`) was damaged. It starts empty; the broken copy is kept as `user-snippets.json.invalid` |
+| `IK-0109` | Your snippet could not be saved | Writing `files/user-snippets.json` failed, usually because the device storage is full (or the list changed in another window meanwhile). The editor stays open with what was entered; free some storage and tap *Save* again. The list on the device is unchanged |
 
 Validation details of a configuration (e.g. `keys.numeric.p1: unknown token {TABB}`) stay in
 English because they quote JSON field names and tokens. The result text of the

@@ -602,7 +602,7 @@
     <string name="snippets_empty_admin">Your organisation has not set up any snippets.</string>
     <string name="section_snippets">Snippets</string>
     <string name="snippets_enabled">Snippets</string>
-    <string name="snippets_enabled_summary">Ready-made texts in ⊞ and as suggestions</string>
+    <string name="snippets_enabled_summary">Ready-made texts in the keyboard and as suggestions</string>
     <string name="snippets_shortcuts">Shortcuts</string>
     <string name="snippets_shortcuts_summary">Typing a shortcut such as “mfg” offers its snippet</string>
     <string name="snippets_button">Snippets in the bar</string>
@@ -638,6 +638,7 @@
         <item quantity="other">At most %1$d snippets</item>
     </plurals>
     <string name="user_snippets_reset">Your snippets could not be read and were reset.</string>
+    <string name="snippet_save_failed">Your snippet could not be saved.</string>
     <string name="mc_snippets_enabled_title">Snippets</string>
     <string name="mc_snippets_enabled_description">Ready-made texts in the keyboard (default on).</string>
     <string name="mc_snippets_shortcuts_title">Snippet shortcuts</string>

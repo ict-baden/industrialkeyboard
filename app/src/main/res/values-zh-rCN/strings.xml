@@ -534,7 +534,7 @@
     <string name="snippets_empty_admin">你的组织尚未设置任何常用语。</string>
     <string name="section_snippets">常用语</string>
     <string name="snippets_enabled">常用语</string>
-    <string name="snippets_enabled_summary">⊞ 菜单中和建议栏里的现成文本</string>
+    <string name="snippets_enabled_summary">键盘中和建议栏里的现成文本</string>
     <string name="snippets_shortcuts">缩写</string>
     <string name="snippets_shortcuts_summary">输入“mfg”等缩写时会提示对应的常用语</string>
     <string name="snippets_button">栏中的常用语按钮</string>
@@ -568,6 +568,7 @@
         <item quantity="other">最多 %1$d 条常用语</item>
     </plurals>
     <string name="user_snippets_reset">无法读取你的常用语，已重置。</string>
+    <string name="snippet_save_failed">无法保存常用语。</string>
     <string name="mc_snippets_enabled_title">常用语</string>
     <string name="mc_snippets_enabled_description">键盘中的现成文本（默认开启）。</string>
     <string name="mc_snippets_shortcuts_title">常用语缩写</string>

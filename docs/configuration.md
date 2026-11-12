@@ -293,8 +293,8 @@ The whole file: [`examples/snippets.json`](../examples/snippets.json).
 |---|---|---|---|
 | `enabled` | `true` / `false` | `true` | Off: no ⊞ tile, no bar button, no shortcuts; the panel never opens |
 | `shortcuts` | `true` / `false` | `true` | A typed shortcut offers its snippet in the suggestion strip |
-| `button` | `true` / `false` | `false` | Own button in the bar: an icon in the toolbar (after `Fn` and scan), or the **last tab** with `topBar: tabs`. With `navigation: keys` there is no bar and so no button. Never over password fields |
-| `allowUser` | `true` / `false` | `true` | Users may keep their own snippets. Off: the keyboard ignores them (the file on the device stays) and the ✎ button is hidden |
+| `button` | `true` / `false` | `false` | Own button in the bar: an icon in the toolbar (after `Fn` and scan), or the **last tab** with `topBar: tabs`. With `navigation: keys` there is no bar and so no button. Never over password fields. With `topBar: tabs` there is no ⊞, so the panel (and with it snippets without a shortcut and the ✎ entry) is only reachable with `button: true` – set it for fleets that keep the tabs |
+| `allowUser` | `true` / `false` | `true` | Users may keep their own snippets. Off: the keyboard ignores them (the file on the device stays) and the ✎ button is hidden. Own snippets survive MDM pushes, imports and *Reset to defaults*; on devices shared between shifts set `false` from the start – snippets already entered are removed only in *My snippets* or with Android's *Clear storage* |
 | `items` | array, at most **100** | `[]` | The administrator's snippets, shown first |
 
 Each snippet:
@@ -311,7 +311,9 @@ Where snippets show up:
 - **⊞ → Snippets** (toolbar) or the **bar button** (`button: true`, in both bar kinds): a panel in
   place of the keys, in their height. Tapping a card types the text and closes the panel; **ABC**
   goes back; ✎ opens the app's snippet screen (only with `allowUser`). The cards are at least
-  56 dp high, for gloves.
+  56 dp high, for gloves. ⊞ exists only with `topBar: toolbar`: with `topBar: tabs` (kept by
+  configurations stored by 2.1 and older) the panel opens only from the bar button, so set
+  `button: true` there.
 - **Shortcut:** while the word being typed equals a shortcut (whole word, **not** case-sensitive:
   `Mfg` after auto-capitals matches `mfg`), the snippet takes the middle of the suggestion strip,
   on an accent-coloured pill. Tapping it deletes the typed shortcut and types the text (no space

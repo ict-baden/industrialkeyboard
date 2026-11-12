@@ -285,7 +285,9 @@ object ConfigJson {
                 Snippets.Problem.LABEL_TOO_LONG -> throw ConfigException("$at.label: at most ${Snippets.MAX_LABEL} characters")
                 Snippets.Problem.TEXT_EMPTY -> throw ConfigException("$at.text is missing")
                 Snippets.Problem.TEXT_TOO_LONG -> throw ConfigException("$at.text: at most ${Snippets.MAX_TEXT} characters")
-                Snippets.Problem.MACRO -> checkMacro(text, "$at.text")
+                // Never Macro.parse's message: "missing } after …" would repeat the rest of the text,
+                // which then lands in logcat and the stored provisioning error.
+                Snippets.Problem.MACRO -> throw ConfigException("$at.text: invalid macro (a { without }, or an unknown {…} token)")
                 Snippets.Problem.MACRO_NOT_ALLOWED -> throw ConfigException("$at.text: own snippets may only contain text, {TAB} and {ENTER}")
                 Snippets.Problem.SHORTCUT_FORMAT ->
                     throw ConfigException("$at.shortcut: \"$shortcut\" must be ${Snippets.MIN_SHORTCUT}–${Snippets.MAX_SHORTCUT} letters")

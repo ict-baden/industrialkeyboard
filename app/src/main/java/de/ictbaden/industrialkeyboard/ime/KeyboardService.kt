@@ -831,7 +831,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         if (typed.isNotEmpty() && ic.getTextBeforeCursor(typed.length, 0)?.toString() == typed) ic.deleteSurroundingText(typed.length, 0)
         endWord()
         if (shift == ShiftState.ONCE && !autoShifted) shift = ShiftState.OFF
-        runCatching { runMacro(steps) }.onFailure { Log.w(TAG, "Snippet could not be typed (${it.javaClass.simpleName})") }
+        runCatching { runMacro(steps, snippet = true) }.onFailure { Log.w(TAG, "Snippet could not be typed (${it.javaClass.simpleName})") }
         updateAutoShift()
         render()
     }
@@ -843,8 +843,12 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         setToolPanel(null)
         // Never shown there; defensive, since the field may have changed under the panel.
         if (!FieldPolicy.snippetsAllowed(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)) return
+        // A one-shot Shift tapped by hand is dropped, as when a shortcut is picked; runMacro ignores it
+        // and the armed Ctrl/Win/Alt for snippets, and uses the one-shot ones up.
+        if (shift == ShiftState.ONCE && !autoShifted) shift = ShiftState.OFF
         // A stored snippet is valid by construction; stay defensive anyway.
-        runCatching { runMacro(Macro.parse(item.text)) }.onFailure { Log.w(TAG, "Snippet could not be typed (${it.javaClass.simpleName})") }
+        runCatching { runMacro(Macro.parse(item.text), snippet = true) }.onFailure { Log.w(TAG, "Snippet could not be typed (${it.javaClass.simpleName})") }
+        render()
     }
 
     /** What the snippets panel lists: the administrator's, then the user's own (with `allowUser`). */
@@ -971,11 +975,11 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         root?.keyboard?.shift = shift
     }
 
-    private fun runMacro(steps: List<MacroStep>) {
+    /** [snippet]: a snippet's text, typed as written – the held modifiers and a manual Shift do not apply. */
+    private fun runMacro(steps: List<MacroStep>, snippet: Boolean = false) {
         // A Shift tapped by hand also applies to Tab, arrows, Esc … (Shift+Tab, Shift+→ selects). Not the
         // automatic one at a sentence start, and not Caps Lock, which would turn every Tab into Shift+Tab.
-        val manualShift = if (shift == ShiftState.ONCE && !autoShifted) KeyEvent.META_SHIFT_ON else 0
-        val held = KeyChords.meta(modifiers.keys) or manualShift
+        val held = KeyChords.heldMeta(modifiers.keys, manualShift = shift == ShiftState.ONCE && !autoShifted, snippet = snippet)
         for (step in steps) {
             when (step) {
                 is MacroStep.Text -> currentInputConnection?.commitText(step.text, 1)

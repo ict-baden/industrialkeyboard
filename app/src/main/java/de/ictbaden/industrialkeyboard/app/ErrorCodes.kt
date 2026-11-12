@@ -18,6 +18,9 @@ object ErrorCodes {
 
     /** The file of the user's own snippets could not be read; reset, the broken copy kept as `.invalid`. */
     const val USER_SNIPPETS_UNREADABLE = "IK-0108"
+
+    /** An own snippet could not be written to `files/user-snippets.json` (storage full, rename failed). */
+    const val USER_SNIPPETS_SAVE_FAILED = "IK-0109"
     const val CAMERA_PERMISSION = "IK-0200"
     const val CAMERA_FAILED = "IK-0201"
     const val MIC_PERMISSION = "IK-0210"

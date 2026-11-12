@@ -107,7 +107,10 @@ class SnippetsJsonTest {
         assertEquals("snippets.items[2].text is missing", error(third("""{"label":"C"}""")))
         assertEquals("snippets.items[2].text is missing", error(third("""{"label":"C","text":""}""")))
         assertEquals("snippets.items[2].text: at most 2000 characters", error(third("""{"label":"C","text":"${"x".repeat(2001)}"}""")))
-        assertEquals("snippets.items[2].text: unknown token {TABB}", error(third("""{"label":"C","text":"A{TABB}"}""")))
+        val badMacro = "snippets.items[2].text: invalid macro (a { without }, or an unknown {…} token)"
+        assertEquals(badMacro, error(third("""{"label":"C","text":"A{TABB}"}""")))
+        // The rest of the text after an open { is never repeated (logcat, stored provisioning error).
+        assertEquals(badMacro, error(third("""{"label":"C","text":"Gruss{ENTER Lager Sued, Tel. 0721 123456"}""")))
         assertEquals("snippets.items[2].shortcut: \"lp1\" must be 2–16 letters", error(third("""{"label":"C","text":"c","shortcut":"lp1"}""")))
         assertEquals("snippets.items[2].shortcut: \"a\" must be 2–16 letters", error(third("""{"label":"C","text":"c","shortcut":"a"}""")))
         assertEquals(

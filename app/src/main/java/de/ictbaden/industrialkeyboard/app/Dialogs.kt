@@ -226,7 +226,8 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
         current: Snippet?,
         taken: Map<String, String>,
         user: Boolean,
-        onSave: (label: String, text: String, shortcut: String?) -> Unit,
+        // False: not saved (the caller said why); the dialog stays open with what was entered.
+        onSave: (label: String, text: String, shortcut: String?) -> Boolean,
         onDelete: (() -> Unit)?,
     ) {
         val label = ui.textField(s(R.string.snippet_label_hint), current?.label.orEmpty(), helper = s(R.string.snippet_label_helper))
@@ -248,10 +249,7 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
             val body = text.value
             val invalid = { message: String -> withCode(message, ErrorCodes.SNIPPET_INVALID) }
             when (Snippets.problem(label.value, body, short, taken.keys, user)) {
-                null -> {
-                    dialog.dismiss()
-                    onSave(label.value.trim(), body, short)
-                }
+                null -> if (onSave(label.value.trim(), body, short)) dialog.dismiss()
                 Snippets.Problem.LABEL_EMPTY -> label.error = invalid(s(R.string.snippet_error_label_empty))
                 Snippets.Problem.LABEL_TOO_LONG -> label.error = invalid(activity.resources.getQuantityString(R.plurals.snippet_error_too_long, Snippets.MAX_LABEL, Snippets.MAX_LABEL))
                 Snippets.Problem.TEXT_EMPTY -> text.error = invalid(s(R.string.snippet_error_text_empty))

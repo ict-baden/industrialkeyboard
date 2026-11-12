@@ -49,6 +49,16 @@ class ModifierKeysTest {
     }
 
     @Test
+    fun `held modifiers and a manual shift apply to macro keys but never to snippets`() {
+        val shift = KeyEvent.META_SHIFT_ON
+        assertEquals(ctrl or shift, KeyChords.heldMeta(listOf(ModifierKey.CTRL), manualShift = true, snippet = false))
+        assertEquals(shift, KeyChords.heldMeta(emptyList(), manualShift = true, snippet = false))
+        // Shift tapped, then the snippet "Lager 3{TAB}Regal 12{ENTER}": plain Tab and Enter, no Shift+Tab.
+        assertEquals(0, KeyChords.heldMeta(emptyList(), manualShift = true, snippet = true))
+        assertEquals(0, KeyChords.heldMeta(listOf(ModifierKey.CTRL, ModifierKey.ALT), manualShift = true, snippet = true))
+    }
+
+    @Test
     fun `win alone is one press of the meta key`() {
         assertEquals(
             listOf(ChordEvent(true, KeyEvent.KEYCODE_META_LEFT, win), ChordEvent(false, KeyEvent.KEYCODE_META_LEFT, win)),

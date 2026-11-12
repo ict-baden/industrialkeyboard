@@ -3,6 +3,7 @@ package de.ictbaden.industrialkeyboard.app
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -21,6 +22,7 @@ import de.ictbaden.industrialkeyboard.config.Provisioning
 import de.ictbaden.industrialkeyboard.config.Snippet
 import de.ictbaden.industrialkeyboard.config.Snippets
 import de.ictbaden.industrialkeyboard.config.UserSnippets
+import java.io.IOException
 
 /**
  * Snippets (Textbausteine). User mode (✎ in the keyboard's panel, the setup screen): the
@@ -129,10 +131,26 @@ class SnippetsActivity : AppCompatActivity() {
         if (current == null && user.items.size >= Snippets.MAX_USER) return full(Snippets.MAX_USER)
         val others = store.config.snippets.items + user.items.filter { it.id != current?.id }
         dialogs.editSnippet(current, taken(others), user = true, onSave = { label, text, shortcut ->
-            runCatching {
-                if (current == null) user.add(label, text, shortcut) else user.replace(current.copy(label = label, text = text, shortcut = shortcut))
-            }.onFailure { full(Snippets.MAX_USER) }
-        }, onDelete = current?.let { { user.remove(it.id) } })
+            saveUser { if (current == null) user.add(label, text, shortcut) else user.replace(current.copy(label = label, text = text, shortcut = shortcut)) }
+        }, onDelete = current?.let { { saveUser { user.remove(it.id) } } })
+    }
+
+    /**
+     * Runs a change of the own snippets; false (with a message) when it failed. Only the limit
+     * check in [UserSnippets.add] reports the limit; a failed write or a list changed meanwhile
+     * report that the snippet was not saved – the editor then stays open with the entered values.
+     */
+    private fun saveUser(change: () -> Unit): Boolean = try {
+        change()
+        true
+    } catch (e: IllegalStateException) {
+        full(Snippets.MAX_USER)
+        false
+    } catch (e: Exception) {
+        if (e !is IOException && e !is IllegalArgumentException) throw e
+        Log.w(TAG, "Own snippet not saved (${e.javaClass.simpleName})")
+        dialogs.toast(dialogs.withCode(getString(R.string.snippet_save_failed), ErrorCodes.USER_SNIPPETS_SAVE_FAILED))
+        false
     }
 
     private fun renderAdmin(c: KeyboardConfig) {
@@ -162,6 +180,7 @@ class SnippetsActivity : AppCompatActivity() {
                 }
                 config.copy(snippets = config.snippets.copy(items = updated))
             }
+            true
         }, onDelete = current?.let { s ->
             { store.update { config -> config.copy(snippets = config.snippets.copy(items = config.snippets.items.filter { it.id != s.id })) } }
         })
@@ -174,6 +193,7 @@ class SnippetsActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_ADMIN = "admin"
+        private const val TAG = "Snippets"
 
         /** [admin] only from the unlocked settings. */
         fun intent(context: Context, admin: Boolean): Intent = Intent(context, SnippetsActivity::class.java).putExtra(EXTRA_ADMIN, admin)

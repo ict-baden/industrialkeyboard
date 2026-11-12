@@ -536,7 +536,7 @@
     <string name="snippets_empty_admin">Su organización no ha configurado ningún fragmento.</string>
     <string name="section_snippets">Fragmentos de texto</string>
     <string name="snippets_enabled">Fragmentos de texto</string>
-    <string name="snippets_enabled_summary">Textos predefinidos en ⊞ y como sugerencia</string>
+    <string name="snippets_enabled_summary">Textos predefinidos en el teclado y como sugerencia</string>
     <string name="snippets_shortcuts">Abreviaturas</string>
     <string name="snippets_shortcuts_summary">Al escribir una abreviatura como «mfg» se ofrece su fragmento</string>
     <string name="snippets_button">Fragmentos en la barra</string>
@@ -574,6 +574,7 @@
         <item quantity="other">Como máximo %1$d fragmentos</item>
     </plurals>
     <string name="user_snippets_reset">Sus fragmentos no se podían leer y se han restablecido.</string>
+    <string name="snippet_save_failed">No se pudo guardar el fragmento.</string>
     <string name="mc_snippets_enabled_title">Fragmentos de texto</string>
     <string name="mc_snippets_enabled_description">Textos predefinidos en el teclado (activado por defecto).</string>
     <string name="mc_snippets_shortcuts_title">Abreviaturas de fragmentos</string>

@@ -535,7 +535,7 @@
     <string name="snippets_empty_admin">Ihre Organisation hat keine Textbausteine eingerichtet.</string>
     <string name="section_snippets">Textbausteine</string>
     <string name="snippets_enabled">Textbausteine</string>
-    <string name="snippets_enabled_summary">Fertige Texte im ⊞-Menü und als Vorschlag</string>
+    <string name="snippets_enabled_summary">Fertige Texte in der Tastatur und als Vorschlag</string>
     <string name="snippets_shortcuts">Kürzel</string>
     <string name="snippets_shortcuts_summary">Ein getipptes Kürzel wie „mfg“ bietet seinen Baustein an</string>
     <string name="snippets_button">Bausteine in der Leiste</string>
@@ -571,6 +571,7 @@
         <item quantity="other">Höchstens %1$d Bausteine</item>
     </plurals>
     <string name="user_snippets_reset">Ihre Bausteine waren nicht lesbar und wurden zurückgesetzt.</string>
+    <string name="snippet_save_failed">Der Baustein konnte nicht gespeichert werden.</string>
     <string name="mc_snippets_enabled_title">Textbausteine</string>
     <string name="mc_snippets_enabled_description">Fertige Texte in der Tastatur (Standard an).</string>
     <string name="mc_snippets_shortcuts_title">Kürzel für Bausteine</string>
