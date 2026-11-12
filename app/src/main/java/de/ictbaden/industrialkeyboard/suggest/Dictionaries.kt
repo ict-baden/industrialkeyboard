@@ -26,6 +26,11 @@ class Dictionaries(context: Context) {
     var current: WordList? = null
         private set
 
+    /** Next-word suggestions of the same language (curated, see tools/dictionaries/next/); empty if none. */
+    @Volatile
+    var next: NextWords = NextWords.EMPTY
+        private set
+
     /** Asset tag for a language: exact (en-GB, pt-BR), else the language, else the first match; English as fallback. */
     fun tagFor(locale: Locale): String? {
         val language = locale.language.lowercase(Locale.ROOT)
@@ -44,15 +49,19 @@ class Dictionaries(context: Context) {
         if (tag == loadedTag) return
         loadedTag = tag
         current = null
+        next = NextWords.EMPTY
         executor.execute {
             val started = SystemClock.elapsedRealtime()
             val list = runCatching { assets.open("$DIR/$tag$SUFFIX").use { WordList.read(it, locale) } }
                 .onFailure { Log.w(TAG, "Dictionary $tag unreadable", it) }
                 .getOrNull()
-            Log.i(TAG, "Dictionary $tag: ${list?.size ?: 0} words in ${SystemClock.elapsedRealtime() - started} ms")
+            val language = tag.substringBefore('-')
+            val followers = runCatching { assets.open("$DIR/$language$NEXT_SUFFIX").use { NextWords.read(it, locale) } }.getOrDefault(NextWords.EMPTY)
+            Log.i(TAG, "Dictionary $tag: ${list?.size ?: 0} words, ${followers.size} next-word entries in ${SystemClock.elapsedRealtime() - started} ms")
             main.post {
                 if (loadedTag == tag) {
                     current = list
+                    next = followers
                     onReady()
                 }
             }
@@ -66,5 +75,6 @@ class Dictionaries(context: Context) {
         const val DIR = "dict"
         // Not ".txt.gz": the Android build unpacks .gz assets and drops the extension (seen on a Pixel 9 Pro).
         const val SUFFIX = ".dic"
+        const val NEXT_SUFFIX = ".nxt"
     }
 }

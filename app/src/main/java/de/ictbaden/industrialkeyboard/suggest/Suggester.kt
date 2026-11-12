@@ -47,7 +47,10 @@ class Suggester(private val words: WordList, private val locale: Locale, letterR
             }
         }
 
-        val ranked = scores.values.sortedByDescending { it.score }
+        // A typed word that is in the dictionary stays the best (the middle of the strip), like
+        // Gboard – even when a more frequent completion exists ("Hall" before "Hallo").
+        val typedWord = if (exact >= 0) scores[exact] else null
+        val ranked = scores.values.sortedWith(compareByDescending<Suggestion> { it === typedWord }.thenByDescending { it.score })
             .map { it.copy(text = withCase(typed, it.text)) }
             .distinctBy { it.text }
             .take(limit)
