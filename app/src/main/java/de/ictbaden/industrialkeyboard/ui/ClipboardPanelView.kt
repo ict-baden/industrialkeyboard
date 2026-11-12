@@ -72,6 +72,8 @@ class ClipboardPanelView(context: Context) : LinearLayout(context) {
     }
 
     private fun rebuild() {
+        // Opaque: the panel lies over the keys.
+        setBackgroundColor(palette.background)
         val res = AppLanguage.localized(context)
         title.text = res.getString(R.string.clipboard_title)
         title.setTextColor(palette.keyText)
