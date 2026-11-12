@@ -477,14 +477,14 @@
     <string name="state_off">Désactivé</string>
     <string name="feature_glove">Gants</string>
     <string name="feature_contrast">Contraste</string>
-    <string name="feature_scanner">Touches scan</string>
+    <string name="feature_scanner">Scanner du clavier</string>
     <string name="feature_sound">Son</string>
     <string name="section_quick_toggles">Bascules rapides</string>
-    <string name="quick_toggles_intro">Valables uniquement sur cet appareil et modifiables aussi avec ⊞ sur le clavier. La configuration ne change pas ; les réglages ci-dessus continuent de l’afficher.</string>
+    <string name="quick_toggles_intro">Valables uniquement sur cet appareil et modifiables aussi dans le clavier (⊞ ou une touche {TOGGLE}). La configuration ne change pas ; les réglages ci-dessus continuent de l’afficher.</string>
     <string name="glove_mode">Mode gants</string>
     <string name="glove_mode_summary">Touches d’au moins %1$d %%, appui long %2$d ms, sans aperçu des touches, vibration plus forte</string>
     <string name="quick_contrast_summary">Touches noires, contours blancs, surlignage jaune</string>
-    <string name="quick_scanner">Scanner dans le clavier</string>
+    <string name="quick_scanner">Scanner du clavier</string>
     <string name="quick_scanner_summary">Désactivé : ni bouton de scan, ni touche de scan, ni caméra dans le clavier. La gâchette de l’appareil, le NFC et les broadcasts de codes-barres continuent de fonctionner.</string>
     <string name="quick_sound_summary">Clic à chaque touche</string>
     <string name="quick_toggles_allowed">Autorisées pour les utilisateurs</string>

@@ -477,14 +477,14 @@
     <string name="state_off">Desactivado</string>
     <string name="feature_glove">Guantes</string>
     <string name="feature_contrast">Contraste</string>
-    <string name="feature_scanner">Teclas de escaneo</string>
+    <string name="feature_scanner">Escáner del teclado</string>
     <string name="feature_sound">Sonido</string>
     <string name="section_quick_toggles">Interruptores rápidos</string>
-    <string name="quick_toggles_intro">Solo se aplican a este dispositivo y también se pueden cambiar con ⊞ en el teclado. La configuración no cambia; los ajustes de arriba la siguen mostrando.</string>
+    <string name="quick_toggles_intro">Solo se aplican a este dispositivo y también se pueden cambiar en el teclado (⊞ o una tecla {TOGGLE}). La configuración no cambia; los ajustes de arriba la siguen mostrando.</string>
     <string name="glove_mode">Modo guantes</string>
     <string name="glove_mode_summary">Teclas al menos %1$d %%, pulsación larga %2$d ms, sin vista previa de teclas, vibración más fuerte</string>
     <string name="quick_contrast_summary">Teclas negras, contornos blancos, resaltes amarillos</string>
-    <string name="quick_scanner">Escáner en el teclado</string>
+    <string name="quick_scanner">Escáner del teclado</string>
     <string name="quick_scanner_summary">Desactivado: sin botón de escaneo, tecla de escaneo ni cámara en el teclado. El gatillo de escaneo del dispositivo, NFC y los broadcasts de códigos siguen funcionando.</string>
     <string name="quick_sound_summary">Clic en cada tecla</string>
     <string name="quick_toggles_allowed">Permitidos para los usuarios</string>

@@ -54,6 +54,17 @@ class QuickTogglesTest {
     }
 
     @Test
+    fun `a configured contrast theme keeps its accent colour`() {
+        // Documented: the administrator's own contrast + accent stays; the tile shows on, a tap switches contrast off.
+        val base = config(theme = ThemeMode.CONTRAST, accent = "#FF8F00")
+        assertTrue(QuickToggles.effective(QuickToggle.CONTRAST, base, emptyMap(), true))
+        assertSame(base, QuickToggles.apply(base, mapOf(QuickToggle.CONTRAST to true), true))
+        val tapped = QuickToggles.toggled(QuickToggle.CONTRAST, base, emptyMap(), true)
+        assertEquals(mapOf(QuickToggle.CONTRAST to false), tapped)
+        assertEquals(ThemeMode.SYSTEM, QuickToggles.apply(base, tapped, true).appearance.theme)
+    }
+
+    @Test
     fun `scanner off hides the soft trigger only`() {
         val base = config()
         val off = QuickToggles.apply(base, mapOf(QuickToggle.SCANNER to false), scanAvailable = true)

@@ -255,8 +255,10 @@ keyboards, double tap on Shift for caps lock, long press on the hide button for 
 ## `quickToggles` – quick toggles on the device
 
 Users can switch four things on their device without changing the configuration: as tiles at
-the end of the toolbar's ⊞ menu (lit while on), under **Settings → Quick toggles**, and with the
-macro [`{TOGGLE:name}`](#macros) on any key.
+the end of the toolbar's ⊞ menu (lit while on), with the macro [`{TOGGLE:name}`](#macros) on any
+key, and under **Settings → Quick toggles**. The settings are behind the
+[admin password](#admin-password) when one is set, so on protected devices users have only ⊞ and
+`{TOGGLE:…}` keys.
 
 | Option | Values | Default | Effect |
 |---|---|---|---|
@@ -266,6 +268,11 @@ macro [`{TOGGLE:name}`](#macros) on any key.
 |---|---|---|---|
 | `glove` | off | Keys at least 130 % (`keyHeight`), long press at least 600 ms, no key preview, vibration on with at least 40 ms – it only raises values, never lowers them | the configuration |
 | `contrast` | on if `appearance.theme` is `contrast` | `theme: contrast` without `accentColor`, so the yellow highlights are guaranteed | `theme: system` if the configuration says `contrast`, otherwise the configuration |
+
+When the configuration itself selects `theme: contrast` together with an `accentColor`, the toggle
+is on without an override and the keyboard keeps the accent colour; a tap switches contrast off.
+The yellow highlights are only forced when a user switches contrast on over a configuration
+without the contrast theme.
 | `scanner` | on if a scanner is available (scan engine or camera); not shown without one | the configuration | No scan button, scan tab, scan key, Scan tile or camera in the keyboard (`trigger: none`, `scanKey: false`). **Still active:** the device's own scan trigger with DataWedge keystroke output, barcode broadcasts (`scanner.input`) and NFC (`scanner.nfc`) – the keyboard has no control over the trigger, and the other two are switched by the administrator |
 | `sound` | `feedback.sound` | click sound on (`soundVolume` as configured) | click sound off |
 
@@ -284,9 +291,10 @@ How they layer:
 - The settings rows for theme, sound, key height … keep showing the configuration; the preview at
   the top shows what the keyboard shows.
 - ⊞ exists only with the toolbar (`layout.topBar: toolbar` and `navigation: tabs`). Configurations
-  stored by 2.1 or older keep the tabs and therefore have no ⊞: there, use **Settings → Quick
-  toggles** or put `{TOGGLE:glove}` … on a [programmable key](#keys--programmable-keys) or a
-  [custom layout](#custom-layouts).
+  stored by 2.1 or older keep the tabs and therefore have no ⊞. There, put `{TOGGLE:glove}` … on a
+  [programmable key](#keys--programmable-keys) or a [custom layout](#custom-layouts), for example
+  `"keys": { "alpha.p1": "{TOGGLE:glove}" }`. **Settings → Quick toggles** is a route for users
+  only when no admin password is set.
 
 ## `scanner`
 
