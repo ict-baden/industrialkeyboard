@@ -292,4 +292,33 @@ class AppProfilesTest {
     }
 
     // endregion
+
+    // region Log line
+
+    @Test
+    fun `log key changes with the app even when no profile matches`() {
+        // No appProfiles yet: each new app still gets a line, so admins can read its package.
+        val start = AppProfiles.logKey(null, null)
+        val sap = AppProfiles.logKey("com.sap.mobile", AppProfiles.match(emptyList(), "com.sap.mobile", text, null))
+        val wms = AppProfiles.logKey("com.example.wms", null)
+        assertFalse(start == sap)
+        assertFalse(sap == wms)
+        assertEquals(sap, AppProfiles.logKey("com.sap.mobile", null))
+        assertEquals("No app profile for com.sap.mobile", AppProfiles.logLine("com.sap.mobile", null))
+    }
+
+    @Test
+    fun `log key changes between apps that hit the same profile`() {
+        val profiles = listOf(AppProfile(name = "Numbers", fields = setOf(FieldKind.NUMBER), page = "numeric"))
+        val a = AppProfiles.match(profiles, "a.app", number, null)
+        val b = AppProfiles.match(profiles, "b.app", number, null)
+        assertEquals(a?.index, b?.index)
+        assertFalse(AppProfiles.logKey("a.app", a) == AppProfiles.logKey("b.app", b))
+        assertEquals("App profile 1 \"Numbers\" for b.app", AppProfiles.logLine("b.app", b))
+        // The hint never reaches the line.
+        val hinted = AppProfiles.match(listOf(AppProfile(name = "Lot", hints = listOf("Lot*"), page = "numeric")), "a.app", text, "Lot 4711")
+        assertFalse(AppProfiles.logLine("a.app", hinted).contains("4711"))
+    }
+
+    // endregion
 }

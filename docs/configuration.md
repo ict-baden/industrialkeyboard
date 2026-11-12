@@ -586,7 +586,8 @@ How profiles are matched:
   (`appProfiles[0]: sets nothing (…)`).
 - To find the package of an app: `adb shell dumpsys window | grep mCurrentFocus`, or
   `adb logcat -s KeyboardService` – the keyboard logs `App profile 2 "WMS" for com.example.wms`
-  or `No app profile for …` when the profile changes. It never logs the hint.
+  or `No app profile for com.example.wms` on the first field of each app and whenever the
+  profile changes – also while `appProfiles` is still empty. It never logs the hint.
 - Browsers report their own package for every web page; see [Limitations](limitations.md).
 
 Mistakes are rejected like everywhere else, with the position, e.g.
