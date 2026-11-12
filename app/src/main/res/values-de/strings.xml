@@ -476,14 +476,14 @@
     <string name="state_off">Aus</string>
     <string name="feature_glove">Handschuhe</string>
     <string name="feature_contrast">Kontrast</string>
-    <string name="feature_scanner">Scan-Tasten</string>
+    <string name="feature_scanner">Tastatur-Scanner</string>
     <string name="feature_sound">Ton</string>
     <string name="section_quick_toggles">Schnellschalter</string>
-    <string name="quick_toggles_intro">Gelten nur auf diesem Gerät und lassen sich auch mit ⊞ auf der Tastatur umschalten. Die Konfiguration bleibt unverändert; die Einstellungen oben zeigen sie weiterhin.</string>
+    <string name="quick_toggles_intro">Gelten nur auf diesem Gerät und lassen sich auch in der Tastatur umschalten (⊞ oder eine {TOGGLE}-Taste). Die Konfiguration bleibt unverändert; die Einstellungen oben zeigen sie weiterhin.</string>
     <string name="glove_mode">Handschuh-Modus</string>
     <string name="glove_mode_summary">Tasten mindestens %1$d %%, langes Drücken %2$d ms, keine Tastenvorschau, stärkere Vibration</string>
     <string name="quick_contrast_summary">Schwarze Tasten, weiße Umrandung, gelbe Hervorhebung</string>
-    <string name="quick_scanner">Scanner in der Tastatur</string>
+    <string name="quick_scanner">Tastatur-Scanner</string>
     <string name="quick_scanner_summary">Aus: kein Scan-Knopf, keine Scan-Taste und keine Kamera in der Tastatur. Die Scantaste des Geräts, NFC und Barcode-Broadcasts funktionieren weiter.</string>
     <string name="quick_sound_summary">Klickton bei jeder Taste</string>
     <string name="quick_toggles_allowed">Für Benutzer erlaubt</string>

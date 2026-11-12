@@ -543,14 +543,14 @@
     <string name="state_off">Off</string>
     <string name="feature_glove">Gloves</string>
     <string name="feature_contrast">Contrast</string>
-    <string name="feature_scanner">Scan keys</string>
+    <string name="feature_scanner">Keyboard scanner</string>
     <string name="feature_sound">Sound</string>
     <string name="section_quick_toggles">Quick toggles</string>
-    <string name="quick_toggles_intro">Apply to this device only and can also be switched with ⊞ on the keyboard. The configuration stays as it is, so the settings above keep showing it.</string>
+    <string name="quick_toggles_intro">Apply to this device only and can also be switched in the keyboard (⊞ or a {TOGGLE} key). The configuration stays as it is, so the settings above keep showing it.</string>
     <string name="glove_mode">Glove mode</string>
     <string name="glove_mode_summary">Keys at least %1$d %%, long press %2$d ms, no key preview, stronger vibration</string>
     <string name="quick_contrast_summary">Black keys, white outlines, yellow highlights</string>
-    <string name="quick_scanner">Scanner in the keyboard</string>
+    <string name="quick_scanner">Keyboard scanner</string>
     <string name="quick_scanner_summary">Off: no scan button, scan key or camera in the keyboard. The device\'s scan trigger, NFC and barcode broadcasts keep working.</string>
     <string name="quick_sound_summary">Click sound on every key</string>
     <string name="quick_toggles_allowed">Allowed for users</string>
