@@ -18,9 +18,12 @@ internal class KeyboardAccessibility(private val view: KeyboardView) : ExploreBy
     private val describer = KeyDescriber(view.context)
     private val bounds = Rect()
 
-    override fun getVirtualViewAt(x: Float, y: Float): Int = view.a11yIndexAt(x, y).takeIf { it >= 0 } ?: INVALID_ID
+    override fun getVirtualViewAt(x: Float, y: Float): Int =
+        if (view.covered) INVALID_ID else view.a11yIndexAt(x, y).takeIf { it >= 0 } ?: INVALID_ID
 
+    /** None while a panel covers the keys ([KeyboardView.covered]): swiping must not land on hidden keys. */
     override fun getVisibleVirtualViews(virtualViewIds: MutableList<Int>) {
+        if (view.covered) return
         for (i in 0 until view.a11yKeyCount()) virtualViewIds += i
     }
 
@@ -50,6 +53,8 @@ internal class KeyboardAccessibility(private val view: KeyboardView) : ExploreBy
     }
 
     override fun onPerformActionForVirtualView(virtualViewId: Int, action: Int, arguments: Bundle?): Boolean {
+        // A node TalkBack still holds from before the panel opened.
+        if (view.covered) return false
         val done = when (action) {
             AccessibilityNodeInfoCompat.ACTION_CLICK -> view.performA11yKey(virtualViewId, click = true)
             AccessibilityNodeInfoCompat.ACTION_LONG_CLICK -> view.performA11yLongPress(virtualViewId)

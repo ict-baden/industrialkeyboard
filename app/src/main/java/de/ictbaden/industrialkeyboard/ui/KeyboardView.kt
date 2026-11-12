@@ -124,8 +124,22 @@ class KeyboardView(context: Context) : View(context) {
             hoverIndex = -1
         }
 
-    /** `accessibility.liftToType`: false = keys are typed only by a double tap. */
-    var liftToType = true
+    /** `accessibility.liftToType`: false (default) = TalkBack's own typing preference decides. */
+    var liftToType = false
+
+    /**
+     * A panel (⊞, clipboard, snippets, emoji, dictation, camera) lies over the keys. The keys stay
+     * laid out (the frame keeps its height), but they are hidden from screen readers and hover
+     * events through the gaps of the panel neither explore nor type them.
+     */
+    var covered = false
+        set(value) {
+            if (field == value) return
+            field = value
+            hoverIndex = -1
+            importantForAccessibility = if (value) IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS else IMPORTANT_FOR_ACCESSIBILITY_YES
+            a11y.invalidateRoot()
+        }
 
     /** Password field without a headset: character keys are spoken as "Key". */
     var obscureKeys = false
@@ -616,6 +630,8 @@ class KeyboardView(context: Context) : View(context) {
      * passthrough) still go to [onTouchEvent]: hold for alternatives, hold Backspace to repeat.
      */
     override fun dispatchHoverEvent(event: MotionEvent): Boolean {
+        // Under a panel: the hover went through a gap of the panel; the keys cannot be seen.
+        if (covered) return false
         if (touchExploration && liftToType) {
             when (event.actionMasked) {
                 MotionEvent.ACTION_HOVER_ENTER, MotionEvent.ACTION_HOVER_MOVE -> hoverIndex = a11yIndexAt(event.x, event.y)

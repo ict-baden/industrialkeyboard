@@ -635,13 +635,14 @@
     <string name="a11y_key_page_up">上一页</string>
     <string name="a11y_key_page_down">下一页</string>
     <string name="a11y_key_insert">插入</string>
+    <string name="a11y_key_forward_delete">向后删除</string>
     <string name="a11y_key_escape">Esc 键</string>
     <string name="a11y_key_print">打印屏幕</string>
     <string name="a11y_key_pause">暂停</string>
     <string name="a11y_key_menu">菜单</string>
     <string name="section_accessibility">无障碍</string>
     <string name="lift_to_type">抬起手指即输入</string>
-    <string name="lift_to_type_summary">使用 TalkBack 时：抬起手指即输入该键。关闭：点按两次输入</string>
+    <string name="lift_to_type_summary">使用 TalkBack 时：抬起手指时由键盘输入该键。关闭：由 TalkBack 的输入偏好决定</string>
     <string name="speak_password_keys">密码字段中的按键</string>
     <string name="password_keys_headset">仅在连接耳机时朗读</string>
     <string name="password_keys_always">始终朗读</string>
@@ -652,7 +653,7 @@
     <string name="screen_reader_on">屏幕阅读器已开启</string>
     <string name="screen_reader_off">未开启屏幕阅读器</string>
     <string name="mc_lift_to_type_title">抬起手指即输入</string>
-    <string name="mc_lift_to_type_description">使用 TalkBack 时，抬起手指即输入该键（默认开启）。</string>
+    <string name="mc_lift_to_type_description">使用 TalkBack 时，抬起手指时由键盘输入该键（默认关闭：采用 TalkBack 自身的输入偏好）。</string>
     <string name="mc_speak_password_keys_title">密码字段中的按键</string>
     <string name="mc_speak_password_keys_description">屏幕阅读器如何朗读密码字段中的按键：仅在连接耳机时、始终、从不。</string>
     <string name="mc_follow_font_size_title">大字体时放大按键</string>

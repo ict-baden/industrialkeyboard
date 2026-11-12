@@ -36,8 +36,10 @@ key are hidden.
 - **Screen readers:** the TalkBack support ([Accessibility](accessibility.md)) is checked by
   automated tests of the node tree, lift-to-type and the double-input guard; it has not yet been
   tried by ear on a device. Not tested: Samsung Voice Assistant, and Zebra devices without
-  TalkBack (AOSP builds). Whether a TalkBack version types a key on lifting by itself (on top of
-  the keyboard's lift-to-type) is guarded against, but has to be confirmed on a device.
+  TalkBack (AOSP builds). That TalkBack types the keyboard's keys on lifting by itself (its
+  *Typing preference*) has to be confirmed on a device; until then the keyboard's own
+  lift-to-type (`accessibility.liftToType`) is off by default, and a double input with it on is
+  guarded against.
 
 Please report results on other devices in the
 [issues](https://github.com/ict-baden/industrialkeyboard/issues) – also when it simply works.

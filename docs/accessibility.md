@@ -25,9 +25,12 @@ own keyboards) and its state.
 - **Explore** by moving a finger over the keys. TalkBack says "q", "Capital Q", "Shift on",
   "Delete", "Space, English", the field's Enter action ("Next", "Search", or the app's own name)
   and so on. Single symbols are spoken by TalkBack itself ("question mark").
-- **Type** by lifting the finger on the key ([`accessibility.liftToType`](configuration.md#accessibility--screen-readers-and-large-fonts),
-  on by default), or by a double tap. A lift and a double tap on the same key within half a
-  second type it only once.
+- **Type** the way TalkBack's own *Typing preference* says (*Lift to type* or *Double-tap to
+  type*), like with Gboard. Only if a TalkBack version does not type keyboard keys on lifting,
+  [`accessibility.liftToType`](configuration.md#accessibility--screen-readers-and-large-fonts)
+  (off by default) lets the keyboard itself type the key when the finger is lifted; it then
+  ignores TalkBack's preference. A lift and a double tap on the same key within half a second
+  type it only once.
 - **Long press:** double-tap and hold. Holding a letter opens its alternatives (lift on the one you
   want); holding Backspace repeats it.
 - **Actions menu** (TalkBack's "Actions"): the alternatives of a key (ä, á, à …), *Delete word* on
@@ -57,8 +60,10 @@ own keyboards) and its state.
 
 With a screen reader, the character keys of a password field are spoken only as "Key" (and their
 alternatives as "Character 1, 2 …") unless headphones, a headset or a hearing aid are connected –
-like Android and Gboard, so that bystanders do not hear the password. Backspace, Shift, Enter and
-the other function keys keep their names.
+like Android and Gboard, so that bystanders do not hear the password. Space is a character of the
+password as well and is spoken as "Key", too (otherwise the pauses would give away the number and
+the lengths of the words of a passphrase). Backspace, Shift, Enter and the other function keys keep
+their names.
 [`accessibility.speakPasswordKeys`](configuration.md#accessibility--screen-readers-and-large-fonts):
 `headset` (default), `always`, `never` (for counters and wards with bystanders). An unusual audio
 device the keyboard does not recognise counts as none: the keys stay obscured.
@@ -95,7 +100,7 @@ MDM keys: `lift_to_type`, `speak_password_keys`, `follow_font_size` ([Deployment
 | 11.5.2.5 Object information | Every key, tab, suggestion and button has a name, the role "keyboard key" (`android.inputmethodservice.Keyboard$Key`) or button, and a state (Shift, Caps lock, Ctrl/Alt/Win on or locked, selected tab, toggles on/off, disabled Cut/Copy) |
 | 11.5.2.12 Execution of available actions | Click, long click and custom actions (alternatives, delete word, lock, pin) |
 | 11.5.2.15 Change notification | Page and autocorrection announcements, pane titles of the panels, live region on the scan pad, names re-read after a key changes its state |
-| 11.7 User preferences | Follows the system font size, dark mode and TalkBack's touch exploration; lift-to-type can be switched off for users who set TalkBack to double-tap typing |
+| 11.7 User preferences | Follows the system font size, dark mode and TalkBack's touch exploration; typing follows TalkBack's typing preference (lift or double tap); the keyboard's own lift-to-type is off by default |
 
 ## Known gaps
 

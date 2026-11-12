@@ -715,13 +715,14 @@
     <string name="a11y_key_page_up">Page up</string>
     <string name="a11y_key_page_down">Page down</string>
     <string name="a11y_key_insert">Insert</string>
+    <string name="a11y_key_forward_delete">Delete forward</string>
     <string name="a11y_key_escape">Escape</string>
     <string name="a11y_key_print">Print screen</string>
     <string name="a11y_key_pause">Pause</string>
     <string name="a11y_key_menu">Menu</string>
     <string name="section_accessibility">Accessibility</string>
     <string name="lift_to_type">Lift to type</string>
-    <string name="lift_to_type_summary">With TalkBack: lifting the finger types the key. Off: double-tap to type</string>
+    <string name="lift_to_type_summary">With TalkBack: the keyboard types the key when you lift the finger. Off: TalkBack’s typing preference decides</string>
     <string name="speak_password_keys">Keys in password fields</string>
     <string name="password_keys_headset">Spoken only with headphones</string>
     <string name="password_keys_always">Always spoken</string>
@@ -732,7 +733,7 @@
     <string name="screen_reader_on">Screen reader active</string>
     <string name="screen_reader_off">No screen reader active</string>
     <string name="mc_lift_to_type_title">Lift to type</string>
-    <string name="mc_lift_to_type_description">With TalkBack, lifting the finger types the key (default on).</string>
+    <string name="mc_lift_to_type_description">With TalkBack, the keyboard types the key when the finger is lifted (default off: TalkBack’s own typing preference applies).</string>
     <string name="mc_speak_password_keys_title">Keys in password fields</string>
     <string name="mc_speak_password_keys_description">How a screen reader speaks keys in password fields: only with headphones, always, never.</string>
     <string name="mc_follow_font_size_title">Larger keys with large font</string>

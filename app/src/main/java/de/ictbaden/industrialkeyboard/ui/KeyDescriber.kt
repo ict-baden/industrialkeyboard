@@ -67,7 +67,12 @@ class KeyDescriber(private val context: Context) {
             is KeyOutput.ShowTab -> tabName(output.tab, key.label)
             is KeyOutput.Modifier -> key.label ?: output.modifier.label
             is KeyOutput.Macro -> macroName(key, output.steps)
-            is KeyOutput.Edit -> if (output.action == EditAction.CLOSE) s(R.string.a11y_letters) else key.label.orEmpty()
+            is KeyOutput.Edit -> when (output.action) {
+                EditAction.CLOSE -> s(R.string.a11y_letters)
+                // Not the short label ("Del"): in some languages it sounds like Backspace.
+                EditAction.DELETE -> s(R.string.a11y_key_forward_delete)
+                else -> key.label.orEmpty()
+            }
             is KeyOutput.Text -> key.label?.takeIf { it.isNotBlank() } ?: output.text.takeIf { it.isNotBlank() } ?: s(R.string.a11y_space)
             KeyOutput.None -> ""
         }
@@ -204,7 +209,7 @@ class KeyDescriber(private val context: Context) {
         KeyEvent.KEYCODE_MOVE_HOME -> R.string.text_edit_home
         KeyEvent.KEYCODE_MOVE_END -> R.string.text_edit_end
         KeyEvent.KEYCODE_INSERT -> R.string.a11y_key_insert
-        KeyEvent.KEYCODE_FORWARD_DEL -> R.string.text_edit_delete
+        KeyEvent.KEYCODE_FORWARD_DEL -> R.string.a11y_key_forward_delete
         KeyEvent.KEYCODE_ESCAPE -> R.string.a11y_key_escape
         KeyEvent.KEYCODE_SYSRQ -> R.string.a11y_key_print
         KeyEvent.KEYCODE_BREAK -> R.string.a11y_key_pause
@@ -238,9 +243,13 @@ class KeyDescriber(private val context: Context) {
         QuickToggle.SOUND -> R.string.feature_sound
     }
 
-    /** Keys that type characters (letters, digits, symbols, text macros): obscured in password fields. */
+    /**
+     * Keys that type characters (letters, digits, symbols, Space, text macros): obscured in password
+     * fields. Space is a character of the password, too (like AOSP LatinIME): its name would give
+     * away the number and the lengths of the words.
+     */
     private fun typesText(key: Key): Boolean = when (val output = key.output) {
-        is KeyOutput.Text -> true
+        is KeyOutput.Text, KeyOutput.Space -> true
         is KeyOutput.Macro -> output.steps.isNotEmpty() && output.steps.all { it is MacroStep.Text }
         else -> false
     }

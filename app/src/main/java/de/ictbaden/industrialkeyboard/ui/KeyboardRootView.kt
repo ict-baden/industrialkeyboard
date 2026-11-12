@@ -72,7 +72,7 @@ data class RenderState(
     /** TalkBack's touch exploration is on (lift-to-type, announcements). */
     val touchExploration: Boolean = false,
     /** `accessibility.liftToType`. */
-    val liftToType: Boolean = true,
+    val liftToType: Boolean = false,
     /** Password field without a headset: character keys are spoken as "Key". */
     val obscureKeys: Boolean = false,
     /** `IME_ACTION_*` of the field for the spoken name of Enter ([KeyDescriber.enterAction]). */
@@ -330,7 +330,21 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         voicePanel.requestLayout()
         emojiPanel.requestLayout()
         camera.requestLayout()
+        updateKeysCovered()
         if (previous?.widthPercent != state.widthPercent) post { requestLayout() }
+    }
+
+    /**
+     * Hides the keys (and the scan page) from screen readers while a panel lies over them: the gaps
+     * of a panel do not take hover events, which would otherwise reach the keys below and type
+     * them. Called by [render] and after the camera picture was shown or hidden.
+     */
+    fun updateKeysCovered() {
+        val covered = camera.isVisible || emojiPanel.isVisible || voicePanel.isVisible ||
+            featuresScroll.isVisible || clipboardPanel.isVisible || snippetsPanel.isVisible
+        keyboard.covered = covered
+        scanRow.covered = covered
+        scanPage.importantForAccessibility = if (covered) IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS else IMPORTANT_FOR_ACCESSIBILITY_AUTO
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {

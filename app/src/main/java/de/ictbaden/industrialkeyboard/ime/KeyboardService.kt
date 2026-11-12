@@ -1531,6 +1531,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         view.onScreen = { cam.screen = it }
         if (view.width > 0) cam.screen = view.screen()
         view.visibility = View.VISIBLE
+        root?.updateKeysCovered()
         cam.open(view.preview)
         feedback.keyDown(null)
         restartCameraTimeout()
@@ -1546,6 +1547,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         handler.removeCallbacks(closeCameraLater)
         camera?.close()
         root?.camera?.visibility = View.GONE
+        root?.updateKeysCovered()
     }
 
     private fun onCameraScan(hit: CameraScanner.Hit) {

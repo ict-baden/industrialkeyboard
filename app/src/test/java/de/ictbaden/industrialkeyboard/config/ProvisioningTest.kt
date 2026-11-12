@@ -333,16 +333,16 @@ class ProvisioningTest {
 
     @Test
     fun `managed accessibility options`() {
-        restrict("lift_to_type" to false, "speak_password_keys" to "always", "follow_font_size" to true)
+        restrict("lift_to_type" to true, "speak_password_keys" to "always", "follow_font_size" to true)
         Provisioning.applyAll(context)
-        assertFalse(store.config.accessibility.liftToType)
+        assertTrue(store.config.accessibility.liftToType)
         assertEquals(PasswordKeySpeech.ALWAYS, store.config.accessibility.speakPasswordKeys)
         assertTrue(store.config.accessibility.followFontSize)
         // An unknown choice keeps the current value; keys that are not sent stay as they are.
         restrict("speak_password_keys" to "loud")
         Provisioning.applyAll(context)
         assertEquals(PasswordKeySpeech.ALWAYS, store.config.accessibility.speakPasswordKeys)
-        assertFalse(store.config.accessibility.liftToType)
+        assertTrue(store.config.accessibility.liftToType)
         assertTrue(store.config.accessibility.followFontSize)
     }
 

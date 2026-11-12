@@ -639,13 +639,14 @@
     <string name="a11y_key_page_up">Bild auf</string>
     <string name="a11y_key_page_down">Bild ab</string>
     <string name="a11y_key_insert">Einfügen</string>
+    <string name="a11y_key_forward_delete">Entf</string>
     <string name="a11y_key_escape">Escape</string>
     <string name="a11y_key_print">Druck</string>
     <string name="a11y_key_pause">Pause</string>
     <string name="a11y_key_menu">Menü</string>
     <string name="section_accessibility">Barrierefreiheit</string>
     <string name="lift_to_type">Tippen beim Loslassen</string>
-    <string name="lift_to_type_summary">Mit TalkBack: Loslassen tippt die Taste. Aus: doppelt tippen</string>
+    <string name="lift_to_type_summary">Mit TalkBack: Die Tastatur tippt die Taste beim Loslassen. Aus: Die Tipp-Einstellung von TalkBack entscheidet</string>
     <string name="speak_password_keys">Tasten in Passwortfeldern</string>
     <string name="password_keys_headset">Nur mit Kopfhörer ansagen</string>
     <string name="password_keys_always">Immer ansagen</string>
@@ -656,7 +657,7 @@
     <string name="screen_reader_on">Screenreader aktiv</string>
     <string name="screen_reader_off">Kein Screenreader aktiv</string>
     <string name="mc_lift_to_type_title">Tippen beim Loslassen</string>
-    <string name="mc_lift_to_type_description">Mit TalkBack tippt Loslassen die Taste (Standard an).</string>
+    <string name="mc_lift_to_type_description">Mit TalkBack tippt die Tastatur die Taste beim Loslassen (Standard aus: Es gilt die Tipp-Einstellung von TalkBack).</string>
     <string name="mc_speak_password_keys_title">Tasten in Passwortfeldern</string>
     <string name="mc_speak_password_keys_description">Wie ein Screenreader Tasten in Passwortfeldern ansagt: nur mit Kopfhörer, immer, nie.</string>
     <string name="mc_follow_font_size_title">Größere Tasten bei großer Schrift</string>

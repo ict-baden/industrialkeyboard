@@ -152,7 +152,7 @@ phone, date) > the app profile's `page` > [`tabs.preferred`](#tabs).
   },
   "quickToggles": { "allowed": ["glove", "contrast", "sound"] },
   "accessibility": {
-    "liftToType": true,
+    "liftToType": false,
     "speakPasswordKeys": "headset",
     "followFontSize": false
   },
@@ -404,7 +404,7 @@ More in [Accessibility](accessibility.md); for low vision and bright sunlight th
 
 | Option | Values | Default | Effect |
 |---|---|---|---|
-| `liftToType` | `true` / `false` | `true` | With TalkBack on: lifting the finger types the key it explored, like Gboard. `false`: only a double tap types (for users who set TalkBack to "double-tap to type") |
+| `liftToType` | `true` / `false` | `false` | With TalkBack on: the keyboard itself types the explored key when the finger is lifted, whatever TalkBack's *Typing preference* says. `false`: TalkBack decides (*Lift to type* or *Double-tap to type*), like with Gboard. Only for TalkBack versions that do not type keyboard keys on lifting by themselves |
 | `speakPasswordKeys` | `headset`, `always`, `never` | `headset` | How TalkBack speaks the character keys of password fields. `headset`: only while wired, USB or Bluetooth headphones or a hearing aid are connected, otherwise just "Key" (like Android and Gboard); `always`; `never` (counters and wards with bystanders). Backspace, Enter and Shift keep their names |
 | `followFontSize` | `true` / `false` | `false` | Key rows, the tab bar and the suggestion strip grow with the system font size, up to 130 %, but the keyboard takes at most 60 % of the screen height (glove mode included) and never gets smaller than `keyHeight`. Off by default, so that stored and fleet configurations keep their height. The text inside the keys follows the font size anyway, as far as it fits |
 
@@ -415,7 +415,8 @@ Invalid values are rejected with the path, e.g.
 
 - **Explore** by moving a finger over the keys; TalkBack says each key ("q", "Shift", "Delete",
   "Space, English", "Next").
-- **Type** by lifting the finger on the key (`liftToType`), or by a double tap anywhere.
+- **Type** as TalkBack's *Typing preference* says: by lifting the finger on the key, or by a double
+  tap anywhere (`liftToType` makes the keyboard type on lifting by itself).
 - **Long press**: double-tap and hold. Holding a letter opens its alternatives (lift on the one you
   want); holding Backspace repeats it.
 - **Alternatives** (ä, é …) are also in TalkBack's actions menu, as are *Delete word* on Backspace,

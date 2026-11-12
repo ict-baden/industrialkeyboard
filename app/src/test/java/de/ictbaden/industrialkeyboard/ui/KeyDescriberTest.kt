@@ -105,6 +105,34 @@ class KeyDescriberTest {
     }
 
     @Test
+    fun `space is obscured in password fields, too`() {
+        val c = KeyDescriber.KeyContext(obscure = true)
+        // The space bar with the language label, a space key with the icon, a text key typing a space.
+        assertEquals("Taste", describer.describe(alpha.key { it.output == KeyOutput.Space }, c))
+        assertEquals("Taste", describer.describe(Key(icon = KeyIcon.SPACE, output = KeyOutput.Space), c))
+        assertEquals("Taste", describer.describe(Key(label = " ", output = KeyOutput.Text(" ")), c))
+        // Long press still switches keyboards.
+        assertEquals(describer.longPressLabel(alpha.key { it.output == KeyOutput.Space }, KeyDescriber.KeyContext()), describer.longPressLabel(alpha.key { it.output == KeyOutput.Space }, c))
+    }
+
+    @Test
+    fun `forward delete has its own spoken name`() {
+        val del = Layouts.function().key { it.label == "Del" }
+        val edit = KeyboardRenderer.textEditingLayout(context).key { (it.output as? KeyOutput.Edit)?.action == EditAction.DELETE }
+        assertEquals("Entf", describer.describe(del, KeyDescriber.KeyContext()))
+        assertEquals("Entf", describer.describe(edit, KeyDescriber.KeyContext()))
+    }
+
+    @Test
+    @Config(qualifiers = "zh-rCN")
+    fun `chinese forward delete differs from backspace`() {
+        val backspace = describer.describe(alpha.key { it.output == KeyOutput.Backspace }, KeyDescriber.KeyContext())
+        val del = describer.describe(Layouts.function().key { it.label == "Del" }, KeyDescriber.KeyContext())
+        assertEquals("删除", backspace)
+        assertEquals("向后删除", del)
+    }
+
+    @Test
     fun `navigation macros get spoken names, F keys and own labels stay`() {
         val function = Layouts.function()
         assertEquals("Bild auf", describer.describe(function.key { it.label == "PgUp" }, KeyDescriber.KeyContext()))
@@ -181,5 +209,8 @@ class KeyDescriberTest {
         assertEquals("Shift on", describer.describe(shift, KeyDescriber.KeyContext(shift = ShiftState.ONCE)))
         assertEquals("Capital Q", describer.describe(letter("q"), KeyDescriber.KeyContext(shift = ShiftState.ONCE)))
         assertEquals("Delete", describer.describe(alpha.key { it.output == KeyOutput.Backspace }, KeyDescriber.KeyContext()))
+        assertEquals("Delete forward", describer.describe(Layouts.function().key { it.label == "Del" }, KeyDescriber.KeyContext()))
+        val edit = KeyboardRenderer.textEditingLayout(context).key { (it.output as? KeyOutput.Edit)?.action == EditAction.DELETE }
+        assertEquals("Delete forward", describer.describe(edit, KeyDescriber.KeyContext()))
     }
 }
