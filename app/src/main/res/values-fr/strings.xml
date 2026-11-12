@@ -420,4 +420,8 @@
     <string name="mc_emoji_key_description">Touche emoji à côté de la barre d’espace dans les champs de texte normaux.</string>
     <string name="sample_note">Note</string>
     <string name="sample_note_helper">Mots avec suggestions et emoji</string>
+    <string name="symbols_key">Touche chiffres (?123)</string>
+    <string name="symbols_key_summary">\?123 en bas à gauche comme Gboard, aussi avec la barre d’onglets ; ABC sur la page des symboles revient</string>
+    <string name="mc_symbols_key_title">Touche chiffres (?123)</string>
+    <string name="mc_symbols_key_description">Touche ?123 en bas à gauche des lettres, aussi avec la barre d’onglets.</string>
 </resources>

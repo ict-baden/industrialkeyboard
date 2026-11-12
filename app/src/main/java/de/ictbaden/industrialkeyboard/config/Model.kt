@@ -148,6 +148,8 @@ data class LayoutSettings(
     val numericOrder: NumericOrder = NumericOrder.PHONE,
     /** QWERTZ with ü, ö and ä as own keys (11 keys per row); otherwise on long press like Gboard. */
     val umlautKeys: Boolean = false,
+    /** "?123" / "ABC" at the left of the bottom row like Gboard, also with the tab bar. */
+    val symbolsKey: Boolean = false,
 )
 
 data class TabSettings(

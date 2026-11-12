@@ -13,6 +13,7 @@ import de.ictbaden.industrialkeyboard.config.Navigation
 import de.ictbaden.industrialkeyboard.config.NumericOrder
 import de.ictbaden.industrialkeyboard.config.ProgrammableKey
 import de.ictbaden.industrialkeyboard.config.ScannerSettings
+import de.ictbaden.industrialkeyboard.config.Tabs
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -42,6 +43,19 @@ class LayoutsTest {
         assertEquals("asdfghjklöä".map { it.toString() }, labels(layout.rows[1]))
         assertTrue("ß" in layout.rows[1].keys[1].popup)
         assertEquals(11f, layout.units)
+    }
+
+    @Test
+    fun `number key like Gboard when switched on`() {
+        fun first(config: KeyboardConfig) = Layouts.alpha(config).rows.last().keys.first()
+        assertTrue(first(KeyboardConfig()).label != "?123")
+        val on = KeyboardConfig(layout = LayoutSettings(symbolsKey = true))
+        assertEquals("?123", first(on).label)
+        assertEquals(KeyOutput.ShowTab(Tabs.SYMBOLS), first(on).output)
+        // On the symbols page it leads back.
+        val back = Layouts.symbols(on).rows.last().keys.first()
+        assertEquals("ABC", back.label)
+        assertEquals(KeyOutput.ShowTab(Tabs.ALPHA), back.output)
     }
 
     @Test

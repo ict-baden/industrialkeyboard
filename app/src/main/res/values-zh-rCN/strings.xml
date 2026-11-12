@@ -418,4 +418,8 @@
     <string name="mc_emoji_key_description">在普通文本框中空格键旁的表情键。</string>
     <string name="sample_note">备注</string>
     <string name="sample_note_helper">带建议和表情的文字</string>
+    <string name="symbols_key">数字键（?123）</string>
+    <string name="symbols_key_summary">像 Gboard 一样在左下角显示 ?123，即使有标签栏；符号页上的 ABC 返回</string>
+    <string name="mc_symbols_key_title">数字键（?123）</string>
+    <string name="mc_symbols_key_description">字母页左下角的 ?123 键，即使有标签栏。</string>
 </resources>
