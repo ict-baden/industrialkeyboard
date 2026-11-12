@@ -13,6 +13,8 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.isVisible
 import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
@@ -39,12 +41,12 @@ class ClipboardPanelView(context: Context) : LinearLayout(context) {
     private var history = false
 
     private val title = TextView(context).apply {
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+        FontCap.apply(this, 15f)
         gravity = Gravity.CENTER_VERTICAL
     }
     private val abc = TextView(context).apply {
         gravity = Gravity.CENTER
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+        FontCap.apply(this, 15f)
         setOnClickListener { onBack?.invoke() }
     }
     private val hint = TextView(context).apply { setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f) }
@@ -78,6 +80,7 @@ class ClipboardPanelView(context: Context) : LinearLayout(context) {
         title.text = res.getString(R.string.clipboard_title)
         title.setTextColor(palette.keyText)
         abc.setText(R.string.label_abc)
+        abc.contentDescription = res.getString(R.string.emoji_back)
         abc.setTextColor(palette.functionText)
         abc.background = rounded(palette.function)
         hint.setTextColor(palette.keyHint)
@@ -100,7 +103,12 @@ class ClipboardPanelView(context: Context) : LinearLayout(context) {
         background = rounded(palette.key)
         isClickable = true
         setOnClickListener { onPaste?.invoke(item) }
-        if (history) setOnLongClickListener { onTogglePin?.invoke(item); true }
+        if (history) {
+            setOnLongClickListener { onTogglePin?.invoke(item); true }
+            // Screen readers name what the long press does.
+            val label = AppLanguage.localized(context).getString(if (item.pinned) R.string.a11y_unpin else R.string.a11y_pin)
+            ViewCompat.replaceAccessibilityAction(this, AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_LONG_CLICK, label, null)
+        }
         addView(TextView(context).apply {
             text = item.text
             maxLines = 3

@@ -41,6 +41,13 @@ purpose – so neither pictures, recognised text nor statistics can leave the de
 **NFC:** a tag held to the device is read once (UID or the text stored on it) and typed into the
 field; nothing is kept.
 
+**Screen readers:** with TalkBack on, the keyboard gives the screen reader the names of the keys,
+the suggestions and the words of autocorrection announcements, which TalkBack speaks. Nothing of it
+is stored or logged by the keyboard. In password fields the character keys are spoken only as
+"Key" unless headphones, a headset or a hearing aid are connected
+([`accessibility.speakPasswordKeys`](configuration.md#accessibility--screen-readers-and-large-fonts));
+to know that, the keyboard asks Android which audio outputs are connected (device types only).
+
 The operator of the devices (your company) is responsible for the data typed with the keyboard;
 ICT-Baden processes none of it.
 

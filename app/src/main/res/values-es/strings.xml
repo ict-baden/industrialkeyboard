@@ -310,7 +310,6 @@
     <string name="sample_email">Correo electrónico</string>
     <string name="sample_email_helper">@ junto a la barra espaciadora</string>
 
-    <string name="scan_pad_description">Escanear</string>
     <string name="scan_pad_no_scanner">No se encontró ningún escáner</string>
     <string name="scan_pad_scanning">Escaneando…</string>
     <string name="scan_pad_tap">Toque para escanear</string>
@@ -598,5 +597,77 @@
         <item>Desactivado</item>
         <item>Izquierda</item>
         <item>Derecha</item>
+    </string-array>
+    <!-- Accessibility (TalkBack): spoken names of keys, tabs and panels. -->
+    <string name="a11y_key_obscured">Tecla</string>
+    <string name="a11y_alternative">Carácter %1$d</string>
+    <string name="a11y_capital">%1$s mayúscula</string>
+    <string name="a11y_shift">Mayúsculas</string>
+    <string name="a11y_shift_on">Mayúsculas activadas</string>
+    <string name="a11y_caps_lock">Bloqueo de mayúsculas activado</string>
+    <string name="a11y_backspace">Borrar</string>
+    <string name="a11y_delete_word">Borrar palabra</string>
+    <string name="a11y_enter">Intro</string>
+    <string name="a11y_enter_done">Hecho</string>
+    <string name="a11y_enter_go">Ir</string>
+    <string name="a11y_enter_next">Siguiente</string>
+    <string name="a11y_enter_previous">Anterior</string>
+    <string name="a11y_enter_search">Buscar</string>
+    <string name="a11y_enter_send">Enviar</string>
+    <string name="a11y_space">Espacio</string>
+    <string name="a11y_space_language">Espacio, %1$s</string>
+    <string name="a11y_tab_key">Tabulador</string>
+    <string name="a11y_next_language">Siguiente idioma</string>
+    <string name="a11y_switch_keyboard">Cambiar teclado</string>
+    <string name="a11y_lock">Bloquear</string>
+    <string name="a11y_emoji">Emoji</string>
+    <string name="a11y_hide">Ocultar teclado</string>
+    <string name="a11y_arrow_left">Flecha izquierda</string>
+    <string name="a11y_arrow_right">Flecha derecha</string>
+    <string name="a11y_arrow_up">Flecha arriba</string>
+    <string name="a11y_arrow_down">Flecha abajo</string>
+    <string name="a11y_letters">Letras</string>
+    <string name="a11y_symbols">Símbolos</string>
+    <string name="a11y_more_symbols">Más símbolos</string>
+    <string name="a11y_more_features">Más funciones</string>
+    <string name="a11y_dictation">Dictado</string>
+    <string name="a11y_voice_start">Iniciar dictado</string>
+    <string name="a11y_voice_pause">Pausar dictado</string>
+    <string name="a11y_voice_resume">Continuar dictado</string>
+    <string name="a11y_camera">Escaneo con cámara</string>
+    <string name="a11y_state_locked">bloqueado</string>
+    <string name="a11y_autocorrected">Corregido a %1$s</string>
+    <string name="a11y_pin">Fijar</string>
+    <string name="a11y_unpin">Soltar</string>
+    <string name="a11y_snippet">Fragmento: %1$s</string>
+    <string name="a11y_key_page_up">Retroceder página</string>
+    <string name="a11y_key_page_down">Avanzar página</string>
+    <string name="a11y_key_insert">Insertar</string>
+    <string name="a11y_key_escape">Escape</string>
+    <string name="a11y_key_print">Imprimir pantalla</string>
+    <string name="a11y_key_pause">Pausa</string>
+    <string name="a11y_key_menu">Menú</string>
+    <string name="section_accessibility">Accesibilidad</string>
+    <string name="lift_to_type">Escribir al levantar el dedo</string>
+    <string name="lift_to_type_summary">Con TalkBack: al levantar el dedo se escribe la tecla. Desactivado: tocar dos veces</string>
+    <string name="speak_password_keys">Teclas en campos de contraseña</string>
+    <string name="password_keys_headset">Solo con auriculares</string>
+    <string name="password_keys_always">Leer siempre</string>
+    <string name="password_keys_never">No leer nunca</string>
+    <string name="follow_font_size">Teclas más grandes con letra grande</string>
+    <string name="follow_font_size_summary">Las teclas crecen con el tamaño de letra del sistema, hasta el %1$d %%</string>
+    <string name="accessibility_settings">Accesibilidad de Android</string>
+    <string name="screen_reader_on">Lector de pantalla activo</string>
+    <string name="screen_reader_off">Ningún lector de pantalla activo</string>
+    <string name="mc_lift_to_type_title">Escribir al levantar el dedo</string>
+    <string name="mc_lift_to_type_description">Con TalkBack, al levantar el dedo se escribe la tecla (activado por defecto).</string>
+    <string name="mc_speak_password_keys_title">Teclas en campos de contraseña</string>
+    <string name="mc_speak_password_keys_description">Cómo lee un lector de pantalla las teclas en campos de contraseña: solo con auriculares, siempre, nunca.</string>
+    <string name="mc_follow_font_size_title">Teclas más grandes con letra grande</string>
+    <string name="mc_follow_font_size_description">Las filas de teclas crecen con el tamaño de letra del sistema, hasta 1,3 veces (desactivado por defecto).</string>
+    <string-array name="mc_speak_password_keys_entries">
+        <item>Solo con auriculares</item>
+        <item>Siempre</item>
+        <item>Nunca</item>
     </string-array>
 </resources>

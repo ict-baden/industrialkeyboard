@@ -4,14 +4,24 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.Typeface
+import android.os.Bundle
 import android.text.TextUtils
 import android.text.TextPaint
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
+import android.view.accessibility.AccessibilityEvent
+import android.widget.Button
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
+import androidx.customview.widget.ExploreByTouchHelper
+import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
+import kotlin.math.min
 
 /**
  * Three word suggestions in place of the tab bar, like Gboard: the best one in the middle, bold.
@@ -36,6 +46,15 @@ class SuggestionStripView(context: Context) : View(context) {
             if (field == value) return
             field = value
             invalidate()
+            a11y.invalidateRoot()
+        }
+
+    /** Height factor for large fonts (`accessibility.followFontSize`), 1 = 46 dp. */
+    var heightScale = 1f
+        set(value) {
+            if (field == value) return
+            field = value
+            requestLayout()
         }
 
     private val micArea get() = if (showMic) dp(52f) else 0f
@@ -46,6 +65,7 @@ class SuggestionStripView(context: Context) : View(context) {
             if (field == value) return
             field = value
             invalidate()
+            a11y.invalidateRoot()
         }
 
     /**
@@ -57,6 +77,7 @@ class SuggestionStripView(context: Context) : View(context) {
             if (field == value) return
             field = value
             invalidate()
+            a11y.invalidateRoot()
         }
 
     var onPickSnippet: (() -> Unit)? = null
@@ -66,6 +87,14 @@ class SuggestionStripView(context: Context) : View(context) {
     private val pressedPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val pillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var pressedSlot = -1
+
+    /** Screen-reader nodes: the slots with a word (the word itself, never kept) and the microphone. */
+    private val a11y = StripAccessibility()
+
+    init {
+        ViewCompat.setAccessibilityDelegate(this, a11y)
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
+    }
 
     /** Slot (0 left, 1 middle, 2 right) → index in [words], or the snippet in the middle. */
     internal fun wordAt(slot: Int): String? = if (snippet != null) {
@@ -85,13 +114,14 @@ class SuggestionStripView(context: Context) : View(context) {
     private fun isSnippetSlot(slot: Int) = slot == 1 && snippet != null
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), dp(46f).toInt())
+        setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), (dp(46f) * heightScale).toInt())
     }
 
     override fun onDraw(canvas: Canvas) {
         canvas.drawColor(palette.tabBar)
         val slot = (width - micArea) / 3f
-        text.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 17f, resources.displayMetrics)
+        // Capped by the height: large system fonts must not clip the words.
+        text.textSize = min(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 17f, resources.displayMetrics), height * 0.48f)
         divider.color = palette.keyHint
         divider.alpha = 70
         for (i in 0..2) {
@@ -130,6 +160,10 @@ class SuggestionStripView(context: Context) : View(context) {
         }
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) = a11y.invalidateRoot()
+
+    override fun dispatchHoverEvent(event: MotionEvent): Boolean = a11y.dispatchHoverEvent(event) || super.dispatchHoverEvent(event)
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val slot = if (showMic && event.x >= width - micArea) MIC_SLOT else (event.x / ((width - micArea) / 3f)).toInt().coerceIn(0, 2)
@@ -160,6 +194,52 @@ class SuggestionStripView(context: Context) : View(context) {
     }
 
     private fun dp(value: Float) = value * resources.displayMetrics.density
+
+    /** Ids 0–2 are the slots (left, middle, right) that hold a word, [MIC_SLOT] the microphone. */
+    private inner class StripAccessibility : ExploreByTouchHelper(this) {
+        override fun getVirtualViewAt(x: Float, y: Float): Int {
+            if (showMic && x >= width - micArea) return MIC_SLOT
+            val slot = (x / ((width - micArea) / 3f)).toInt().coerceIn(0, 2)
+            return if (wordAt(slot) != null) slot else INVALID_ID
+        }
+
+        override fun getVisibleVirtualViews(virtualViewIds: MutableList<Int>) {
+            for (i in 0..2) if (wordAt(i) != null) virtualViewIds += i
+            if (showMic) virtualViewIds += MIC_SLOT
+        }
+
+        @Suppress("DEPRECATION") // setBoundsInParent: ExploreByTouchHelper computes the screen bounds from it.
+        override fun onPopulateNodeForVirtualView(virtualViewId: Int, node: AccessibilityNodeInfoCompat) {
+            val res = AppLanguage.localized(context)
+            val slot = (width - micArea) / 3f
+            node.className = Button::class.java.name
+            if (virtualViewId == MIC_SLOT) {
+                node.contentDescription = res.getString(R.string.a11y_voice_start)
+                node.setBoundsInParent(Rect((width - micArea).toInt(), 0, width, height))
+            } else {
+                val word = wordAt(virtualViewId).orEmpty()
+                node.contentDescription = if (isSnippetSlot(virtualViewId)) res.getString(R.string.a11y_snippet, word) else word
+                node.setBoundsInParent(Rect((virtualViewId * slot).toInt(), 0, ((virtualViewId + 1) * slot).toInt(), height))
+            }
+            node.addAction(AccessibilityActionCompat.ACTION_CLICK)
+        }
+
+        override fun onPerformActionForVirtualView(virtualViewId: Int, action: Int, arguments: Bundle?): Boolean {
+            if (action != AccessibilityNodeInfoCompat.ACTION_CLICK) return false
+            when {
+                virtualViewId == MIC_SLOT -> if (showMic) onMic else null
+                isSnippetSlot(virtualViewId) -> onPickSnippet
+                else -> wordAt(virtualViewId)?.let { word -> { onPick?.invoke(word) } }
+            }?.let { pick ->
+                onPress?.invoke()
+                // Before the pick: picking a word changes the strip (the node goes away).
+                sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED)
+                pick()
+                return true
+            }
+            return false
+        }
+    }
 
     private companion object {
         const val MIC_SLOT = 9

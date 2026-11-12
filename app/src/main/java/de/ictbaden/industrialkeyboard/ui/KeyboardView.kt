@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PointF
+import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.os.Build
@@ -13,11 +14,13 @@ import android.os.SystemClock
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import androidx.annotation.DrawableRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.withSave
+import androidx.core.view.ViewCompat
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.config.KeyStyle
 import de.ictbaden.industrialkeyboard.layout.EditAction
@@ -66,6 +69,10 @@ class KeyboardView(context: Context) : View(context) {
 
     var listener: Listener? = null
     var popupHost: PopupHost? = null
+
+    /** Screen-reader nodes for the keys (always there; also for Switch Access and UI automation). */
+    private val a11y = KeyboardAccessibility(this)
+
     var palette: Palette = Palette.light(Palette.DEFAULT_ACCENT)
         set(value) {
             field = value
@@ -76,6 +83,7 @@ class KeyboardView(context: Context) : View(context) {
             if (field != value) {
                 field = value
                 invalidate()
+                a11y.invalidateRoot()
             }
         }
 
@@ -85,6 +93,7 @@ class KeyboardView(context: Context) : View(context) {
             if (field != value) {
                 field = value
                 invalidate()
+                a11y.invalidateRoot()
             }
         }
 
@@ -94,19 +103,62 @@ class KeyboardView(context: Context) : View(context) {
             if (field != value) {
                 field = value
                 invalidate()
+                a11y.invalidateRoot()
             }
         }
 
     @DrawableRes
     var enterIcon: Int = R.drawable.kb_enter
         set(value) {
+            val changed = field != value
             field = value
             invalidate()
+            if (changed) a11y.invalidateRoot()
+        }
+
+    /** TalkBack's touch exploration is on: lifting the finger types the explored key ([liftToType]). */
+    var touchExploration = false
+        set(value) {
+            if (field == value) return
+            field = value
+            hoverIndex = -1
+        }
+
+    /** `accessibility.liftToType`: false = keys are typed only by a double tap. */
+    var liftToType = true
+
+    /** Password field without a headset: character keys are spoken as "Key". */
+    var obscureKeys = false
+        set(value) {
+            if (field == value) return
+            field = value
+            a11y.invalidateRoot()
+        }
+
+    /** `IME_ACTION_*` of the field (the spoken name of Enter), see [KeyDescriber.enterAction]. */
+    var enterAction = EditorInfo.IME_ACTION_UNSPECIFIED
+        set(value) {
+            if (field == value) return
+            field = value
+            a11y.invalidateRoot()
+        }
+
+    /** The app's name for the Enter action (`EditorInfo.actionLabel`). */
+    var enterLabel: String? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            a11y.invalidateRoot()
         }
     var keyPopups = true
 
     /** Swipe left from Backspace deletes words (`typing.deleteGesture`). */
     var deleteGesture = true
+        set(value) {
+            if (field == value) return
+            field = value
+            a11y.invalidateRoot()
+        }
 
     /** Letter keys as tiles; false: like Gboard with "Key borders" off. */
     var keyBorders = true
@@ -174,6 +226,18 @@ class KeyboardView(context: Context) : View(context) {
     private val regular = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) Typeface.create(Typeface.DEFAULT, 500, false) else Typeface.create("sans-serif-medium", Typeface.NORMAL)
     private val medium = Typeface.create("sans-serif-medium", Typeface.NORMAL)
 
+    /** Key under the exploring finger (touch exploration), -1 = none. */
+    private var hoverIndex = -1
+
+    /** Last key typed by lifting the finger and by a double tap (index, key, time), against double input. */
+    private var lastLift: Triple<Int, Key, Long>? = null
+    private var lastClick: Triple<Int, Key, Long>? = null
+
+    init {
+        ViewCompat.setAccessibilityDelegate(this, a11y)
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = MeasureSpec.getSize(widthMeasureSpec)
         setMeasuredDimension(width, paddingTop + paddingBottom + heightRows * rowHeight)
@@ -183,6 +247,8 @@ class KeyboardView(context: Context) : View(context) {
 
     private fun computeBoxes() {
         boxes.clear()
+        hoverIndex = -1
+        a11y.invalidateRoot()
         val layout = layout ?: return
         if (width == 0 || height == 0 || layout.rows.isEmpty()) return
         val w = (width - paddingLeft - paddingRight).toFloat()
@@ -541,6 +607,96 @@ class KeyboardView(context: Context) : View(context) {
         super.onDetachedFromWindow()
     }
 
+    // region accessibility
+
+    /**
+     * Lift-to-type with TalkBack: exploring moves over the keys, lifting the finger (HOVER_EXIT inside
+     * the view on the explored key) types it; leaving the keyboard types nothing. Without touch
+     * exploration only the helper sees the hover events. Raw touches (TalkBack's double-tap-and-hold
+     * passthrough) still go to [onTouchEvent]: hold for alternatives, hold Backspace to repeat.
+     */
+    override fun dispatchHoverEvent(event: MotionEvent): Boolean {
+        if (touchExploration && liftToType) {
+            when (event.actionMasked) {
+                MotionEvent.ACTION_HOVER_ENTER, MotionEvent.ACTION_HOVER_MOVE -> hoverIndex = a11yIndexAt(event.x, event.y)
+                MotionEvent.ACTION_HOVER_EXIT -> {
+                    val index = hoverIndex
+                    hoverIndex = -1
+                    if (index >= 0 && a11yIndexAt(event.x, event.y) == index && performA11yKey(index, click = false)) a11y.keyPerformed(index)
+                }
+            }
+        }
+        return a11y.dispatchHoverEvent(event) || super.dispatchHoverEvent(event)
+    }
+
+    internal fun a11yKeyCount(): Int = boxes.size
+
+    internal fun a11yKey(index: Int): Key? = boxes.getOrNull(index)?.key
+
+    internal fun a11yRect(index: Int, out: Rect) {
+        boxes.getOrNull(index)?.rect?.roundOut(out) ?: out.setEmpty()
+    }
+
+    /** The key at ([x], [y]) like a touch would find it (forgiving edges); -1 outside the view. */
+    internal fun a11yIndexAt(x: Float, y: Float): Int {
+        if (x < 0 || y < 0 || x >= width || y >= height) return -1
+        val box = boxAt(x, y) ?: return -1
+        return boxes.indexOf(box)
+    }
+
+    internal fun a11yContext() = KeyDescriber.KeyContext(
+        shift = shift,
+        modifiers = modifiers,
+        enterAction = enterAction,
+        enterLabel = enterLabel,
+        obscure = obscureKeys,
+        deleteGesture = deleteGesture,
+        editState = editState,
+        layoutId = layout?.id,
+    )
+
+    /**
+     * Types key [index] like a tap (haptics and sound, then the key). [click] = TalkBack's double tap,
+     * otherwise lifting the finger. The same key from the other path within [LIFT_DEDUPE_MS] is
+     * ignored (some TalkBack versions click IME keys on lifting themselves): one character per lift.
+     */
+    internal fun performA11yKey(index: Int, click: Boolean): Boolean {
+        val key = boxes.getOrNull(index)?.key ?: return false
+        if (disabled(key)) return false
+        val now = SystemClock.uptimeMillis()
+        val other = if (click) lastLift else lastClick
+        if (other != null && other.first == index && other.second == key && now - other.third < LIFT_DEDUPE_MS) return true
+        if (click) lastClick = Triple(index, key, now) else lastLift = Triple(index, key, now)
+        listener?.onKeyDown(key)
+        listener?.onKey(key, null)
+        return true
+    }
+
+    /** Long press: Backspace deletes a word (delete gesture), others like holding them (lock, keyboards). */
+    internal fun performA11yLongPress(index: Int): Boolean {
+        val key = boxes.getOrNull(index)?.key ?: return false
+        if (disabled(key)) return false
+        if (key.output == KeyOutput.Backspace) {
+            if (!deleteGesture) return false
+            listener?.onKeyDown(key)
+            listener?.onDeleteSwipe(1, done = false)
+            listener?.onDeleteSwipe(1, done = true)
+            return true
+        }
+        listener?.onKeyDown(key)
+        return listener?.onKeyLongPress(key) == true
+    }
+
+    /** Long-press alternative [option] of key [index] (TalkBack's actions menu). */
+    internal fun performA11yAlternative(index: Int, option: String): Boolean {
+        val key = boxes.getOrNull(index)?.key ?: return false
+        listener?.onKeyDown(key)
+        listener?.onKey(key, option)
+        return true
+    }
+
+    // endregion
+
     /** Center of the first key labeled [label] (documentation screenshots). */
     @VisibleForTesting
     internal fun keyCenter(label: String): PointF? =
@@ -568,5 +724,8 @@ class KeyboardView(context: Context) : View(context) {
         const val CURSOR_SLOP_DP = 18f
         const val CURSOR_STEP_DP = 14f
         const val DELETE_STEP_DP = 24f
+
+        /** A lift and a double tap on the same key within this time type it once. */
+        const val LIFT_DEDUPE_MS = 500L
     }
 }

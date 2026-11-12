@@ -42,6 +42,7 @@ class ConfigJsonTest {
             ),
             adminPasswordHash = PasswordHasher.hash("secret"),
             quickToggles = QuickToggleSettings(setOf(QuickToggle.GLOVE, QuickToggle.SOUND)),
+            accessibility = AccessibilitySettings(liftToType = false, speakPasswordKeys = PasswordKeySpeech.NEVER, followFontSize = true),
         )
         assertEquals(config, ConfigJson.parse(ConfigJson.write(config)))
     }
@@ -162,6 +163,20 @@ class ConfigJsonTest {
         rejected("""{"quickToggles":{"allowed":["glove","sound","torch"]}}""", "quickToggles.allowed[2]: unknown toggle \"torch\" (glove, contrast, scanner, sound)")
         rejected("""{"quickToggles":{"allowed":"glove"}}""", "quickToggles.allowed: array expected")
         rejected("""{"keys":{"alpha.p1":"{TOGGLE:torch}"}}""", "keys.alpha.p1: unknown quick toggle {TOGGLE:torch}")
+        rejected("""{"accessibility":{"speakPasswordKeys":"loud"}}""", "accessibility.speakPasswordKeys: unknown value \"loud\" (headset, always, never)")
+    }
+
+    @Test
+    fun `accessibility defaults change nothing and booleans are lenient`() {
+        val defaults = ConfigJson.parse("{}").accessibility
+        assertTrue(defaults.liftToType)
+        assertEquals(PasswordKeySpeech.HEADSET, defaults.speakPasswordKeys)
+        assertFalse(defaults.followFontSize)
+        assertEquals(defaults, ConfigJson.parse("""{"accessibility":{}}""").accessibility)
+        val set = ConfigJson.parse("""{"accessibility":{"liftToType":"false","speakPasswordKeys":"ALWAYS","followFontSize":true}}""").accessibility
+        assertFalse(set.liftToType)
+        assertEquals(PasswordKeySpeech.ALWAYS, set.speakPasswordKeys)
+        assertTrue(set.followFontSize)
     }
 
     private fun rejected(json: String, expected: String) {

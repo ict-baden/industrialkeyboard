@@ -1,6 +1,7 @@
 package de.ictbaden.industrialkeyboard.ime
 
 import android.content.Context
+import android.view.inputmethod.EditorInfo
 import androidx.annotation.DrawableRes
 import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
@@ -23,6 +24,30 @@ import de.ictbaden.industrialkeyboard.ui.TabBarView
 /** Builds what the keyboard frame shows; shared by the input method and the settings preview. */
 object KeyboardRenderer {
     const val BASE_ROW_DP = 54f
+
+    /** `accessibility.followFontSize`: rows grow with the font size up to this factor … */
+    const val MAX_FONT_FACTOR = 1.3f
+
+    /** … and the keys with the bar take at most this share of the screen height. */
+    const val MAX_SCREEN_SHARE = 0.6f
+
+    /** Height of the tab bar and the suggestion strip at a factor of 1. */
+    const val BAR_DP = 46f
+
+    /** How much the rows grow with the system [fontScale]: 1 unless [follow], never below 1, at most [MAX_FONT_FACTOR]. */
+    fun fontFactor(follow: Boolean, fontScale: Float): Float = if (!follow) 1f else fontScale.coerceIn(1f, MAX_FONT_FACTOR)
+
+    /**
+     * Row height in pixels: [basePx] at [keyHeight] percent (glove mode included) times [factor],
+     * but the [heightRows] rows plus the bar ([barPx]) at most [MAX_SCREEN_SHARE] of [screenHeightPx]
+     * – and never less than without the factor, so a configured height is never shrunk.
+     */
+    internal fun rowHeightPx(basePx: Float, keyHeight: Int, factor: Float, heightRows: Int, screenHeightPx: Int, barPx: Float): Int {
+        val unscaled = basePx * keyHeight / 100f
+        if (factor <= 1f) return unscaled.toInt()
+        val cap = (screenHeightPx * MAX_SCREEN_SHARE - barPx) / heightRows.coerceAtLeast(1)
+        return maxOf(unscaled, minOf(unscaled * factor, cap)).toInt()
+    }
 
     /**
      * Row height (key plus gap) at 100 %: like Gboard about 6.8 % of the screen height – 65 dp on a
@@ -152,9 +177,27 @@ object KeyboardRenderer {
         snippetsEditable: Boolean = false,
         /** Label of the snippet whose shortcut was typed (middle of the suggestion strip). */
         snippetSuggestion: String? = null,
+        /** TalkBack's touch exploration is on. */
+        touchExploration: Boolean = false,
+        /** Password field without a headset: keys are spoken as "Key" ([PasswordSpeech]). */
+        obscureKeys: Boolean = false,
+        /** `IME_ACTION_*` for the spoken name of Enter ([de.ictbaden.industrialkeyboard.ui.KeyDescriber.enterAction]). */
+        enterAction: Int = EditorInfo.IME_ACTION_UNSPECIFIED,
+        /** The app's name for the Enter action. */
+        enterLabel: String? = null,
     ): RenderState {
         val appearance = config.appearance
-        val rowHeight = (baseRowDp(context) * context.resources.displayMetrics.density * appearance.keyHeight / 100f).toInt()
+        val metrics = context.resources.displayMetrics
+        val factor = fontFactor(config.accessibility.followFontSize, context.resources.configuration.fontScale)
+        val heightRows = heightRows(config)
+        val rowHeight = rowHeightPx(
+            basePx = baseRowDp(context) * metrics.density,
+            keyHeight = appearance.keyHeight,
+            factor = factor,
+            heightRows = heightRows,
+            screenHeightPx = metrics.heightPixels,
+            barPx = BAR_DP * metrics.density * factor,
+        )
         // Without a scanner the scan key would do nothing.
         val keys = if (scannerName == null && config.scanner.scanKey) config.copy(scanner = config.scanner.copy(scanKey = false)) else config
         return RenderState(
@@ -168,7 +211,7 @@ object KeyboardRenderer {
             modifiers = modifiers,
             enterIcon = enterIcon,
             rowHeight = rowHeight,
-            heightRows = heightRows(config),
+            heightRows = heightRows,
             keyPopups = config.feedback.keyPopup && !passwordField,
             keyBorders = config.appearance.keyBorders,
             deleteGesture = config.typing.deleteGesture,
@@ -189,6 +232,12 @@ object KeyboardRenderer {
             snippets = snippets.takeIf { toolPanel == Tabs.TOOL_SNIPPETS }.orEmpty(),
             snippetsEditable = snippetsEditable,
             snippetSuggestion = snippetSuggestion,
+            touchExploration = touchExploration,
+            liftToType = config.accessibility.liftToType,
+            obscureKeys = obscureKeys,
+            enterAction = enterAction,
+            enterLabel = enterLabel,
+            barScale = factor,
         )
     }
 }

@@ -72,6 +72,7 @@
 | 🌍 **Languages** | Keyboard languages like Gboard (switch with 🌐), letters follow the language, or fixed QWERTY, QWERTZ, AZERTY, Nordic and Spanish; accents on long press, optional number row |
 | 💬 **Suggestions and emoji** | Word suggestions from built-in dictionaries (no learning, nothing stored), optional autocorrection, emoji panel |
 | 🎨 **Looks good** | Light, dark, high contrast or follow the system; custom accent color; smooth animations |
+| ♿ **Screen readers** | Keys, tabs, suggestions and dictation named for TalkBack, with lift-to-type, accents in the actions menu, announced page changes, quiet password keys without headphones, and text that follows the font size ([details](docs/accessibility.md)) |
 | 📡 **Central configuration** | Managed configuration (SOTI, Intune, Workspace ONE …), configuration file (also Zebra `/enterprise/usr`), broadcast intent (StageNow, only with the admin password or on EMM-managed devices), admin password |
 | 🔒 **Private by design** | No internet permission, no dictionary, nothing typed in other apps is stored or learned (only snippets you enter in the app); configuration excluded from backups |
 
@@ -204,6 +205,7 @@ the real keyboard code – see [tools/screenshots](tools/screenshots/README.md).
 - [Scanner & app integration](docs/integration.md) – soft trigger, scan broadcasts, intent API
 - [Data and privacy](docs/data-and-privacy.md) – what is stored where, which broadcasts the keyboard sends and receives
 - [Limitations](docs/limitations.md) – tested devices, what is untested, what it does not do
+- [Accessibility](docs/accessibility.md) – TalkBack, large fonts, EN 301 549 basics
 - [Error codes](docs/error-codes.md) – codes shown next to error messages, the same in every language
 - [Google Play](docs/play-store.md) – store texts, graphics, Play Console answers
 - [Changelog](CHANGELOG.md)

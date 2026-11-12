@@ -39,7 +39,7 @@ class SnippetsPanelView(context: Context) : LinearLayout(context) {
     private var editable = false
 
     private val title = TextView(context).apply {
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+        FontCap.apply(this, 15f)
         gravity = Gravity.CENTER_VERTICAL
     }
     private val edit = ImageView(context).apply {
@@ -49,7 +49,7 @@ class SnippetsPanelView(context: Context) : LinearLayout(context) {
     }
     private val abc = TextView(context).apply {
         gravity = Gravity.CENTER
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+        FontCap.apply(this, 15f)
         setOnClickListener { onBack?.invoke() }
     }
     private val list = LinearLayout(context).apply { orientation = VERTICAL }
@@ -92,6 +92,7 @@ class SnippetsPanelView(context: Context) : LinearLayout(context) {
         edit.imageTintList = ColorStateList.valueOf(palette.functionText)
         edit.background = rounded(palette.function)
         abc.setText(R.string.label_abc)
+        abc.contentDescription = res.getString(R.string.emoji_back)
         abc.setTextColor(palette.functionText)
         abc.background = rounded(palette.function)
         list.removeAllViews()

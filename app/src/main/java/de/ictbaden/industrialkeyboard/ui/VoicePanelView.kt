@@ -4,15 +4,25 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.RectF
+import android.os.Bundle
 import android.text.TextPaint
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
+import android.view.accessibility.AccessibilityEvent
+import android.widget.Button
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
+import androidx.customview.widget.ExploreByTouchHelper
+import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
+import kotlin.math.min
 
 /**
  * Dictation in place of the keys, like Gboard: a large microphone that pulses with the voice,
@@ -37,9 +47,11 @@ class VoicePanelView(context: Context) : View(context) {
     /** Listening (pulsing, filled) or paused (outlined). */
     var listening = false
         set(value) {
+            val changed = field != value
             field = value
             if (!value) level = 0f
             invalidate()
+            if (changed) a11y.invalidateVirtualView(MIC)
         }
 
     /** Loudness 0–1, smoothed. */
@@ -61,14 +73,41 @@ class VoicePanelView(context: Context) : View(context) {
     private val backspaceButton = RectF()
     private var pressed: RectF? = null
 
-    override fun onDraw(canvas: Canvas) {
-        canvas.drawColor(palette.background)
+    /** Screen-reader nodes: microphone (pause/continue), ⌨ and ⌫. No status announcements: TalkBack would be dictated. */
+    private val a11y = VoiceAccessibility()
+
+    init {
+        ViewCompat.setAccessibilityDelegate(this, a11y)
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        layoutButtons()
+        a11y.invalidateRoot()
+    }
+
+    /** Where the microphone and the two buttons are (drawing and screen-reader bounds). */
+    private fun layoutButtons() {
         val w = width.toFloat()
         val h = height.toFloat()
         val radius = minOf(w, h) * 0.17f
         val cx = w / 2
         val cy = h * 0.42f
         micCircle.set(cx - radius, cy - radius, cx + radius, cy + radius)
+        val size = dp(52f)
+        val bottom = h - dp(10f)
+        keyboardButton.set(dp(14f), bottom - size, dp(14f) + size * 1.4f, bottom)
+        backspaceButton.set(w - dp(14f) - size * 1.4f, bottom - size, w - dp(14f), bottom)
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        canvas.drawColor(palette.background)
+        layoutButtons()
+        val w = width.toFloat()
+        val h = height.toFloat()
+        val radius = micCircle.width() / 2
+        val cx = micCircle.centerX()
+        val cy = micCircle.centerY()
 
         // Halo that grows with the voice.
         if (listening) {
@@ -92,15 +131,12 @@ class VoicePanelView(context: Context) : View(context) {
         drawIcon(canvas, R.drawable.kb_mic, cx, cy, radius * 1.0f, if (listening) palette.accentText else palette.accent)
 
         text.color = palette.keyText
-        text.textSize = sp(16f)
+        // Capped by the height: large system fonts must not push the line into the buttons.
+        text.textSize = min(sp(16f), h * 0.1f)
         val shown = TextUtils.ellipsize(status, text, w - dp(32f), TextUtils.TruncateAt.END).toString()
         canvas.drawText(shown, cx, cy + radius + dp(34f), text)
 
         // ⌨ bottom left, ⌫ bottom right – where the thumbs are.
-        val size = dp(52f)
-        val bottom = h - dp(10f)
-        keyboardButton.set(dp(14f), bottom - size, dp(14f) + size * 1.4f, bottom)
-        backspaceButton.set(w - dp(14f) - size * 1.4f, bottom - size, w - dp(14f), bottom)
         for ((rect, icon) in listOf(keyboardButton to R.drawable.ic_keyboard, backspaceButton to R.drawable.kb_backspace)) {
             fill.color = if (pressed === rect) ColorUtils.compositeColors(palette.pressed, palette.function) else palette.function
             canvas.drawRoundRect(rect, rect.height() / 2, rect.height() / 2, fill)
@@ -115,6 +151,8 @@ class VoicePanelView(context: Context) : View(context) {
         drawable.setTint(color)
         drawable.draw(canvas)
     }
+
+    override fun dispatchHoverEvent(event: MotionEvent): Boolean = a11y.dispatchHoverEvent(event) || super.dispatchHoverEvent(event)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -145,4 +183,56 @@ class VoicePanelView(context: Context) : View(context) {
     private fun dp(value: Float) = value * resources.displayMetrics.density
 
     private fun sp(value: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, value, resources.displayMetrics)
+
+    private fun buttonRect(id: Int): RectF? = when (id) {
+        MIC -> micCircle
+        KEYBOARD -> keyboardButton
+        BACKSPACE -> backspaceButton
+        else -> null
+    }
+
+    private inner class VoiceAccessibility : ExploreByTouchHelper(this) {
+        override fun getVirtualViewAt(x: Float, y: Float): Int =
+            listOf(MIC, KEYBOARD, BACKSPACE).firstOrNull { buttonRect(it)?.contains(x, y) == true } ?: INVALID_ID
+
+        override fun getVisibleVirtualViews(virtualViewIds: MutableList<Int>) {
+            virtualViewIds += listOf(MIC, KEYBOARD, BACKSPACE)
+        }
+
+        @Suppress("DEPRECATION") // setBoundsInParent: ExploreByTouchHelper computes the screen bounds from it.
+        override fun onPopulateNodeForVirtualView(virtualViewId: Int, node: AccessibilityNodeInfoCompat) {
+            val res = AppLanguage.localized(context)
+            node.className = Button::class.java.name
+            node.contentDescription = res.getString(
+                when (virtualViewId) {
+                    MIC -> if (listening) R.string.a11y_voice_pause else R.string.a11y_voice_resume
+                    KEYBOARD -> R.string.emoji_back
+                    else -> R.string.a11y_backspace
+                },
+            )
+            val bounds = Rect()
+            buttonRect(virtualViewId)?.roundOut(bounds)
+            node.setBoundsInParent(bounds)
+            node.addAction(AccessibilityActionCompat.ACTION_CLICK)
+        }
+
+        override fun onPerformActionForVirtualView(virtualViewId: Int, action: Int, arguments: Bundle?): Boolean {
+            if (action != AccessibilityNodeInfoCompat.ACTION_CLICK) return false
+            val run = when (virtualViewId) {
+                MIC -> onMic
+                KEYBOARD -> onKeyboard
+                BACKSPACE -> onBackspace
+                else -> null
+            } ?: return false
+            sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED)
+            run()
+            return true
+        }
+    }
+
+    private companion object {
+        const val MIC = 0
+        const val KEYBOARD = 1
+        const val BACKSPACE = 2
+    }
 }

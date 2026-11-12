@@ -33,6 +33,11 @@ key are hidden.
   if another app on the device also handles tags, Android may ask which one to use.
 - **Translations:** Spanish, French and Chinese (simplified) are machine translations and have
   not yet been proofread by native speakers. They are marked as such in the language picker.
+- **Screen readers:** the TalkBack support ([Accessibility](accessibility.md)) is checked by
+  automated tests of the node tree, lift-to-type and the double-input guard; it has not yet been
+  tried by ear on a device. Not tested: Samsung Voice Assistant, and Zebra devices without
+  TalkBack (AOSP builds). Whether a TalkBack version types a key on lifting by itself (on top of
+  the keyboard's lift-to-type) is guarded against, but has to be confirmed on a device.
 
 Please report results on other devices in the
 [issues](https://github.com/ict-baden/industrialkeyboard/issues) – also when it simply works.
@@ -72,7 +77,6 @@ Please report results on other devices in the
   what is next to the cursor, can still move the focus to another view; the panel then closes.
 - In select mode ←/→ set the selection directly; ↑/↓, Home and End send Shift with the key,
   which an editor may ignore.
-- The panel keys are drawn on a canvas and are not yet readable by TalkBack (issue #9).
 
 ## App profiles
 
@@ -96,3 +100,7 @@ Please report results on other devices in the
 - Camera scan reads one code per tap and has no batch or multi-code mode; a scan engine is faster
   and works in the dark. The camera picture fills only the keyboard area.
 - Key labels are not translated (they are what the keys type) – except on the text editing panel.
+  Screen readers get translated names ("Shift", "Delete", "Page up" …).
+- Accessibility covers the basics of EN 301 549 / BITV and has not been audited
+  ([details](accessibility.md)): no braille, no D-pad or hardware-key navigation inside the
+  keyboard, no description of the camera picture and the OCR line picker.

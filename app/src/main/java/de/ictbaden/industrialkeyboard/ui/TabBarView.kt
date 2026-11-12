@@ -5,17 +5,26 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
+import android.view.accessibility.AccessibilityEvent
 import android.view.animation.PathInterpolator
+import android.widget.Button
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.AccessibilityActionCompat
+import androidx.customview.widget.ExploreByTouchHelper
 import de.ictbaden.industrialkeyboard.R
+import de.ictbaden.industrialkeyboard.config.Tabs
 import kotlin.math.min
 
 /** Row of tabs (ABC, 123, symbols …) with an animated selection pill and a hide button. */
@@ -35,6 +44,20 @@ class TabBarView(context: Context) : View(context) {
             invalidate()
         }
     var showHide = true
+        set(value) {
+            if (field == value) return
+            field = value
+            computeCells()
+            invalidate()
+        }
+
+    /** Height factor for large fonts (`accessibility.followFontSize`), 1 = 46 dp. */
+    var heightScale = 1f
+        set(value) {
+            if (field == value) return
+            field = value
+            requestLayout()
+        }
 
     /** Toolbar: icons spread evenly over the width like Gboard, instead of tabs packed at the left. */
     var spread = false
@@ -81,12 +104,22 @@ class TabBarView(context: Context) : View(context) {
     }
     private val icons = HashMap<Int, Drawable>()
 
+    /** Screen-reader nodes: one per tab, the microphone and the hide button. */
+    private val a11y = TabBarAccessibility()
+    private val describer = KeyDescriber(context)
+
+    init {
+        ViewCompat.setAccessibilityDelegate(this, a11y)
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
+    }
+
     fun setTabs(tabs: List<Tab>, selected: String?, animate: Boolean) {
         val changed = tabs != this.tabs
         this.tabs = tabs
         val previous = this.selected
         this.selected = selected
         if (changed) computeCells()
+        if (changed || previous != selected) a11y.invalidateRoot()
         val target = selectedCell()
         if (target == null) {
             pill.setEmpty()
@@ -100,7 +133,7 @@ class TabBarView(context: Context) : View(context) {
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), dp(46f).toInt())
+        setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), (dp(46f) * heightScale).toInt())
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -122,6 +155,7 @@ class TabBarView(context: Context) : View(context) {
             cells += RectF(x, dp(6f), x + cellWidth, height - dp(6f))
             x += cellWidth
         }
+        a11y.invalidateRoot()
     }
 
     private fun selectedCell(): RectF? = tabs.indexOfFirst { it.id == selected }.takeIf { it >= 0 }?.let { cells.getOrNull(it) }?.let { inset(it) }
@@ -168,7 +202,8 @@ class TabBarView(context: Context) : View(context) {
                 drawIcon(canvas, icon, cell.centerX(), cell.centerY(), dp(22f), color)
             } else {
                 text.color = color
-                text.textSize = sp(14f)
+                // Capped by the cell: large system fonts must not clip the label.
+                text.textSize = min(sp(14f), cell.height() * 0.5f)
                 val label = tab.label.orEmpty()
                 while (text.measureText(label) > cell.width() - dp(10f) && text.textSize > sp(9f)) text.textSize -= 1f
                 canvas.drawText(label, cell.centerX(), cell.centerY() - (text.descent() + text.ascent()) / 2, text)
@@ -200,6 +235,8 @@ class TabBarView(context: Context) : View(context) {
         drawable.setTint(color)
         drawable.draw(canvas)
     }
+
+    override fun dispatchHoverEvent(event: MotionEvent): Boolean = a11y.dispatchHoverEvent(event) || super.dispatchHoverEvent(event)
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -241,6 +278,67 @@ class TabBarView(context: Context) : View(context) {
     private fun dp(value: Float) = value * resources.displayMetrics.density
 
     private fun sp(value: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, value, resources.displayMetrics)
+
+    /** Virtual ids: tab index, [KeyDescriber.MIC], [KeyDescriber.HIDE]; double tap acts like a tap. */
+    private inner class TabBarAccessibility : ExploreByTouchHelper(this) {
+        override fun getVirtualViewAt(x: Float, y: Float): Int = when (val index = hit(x)) {
+            HIDE -> KeyDescriber.HIDE
+            MIC -> KeyDescriber.MIC
+            NONE -> INVALID_ID
+            else -> index
+        }
+
+        override fun getVisibleVirtualViews(virtualViewIds: MutableList<Int>) {
+            for (i in tabs.indices) if (cells.getOrNull(i) != null) virtualViewIds += i
+            if (showMic) virtualViewIds += KeyDescriber.MIC
+            if (showHide) virtualViewIds += KeyDescriber.HIDE
+        }
+
+        @Suppress("DEPRECATION") // setBoundsInParent: ExploreByTouchHelper computes the screen bounds from it.
+        override fun onPopulateNodeForVirtualView(virtualViewId: Int, node: AccessibilityNodeInfoCompat) {
+            val bounds = Rect()
+            node.className = Button::class.java.name
+            when (virtualViewId) {
+                KeyDescriber.MIC -> {
+                    node.contentDescription = describer.tabBarExtra(KeyDescriber.MIC)
+                    micCell.roundOut(bounds)
+                }
+                KeyDescriber.HIDE -> {
+                    node.contentDescription = describer.tabBarExtra(KeyDescriber.HIDE)
+                    hideCell.roundOut(bounds)
+                    // A long press opens the settings.
+                    node.addAction(AccessibilityActionCompat(AccessibilityNodeInfoCompat.ACTION_LONG_CLICK, describer.tab(Tab(Tabs.TOOL_SETTINGS, null))))
+                }
+                else -> {
+                    val tab = tabs.getOrNull(virtualViewId)
+                    node.contentDescription = tab?.let(describer::tab).orEmpty()
+                    node.isSelected = tab != null && tab.id == selected
+                    cells.getOrNull(virtualViewId)?.roundOut(bounds)
+                }
+            }
+            node.setBoundsInParent(bounds)
+            node.addAction(AccessibilityActionCompat.ACTION_CLICK)
+        }
+
+        override fun onPerformActionForVirtualView(virtualViewId: Int, action: Int, arguments: Bundle?): Boolean {
+            val done = when (action) {
+                AccessibilityNodeInfoCompat.ACTION_CLICK -> {
+                    when (virtualViewId) {
+                        KeyDescriber.MIC -> if (showMic) onMic?.let { onPress?.invoke(); it() } else null
+                        KeyDescriber.HIDE -> if (showHide) onHide?.let { onPress?.invoke(); it() } else null
+                        else -> tabs.getOrNull(virtualViewId)?.let { tab -> onTab?.let { onPress?.invoke(); it(tab.id) } }
+                    } != null
+                }
+                AccessibilityNodeInfoCompat.ACTION_LONG_CLICK -> virtualViewId == KeyDescriber.HIDE && onHideLongPress?.invoke() != null
+                else -> false
+            }
+            if (done) {
+                sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED)
+                invalidateVirtualView(virtualViewId)
+            }
+            return done
+        }
+    }
 
     private companion object {
         const val NONE = -2

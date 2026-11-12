@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.view.ViewGroup
+import android.view.accessibility.AccessibilityManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -47,6 +48,7 @@ import de.ictbaden.industrialkeyboard.config.OcrCharset
 import de.ictbaden.industrialkeyboard.config.OcrMode
 import de.ictbaden.industrialkeyboard.config.OcrSettings
 import de.ictbaden.industrialkeyboard.config.OneHanded
+import de.ictbaden.industrialkeyboard.config.PasswordKeySpeech
 import de.ictbaden.industrialkeyboard.config.ProgrammableKey
 import de.ictbaden.industrialkeyboard.config.Provisioning
 import de.ictbaden.industrialkeyboard.config.QuickToggle
@@ -502,6 +504,7 @@ class SettingsActivity : AppCompatActivity() {
         )
 
         renderQuickToggles(c)
+        renderAccessibility(c)
 
         content.addView(ui.section(getString(R.string.section_scanner)))
         scanner.settings = c.scanner
@@ -680,6 +683,55 @@ class SettingsActivity : AppCompatActivity() {
      * Quick toggles: switches for this device (effective state, like ⊞ on the keyboard), the admin
      * part (which ones users may switch, written to the configuration) and a reset.
      */
+    /** Screen readers and large fonts (`accessibility`), between the quick toggles and the scanner. */
+    private fun renderAccessibility(c: KeyboardConfig) {
+        val screenReader = getSystemService(AccessibilityManager::class.java)?.isTouchExplorationEnabled == true
+        content.addView(ui.section(getString(R.string.section_accessibility)))
+        content.addView(
+            ui.card(
+                listOf(
+                    ui.row(
+                        R.drawable.ic_accessibility,
+                        getString(R.string.accessibility_settings),
+                        getString(if (screenReader) R.string.screen_reader_on else R.string.screen_reader_off),
+                        onClick = {
+                            try {
+                                startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                            } catch (_: ActivityNotFoundException) {
+                                // Some kiosk builds have no accessibility settings screen.
+                            }
+                        },
+                    ),
+                    ui.switchRow(R.drawable.ic_accessibility, getString(R.string.lift_to_type), getString(R.string.lift_to_type_summary), c.accessibility.liftToType) { on ->
+                        update { it.copy(accessibility = it.accessibility.copy(liftToType = on)) }
+                    },
+                    ui.choiceRow(
+                        R.drawable.ic_lock,
+                        getString(R.string.speak_password_keys),
+                        PasswordKeySpeech.entries.map { it to getString(passwordKeysLabel(it)) },
+                        c.accessibility.speakPasswordKeys,
+                    ) { value ->
+                        update { it.copy(accessibility = it.accessibility.copy(speakPasswordKeys = value)) }
+                    },
+                    ui.switchRow(
+                        R.drawable.ic_text,
+                        getString(R.string.follow_font_size),
+                        getString(R.string.follow_font_size_summary, (KeyboardRenderer.MAX_FONT_FACTOR * 100).toInt()),
+                        c.accessibility.followFontSize,
+                    ) { on ->
+                        update { it.copy(accessibility = it.accessibility.copy(followFontSize = on)) }
+                    },
+                ),
+            ),
+        )
+    }
+
+    private fun passwordKeysLabel(p: PasswordKeySpeech) = when (p) {
+        PasswordKeySpeech.HEADSET -> R.string.password_keys_headset
+        PasswordKeySpeech.ALWAYS -> R.string.password_keys_always
+        PasswordKeySpeech.NEVER -> R.string.password_keys_never
+    }
+
     private fun renderQuickToggles(c: KeyboardConfig) {
         scanner.settings = c.scanner
         val scanBase = scanner.available

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
-import android.util.TypedValue
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.ContextThemeWrapper
@@ -35,7 +34,7 @@ class EmojiPanelView(context: Context) : LinearLayout(context) {
     private val abc = TextView(context).apply {
         setText(R.string.label_abc)
         gravity = Gravity.CENTER
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+        FontCap.apply(this, 16f)
         setOnClickListener { onBack?.invoke() }
     }
     private val backspace = ImageButton(context).apply {

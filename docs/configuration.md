@@ -151,6 +151,11 @@ phone, date) > the app profile's `page` > [`tabs.preferred`](#tabs).
     "items": []
   },
   "quickToggles": { "allowed": ["glove", "contrast", "sound"] },
+  "accessibility": {
+    "liftToType": true,
+    "speakPasswordKeys": "headset",
+    "followFontSize": false
+  },
   "appProfiles": []
 }
 ```
@@ -389,6 +394,37 @@ How they layer:
   [programmable key](#keys--programmable-keys) or a [custom layout](#custom-layouts), for example
   `"keys": { "alpha.p1": "{TOGGLE:glove}" }`. **Settings → Quick toggles** is a route for users
   only when no admin password is set.
+
+## `accessibility` – screen readers and large fonts
+
+Every key, tab, suggestion and dictation button is named for screen readers (TalkBack), with its
+state (Shift on, Ctrl locked …). The defaults change nothing for users without a screen reader.
+More in [Accessibility](accessibility.md); for low vision and bright sunlight there is also the
+[`contrast` theme](#appearance).
+
+| Option | Values | Default | Effect |
+|---|---|---|---|
+| `liftToType` | `true` / `false` | `true` | With TalkBack on: lifting the finger types the key it explored, like Gboard. `false`: only a double tap types (for users who set TalkBack to "double-tap to type") |
+| `speakPasswordKeys` | `headset`, `always`, `never` | `headset` | How TalkBack speaks the character keys of password fields. `headset`: only while wired, USB or Bluetooth headphones or a hearing aid are connected, otherwise just "Key" (like Android and Gboard); `always`; `never` (counters and wards with bystanders). Backspace, Enter and Shift keep their names |
+| `followFontSize` | `true` / `false` | `false` | Key rows, the tab bar and the suggestion strip grow with the system font size, up to 130 %, but the keyboard takes at most 60 % of the screen height (glove mode included) and never gets smaller than `keyHeight`. Off by default, so that stored and fleet configurations keep their height. The text inside the keys follows the font size anyway, as far as it fits |
+
+Invalid values are rejected with the path, e.g.
+`accessibility.speakPasswordKeys: unknown value "loud" (headset, always, never)`.
+
+### Using the keyboard with TalkBack
+
+- **Explore** by moving a finger over the keys; TalkBack says each key ("q", "Shift", "Delete",
+  "Space, English", "Next").
+- **Type** by lifting the finger on the key (`liftToType`), or by a double tap anywhere.
+- **Long press**: double-tap and hold. Holding a letter opens its alternatives (lift on the one you
+  want); holding Backspace repeats it.
+- **Alternatives** (ä, é …) are also in TalkBack's actions menu, as are *Delete word* on Backspace,
+  *Lock* on Shift, Ctrl, Alt and Win, and *Switch keyboard* on the space bar.
+- **Pages**: switching to symbols, numbers or function keys is announced; ⊞, clipboard, snippets,
+  emoji, dictation and the camera are announced by their title when they open. An
+  autocorrection is announced ("Corrected to …").
+- **Scan tab**: a double tap scans once (or opens the camera); double-tap and hold scans for as
+  long as the finger stays down. "Scanning …" is announced.
 
 ## `scanner`
 
