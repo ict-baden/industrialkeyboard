@@ -25,6 +25,13 @@ object TextEditing {
     fun editor(inputType: Int): Boolean = (inputType and InputType.TYPE_MASK_CLASS) != InputType.TYPE_NULL
 
     /**
+     * Paste types the clip itself when the field has no paste action – only in
+     * [InputType.TYPE_NULL] fields. A text editor may answer `false` and paste anyway (Compose
+     * sends KEYCODE_PASTE and returns false), so the clip would land twice.
+     */
+    fun pasteFallback(inputType: Int): Boolean = !editor(inputType)
+
+    /**
      * Single-line field: text without the multi-line flags, or a number, phone or date field. Never
      * [InputType.TYPE_NULL], where ↑/↓ belong to the terminal.
      */
