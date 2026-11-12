@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "snippets": {
+    "enabled": true,
+    "shortcuts": true,
+    "button": true,
+    "allowUser": true,
+    "items": [
+      { "id": "damaged", "label": "Ware beschädigt", "text": "Ware bei Anlieferung beschädigt, Foto folgt.", "shortcut": "wb" },
+      { "id": "regards", "label": "Mit freundlichen Grüßen", "text": "Mit freundlichen Grüßen{ENTER}Lager Süd", "shortcut": "mfg" },
+      { "id": "bin", "label": "Lagerplatz A-01", "text": "A-01-03{TAB}" }
+    ]
+  }
+}

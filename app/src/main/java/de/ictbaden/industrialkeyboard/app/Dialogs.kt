@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.GridLayout
 import android.widget.ImageView
+import android.widget.ScrollView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.button.MaterialButton
@@ -15,6 +16,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.config.PasswordGuard
 import de.ictbaden.industrialkeyboard.config.PasswordHasher
+import de.ictbaden.industrialkeyboard.config.Snippet
+import de.ictbaden.industrialkeyboard.config.Snippets
 import de.ictbaden.industrialkeyboard.config.Symbology
 import de.ictbaden.industrialkeyboard.layout.Macro
 import de.ictbaden.industrialkeyboard.ui.Palette
@@ -210,6 +213,56 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
             } else {
                 dialog.dismiss()
                 onSave(text)
+            }
+        }
+    }
+
+    /**
+     * Edits one snippet: name, shortcut and text (several lines, a macro). [taken]: lower-case
+     * shortcuts of the other snippets → their names. [user]: an own snippet (text, `{TAB}` and
+     * `{ENTER}` only). [onDelete] adds a Delete button. Errors carry IK-0107, macro errors IK-0105.
+     */
+    fun editSnippet(
+        current: Snippet?,
+        taken: Map<String, String>,
+        user: Boolean,
+        onSave: (label: String, text: String, shortcut: String?) -> Unit,
+        onDelete: (() -> Unit)?,
+    ) {
+        val label = ui.textField(s(R.string.snippet_label_hint), current?.label.orEmpty(), helper = s(R.string.snippet_label_helper))
+        val shortcut = ui.textField(s(R.string.snippet_shortcut_hint), current?.shortcut.orEmpty(), helper = s(R.string.snippet_shortcut_helper))
+        val text = ui.textField(s(R.string.snippet_text_hint), current?.text.orEmpty(), helper = s(R.string.snippet_text_helper), multiLine = true)
+        val builder = MaterialAlertDialogBuilder(activity)
+            .setIcon(ui.icon(R.drawable.ic_snippets))
+            .setTitle(R.string.snippet_edit_title)
+            // Scrolls: with the keyboard open the three fields may not fit.
+            .setView(ScrollView(activity).apply { addView(ui.form(label, shortcut, text)) })
+            .setPositiveButton(R.string.button_save, null)
+            .setNegativeButton(R.string.button_cancel, null)
+        onDelete?.let { delete -> builder.setNeutralButton(R.string.snippet_delete) { _, _ -> delete() } }
+        val dialog = builder.show()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            listOf(label, shortcut, text).forEach { it.error = null }
+            val short = shortcut.value.trim().ifEmpty { null }
+            // The text exactly as typed: leading and trailing spaces may be wanted.
+            val body = text.value
+            val invalid = { message: String -> withCode(message, ErrorCodes.SNIPPET_INVALID) }
+            when (Snippets.problem(label.value, body, short, taken.keys, user)) {
+                null -> {
+                    dialog.dismiss()
+                    onSave(label.value.trim(), body, short)
+                }
+                Snippets.Problem.LABEL_EMPTY -> label.error = invalid(s(R.string.snippet_error_label_empty))
+                Snippets.Problem.LABEL_TOO_LONG -> label.error = invalid(activity.resources.getQuantityString(R.plurals.snippet_error_too_long, Snippets.MAX_LABEL, Snippets.MAX_LABEL))
+                Snippets.Problem.TEXT_EMPTY -> text.error = invalid(s(R.string.snippet_error_text_empty))
+                Snippets.Problem.TEXT_TOO_LONG -> text.error = invalid(activity.resources.getQuantityString(R.plurals.snippet_error_too_long, Snippets.MAX_TEXT, Snippets.MAX_TEXT))
+                Snippets.Problem.MACRO -> text.error = runCatching { Macro.parse(body) }.exceptionOrNull().let {
+                    withCode(activity.getString(R.string.macro_invalid, it?.message.orEmpty()), ErrorCodes.INVALID_MACRO)
+                }
+                Snippets.Problem.MACRO_NOT_ALLOWED -> text.error = invalid(s(R.string.snippet_error_macro_not_allowed))
+                Snippets.Problem.SHORTCUT_FORMAT -> shortcut.error = invalid(s(R.string.snippet_error_shortcut))
+                Snippets.Problem.SHORTCUT_TAKEN -> shortcut.error =
+                    invalid(activity.getString(R.string.snippet_error_shortcut_taken, short.orEmpty(), taken[Snippets.key(short.orEmpty())].orEmpty()))
             }
         }
     }

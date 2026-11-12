@@ -84,6 +84,14 @@
             android:label="@string/settings_title"
             android:windowSoftInputMode="stateHidden|adjustResize" />
 
+        <!-- Snippets: the user's own (from the keyboard's ✎ and the setup screen) and, from the unlocked
+             settings only, the administrator's. Not exported: no other app may open the admin mode. -->
+        <activity
+            android:name=".app.SnippetsActivity"
+            android:exported="false"
+            android:label="@string/snippets_title"
+            android:windowSoftInputMode="adjustResize" />
+
         <!-- Asks for the camera permission for the keyboard (an input method cannot). -->
         <!-- Asks for the microphone permission for dictation (an input method cannot). -->
         <activity

@@ -158,6 +158,7 @@ class FeaturesPanelView(context: Context) : GridLayout(context) {
         const val SCAN = "feature:scan"
         const val NUMBER_PAD = "feature:numpad"
         const val CLIPBOARD = "feature:clipboard"
+        const val SNIPPETS = "feature:snippets"
         const val TEXT_EDITING = "feature:textedit"
         const val ONE_HANDED = "feature:onehanded"
         const val LANGUAGES = "feature:languages"

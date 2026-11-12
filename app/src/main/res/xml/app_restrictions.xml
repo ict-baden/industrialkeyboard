@@ -220,4 +220,35 @@
         android:key="quick_toggles"
         android:restrictionType="string"
         android:title="@string/mc_quick_toggles_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_snippets_enabled_description"
+        android:key="snippets_enabled"
+        android:restrictionType="bool"
+        android:title="@string/mc_snippets_enabled_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_snippets_shortcuts_description"
+        android:key="snippets_shortcuts"
+        android:restrictionType="bool"
+        android:title="@string/mc_snippets_shortcuts_title" />
+    <restriction
+        android:defaultValue="false"
+        android:description="@string/mc_snippets_button_description"
+        android:key="snippets_button"
+        android:restrictionType="bool"
+        android:title="@string/mc_snippets_button_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_snippets_allow_user_description"
+        android:key="snippets_allow_user"
+        android:restrictionType="bool"
+        android:title="@string/mc_snippets_allow_user_title" />
+    <!-- One string like config_json (a JSON array of snippets): no bundle_array, works in single-line EMM fields. -->
+    <restriction
+        android:defaultValue=""
+        android:description="@string/mc_snippets_json_description"
+        android:key="snippets_json"
+        android:restrictionType="string"
+        android:title="@string/mc_snippets_json_title" />
 </restrictions>

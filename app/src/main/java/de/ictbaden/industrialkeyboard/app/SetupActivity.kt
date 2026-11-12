@@ -26,6 +26,7 @@ import androidx.core.widget.NestedScrollView
 import com.google.android.material.button.MaterialButton
 import de.ictbaden.industrialkeyboard.BuildConfig
 import de.ictbaden.industrialkeyboard.R
+import de.ictbaden.industrialkeyboard.config.ConfigStore
 
 /** Start screen: enable and select the keyboard, then try it in a sample form. */
 class SetupActivity : AppCompatActivity() {
@@ -35,6 +36,9 @@ class SetupActivity : AppCompatActivity() {
     private lateinit var status: TextView
     private lateinit var steps: LinearLayout
     private lateinit var scroll: NestedScrollView
+
+    /** "More": rebuilt on refresh, the snippets row follows `snippets.enabled`. */
+    private lateinit var more: LinearLayout
 
     /** Sample form fields; tests use them to show the keyboard in context. */
     @VisibleForTesting
@@ -55,16 +59,8 @@ class SetupActivity : AppCompatActivity() {
         content.addView(ui.section(getString(R.string.section_try_it)))
         content.addView(ui.card(sampleForm(), padded = true))
         content.addView(ui.section(getString(R.string.section_more)))
-        content.addView(
-            ui.card(
-                listOf(
-                    ui.row(R.drawable.ic_settings, getString(R.string.settings_title), getString(R.string.settings_summary)) {
-                        startActivity(Intent(this, SettingsActivity::class.java))
-                    },
-                    ui.row(R.drawable.ic_globe, getString(R.string.switch_keyboard), getString(R.string.switch_keyboard_summary)) { showPicker() },
-                ),
-            ),
-        )
+        more = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        content.addView(more)
         content.addView(TextView(this).apply {
             text = getString(R.string.footer, BuildConfig.VERSION_NAME)
             gravity = Gravity.CENTER
@@ -146,6 +142,25 @@ class SetupActivity : AppCompatActivity() {
             cornerRadius = ui.dp(100).toFloat()
             setColor(if (active) 0xFFC8F7C5.toInt() else 0xFFFFE0B2.toInt())
         }
+        more.removeAllViews()
+        val config = ConfigStore.get(this).config
+        more.addView(
+            ui.card(
+                listOfNotNull(
+                    ui.row(R.drawable.ic_settings, getString(R.string.settings_title), getString(R.string.settings_summary)) {
+                        startActivity(Intent(this, SettingsActivity::class.java))
+                    },
+                    if (config.snippets.enabled) {
+                        ui.row(R.drawable.ic_snippets, getString(R.string.snippets_mine), getString(R.string.snippets_mine_summary)) {
+                            startActivity(SnippetsActivity.intent(this, admin = false))
+                        }
+                    } else {
+                        null
+                    },
+                    ui.row(R.drawable.ic_globe, getString(R.string.switch_keyboard), getString(R.string.switch_keyboard_summary)) { showPicker() },
+                ),
+            ),
+        )
         steps.removeAllViews()
         steps.addView(
             ui.card(

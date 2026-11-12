@@ -68,11 +68,12 @@
 | 🧩 **Programmable keys & macros** | Five free keys and custom layouts with macros such as `{TAB}`, `{F13}`, `OK{ENTER}`, `{SCAN}` or `{SHOW:numeric}` |
 | 🗂️ **Custom layouts** | Your own keyboards (e.g. *OK / Skip / Damaged*) as extra tabs – defined in JSON, no app update needed |
 | 🎯 **App profiles** | Per app, field type or field hint: start page, letter layout, number order, toolbar or tabs, emoji key, suggestions, autocorrection and scan suffix – e.g. 7-8-9 for quantity fields, Fn for the terminal emulation ([details](docs/configuration.md#appprofiles--app-profiles)) |
+| 📝 **Snippets** | Ready-made texts from the administrator and the users' own, in ⊞ or an own bar button; typed shortcuts such as `mfg` offer them in the suggestion strip – with `{TAB}` and `{ENTER}` for forms ([details](docs/configuration.md#snippets--snippets)) |
 | 🌍 **Languages** | Keyboard languages like Gboard (switch with 🌐), letters follow the language, or fixed QWERTY, QWERTZ, AZERTY, Nordic and Spanish; accents on long press, optional number row |
 | 💬 **Suggestions and emoji** | Word suggestions from built-in dictionaries (no learning, nothing stored), optional autocorrection, emoji panel |
 | 🎨 **Looks good** | Light, dark, high contrast or follow the system; custom accent color; smooth animations |
 | 📡 **Central configuration** | Managed configuration (SOTI, Intune, Workspace ONE …), configuration file (also Zebra `/enterprise/usr`), broadcast intent (StageNow, only with the admin password or on EMM-managed devices), admin password |
-| 🔒 **Private by design** | No internet permission, no dictionary, nothing you type is stored or learned; configuration excluded from backups |
+| 🔒 **Private by design** | No internet permission, no dictionary, nothing typed in other apps is stored or learned (only snippets you enter in the app); configuration excluded from backups |
 
 ## ⚡ Up and running in 5 minutes
 

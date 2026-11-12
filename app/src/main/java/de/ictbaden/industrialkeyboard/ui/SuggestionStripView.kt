@@ -48,17 +48,41 @@ class SuggestionStripView(context: Context) : View(context) {
             invalidate()
         }
 
+    /**
+     * Label of the snippet whose shortcut was typed: it takes the middle slot, on an accent pill;
+     * the best two words move to the sides. Tapping it calls [onPickSnippet].
+     */
+    var snippet: String? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            invalidate()
+        }
+
+    var onPickSnippet: (() -> Unit)? = null
+
     private val text = TextPaint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER }
     private val divider = Paint()
     private val pressedPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val pillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var pressedSlot = -1
 
-    /** Slot (0 left, 1 middle, 2 right) → index in [words]. */
-    private fun wordAt(slot: Int): String? = when (slot) {
-        0 -> words.getOrNull(1)
-        1 -> words.getOrNull(0)
-        else -> words.getOrNull(2)
+    /** Slot (0 left, 1 middle, 2 right) → index in [words], or the snippet in the middle. */
+    internal fun wordAt(slot: Int): String? = if (snippet != null) {
+        when (slot) {
+            0 -> words.getOrNull(0)
+            1 -> snippet
+            else -> words.getOrNull(1)
+        }
+    } else {
+        when (slot) {
+            0 -> words.getOrNull(1)
+            1 -> words.getOrNull(0)
+            else -> words.getOrNull(2)
+        }
     }
+
+    private fun isSnippetSlot(slot: Int) = slot == 1 && snippet != null
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), dp(46f).toInt())
@@ -72,6 +96,11 @@ class SuggestionStripView(context: Context) : View(context) {
         divider.alpha = 70
         for (i in 0..2) {
             val word = wordAt(i) ?: continue
+            if (isSnippetSlot(i)) {
+                pillPaint.color = palette.accent
+                pillPaint.alpha = SNIPPET_PILL_ALPHA
+                canvas.drawRoundRect(i * slot + dp(4f), dp(5f), (i + 1) * slot - dp(4f), height - dp(5f), dp(10f), dp(10f), pillPaint)
+            }
             if (i == pressedSlot) {
                 pressedPaint.color = palette.pressed
                 canvas.drawRoundRect(i * slot + dp(4f), dp(5f), (i + 1) * slot - dp(4f), height - dp(5f), dp(10f), dp(10f), pressedPaint)
@@ -82,7 +111,8 @@ class SuggestionStripView(context: Context) : View(context) {
             canvas.drawText(shown, i * slot + slot / 2, height / 2f - (text.ascent() + text.descent()) / 2, text)
         }
         for (i in 1..2) {
-            if (wordAt(i - 1) != null && wordAt(i) != null) {
+            // No divider next to the snippet pill: it has its own outline.
+            if (wordAt(i - 1) != null && wordAt(i) != null && snippet == null) {
                 canvas.drawRect(i * slot - dp(0.5f), height * 0.3f, i * slot + dp(0.5f), height * 0.7f, divider)
             }
         }
@@ -112,10 +142,13 @@ class SuggestionStripView(context: Context) : View(context) {
             }
             MotionEvent.ACTION_UP -> {
                 val mic = slot == MIC_SLOT && pressedSlot == MIC_SLOT
-                val word = if (slot == pressedSlot && slot != MIC_SLOT) wordAt(slot) else null
+                val picked = slot == pressedSlot && slot != MIC_SLOT
+                val pickedSnippet = picked && isSnippetSlot(slot)
+                val word = if (picked && !pickedSnippet) wordAt(slot) else null
                 pressedSlot = -1
                 invalidate()
                 if (mic) onMic?.invoke()
+                if (pickedSnippet) onPickSnippet?.invoke()
                 word?.let { onPick?.invoke(it) }
             }
             MotionEvent.ACTION_CANCEL -> {
@@ -130,5 +163,8 @@ class SuggestionStripView(context: Context) : View(context) {
 
     private companion object {
         const val MIC_SLOT = 9
+
+        /** The snippet pill: the accent colour, light enough for the key text on top. */
+        const val SNIPPET_PILL_ALPHA = 50
     }
 }
