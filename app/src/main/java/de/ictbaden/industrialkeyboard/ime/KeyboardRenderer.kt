@@ -79,6 +79,8 @@ object KeyboardRenderer {
         suggestions: List<String> = emptyList(),
         /** The emoji panel replaces the keys. */
         emojiOpen: Boolean = false,
+        /** Microphone in the tab bar (a voice input method exists). */
+        mic: Boolean = false,
     ): RenderState {
         val appearance = config.appearance
         val rowHeight = (baseRowDp(context) * context.resources.displayMetrics.density * appearance.keyHeight / 100f).toInt()
@@ -95,6 +97,8 @@ object KeyboardRenderer {
             rowHeight = rowHeight,
             heightRows = heightRows(config),
             keyPopups = config.feedback.keyPopup && !passwordField,
+            keyBorders = config.appearance.keyBorders,
+            deleteGesture = config.typing.deleteGesture,
             longPressDelay = config.typing.longPressDelay.toLong(),
             widthPercent = appearance.width,
             scannerName = scannerName,
@@ -102,6 +106,7 @@ object KeyboardRenderer {
             camera = camera,
             suggestions = suggestions,
             emojiOpen = emojiOpen,
+            mic = mic,
         )
     }
 }

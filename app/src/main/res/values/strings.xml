@@ -484,4 +484,32 @@
     <string name="symbols_key_summary">\?123 at the bottom left like Gboard, also with the tab bar; ABC on the symbols page leads back</string>
     <string name="mc_symbols_key_title">Number key (?123)</string>
     <string name="mc_symbols_key_description">\?123 key at the bottom left of the letters, also with the tab bar.</string>
+    <string name="symbol_hints">Symbols on long press</string>
+    <string name="symbol_hints_summary">Small symbols on the letters (a @, s # …) that a long press types, like Gboard</string>
+    <string name="key_borders">Key borders</string>
+    <string name="key_borders_summary">Letter keys as tiles; off: only the letters, like Gboard without key borders</string>
+    <string name="voice_input">Dictation (microphone)</string>
+    <string name="voice_system">Voice input of the device</string>
+    <string name="delete_gesture">Swipe to delete</string>
+    <string name="delete_gesture_summary">Swipe left from Backspace to delete whole words</string>
+    <string name="mc_voice_title">Dictation</string>
+    <string name="mc_voice_description">Microphone button: voice input method of the device (auto/system) or off. “offline” is planned.</string>
+    <string name="mc_symbol_hints_title">Symbols on long press</string>
+    <string name="mc_symbol_hints_description">Symbols on the letter keys that a long press types.</string>
+    <string name="mc_key_borders_title">Key borders</string>
+    <string name="mc_key_borders_description">Letter keys drawn as tiles.</string>
+    <string name="mc_delete_gesture_title">Swipe to delete</string>
+    <string name="mc_delete_gesture_description">Swipe left from Backspace deletes words.</string>
+    <string-array name="mc_voice_entries">
+        <item>Automatic</item>
+        <item>Voice input of the device</item>
+        <item>Offline (planned)</item>
+        <item>Off</item>
+    </string-array>
+    <string-array name="mc_voice_values" translatable="false">
+        <item>auto</item>
+        <item>system</item>
+        <item>offline</item>
+        <item>off</item>
+    </string-array>
 </resources>

@@ -36,6 +36,18 @@ class TabBarView(context: Context) : View(context) {
         }
     var showHide = true
 
+    /** Microphone for dictation, left of the hide button – at the right end like in Gboard. */
+    var showMic = false
+        set(value) {
+            if (field == value) return
+            field = value
+            computeCells()
+            selectedCell()?.let { pill.set(it) }
+            invalidate()
+        }
+    var onMic: (() -> Unit)? = null
+    private val micCell = RectF()
+
     private var tabs: List<Tab> = emptyList()
     private var selected: String? = null
     private val cells = mutableListOf<RectF>()
@@ -92,7 +104,9 @@ class TabBarView(context: Context) : View(context) {
         if (width == 0) return
         val hideWidth = if (showHide) dp(52f) else 0f
         hideCell.set(width - hideWidth, 0f, width.toFloat(), height.toFloat())
-        val area = width - hideWidth - dp(8f)
+        val micWidth = if (showMic) dp(52f) else 0f
+        micCell.set(hideCell.left - micWidth, 0f, hideCell.left, height.toFloat())
+        val area = width - hideWidth - micWidth - dp(8f)
         val cellWidth = if (tabs.isEmpty()) 0f else min(area / tabs.size, dp(92f))
         var x = dp(6f)
         tabs.forEach { _ ->
@@ -151,6 +165,13 @@ class TabBarView(context: Context) : View(context) {
                 canvas.drawText(label, cell.centerX(), cell.centerY() - (text.descent() + text.ascent()) / 2, text)
             }
         }
+        if (showMic) {
+            if (pressedIndex == MIC) {
+                fill.color = palette.pressed
+                canvas.drawCircle(micCell.centerX(), micCell.centerY(), dp(18f), fill)
+            }
+            drawIcon(canvas, R.drawable.kb_mic, micCell.centerX(), micCell.centerY(), dp(24f), palette.tabText)
+        }
         if (showHide) {
             if (pressedIndex == HIDE) {
                 fill.color = palette.pressed
@@ -183,6 +204,7 @@ class TabBarView(context: Context) : View(context) {
                 if (index == pressedIndex) {
                     when {
                         index == HIDE -> onHide?.invoke()
+                        index == MIC -> onMic?.invoke()
                         index >= 0 -> onTab?.invoke(tabs[index].id)
                     }
                 }
@@ -200,6 +222,7 @@ class TabBarView(context: Context) : View(context) {
 
     private fun hit(x: Float): Int {
         if (showHide && x >= hideCell.left) return HIDE
+        if (showMic && x >= micCell.left && x < micCell.right) return MIC
         return cells.indexOfFirst { x >= it.left && x < it.right }.takeIf { it >= 0 } ?: NONE
     }
 
@@ -210,5 +233,6 @@ class TabBarView(context: Context) : View(context) {
     private companion object {
         const val NONE = -2
         const val HIDE = -1
+        const val MIC = -3
     }
 }

@@ -30,6 +30,12 @@ data class RenderState(
     val rowHeight: Int,
     val heightRows: Int,
     val keyPopups: Boolean,
+    /** Letter keys as tiles (`appearance.keyBorders`). */
+    val keyBorders: Boolean = true,
+    /** Swipe left from Backspace deletes words. */
+    val deleteGesture: Boolean = true,
+    /** Microphone button for dictation in the tab bar. */
+    val mic: Boolean = false,
     val longPressDelay: Long,
     /** 50–100 %. */
     val widthPercent: Int,
@@ -142,6 +148,7 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         tabBar.palette = p
         // Like Gboard: while a word is typed, suggestions take the place of the tab bar.
         val suggesting = state.suggestions.isNotEmpty() && !state.emojiOpen
+        tabBar.showMic = state.mic
         tabBar.isVisible = state.tabs != null && !suggesting
         suggestionStrip.isVisible = suggesting
         suggestionStrip.palette = p
@@ -160,6 +167,8 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
             it.enterIcon = state.enterIcon
             it.rowHeight = state.rowHeight
             it.keyPopups = state.keyPopups
+            it.keyBorders = state.keyBorders
+            it.deleteGesture = state.deleteGesture
             it.longPressDelay = state.longPressDelay
         }
         keyboard.heightRows = state.heightRows

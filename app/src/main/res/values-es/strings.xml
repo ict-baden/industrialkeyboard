@@ -424,4 +424,26 @@
     <string name="symbols_key_summary">\?123 abajo a la izquierda como en Gboard, también con la barra de pestañas; ABC en la página de símbolos vuelve</string>
     <string name="mc_symbols_key_title">Tecla de números (?123)</string>
     <string name="mc_symbols_key_description">Tecla ?123 abajo a la izquierda en las letras, también con la barra de pestañas.</string>
+    <string name="symbol_hints">Símbolos con pulsación larga</string>
+    <string name="symbol_hints_summary">Símbolos pequeños en las letras (a @, s # …) que escribe una pulsación larga, como Gboard</string>
+    <string name="key_borders">Bordes de teclas</string>
+    <string name="key_borders_summary">Letras como mosaicos; desactivado: solo las letras, como Gboard sin bordes</string>
+    <string name="voice_input">Dictado (micrófono)</string>
+    <string name="voice_system">Entrada de voz del dispositivo</string>
+    <string name="delete_gesture">Deslizar para borrar</string>
+    <string name="delete_gesture_summary">Deslizar a la izquierda desde Retroceso borra palabras enteras</string>
+    <string name="mc_voice_title">Dictado</string>
+    <string name="mc_voice_description">Botón de micrófono: entrada de voz del dispositivo (auto/system) o desactivado. «offline» está previsto.</string>
+    <string name="mc_symbol_hints_title">Símbolos con pulsación larga</string>
+    <string name="mc_symbol_hints_description">Símbolos en las teclas de letras que escribe una pulsación larga.</string>
+    <string name="mc_key_borders_title">Bordes de teclas</string>
+    <string name="mc_key_borders_description">Teclas de letras como mosaicos.</string>
+    <string name="mc_delete_gesture_title">Deslizar para borrar</string>
+    <string name="mc_delete_gesture_description">Deslizar a la izquierda desde Retroceso borra palabras.</string>
+    <string-array name="mc_voice_entries">
+        <item>Automático</item>
+        <item>Entrada de voz del dispositivo</item>
+        <item>Sin conexión (previsto)</item>
+        <item>Desactivado</item>
+    </string-array>
 </resources>

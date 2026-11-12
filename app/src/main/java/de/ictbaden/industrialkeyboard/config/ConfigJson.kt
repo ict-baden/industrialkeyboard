@@ -53,6 +53,8 @@ object ConfigJson {
             putOpt("accentColor", a.accentColor)
             put("dynamicColor", a.dynamicColor)
             put("emojiKey", a.emojiKey)
+            put("symbolHints", a.symbolHints)
+            put("keyBorders", a.keyBorders)
             put("keyHeight", a.keyHeight)
             put("width", a.width)
             put("numberRow", a.numberRow)
@@ -84,6 +86,8 @@ object ConfigJson {
             put("longPressDelay", config.typing.longPressDelay)
             put("suggestions", config.typing.suggestions)
             put("autocorrect", config.typing.autocorrect)
+            put("voice", config.typing.voice.key)
+            put("deleteGesture", config.typing.deleteGesture)
         })
         root.put("feedback", JSONObject().apply {
             val f = config.feedback
@@ -226,6 +230,8 @@ object ConfigJson {
             functionModifiers = json.optBoolean("functionModifiers", d.functionModifiers),
             dynamicColor = json.optBoolean("dynamicColor", d.dynamicColor),
             emojiKey = json.optBoolean("emojiKey", d.emojiKey),
+            symbolHints = json.optBoolean("symbolHints", d.symbolHints),
+            keyBorders = json.optBoolean("keyBorders", d.keyBorders),
         )
     }
 
@@ -279,6 +285,8 @@ object ConfigJson {
             longPressDelay = json.optInt("longPressDelay", d.longPressDelay).coerceIn(200, 1500),
             suggestions = json.optBoolean("suggestions", d.suggestions),
             autocorrect = json.optBoolean("autocorrect", d.autocorrect),
+            voice = enumValue(json, "voice", "typing", d.voice),
+            deleteGesture = json.optBoolean("deleteGesture", d.deleteGesture),
         )
     }
 

@@ -424,4 +424,26 @@
     <string name="symbols_key_summary">\?123 en bas à gauche comme Gboard, aussi avec la barre d’onglets ; ABC sur la page des symboles revient</string>
     <string name="mc_symbols_key_title">Touche chiffres (?123)</string>
     <string name="mc_symbols_key_description">Touche ?123 en bas à gauche des lettres, aussi avec la barre d’onglets.</string>
+    <string name="symbol_hints">Symboles par appui long</string>
+    <string name="symbol_hints_summary">Petits symboles sur les lettres (a @, s # …) qu’un appui long tape, comme Gboard</string>
+    <string name="key_borders">Bordures des touches</string>
+    <string name="key_borders_summary">Lettres en tuiles ; désactivé : seulement les lettres, comme Gboard sans bordures</string>
+    <string name="voice_input">Dictée (micro)</string>
+    <string name="voice_system">Saisie vocale de l’appareil</string>
+    <string name="delete_gesture">Balayer pour supprimer</string>
+    <string name="delete_gesture_summary">Balayer vers la gauche depuis Retour arrière supprime des mots entiers</string>
+    <string name="mc_voice_title">Dictée</string>
+    <string name="mc_voice_description">Bouton micro : saisie vocale de l’appareil (auto/system) ou désactivé. « offline » est prévu.</string>
+    <string name="mc_symbol_hints_title">Symboles par appui long</string>
+    <string name="mc_symbol_hints_description">Symboles sur les touches de lettres qu’un appui long tape.</string>
+    <string name="mc_key_borders_title">Bordures des touches</string>
+    <string name="mc_key_borders_description">Touches de lettres en tuiles.</string>
+    <string name="mc_delete_gesture_title">Balayer pour supprimer</string>
+    <string name="mc_delete_gesture_description">Balayer vers la gauche depuis Retour arrière supprime des mots.</string>
+    <string-array name="mc_voice_entries">
+        <item>Automatique</item>
+        <item>Saisie vocale de l’appareil</item>
+        <item>Hors ligne (prévu)</item>
+        <item>Désactivé</item>
+    </string-array>
 </resources>
