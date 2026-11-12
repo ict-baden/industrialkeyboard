@@ -1,6 +1,7 @@
 package de.ictbaden.industrialkeyboard.ime
 
 import android.text.InputType
+import android.view.inputmethod.EditorInfo
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
 import de.ictbaden.industrialkeyboard.config.Navigation
 import de.ictbaden.industrialkeyboard.config.Tabs
@@ -78,8 +79,15 @@ object FieldPolicy {
     fun suggestionsAllowed(inputType: Int): Boolean {
         if (inputType and InputType.TYPE_MASK_CLASS != InputType.TYPE_CLASS_TEXT) return false
         if (inputType and InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS != 0) return false
-        return (inputType and InputType.TYPE_MASK_VARIATION) !in NO_WORD_VARIATIONS
+        // Search and filter fields get suggestions too, like Gboard (but no autocorrect, see below).
+        return (inputType and InputType.TYPE_MASK_VARIATION) !in NO_WORD_VARIATIONS - InputType.TYPE_TEXT_VARIATION_FILTER
     }
+
+    /** Autocorrect only where suggestions are shown, and never in search fields: a query is often a name or code. */
+    fun autocorrectAllowed(inputType: Int, imeOptions: Int): Boolean =
+        suggestionsAllowed(inputType) &&
+            (inputType and InputType.TYPE_MASK_VARIATION) != InputType.TYPE_TEXT_VARIATION_FILTER &&
+            (imeOptions and EditorInfo.IME_MASK_ACTION) != EditorInfo.IME_ACTION_SEARCH
 
     /** Emoji only make sense in normal text: not in passwords, e-mail, web addresses, numbers or dates. */
     fun emojiAllowed(inputType: Int): Boolean {
