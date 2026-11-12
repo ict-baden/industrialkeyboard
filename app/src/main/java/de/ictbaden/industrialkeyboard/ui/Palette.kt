@@ -3,6 +3,8 @@ package de.ictbaden.industrialkeyboard.ui
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.toColorInt
 import de.ictbaden.industrialkeyboard.config.Appearance
@@ -35,11 +37,65 @@ data class Palette(
 
         fun resolve(context: Context, appearance: Appearance): Palette {
             val accent = parse(appearance.accentColor)
+            // Like Gboard: the system colours from the wallpaper, unless a brand colour is set.
+            if (accent == null && appearance.dynamicColor && appearance.theme != ThemeMode.CONTRAST && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val dark = when (appearance.theme) {
+                    ThemeMode.LIGHT -> false
+                    ThemeMode.DARK -> true
+                    else -> isNight(context)
+                }
+                return dynamic(context, dark)
+            }
             return when (appearance.theme) {
                 ThemeMode.LIGHT -> light(accent ?: DEFAULT_ACCENT)
                 ThemeMode.DARK -> dark(accent ?: DEFAULT_ACCENT)
                 ThemeMode.CONTRAST -> contrast(accent ?: CONTRAST_ACCENT)
                 ThemeMode.SYSTEM -> if (isNight(context)) dark(accent ?: DEFAULT_ACCENT) else light(accent ?: DEFAULT_ACCENT)
+            }
+        }
+
+        /** Material You tones as Gboard uses them (measured on a Pixel 9 Pro, Android 17). */
+        @RequiresApi(Build.VERSION_CODES.S)
+        fun dynamic(context: Context, dark: Boolean): Palette {
+            fun c(id: Int) = context.getColor(id)
+            return if (dark) {
+                Palette(
+                    background = c(android.R.color.system_neutral1_900),
+                    key = c(android.R.color.system_neutral1_800),
+                    keyText = c(android.R.color.system_neutral1_50),
+                    keyHint = c(android.R.color.system_neutral2_300),
+                    function = c(android.R.color.system_accent2_800),
+                    functionText = c(android.R.color.system_accent2_100),
+                    accent = c(android.R.color.system_accent1_200),
+                    accentText = c(android.R.color.system_accent1_800),
+                    pressed = 0x2EFFFFFF,
+                    shadow = 0x66000000,
+                    border = 0,
+                    tabBar = c(android.R.color.system_neutral1_900),
+                    tabText = c(android.R.color.system_neutral2_200),
+                    popup = c(android.R.color.system_neutral1_700),
+                    popupText = c(android.R.color.system_neutral1_50),
+                    dark = true,
+                )
+            } else {
+                Palette(
+                    background = c(android.R.color.system_neutral2_50),
+                    key = c(android.R.color.system_neutral1_10),
+                    keyText = c(android.R.color.system_neutral1_900),
+                    keyHint = c(android.R.color.system_neutral2_500),
+                    function = c(android.R.color.system_accent2_100),
+                    functionText = c(android.R.color.system_accent2_900),
+                    accent = c(android.R.color.system_accent1_600),
+                    accentText = c(android.R.color.system_accent1_0),
+                    pressed = 0x24000000,
+                    shadow = 0x2E1C2026,
+                    border = 0,
+                    tabBar = c(android.R.color.system_neutral2_50),
+                    tabText = c(android.R.color.system_neutral2_700),
+                    popup = c(android.R.color.system_neutral1_10),
+                    popupText = c(android.R.color.system_neutral1_900),
+                    dark = false,
+                )
             }
         }
 

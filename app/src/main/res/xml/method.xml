@@ -1,5 +1,304 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Keyboard languages (subtypes): Android enables those matching the system languages, more can be
+     added under Settings → System → Keyboard → Industrial Keyboard → Languages. With
+     layout.alphabet "auto" the letter layout follows the selected language (Alphabet.forLocale);
+     only Latin-script languages, because the keyboard has no other scripts. -->
 <input-method xmlns:android="http://schemas.android.com/apk/res/android"
     android:isDefault="false"
     android:settingsActivity="de.ictbaden.industrialkeyboard.app.SettingsActivity"
-    android:supportsSwitchingToNextInputMethod="true" />
+    android:supportsSwitchingToNextInputMethod="true">
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="en_US"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="en-US" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="en_GB"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="en-GB" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="de_DE"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="de-DE" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="de_AT"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="de-AT" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="de_CH"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="de-CH" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="fr_FR"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="fr-FR" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="fr_BE"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="fr-BE" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="fr_CA"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="fr-CA" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="fr_CH"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="fr-CH" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="it_IT"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="it-IT" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="es_ES"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="es-ES" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="es_MX"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="es-MX" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="ca_ES"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="ca-ES" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="pt_PT"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="pt-PT" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="pt_BR"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="pt-BR" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="nl_NL"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="nl-NL" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="nl_BE"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="nl-BE" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="sv_SE"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="sv-SE" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="da_DK"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="da-DK" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="nb_NO"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="nb-NO" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="fi_FI"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="fi-FI" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="is_IS"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="is-IS" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="pl_PL"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="pl-PL" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="cs_CZ"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="cs-CZ" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="sk_SK"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="sk-SK" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="hu_HU"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="hu-HU" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="sl_SI"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="sl-SI" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="hr_HR"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="hr-HR" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="ro_RO"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="ro-RO" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="tr_TR"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="tr-TR" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="id_ID"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="id-ID" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="ms_MY"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="ms-MY" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="vi_VN"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="vi-VN" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="tl_PH"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="tl-PH" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="sw_KE"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="sw-KE" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="zu_ZA"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="zu-ZA" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="af_ZA"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="af-ZA" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="sq_AL"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="sq-AL" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="lb_LU"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="lb-LU" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="et_EE"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="et-EE" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="lv_LV"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="lv-LV" />
+    <subtype
+        android:icon="@drawable/kb_globe"
+        android:imeSubtypeLocale="lt_LT"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/subtype_generic"
+        android:languageTag="lt-LT" />
+</input-method>

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.nfc.NfcAdapter
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -244,6 +245,13 @@ class SettingsActivity : AppCompatActivity() {
                             update { it.copy(appearance = it.appearance.copy(accentColor = color)) }
                         }
                     },
+                    ui.switchRow(
+                        R.drawable.ic_palette,
+                        getString(R.string.dynamic_color),
+                        getString(R.string.dynamic_color_summary),
+                        c.appearance.dynamicColor,
+                        enabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && c.appearance.accentColor == null && c.appearance.theme != ThemeMode.CONTRAST,
+                    ) { on -> update { it.copy(appearance = it.appearance.copy(dynamicColor = on)) } },
                     ui.sliderRow(R.drawable.ic_keyboard, getString(R.string.key_height), 70, 160, 5, c.appearance.keyHeight, format = ::percent) { value ->
                         update { it.copy(appearance = it.appearance.copy(keyHeight = value)) }
                     },
@@ -275,6 +283,10 @@ class SettingsActivity : AppCompatActivity() {
                 listOf(
                     ui.choiceRow(R.drawable.ic_keyboard, getString(R.string.letters), Alphabet.entries.map { it to alphabetLabel(it) }, c.layout.alphabet) { alphabet ->
                         update { it.copy(layout = it.layout.copy(alphabet = alphabet)) }
+                    },
+                    ui.row(R.drawable.ic_globe, getString(R.string.keyboard_languages), getString(R.string.keyboard_languages_summary)) { openLanguageSettings() },
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.umlaut_keys), getString(R.string.umlaut_keys_summary), c.layout.umlautKeys) { on ->
+                        update { it.copy(layout = it.layout.copy(umlautKeys = on)) }
                     },
                     ui.choiceRow(
                         R.drawable.ic_keyboard,
@@ -580,6 +592,13 @@ class SettingsActivity : AppCompatActivity() {
         setImageResource(R.drawable.bg_avatar)
         imageTintList = ColorStateList.valueOf(Palette.resolve(this@SettingsActivity, config.appearance).accent)
         layoutParams = LinearLayout.LayoutParams(ui.dp(28), ui.dp(28))
+    }
+
+    /** Android's list of keyboard languages for this keyboard (subtypes in res/xml/method.xml). */
+    private fun openLanguageSettings() {
+        val id = getSystemService(InputMethodManager::class.java)?.inputMethodList?.firstOrNull { it.packageName == packageName }?.id
+        val intent = Intent(Settings.ACTION_INPUT_METHOD_SUBTYPE_SETTINGS).apply { id?.let { putExtra(Settings.EXTRA_INPUT_METHOD_ID, it) } }
+        runCatching { startActivity(intent) }.onFailure { startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)) }
     }
 
     /** „Automatic (QWERTZ)“: shows which layout the system language gives. */

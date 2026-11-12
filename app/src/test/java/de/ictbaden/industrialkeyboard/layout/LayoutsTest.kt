@@ -22,14 +22,34 @@ class LayoutsTest {
     private fun labels(row: KeyRow) = row.keys.mapNotNull { it.label }
 
     @Test
-    fun `qwertz has umlauts and digit hints`() {
+    fun `qwertz like Gboard - umlauts first on long press, digit hints`() {
         val layout = Layouts.alpha(KeyboardConfig(layout = LayoutSettings(alphabet = Alphabet.QWERTZ)))
-        assertEquals("qwertzuiopü".map { it.toString() }, labels(layout.rows[0]))
-        assertEquals("asdfghjklöä".map { it.toString() }, labels(layout.rows[1]))
+        assertEquals("qwertzuiop".map { it.toString() }, labels(layout.rows[0]))
+        assertEquals("asdfghjkl".map { it.toString() }, labels(layout.rows[1]))
         assertEquals("1", layout.rows[0].keys[0].hint)
         assertEquals(listOf("1"), layout.rows[0].keys[0].popup)
+        // u carries the digit 7 first, then ü; a, o and s start with ä, ö, ß.
+        assertEquals(listOf("7", "ü"), layout.rows[0].keys[6].popup.take(2))
+        assertEquals("ä", layout.rows[1].keys[0].popup.first())
+        assertEquals("ß", layout.rows[1].keys[1].popup.first())
+        assertEquals(10f, layout.units)
+    }
+
+    @Test
+    fun `qwertz with umlaut keys`() {
+        val layout = Layouts.alpha(KeyboardConfig(layout = LayoutSettings(alphabet = Alphabet.QWERTZ, umlautKeys = true)))
+        assertEquals("qwertzuiopü".map { it.toString() }, labels(layout.rows[0]))
+        assertEquals("asdfghjklöä".map { it.toString() }, labels(layout.rows[1]))
         assertTrue("ß" in layout.rows[1].keys[1].popup)
         assertEquals(11f, layout.units)
+    }
+
+    @Test
+    fun `language key next to the space bar only when asked`() {
+        val plain = Layouts.alpha(KeyboardConfig()).rows.last().keys
+        val withKey = Layouts.alpha(KeyboardConfig(), languageKey = true).rows.last().keys
+        assertTrue(plain.none { it.output == KeyOutput.Language })
+        assertEquals(1, withKey.count { it.output == KeyOutput.Language })
     }
 
     @Test

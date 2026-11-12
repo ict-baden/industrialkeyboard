@@ -17,8 +17,21 @@ import de.ictbaden.industrialkeyboard.ui.TabBarView
 object KeyboardRenderer {
     const val BASE_ROW_DP = 54f
 
-    fun layoutFor(page: Page, config: KeyboardConfig, shift: ShiftState = ShiftState.OFF): KeyboardLayout? = when (page) {
-        is Page.Alpha -> Layouts.alpha(config, page.variant)
+    /**
+     * Row height (key plus gap) at 100 %: like Gboard about 6.8 % of the screen height – 65 dp on a
+     * Pixel 9 Pro – but at least the former 54 dp and at most 70 dp. In landscape the short side
+     * counts less, so the keys do not cover the whole screen.
+     */
+    fun baseRowDp(context: Context): Float {
+        val config = context.resources.configuration
+        val portrait = config.screenHeightDp >= config.screenWidthDp
+        val height = maxOf(config.screenHeightDp, config.screenWidthDp).toFloat()
+        val ideal = height * 0.068f
+        return if (portrait) ideal.coerceIn(BASE_ROW_DP, 70f) else (ideal * 0.75f).coerceIn(48f, BASE_ROW_DP)
+    }
+
+    fun layoutFor(page: Page, config: KeyboardConfig, shift: ShiftState = ShiftState.OFF, languageKey: Boolean = false): KeyboardLayout? = when (page) {
+        is Page.Alpha -> Layouts.alpha(config, page.variant, languageKey)
         is Page.Symbols -> Layouts.symbols(config, page.page, page.variant)
         is Page.Numeric -> Layouts.numeric(config, page.variant)
         Page.Function -> Layouts.function(shifted = shift != ShiftState.OFF, modifiers = config.appearance.functionModifiers)
@@ -58,16 +71,18 @@ object KeyboardRenderer {
         /** Armed (ONCE) or locked Ctrl, Win and Alt. */
         modifiers: Map<ModifierKey, ShiftState> = emptyMap(),
         camera: Boolean = false,
+        /** 🌐 next to the space bar. */
+        languageKey: Boolean = false,
     ): RenderState {
         val appearance = config.appearance
-        val rowHeight = (BASE_ROW_DP * context.resources.displayMetrics.density * appearance.keyHeight / 100f).toInt()
+        val rowHeight = (baseRowDp(context) * context.resources.displayMetrics.density * appearance.keyHeight / 100f).toInt()
         // Without a scanner the scan key would do nothing.
         val keys = if (scannerName == null && config.scanner.scanKey) config.copy(scanner = config.scanner.copy(scanKey = false)) else config
         return RenderState(
             palette = Palette.resolve(context, appearance),
             tabs = tabs(config, scannerName != null),
             selectedTab = page.tab,
-            layout = layoutFor(page, keys, shift),
+            layout = layoutFor(page, keys, shift, languageKey),
             shift = shift,
             modifiers = modifiers,
             enterIcon = enterIcon,

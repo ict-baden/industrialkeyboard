@@ -159,8 +159,9 @@ class KeyboardView(context: Context) : View(context) {
         val h = (height - paddingTop - paddingBottom).toFloat()
         val unit = w / layout.units
         val rowH = h / layout.rows.size
-        val gapX = dp(5f)
-        val gapY = min(dp(8f), rowH * 0.15f)
+        // Gaps like Gboard (measured on a Pixel 9 Pro: 5.3 dp between keys, 12 dp between rows).
+        val gapX = dp(5.5f)
+        val gapY = min(dp(12f), rowH * 0.19f)
         layout.rows.forEachIndexed { r, row ->
             val spare = layout.units - row.units
             val flex = row.keys.count { it.flex }
@@ -268,6 +269,7 @@ class KeyboardView(context: Context) : View(context) {
             KeyIcon.TAB -> R.drawable.kb_tab
             KeyIcon.SPACE -> R.drawable.kb_space
             KeyIcon.SCAN -> R.drawable.kb_scan
+            KeyIcon.GLOBE -> R.drawable.kb_globe
             KeyIcon.HIDE -> R.drawable.kb_hide
             KeyIcon.LEFT -> R.drawable.kb_left
             KeyIcon.RIGHT -> R.drawable.kb_right

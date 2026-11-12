@@ -2,7 +2,7 @@ package de.ictbaden.industrialkeyboard.layout
 
 import de.ictbaden.industrialkeyboard.config.KeyStyle
 
-enum class KeyIcon { SHIFT, BACKSPACE, ENTER, TAB, SPACE, SCAN, HIDE, LEFT, RIGHT, UP, DOWN, SETTINGS }
+enum class KeyIcon { SHIFT, BACKSPACE, ENTER, TAB, SPACE, SCAN, HIDE, LEFT, RIGHT, UP, DOWN, SETTINGS, GLOBE }
 
 /** What a key does when it is released. */
 sealed interface KeyOutput {
@@ -20,6 +20,9 @@ sealed interface KeyOutput {
 
     /** Ctrl, Alt or Win: applies to the next key; tap again to press it alone, hold to lock. */
     data class Modifier(val modifier: ModifierKey) : KeyOutput
+
+    /** Next keyboard language (tap) or the list of keyboards (long press), like 🌐 in Gboard. */
+    data object Language : KeyOutput
 
     /** Toggles between the two symbol pages. */
     data object SymbolsPage : KeyOutput

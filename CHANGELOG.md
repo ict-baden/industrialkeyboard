@@ -5,6 +5,14 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 ## [Unveröffentlicht]
 
 ### Neu
+- **Wie Gboard** (gemessen auf einem Pixel 9 Pro):
+  - Tastengröße folgt der Bildschirmhöhe (etwa 6,8 % je Reihe, 54–70 dp), Lücken 5,5 dp zwischen Tasten und 12 dp zwischen Reihen; der Regler „Tastenhöhe“ wirkt weiter.
+  - Abstand unten: die Tasten bleiben über Androids eigenen Knöpfen ⌄ und 🌐 bei Gestensteuerung (bisher ragten sie hinein).
+  - Tastatursprachen (Subtypes) für 40 Sprachen mit lateinischer Schrift: Android schaltet die zur Systemsprache passenden frei, 🌐 wechselt beim Tippen, die Leertaste zeigt die Sprache („Deutsch“), mit `layout.alphabet: "auto"` folgt das Layout der Sprache. Eigene 🌐-Taste neben der Leertaste, wenn mehrere Sprachen aktiv sind und Android keinen Umschaltknopf zeigt. Einstellung „Tastatursprachen“ öffnet die Android-Liste.
+  - QWERTZ mit 10/9/7 Tasten, ä, ö, ü, ß zuerst bei langem Druck auf a, o, u, s. Die bisherige Variante mit eigenen Umlaut-Tasten: `layout.umlautKeys: true`.
+  - Systemfarben (Material You) ab Android 12, solange keine eigene Akzentfarbe gesetzt ist (`appearance.dynamicColor`, Standard an).
+  - Haptik: ohne `feedback.vibrationMs` der Tastatur-Tick des Systems statt eines festen 18-ms-Brummens.
+  - Enter 1,5 statt 2 Tasten breit.
 - **Strg, Win und Alt für Remotedesktop:** wahlweise als Reihe über den Buchstaben (mit Esc, Tab und Entf, `appearance.modifierRow`) und als zusätzliche Reihe bei den Funktionstasten (`appearance.functionModifiers`), beides auch in den Einstellungen unter „Darstellung“. Die Tasten rasten ein: tippen gilt für die nächste Taste, nochmal tippen drückt sie allein (Win öffnet das Startmenü), halten stellt fest. Sie bleiben beim Wechsel des Tabs an, Alt und dann F4 auf dem Fn-Tab ergibt Alt+F4. Solange eine an ist, gehen Buchstaben, Ziffern und Satzzeichen als Tastendruck raus statt als Text, und Strg/Win/Alt werden wie auf einer PC-Tastatur um die Taste herum gedrückt und losgelassen.
 - **Shift auch für Tab, Pfeile und Co.:** ein von Hand getipptes Shift gilt jetzt auch für Tab, Pfeile, Esc, Entf, Pos1/Ende und die anderen Tasten – Shift+Tab springt zurück, Shift+Pfeil markiert, mit Strg zusammen Strg+Shift+Esc. Das automatische Shift am Satzanfang und die Feststelltaste tun das nicht.
 - **Menü, Druck und Pause** auf dem Fn-Tab, in der Reihe mit Strg, Win und Alt (`appearance.functionModifiers`).

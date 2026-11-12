@@ -2,6 +2,8 @@
 <resources>
     <string name="app_name" translatable="false">Industrial Keyboard</string>
     <string name="ime_name" translatable="false">Industrial Keyboard</string>
+    <!-- Subtype label: Android puts in the language name of the subtype. -->
+    <string name="subtype_generic" translatable="false">%s</string>
     <string name="settings_title">Keyboard settings</string>
     <string name="message_with_code">%1$s (%2$s)</string>
     <string name="value_percent">%1$d %%</string>
@@ -454,4 +456,10 @@
         <item>uid</item>
         <item>ndef</item>
     </string-array>
+    <string name="dynamic_color">System colours (Material You)</string>
+    <string name="dynamic_color_summary">Colours from the wallpaper like Gboard; Android 12+ and only without own accent colour</string>
+    <string name="keyboard_languages">Keyboard languages</string>
+    <string name="keyboard_languages_summary">Languages the 🌐 button switches between, from the Android settings</string>
+    <string name="umlaut_keys">Umlaut keys</string>
+    <string name="umlaut_keys_summary">ü, ö and ä as own keys in QWERTZ; otherwise on long press of u, o, a</string>
 </resources>
