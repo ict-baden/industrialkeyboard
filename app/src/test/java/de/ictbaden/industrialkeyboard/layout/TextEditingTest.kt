@@ -108,4 +108,14 @@ class TextEditingTest {
         assertNull(TextEditing.extend(anchor = -1, selStart = -1, selEnd = -1, delta = -1))
         assertNull(TextEditing.extend(anchor = -1, selStart = -1, selEnd = -1, delta = 1))
     }
+
+    @Test
+    fun `paste types the clip itself only in terminals`() {
+        // Compose pastes via KEYCODE_PASTE and still answers false: no second copy in editors.
+        assertFalse(TextEditing.pasteFallback(text))
+        assertFalse(TextEditing.pasteFallback(multiLine))
+        assertFalse(TextEditing.pasteFallback(number))
+        assertFalse(TextEditing.pasteFallback(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD))
+        assertTrue(TextEditing.pasteFallback(terminal))
+    }
 }

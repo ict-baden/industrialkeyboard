@@ -432,12 +432,18 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         }
     }
 
+    override fun onStartInput(attribute: EditorInfo, restarting: Boolean) {
+        super.onStartInput(attribute, restarting)
+        // Fresh EditorInfo on every start and restart. Not in onStartInputView: on a plain re-show
+        // it gets the old EditorInfo, and onUpdateSelection has reported newer positions meanwhile.
+        selStart = attribute.initialSelStart
+        selEnd = attribute.initialSelEnd
+    }
+
     override fun onStartInputView(info: EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         toolPanel = null
         textSelecting = false
-        selStart = info.initialSelStart
-        selEnd = info.initialSelEnd
         // First, so that the dictionary, dictation and the start page see the effective configuration.
         val effectiveChanged = useEffective()
         watchClipboard(true)
@@ -1100,8 +1106,9 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
                 textSelecting = false
             }
             EditAction.PASTE -> {
-                // Some terminals and custom editors have no paste action: type the clip (never a sensitive one).
-                if (!ic.performContextMenuAction(android.R.id.paste)) {
+                // Terminals and remote desktops have no paste action: type the clip there (never a
+                // sensitive one). Editors may paste and still answer false (Compose sends KEYCODE_PASTE).
+                if (!ic.performContextMenuAction(android.R.id.paste) && TextEditing.pasteFallback(type)) {
                     currentClip()?.let { clip ->
                         ownEdits++
                         ic.commitText(clip, 1)

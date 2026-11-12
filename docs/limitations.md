@@ -59,12 +59,13 @@ Please report results on other devices in the
 
 ## Text editing panel
 
-- Select all, Cut, Copy and Paste use the field's own text actions. Apps without them (some
-  Compose, Flutter, React Native or custom editors) ignore Select all, Cut and Copy; Paste then
-  types the current clipboard text instead.
+- Select all, Cut, Copy and Paste use the field's own text actions (Compose text fields handle
+  them as well). Custom editors without these actions ignore Cut, Copy and Paste; Select all
+  then selects the text the field reports.
 - Terminal emulators and remote desktop apps (fields without a text editor) get only keys and
-  Paste; Select, Select all, Cut and Copy are dimmed there. There is no Ctrl+C fallback on
-  purpose: in a terminal Ctrl+C interrupts the running program.
+  Paste, which types the current clipboard text there; Select, Select all, Cut and Copy are
+  dimmed. There is no Ctrl+C fallback on purpose: in a terminal Ctrl+C interrupts the running
+  program.
 - In single-line fields ↑/↓ act as Home/End (Gboard moves the focus there). Fields that report a
   wrong input type (some WebViews) may behave differently.
 - ↑/↓ on the first or last line of a multi-line field, and ←/→ when the app does not answer
