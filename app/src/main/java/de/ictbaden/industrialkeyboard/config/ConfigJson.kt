@@ -270,7 +270,12 @@ object ConfigJson {
                 throw ConfigException("keys: unknown key \"$id\" (${ProgrammableKey.entries.joinToString { it.id }})")
             }
             val macro = json.optString(id)
-            if (macro.isEmpty()) throw ConfigException("keys.$id: empty")
+            // alpha.p1 may be empty: then there is no such key (like Gboard).
+            if (macro.isEmpty() && id != ProgrammableKey.ALPHA_P1.id) throw ConfigException("keys.$id: empty")
+            if (macro.isEmpty()) {
+                keys[id] = macro
+                return@forEach
+            }
             checkMacro(macro, "keys.$id")
             keys[id] = macro
         }

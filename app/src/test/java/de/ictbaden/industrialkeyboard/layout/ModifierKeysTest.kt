@@ -124,9 +124,10 @@ class ModifierKeysTest {
     @Test
     fun `a key whose macro is just a modifier becomes sticky`() {
         val config = KeyboardConfig(keys = KeySettings(ProgrammableKey.DEFAULTS + ("alpha.p1" to "{CTRL}")))
+        // P1 sits right of the ?123 key.
         val bottom = Layouts.alpha(config).rows.last()
-        assertEquals(KeyOutput.Modifier(ModifierKey.CTRL), bottom.keys[0].output)
-        assertEquals("Ctrl", bottom.keys[0].label)
+        assertEquals(KeyOutput.Modifier(ModifierKey.CTRL), bottom.keys[1].output)
+        assertEquals("Ctrl", bottom.keys[1].label)
         val custom = Layouts.custom(
             CustomLayout("rdp", "RDP", listOf(listOf(CustomKey("Strg", "{CTRL}"), CustomKey("Task-Manager", "{CTRL+SHIFT+ESC}")))),
         )

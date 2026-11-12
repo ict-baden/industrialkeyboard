@@ -166,7 +166,7 @@ data class LayoutSettings(
     /** QWERTZ with ü, ö and ä as own keys (11 keys per row); otherwise on long press like Gboard. */
     val umlautKeys: Boolean = false,
     /** "?123" / "ABC" at the left of the bottom row like Gboard, also with the tab bar. */
-    val symbolsKey: Boolean = false,
+    val symbolsKey: Boolean = true,
 )
 
 data class TabSettings(
@@ -184,7 +184,8 @@ data class KeySettings(val programmable: Map<String, String> = ProgrammableKey.D
 
 /** Descriptions for the settings are string resources (`key_alpha_p1` …). */
 enum class ProgrammableKey(val id: String, val default: String) {
-    ALPHA_P1("alpha.p1", "{TAB}"),
+    /** Empty by default like Gboard (no key); `{TAB}` was the default up to 2.1. */
+    ALPHA_P1("alpha.p1", ""),
     NUMERIC_P1("numeric.p1", "-"),
     NUMERIC_P2("numeric.p2", "/"),
     NUMERIC_P3("numeric.p3", ":"),
@@ -201,11 +202,11 @@ data class TypingSettings(
     val autoCapitalize: Boolean = true,
     val doubleSpacePeriod: Boolean = true,
     /** Milliseconds until a held key shows its alternatives (200–1500). */
-    val longPressDelay: Int = 400,
+    val longPressDelay: Int = 300,
     /** Three word suggestions above the keys in normal text fields, from a built-in dictionary (no learning). */
     val suggestions: Boolean = true,
     /** Space replaces an obvious typo by the best suggestion; Backspace right after undoes it. */
-    val autocorrect: Boolean = false,
+    val autocorrect: Boolean = true,
     /** Microphone button for dictation. */
     val voice: VoiceInput = VoiceInput.AUTO,
     /** Swipe left from Backspace deletes word by word, like Gboard. */

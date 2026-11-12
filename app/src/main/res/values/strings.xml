@@ -512,4 +512,5 @@
         <item>offline</item>
         <item>off</item>
     </string-array>
+    <string name="key_none">none (no key)</string>
 </resources>

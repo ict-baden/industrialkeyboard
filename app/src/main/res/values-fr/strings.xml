@@ -446,4 +446,5 @@
         <item>Hors ligne (prévu)</item>
         <item>Désactivé</item>
     </string-array>
+    <string name="key_none">aucune (pas de touche)</string>
 </resources>

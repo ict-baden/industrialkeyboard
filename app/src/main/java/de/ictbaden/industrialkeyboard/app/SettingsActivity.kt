@@ -366,8 +366,9 @@ class SettingsActivity : AppCompatActivity() {
                 ProgrammableKey.entries.map { key ->
                     val value = c.programmable(key)
                     val description = getString(keyDescription(key))
-                    ui.row(R.drawable.ic_key, key.id.uppercase(), "$value  ·  $description") {
-                        dialogs.editMacro(description, value, key.default) { macro ->
+                    val shown = value.ifEmpty { getString(R.string.key_none) }
+                    ui.row(R.drawable.ic_key, key.id.uppercase(), "$shown  ·  $description") {
+                        dialogs.editMacro(description, value, key.default.ifEmpty { getString(R.string.key_none) }, allowEmpty = key == ProgrammableKey.ALPHA_P1) { macro ->
                             update { it.copy(keys = it.keys.copy(programmable = it.keys.programmable + (key.id to (macro ?: key.default)))) }
                         }
                     }

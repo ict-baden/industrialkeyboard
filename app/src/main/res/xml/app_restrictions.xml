@@ -148,7 +148,7 @@
         android:restrictionType="bool"
         android:title="@string/mc_emoji_key_title" />
     <restriction
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:description="@string/mc_symbols_key_description"
         android:key="symbols_key"
         android:restrictionType="bool"

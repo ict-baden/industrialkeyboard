@@ -269,7 +269,8 @@ object Layouts {
                 val toSymbols = page == Tabs.ALPHA
                 add(Key(label = if (toSymbols) "?123" else "ABC", output = KeyOutput.ShowTab(if (toSymbols) Tabs.SYMBOLS else Tabs.ALPHA), width = 1.5f, style = KeyStyle.FUNCTION))
             }
-            add(programmable(config.programmable(ProgrammableKey.ALPHA_P1), width = if (switchKey) 1f else 1.5f))
+            val p1 = config.programmable(ProgrammableKey.ALPHA_P1)
+            if (p1.isNotEmpty()) add(programmable(p1, width = if (switchKey) 1f else 1.5f))
             val secondSymbols = page == "${Tabs.SYMBOLS}-2"
             add(
                 // Like Gboard: comma and period in the colour of the function keys.

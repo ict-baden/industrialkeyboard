@@ -44,7 +44,7 @@ as managed configuration (`config_json`), as a file, as a broadcast, or imported
     "preferred": "auto"
   },
   "keys": {
-    "alpha.p1": "{TAB}",
+    "alpha.p1": "",
     "numeric.p1": "-",
     "numeric.p2": "/",
     "numeric.p3": ":",
@@ -53,7 +53,7 @@ as managed configuration (`config_json`), as a file, as a broadcast, or imported
   "typing": {
     "autoCapitalize": true,
     "doubleSpacePeriod": true,
-    "longPressDelay": 400
+    "longPressDelay": 300
   },
   "feedback": {
     "keyPopup": true,
@@ -168,7 +168,7 @@ every language: [Error codes](error-codes.md).
 | Option | Values | Default | Effect |
 |---|---|---|---|
 | `alphabet` | `auto`, `qwerty`, `qwertz`, `azerty`, `nordic`, `spanish` | `auto` | Letter layout. `auto` follows the selected keyboard language (Android keyboard languages, switched with 🌐; before one is known: the first system language) (German, Czech, Swiss … → `qwertz`, French and Belgian → `azerty`, Swedish, Danish, Norwegian, Finnish → `nordic`, Spanish and Catalan → `spanish`, everything else `qwerty`) and changes with it. `qwertz` has ä ö ü ß first on long press (own keys with `umlautKeys`), `nordic` adds å ö ä, `spanish` ñ. Accents and special letters (ß, é, ç …) on long press |
-| `symbolsKey` | `true` / `false` | `false` | `?123` key at the left of the bottom row like Gboard (`ABC` on the symbols page), also with `navigation: "tabs"`; with `"keys"` it is always there |
+| `symbolsKey` | `true` / `false` | `true` | `?123` key at the left of the bottom row like Gboard (`ABC` on the symbols page), also with `navigation: "tabs"`; with `"keys"` it is always there |
 | `umlautKeys` | `true` / `false` | `false` | QWERTZ with ü, ö and ä as own keys (11 keys per row). Off: like Gboard, ä, ö, ü and ß come first on long press of a, o, u and s |
 | `navigation` | `tabs`, `keys` | `tabs` | `tabs`: tab bar above the keys (ABC, 123, #+=, Fn, scan, custom layouts, hide button). `keys`: no tab bar, `?123` / `ABC` keys like a phone keyboard; on the numeric pad the last side key becomes `ABC`. Other pages are then reachable with [`{SHOW:…}`](#macros) on a programmable key |
 | `numericOrder` | `phone`, `calculator` | `phone` | `phone`: 1-2-3 at the top. `calculator`: 7-8-9 at the top. Dial pads (phone number fields) always use phone order |
@@ -195,7 +195,7 @@ numeric pad, whatever is configured here.
 
 | Key | Position | Default |
 |---|---|---|
-| `alpha.p1` | Letters, bottom row, left of the comma | `{TAB}` |
+| `alpha.p1` | Letters, bottom row, left of the comma | empty = no key (like Gboard); `{TAB}` up to 2.1 |
 | `numeric.p1` … `numeric.p4` | Numeric pad, left column, top to bottom | `-` `/` `:` `+` |
 
 The value is a [macro](#macros): text (`-`), keys (`{TAB}`), both (`OK{ENTER}`) or a command
@@ -208,9 +208,9 @@ Phone, date and time fields show fixed keys instead of the numeric ones.
 |---|---|---|---|
 | `autoCapitalize` | `true` / `false` | `true` | Capital letters where the field asks for them: sentence start, every word, or all capitals (item numbers) |
 | `doubleSpacePeriod` | `true` / `false` | `true` | Two spaces after a word type `. ` |
-| `longPressDelay` | 200–1500 (ms) | `400` | Time until a long press shows the alternatives; 500–700 avoids accidental accents with gloves |
+| `longPressDelay` | 200–1500 (ms) | `300` (like Gboard; `400` up to 2.1) | Time until a long press shows the alternatives; 500–700 avoids accidental accents with gloves |
 | `suggestions` | `true` / `false` | `true` | Three word suggestions above the keys while a word is typed, like Gboard: from a built-in dictionary of the keyboard language, best one in the middle; tap one to replace the word and add a space. Only in normal text fields – never in passwords, e-mail and web addresses, numbers, dates or fields that set `textNoSuggestions` (barcode fields usually do). Nothing is learnt or stored |
-| `autocorrect` | `true` / `false` | `false` | Space replaces an obvious typo (one wrong, missing, extra or swapped letter) by the best suggestion; Backspace right after it brings the typed word back. Off by default: in data entry a "corrected" article number is worse than a typo |
+| `autocorrect` | `true` / `false` | `true` (like Gboard) | Space replaces an obvious typo (one wrong, missing, extra or swapped letter) by the best suggestion; Backspace right after it brings the typed word back. Only in normal text fields with suggestions – never in fields that switch suggestions off (barcode and article number fields usually do); for pure data entry switch it off |
 | `voice` | `auto`, `system`, `offline`, `off` | `auto` | Microphone button at the right of the tab bar (before ⌄). `auto` / `system`: switches to the voice input of the device (e.g. Google Voice Typing), which returns to this keyboard when done – the keyboard itself never records audio and needs no microphone permission. Hidden when the device has no voice input, in password fields and without tab bar. `offline` (speech recognition inside the keyboard for devices without Google, issue #24) is planned; until then it means `off` |
 | `deleteGesture` | `true` / `false` | `true` | Swipe left from Backspace marks whole words (one more per finger width), lifting the finger deletes them – like Gboard |
 

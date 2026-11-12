@@ -445,4 +445,5 @@
         <item>Offline (geplant)</item>
         <item>Aus</item>
     </string-array>
+    <string name="key_none">keine (keine Taste)</string>
 </resources>
