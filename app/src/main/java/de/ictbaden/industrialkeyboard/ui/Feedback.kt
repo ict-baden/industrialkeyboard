@@ -6,6 +6,8 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.view.HapticFeedbackConstants
+import android.view.View
 import de.ictbaden.industrialkeyboard.config.FeedbackSettings
 import de.ictbaden.industrialkeyboard.layout.Key
 import de.ictbaden.industrialkeyboard.layout.KeyOutput
@@ -22,8 +24,17 @@ class Feedback(context: Context) {
         context.getSystemService(Vibrator::class.java)
     }
 
+    /** The keyboard view: without a configured length the system's keyboard haptic is used on it. */
+    var hapticView: View? = null
+
     fun keyDown(key: Key?) {
-        if (settings.vibrate) vibrate()
+        if (settings.vibrate) {
+            // Like Gboard: the device's tuned "keyboard tap" (a short tick on Pixel), unless an
+            // administrator set a length (e.g. stronger for gloves).
+            val ticked = settings.vibrationMs == null &&
+                hapticView?.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP, HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING) == true
+            if (!ticked) vibrate()
+        }
         if (settings.sound) click(key?.output)
     }
 

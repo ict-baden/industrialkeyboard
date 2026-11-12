@@ -398,4 +398,10 @@
         <item>UID (numéro de série)</item>
         <item>Texte de l’étiquette (NDEF)</item>
     </string-array>
+    <string name="dynamic_color">Couleurs du système (Material You)</string>
+    <string name="dynamic_color_summary">Couleurs du fond d’écran comme Gboard ; Android 12+ et seulement sans couleur d’accent propre</string>
+    <string name="keyboard_languages">Langues du clavier</string>
+    <string name="keyboard_languages_summary">Langues entre lesquelles 🌐 bascule, dans les paramètres Android</string>
+    <string name="umlaut_keys">Touches à tréma</string>
+    <string name="umlaut_keys_summary">ü, ö et ä comme touches propres en QWERTZ ; sinon par appui long sur u, o, a</string>
 </resources>

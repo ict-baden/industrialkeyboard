@@ -81,11 +81,27 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         scanRow.setPadding(dp(3), 0, dp(3), dp(4))
         // Android 15+ draws the IME behind the navigation bar: keep the keys above it.
         ViewCompat.setOnApplyWindowInsetsListener(this) { _, insets ->
-            navigationInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            // With gesture navigation the bar itself is only the handle (24 dp), but below the keyboard
+            // Android also draws its own buttons (hide ⌄, switch keyboard 🌐) – they count as a
+            // tappable element (48 dp). Keep the keys above both, like Gboard.
+            val bar = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            val tappable = insets.getInsets(WindowInsetsCompat.Type.tappableElement()).bottom
+            val buttons = tappable > bar
+            // Gboard keeps another ~13 dp between its keys and those buttons (measured on a Pixel 9 Pro).
+            navigationInset = maxOf(bar, tappable) + if (buttons) dp(13) else 0
+            if (buttons != systemImeButtons) {
+                systemImeButtons = buttons
+                onSystemImeButtonsChanged?.invoke()
+            }
             panel.updatePadding(bottom = navigationInset)
             insets
         }
     }
+
+    /** Android draws its own hide and switch-keyboard buttons below the keyboard (gesture navigation). */
+    var systemImeButtons = false
+        private set
+    var onSystemImeButtonsChanged: (() -> Unit)? = null
 
     /** Top of the touchable keyboard panel inside this view. */
     val panelTop: Int get() = panel.top

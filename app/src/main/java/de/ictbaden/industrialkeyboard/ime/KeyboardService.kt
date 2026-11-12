@@ -18,6 +18,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.view.inputmethod.InputMethodSubtype
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import de.ictbaden.industrialkeyboard.AppLanguage
@@ -25,6 +26,7 @@ import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.api.KeyboardApi
 import de.ictbaden.industrialkeyboard.api.KeyboardBus
 import de.ictbaden.industrialkeyboard.app.SettingsActivity
+import de.ictbaden.industrialkeyboard.config.Alphabet
 import de.ictbaden.industrialkeyboard.config.ConfigStore
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
 import de.ictbaden.industrialkeyboard.config.Provisioning
@@ -175,14 +177,49 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         view.tabBar.onHideLongPress = { openSettings() }
         view.tabBar.onPress = { feedback.keyDown(null) }
         root = view
+        view.onSystemImeButtonsChanged = { render() }
+        feedback.hapticView = view.keyboard
         render()
         return view
     }
 
     override fun onEvaluateFullscreenMode(): Boolean = false
 
+    override fun onCurrentInputMethodSubtypeChanged(newSubtype: InputMethodSubtype?) {
+        super.onCurrentInputMethodSubtypeChanged(newSubtype)
+        useSubtype(newSubtype)
+        render()
+    }
+
+    /** The keyboard language decides the letters with `layout.alphabet: auto`. */
+    private fun useSubtype(subtype: InputMethodSubtype?) {
+        val tag = subtype?.languageTag?.takeIf { it.isNotEmpty() }
+        Alphabet.subtypeLocale = tag?.let(Locale::forLanguageTag)
+        // Asked here and not on every key: it is a call into the system.
+        multipleLanguages = severalLanguages()
+    }
+
+    private var multipleLanguages = false
+
+    /** More than one of our keyboard languages is switched on in the Android settings. */
+    private fun severalLanguages(): Boolean {
+        val imm = getSystemService(InputMethodManager::class.java) ?: return false
+        val me = imm.enabledInputMethodList.firstOrNull { it.packageName == packageName } ?: return false
+        return imm.getEnabledInputMethodSubtypeList(me, true).size > 1
+    }
+
+    private fun nextLanguage() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // Only within this keyboard: cycles through its languages.
+            if (!switchToNextInputMethod(true)) getSystemService(InputMethodManager::class.java)?.showInputMethodPicker()
+        } else {
+            getSystemService(InputMethodManager::class.java)?.showInputMethodPicker()
+        }
+    }
+
     override fun onStartInputView(info: EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
+        useSubtype(getSystemService(InputMethodManager::class.java)?.currentInputMethodSubtype)
         Provisioning.applyAllAsync(this)
         val newField = FieldPolicy.field(info.inputType)
         if (!restarting || newField != field) {
@@ -252,6 +289,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             KeyOutput.Backspace -> if (held) chordWithModifiers(KeyEvent.KEYCODE_DEL) else backspace()
             KeyOutput.Enter -> if (held) chordWithModifiers(KeyEvent.KEYCODE_ENTER) else enter()
             KeyOutput.Space -> if (held) chordWithModifiers(KeyEvent.KEYCODE_SPACE) else space()
+            KeyOutput.Language -> nextLanguage()
             KeyOutput.SymbolsPage -> {
                 val current = page as? Page.Symbols
                 page = Page.Symbols(if (current?.page == 2) 1 else 2, field.alpha)
@@ -267,7 +305,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             render()
             true
         }
-        KeyOutput.Space -> {
+        KeyOutput.Space, KeyOutput.Language -> {
             getSystemService(InputMethodManager::class.java)?.showInputMethodPicker()
             true
         }
@@ -643,10 +681,14 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     // endregion
 
+    /** 🌐 next to the space bar: several languages, letters follow them, and Android shows no switch button. */
+    private fun languageKey(): Boolean =
+        config.layout.alphabet == Alphabet.AUTO && root?.systemImeButtons != true && multipleLanguages
+
     private fun render() {
         val root = root ?: return
         val secret = FieldPolicy.isPassword(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)
-        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA))
+        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey()))
     }
 
     private fun enterIcon(): Int {

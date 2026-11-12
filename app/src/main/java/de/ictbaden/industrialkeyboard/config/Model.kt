@@ -26,8 +26,8 @@ enum class Alphabet(override val key: String, val label: String) : Keyed {
     SPANISH("spanish", "Español"),
     ;
 
-    /** The layout actually shown: [AUTO] becomes the layout of the system language. */
-    fun resolve(locale: Locale = systemLocale()): Alphabet = if (this == AUTO) forLocale(locale) else this
+    /** The layout actually shown: [AUTO] becomes the layout of the keyboard language. */
+    fun resolve(locale: Locale = keyboardLocale()): Alphabet = if (this == AUTO) forLocale(locale) else this
 
     companion object {
         private val QWERTZ_LANGUAGES = setOf("de", "lb", "rm", "cs", "sk", "hu", "sl", "hr", "bs", "sq")
@@ -55,6 +55,24 @@ enum class Alphabet(override val key: String, val label: String) : Keyed {
          * set differently for the texts of the keyboard.
          */
         fun systemLocale(): Locale = runCatching { Resources.getSystem().configuration.locales[0] }.getOrNull() ?: Locale.getDefault()
+
+        /**
+         * Language of the selected keyboard subtype (Android's keyboard languages, switched with 🌐),
+         * set by the input method; `null` before the first subtype is known.
+         */
+        @Volatile
+        var subtypeLocale: Locale? = null
+
+        /** The language the letters follow: the keyboard subtype, else the first system language. */
+        fun keyboardLocale(): Locale = subtypeLocale ?: systemLocale()
+
+        /** "Deutsch", "English (UK)": the language in its own language, like Gboard on the space bar. */
+        fun languageName(locale: Locale): String {
+            val language = locale.getDisplayLanguage(locale).replaceFirstChar { it.titlecase(locale) }
+            val country = locale.country.uppercase(Locale.ROOT)
+            // Only where the country changes letters or spelling people care about.
+            return if (country in setOf("GB", "CH", "AT", "BE", "CA", "BR", "MX")) "$language (${country.let { if (it == "GB") "UK" else it }})" else language
+        }
     }
 }
 
@@ -115,12 +133,19 @@ data class Appearance(
     val modifierRow: Boolean = false,
     /** Ctrl, Win and Alt as an extra row on the function key tab (Alt+F4, Ctrl+Home …). */
     val functionModifiers: Boolean = false,
+    /**
+     * Android 12+: the system colours (Material You, from the wallpaper) like Gboard, as long as no
+     * [accentColor] is set. Not for the contrast theme.
+     */
+    val dynamicColor: Boolean = true,
 )
 
 data class LayoutSettings(
     val alphabet: Alphabet = Alphabet.AUTO,
     val navigation: Navigation = Navigation.TABS,
     val numericOrder: NumericOrder = NumericOrder.PHONE,
+    /** QWERTZ with ü, ö and ä as own keys (11 keys per row); otherwise on long press like Gboard. */
+    val umlautKeys: Boolean = false,
 )
 
 data class TabSettings(

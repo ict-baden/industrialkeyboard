@@ -21,9 +21,14 @@ object Layouts {
 
     private const val DIGITS = "1234567890"
 
+    /** QWERTZ with ü, ö and ä as own keys (`layout.umlautKeys`). */
+    private val QWERTZ_UMLAUTS = listOf("qwertzuiopü", "asdfghjklöä", "yxcvbnm")
+
+    private val GERMAN_FIRST = mapOf('a' to 'ä', 'o' to 'ö', 'u' to 'ü', 's' to 'ß')
+
     private val ROWS: Map<Alphabet, List<String>> = mapOf(
         Alphabet.QWERTY to listOf("qwertyuiop", "asdfghjkl", "zxcvbnm"),
-        Alphabet.QWERTZ to listOf("qwertzuiopü", "asdfghjklöä", "yxcvbnm"),
+        Alphabet.QWERTZ to listOf("qwertzuiop", "asdfghjkl", "yxcvbnm"),
         Alphabet.AZERTY to listOf("azertyuiop", "qsdfghjklm", "wxcvbn'"),
         Alphabet.NORDIC to listOf("qwertyuiopå", "asdfghjklöä", "zxcvbnm"),
         Alphabet.SPANISH to listOf("qwertyuiop", "asdfghjklñ", "zxcvbnm"),
@@ -81,9 +86,15 @@ object Layouts {
         listOf("•", "×", "÷", "¶", "®", "™", "✓"),
     )
 
-    fun alpha(config: KeyboardConfig, variant: AlphaVariant = AlphaVariant.TEXT): KeyboardLayout {
+    /**
+     * Letters. [languageKey]: show 🌐 next to the space bar (several keyboard languages and no
+     * switch button of Android below the keyboard).
+     */
+    fun alpha(config: KeyboardConfig, variant: AlphaVariant = AlphaVariant.TEXT, languageKey: Boolean = false): KeyboardLayout {
         val alphabet = config.layout.alphabet.resolve()
-        val letters = ROWS.getValue(alphabet)
+        val letters = if (alphabet == Alphabet.QWERTZ && config.layout.umlautKeys) QWERTZ_UMLAUTS else ROWS.getValue(alphabet)
+        // German like Gboard: ä, ö, ü and ß first on long press of a, o, u and s.
+        val firstAlternatives = if (alphabet == Alphabet.QWERTZ && !config.layout.umlautKeys) GERMAN_FIRST else emptyMap()
         val hints = config.appearance.keyHints && !config.appearance.numberRow
         val rows = buildList {
             if (config.appearance.functionRow) {
@@ -93,10 +104,10 @@ object Layouts {
             }
             if (config.appearance.modifierRow) add(modifierRow(letters[0].length.toFloat()))
             if (config.appearance.numberRow) add(KeyRow(DIGITS.map { textKey(it.toString()) }))
-            add(KeyRow(letters[0].mapIndexed { i, c -> letterKey(c, digit = if (hints && i < DIGITS.length) DIGITS[i] else null) }))
-            add(KeyRow(letters[1].map { letterKey(it) }))
-            add(KeyRow(listOf(shiftKey()) + letters[2].map { letterKey(it) } + backspaceKey()))
-            add(bottomRow(config, variant, Tabs.ALPHA, alphabet.label))
+            add(KeyRow(letters[0].mapIndexed { i, c -> letterKey(c, digit = if (hints && i < DIGITS.length) DIGITS[i] else null, first = firstAlternatives[c]) }))
+            add(KeyRow(letters[1].map { letterKey(it, first = firstAlternatives[it]) }))
+            add(KeyRow(listOf(shiftKey()) + letters[2].map { letterKey(it, first = firstAlternatives[it]) } + backspaceKey()))
+            add(bottomRow(config, variant, Tabs.ALPHA, spaceLabel(config, alphabet), languageKey))
         }
         return KeyboardLayout(Tabs.ALPHA, rows, alphabet.label)
     }
@@ -206,7 +217,11 @@ object Layouts {
 
     // region keys
 
-    private fun bottomRow(config: KeyboardConfig, variant: AlphaVariant, page: String, spaceLabel: String): KeyRow {
+    /** Space bar text: the keyboard language with `auto` (like Gboard), else the fixed layout. */
+    private fun spaceLabel(config: KeyboardConfig, alphabet: Alphabet): String =
+        if (config.layout.alphabet == Alphabet.AUTO) Alphabet.languageName(Alphabet.keyboardLocale()) else alphabet.label
+
+    private fun bottomRow(config: KeyboardConfig, variant: AlphaVariant, page: String, spaceLabel: String, languageKey: Boolean = false): KeyRow {
         val classic = config.layout.navigation == Navigation.KEYS
         val keys = buildList {
             if (classic) {
@@ -221,7 +236,8 @@ object Layouts {
                     AlphaVariant.TEXT -> textKey(",", listOf(";", ":", "_", "-"))
                 },
             )
-            add(Key(label = spaceLabel, output = KeyOutput.Space, width = 3f, flex = true))
+            if (languageKey) add(Key(icon = KeyIcon.GLOBE, output = KeyOutput.Language, style = KeyStyle.FUNCTION))
+            add(Key(label = spaceLabel, output = KeyOutput.Space, width = if (languageKey) 2f else 3f, flex = true))
             add(
                 if (variant == AlphaVariant.URL) {
                     textKey(".", listOf(".com", ".de", ".org", ".net", "www."))
@@ -230,7 +246,8 @@ object Layouts {
                 },
             )
             if (config.scanner.scanKey) add(Key(icon = KeyIcon.SCAN, output = KeyOutput.Macro(listOf(MacroStep.Command(KeyCommand.SCAN))), width = 1.25f, style = KeyStyle.FUNCTION))
-            add(enterKey(width = 2f))
+            // 1.5 like Gboard: the space bar gets the rest.
+            add(enterKey(width = 1.5f))
         }
         return KeyRow(keys)
     }
@@ -245,9 +262,9 @@ object Layouts {
     fun modifierKey(modifier: ModifierKey, width: Float = 1f, style: KeyStyle = KeyStyle.FUNCTION) =
         Key(label = modifier.label, output = KeyOutput.Modifier(modifier), width = width, style = style)
 
-    private fun letterKey(c: Char, digit: Char? = null): Key {
+    private fun letterKey(c: Char, digit: Char? = null, first: Char? = null): Key {
         if (!c.isLetter()) return textKey(c.toString())
-        val alternatives = LETTER_ALTERNATIVES[c].orEmpty().map { it.toString() }
+        val alternatives = (listOfNotNull(first) + LETTER_ALTERNATIVES[c].orEmpty().toList().filter { it != first }).map { it.toString() }
         return Key(
             label = c.toString(),
             output = KeyOutput.Text(c.toString()),

@@ -149,6 +149,7 @@ every language: [Error codes](error-codes.md).
 |---|---|---|---|
 | `theme` | `system`, `light`, `dark`, `contrast` | `system` | `system` follows the device's dark mode. `contrast`: black keys with white outlines and yellow highlights, for bright sunlight and low vision |
 | `accentColor` | `#RRGGBB` or `#AARRGGBB` | blue `#2563EB`, yellow `#FFD600` in `contrast` | Selected tab, Enter key, Shift, scan pad and highlights |
+| `dynamicColor` | `true` / `false` | `true` | Android 12+: system colours from the wallpaper (Material You) like Gboard, as long as `accentColor` is not set; not for `contrast` |
 | `keyHeight` | 70–160 (percent) | `100` | Row height; 100 % = 54 dp. Use 120–140 for gloves |
 | `width` | 50–100 (percent) | `100` | Width of the keys, centered – for tablets and landscape |
 | `numberRow` | `true` / `false` | `false` | Row with 1–0 above the letters |
@@ -163,7 +164,8 @@ every language: [Error codes](error-codes.md).
 
 | Option | Values | Default | Effect |
 |---|---|---|---|
-| `alphabet` | `auto`, `qwerty`, `qwertz`, `azerty`, `nordic`, `spanish` | `auto` | Letter layout. `auto` follows the first system language of the device (German, Czech, Swiss … → `qwertz`, French and Belgian → `azerty`, Swedish, Danish, Norwegian, Finnish → `nordic`, Spanish and Catalan → `spanish`, everything else `qwerty`) and changes with it. `qwertz` adds ü ö ä, `nordic` å ö ä, `spanish` ñ. Accents and special letters (ß, é, ç …) on long press |
+| `alphabet` | `auto`, `qwerty`, `qwertz`, `azerty`, `nordic`, `spanish` | `auto` | Letter layout. `auto` follows the selected keyboard language (Android keyboard languages, switched with 🌐; before one is known: the first system language) (German, Czech, Swiss … → `qwertz`, French and Belgian → `azerty`, Swedish, Danish, Norwegian, Finnish → `nordic`, Spanish and Catalan → `spanish`, everything else `qwerty`) and changes with it. `qwertz` adds ü ö ä, `nordic` å ö ä, `spanish` ñ. Accents and special letters (ß, é, ç …) on long press |
+| `umlautKeys` | `true` / `false` | `false` | QWERTZ with ü, ö and ä as own keys (11 keys per row). Off: like Gboard, ä, ö, ü and ß come first on long press of a, o, u and s |
 | `navigation` | `tabs`, `keys` | `tabs` | `tabs`: tab bar above the keys (ABC, 123, #+=, Fn, scan, custom layouts, hide button). `keys`: no tab bar, `?123` / `ABC` keys like a phone keyboard; on the numeric pad the last side key becomes `ABC`. Other pages are then reachable with [`{SHOW:…}`](#macros) on a programmable key |
 | `numericOrder` | `phone`, `calculator` | `phone` | `phone`: 1-2-3 at the top. `calculator`: 7-8-9 at the top. Dial pads (phone number fields) always use phone order |
 
@@ -216,7 +218,7 @@ keyboards, double tap on Shift for caps lock, long press on the hide button for 
 | `sound` | `true` / `false` | `false` | Click sound (independent of the system's touch sounds) |
 | `soundVolume` | 0–100 | not set = default volume | Click volume |
 | `vibrate` | `true` / `false` | `true` | Short vibration on every key |
-| `vibrationMs` | 5–100 (ms) | not set = 18 ms | Vibration length; 30–40 can be felt through gloves |
+| `vibrationMs` | 5–100 (ms) | not set = the system's keyboard haptic | Vibration length; 30–40 can be felt through gloves. Not set: the device's tuned keyboard tick, like Gboard |
 
 ## `scanner`
 

@@ -396,4 +396,10 @@
         <item>UID（序列号）</item>
         <item>标签上的文字（NDEF）</item>
     </string-array>
+    <string name="dynamic_color">系统颜色（Material You）</string>
+    <string name="dynamic_color_summary">与 Gboard 一样使用壁纸颜色；需 Android 12 及以上且未设置自定义强调色</string>
+    <string name="keyboard_languages">键盘语言</string>
+    <string name="keyboard_languages_summary">🌐 在其间切换的语言，在 Android 设置中</string>
+    <string name="umlaut_keys">变音字母键</string>
+    <string name="umlaut_keys_summary">QWERTZ 中 ü、ö、ä 作为独立按键；否则长按 u、o、a</string>
 </resources>

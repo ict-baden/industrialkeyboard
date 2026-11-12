@@ -51,6 +51,7 @@ object ConfigJson {
             val a = config.appearance
             put("theme", a.theme.key)
             putOpt("accentColor", a.accentColor)
+            put("dynamicColor", a.dynamicColor)
             put("keyHeight", a.keyHeight)
             put("width", a.width)
             put("numberRow", a.numberRow)
@@ -63,6 +64,7 @@ object ConfigJson {
             put("alphabet", config.layout.alphabet.key)
             put("navigation", config.layout.navigation.key)
             put("numericOrder", config.layout.numericOrder.key)
+            put("umlautKeys", config.layout.umlautKeys)
         })
         root.put("tabs", JSONObject().apply {
             val t = config.tabs
@@ -218,6 +220,7 @@ object ConfigJson {
             keyHints = json.optBoolean("keyHints", d.keyHints),
             modifierRow = json.optBoolean("modifierRow", d.modifierRow),
             functionModifiers = json.optBoolean("functionModifiers", d.functionModifiers),
+            dynamicColor = json.optBoolean("dynamicColor", d.dynamicColor),
         )
     }
 
@@ -227,6 +230,7 @@ object ConfigJson {
             alphabet = enumValue(json, "alphabet", "layout", d.alphabet),
             navigation = enumValue(json, "navigation", "layout", d.navigation),
             numericOrder = enumValue(json, "numericOrder", "layout", d.numericOrder),
+            umlautKeys = json.optBoolean("umlautKeys", d.umlautKeys),
         )
     }
 
