@@ -3,13 +3,13 @@ package de.ictbaden.industrialkeyboard.ime
 import de.ictbaden.industrialkeyboard.config.ConfigJson
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
 import de.ictbaden.industrialkeyboard.config.VoiceInput
-import de.ictbaden.industrialkeyboard.ime.VoiceInputs.Candidate
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.util.Locale
 
-/** Delete gesture, voice input selection and the new settings. */
+/** Delete gesture, dictation rules and the new settings. */
 class GboardFeelTest {
 
     @Test
@@ -24,33 +24,50 @@ class GboardFeelTest {
         assertEquals(0, DeleteGesture.start("", 3))
     }
 
-    private val gboard = listOf(
-        Candidate("com.google.android.inputmethod.latin/.LatinIME", "com.google.android.inputmethod.latin", "keyboard", 0),
-        Candidate("own/.Ime", "own", "voice", 0),
-        Candidate("com.google.android.tts/.VoiceInputMethodService", "com.google.android.tts", "voice", 0),
-    )
-
     @Test
-    fun `microphone uses the voice input of another app`() {
-        assertEquals("com.google.android.tts", VoiceInputs.pick(VoiceInput.AUTO, "own", gboard)?.packageName)
-        assertEquals("com.google.android.tts", VoiceInputs.pick(VoiceInput.SYSTEM, "own", gboard)?.packageName)
-        assertNull(VoiceInputs.pick(VoiceInput.OFF, "own", gboard))
-        // Planned (issue #24): until then no microphone.
-        assertNull(VoiceInputs.pick(VoiceInput.OFFLINE, "own", gboard))
-        assertNull(VoiceInputs.pick(VoiceInput.AUTO, "own", gboard.take(2)))
+    fun `dictation engine from the setting and what the device offers`() {
+        // auto: on the device first, else the speech service.
+        assertEquals(Dictation.Engine.ON_DEVICE, Dictation.engine(VoiceInput.AUTO, onDeviceAvailable = true, serviceAvailable = true))
+        assertEquals(Dictation.Engine.SERVICE, Dictation.engine(VoiceInput.AUTO, onDeviceAvailable = false, serviceAvailable = true))
+        assertEquals(Dictation.Engine.NONE, Dictation.engine(VoiceInput.AUTO, onDeviceAvailable = false, serviceAvailable = false))
+        // offline never falls back to a service that may work online.
+        assertEquals(Dictation.Engine.ON_DEVICE, Dictation.engine(VoiceInput.OFFLINE, onDeviceAvailable = true, serviceAvailable = true))
+        assertEquals(Dictation.Engine.NONE, Dictation.engine(VoiceInput.OFFLINE, onDeviceAvailable = false, serviceAvailable = true))
+        assertEquals(Dictation.Engine.NONE, Dictation.engine(VoiceInput.OFF, onDeviceAvailable = true, serviceAvailable = true))
     }
 
     @Test
-    fun `new settings survive the json round trip, preview off by default`() {
+    fun `dictated text gets a space and a capital letter where needed`() {
+        val de = Locale.GERMANY
+        assertEquals("Hallo Welt", Dictation.prepare("hallo Welt", "", autoCapitalize = true, locale = de))
+        assertEquals(" noch etwas", Dictation.prepare("noch etwas", "Lager 12", autoCapitalize = true, locale = de))
+        assertEquals("noch etwas", Dictation.prepare("noch etwas", "Lager 12 ", autoCapitalize = true, locale = de))
+        assertEquals(" Neuer Satz", Dictation.prepare("neuer Satz", "Fertig.", autoCapitalize = true, locale = de))
+        assertEquals("Neuer Satz", Dictation.prepare("neuer Satz", "Fertig. ", autoCapitalize = true, locale = de))
+        assertEquals("klein", Dictation.prepare("klein", "(", autoCapitalize = true, locale = de))
+        assertEquals("neuer Satz", Dictation.prepare("neuer Satz", "", autoCapitalize = false, locale = de))
+        assertEquals("", Dictation.prepare("   ", "x", autoCapitalize = true, locale = de))
+    }
+
+    @Test
+    fun `old value system means auto`() {
+        assertEquals(VoiceInput.AUTO, ConfigJson.parse("""{"typing":{"voice":"system"}}""").typing.voice)
+        assertEquals(VoiceInput.OFFLINE, ConfigJson.parse("""{"typing":{"voice":"offline"}}""").typing.voice)
+        assertEquals(VoiceInput.AUTO, VoiceInput.parse("System"))
+        assertNull(VoiceInput.parse("loud"))
+    }
+
+    @Test
+    fun `new settings survive the json round trip, preview on by default like Gboard`() {
         val config = KeyboardConfig().let {
             it.copy(
                 appearance = it.appearance.copy(symbolHints = false, keyBorders = false),
-                typing = it.typing.copy(voice = VoiceInput.SYSTEM, deleteGesture = false),
-                feedback = it.feedback.copy(keyPopup = true),
+                typing = it.typing.copy(voice = VoiceInput.OFFLINE, deleteGesture = false),
+                feedback = it.feedback.copy(keyPopup = false),
             )
         }
         assertEquals(config, ConfigJson.parse(ConfigJson.write(config)))
-        assertFalse(KeyboardConfig().feedback.keyPopup)
+        assertTrue(KeyboardConfig().feedback.keyPopup)
         assertEquals(VoiceInput.OFF, ConfigJson.parse("""{"typing":{"voice":"off"}}""").typing.voice)
     }
 }

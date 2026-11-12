@@ -124,7 +124,7 @@ object Provisioning {
             typing = config.typing.copy(
                 suggestions = bool("suggestions", config.typing.suggestions),
                 autocorrect = bool("autocorrect", config.typing.autocorrect),
-                voice = choice("voice", VoiceInput.entries.toTypedArray(), config.typing.voice),
+                voice = values.getString("voice")?.let(VoiceInput::parse) ?: config.typing.voice,
                 deleteGesture = bool("delete_gesture", config.typing.deleteGesture),
             ),
             layout = config.layout.copy(

@@ -6,10 +6,8 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
-import android.os.SystemClock
 import android.util.TypedValue
 import android.view.View
-import androidx.core.graphics.withScale
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.max
@@ -26,7 +24,7 @@ class PopupOverlay(context: Context) : View(context), PopupHost {
 
     private var previewLabel: String? = null
     private val previewRect = RectF()
-    private var previewShownAt = 0L
+    private var previewKeyHeight = 0f
 
     private var options: List<String> = emptyList()
     private val cells = mutableListOf<RectF>()
@@ -49,13 +47,15 @@ class PopupOverlay(context: Context) : View(context), PopupHost {
 
     override fun showPreview(source: View, key: RectF, label: String) {
         val r = toLocal(source, key)
-        // Wide custom keys: never wider than the overlay.
-        val width = min(max(r.width() * 1.3f, dp(52f)), this.width - dp(4f))
-        val height = r.height() * 1.45f
-        val bottom = r.top + r.height() * 0.32f
+        // Like Gboard: a balloon about 20 % wider and 1.6 × as high as the key, standing on the key
+        // (slight overlap) – the top row uses the transparent headroom, so nothing is clipped.
+        val width = min(max(r.width() * 1.2f, dp(44f)), this.width - dp(4f))
+        val height = r.height() * 1.6f
+        val bottom = r.top + r.height() * 0.12f
+        val top = max(bottom - height, dp(2f))
         val left = clampLeft(r.centerX() - width / 2, width)
-        previewRect.set(left, bottom - height, left + width, bottom)
-        if (previewLabel == null) previewShownAt = SystemClock.uptimeMillis()
+        previewRect.set(left, top, left + width, top + height)
+        previewKeyHeight = r.height()
         previewLabel = label
         invalidate()
     }
@@ -133,20 +133,17 @@ class PopupOverlay(context: Context) : View(context), PopupHost {
     }
 
     private fun drawPreview(canvas: Canvas, label: String) {
-        val age = SystemClock.uptimeMillis() - previewShownAt
-        val scale = if (age < POP_MS) 0.86f + 0.14f * age / POP_MS else 1f
-        canvas.withScale(scale, scale, previewRect.centerX(), previewRect.bottom) {
-            val radius = dp(12f)
-            fill.color = palette.popup
-            fill.setShadowLayer(dp(8f), 0f, dp(3f), 0x55000000)
-            canvas.drawRoundRect(previewRect, radius, radius, fill)
-            fill.clearShadowLayer()
-            text.color = palette.popupText
-            text.textSize = min(sp(30f), previewRect.height() * 0.42f)
-            val cy = previewRect.top + previewRect.height() * 0.42f
-            canvas.drawText(label, previewRect.centerX(), cy - (text.descent() + text.ascent()) / 2, text)
-        }
-        if (age < POP_MS) postInvalidateOnAnimation()
+        // Shown at once on touch-down and gone on release, no animation – like Gboard.
+        val radius = min(dp(14f), previewRect.width() / 3f)
+        fill.color = palette.popup
+        fill.setShadowLayer(dp(6f), 0f, dp(2f), 0x44000000)
+        canvas.drawRoundRect(previewRect, radius, radius, fill)
+        fill.clearShadowLayer()
+        text.color = palette.popupText
+        // About 1.4 × the key label (27 sp on letters).
+        text.textSize = min(sp(38f), previewKeyHeight * 0.75f)
+        val cy = previewRect.top + previewRect.height() * 0.40f
+        canvas.drawText(label, previewRect.centerX(), cy - (text.descent() + text.ascent()) / 2, text)
     }
 
     private fun drawAlternatives(canvas: Canvas) {
@@ -189,6 +186,5 @@ class PopupOverlay(context: Context) : View(context), PopupHost {
     private companion object {
         const val MAX_PER_ROW = 5
         const val SCRIM = 0x66000000
-        const val POP_MS = 70L
     }
 }

@@ -15,6 +15,10 @@ any of the five languages. Source: [`ErrorCodes.kt`](../app/src/main/java/de/ict
 | `IK-0105` | Invalid (macro) | Unknown token in a programmable key, e.g. `{TABB}` |
 | `IK-0200` | Without camera permission the keyboard cannot scan with the camera | The camera permission was denied. Allow it in the Android app settings (Permissions → Camera) or with the EMM |
 | `IK-0201` | The camera could not be started | Another app uses the camera, or the device has none. Close the other app and tap scan again |
+| `IK-0210` | Without microphone permission the keyboard cannot take dictation | Allow the microphone for Industrial Keyboard (Android settings → Apps → Permissions) or tap 🎤 again and allow it |
+| `IK-0211` | Speech recognition is not available for this language | The device's speech recognition does not support the keyboard language, or none is installed |
+| `IK-0212` | Speech recognition needs a connection that is not available | The speech service works online and the device is offline; use `typing.voice: "offline"` on devices with on-device recognition |
+| `IK-0213` | Not understood | Nothing could be recognised; tap 🎤 and speak again |
 | `IK-0106` | The stored configuration cannot be read | Storage error or empty `config.json`: the admin password is unknown, the settings stay locked. Restart; otherwise set the admin password with the EMM (`admin_password`, applied again as long as the file is unreadable) or clear the app's storage |
 
 Validation details of a configuration (e.g. `keys.numeric.p1: unknown token {TABB}`) stay in

@@ -98,6 +98,7 @@ keyboards.
 |---|---|
 | `VIBRATE` | Key and scan feedback |
 | `CAMERA` | Scanning barcodes with the camera on devices without a scan engine (`scanner.trigger` `auto` or `camera`). Asked only when the user taps scan (or imports a configuration QR code) the first time. The pictures are decoded on the device and never stored or sent |
+| `RECORD_AUDIO` | Dictation inside the keyboard (`typing.voice`). Only while the dictation panel is open; the audio goes to the device's speech recognition and is neither collected, stored nor sent by the app (no internet permission). Data safety: audio is processed on the device / by the device's speech service, not collected |
 | `NFC` | Typing NFC tags (UID or stored text) into the focused field (`scanner.nfc`). Only while the keyboard is open in a field |
 
 The input method service is bound with `BIND_INPUT_METHOD` (granted by the system when the user

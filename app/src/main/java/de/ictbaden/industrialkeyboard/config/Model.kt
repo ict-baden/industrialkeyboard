@@ -76,17 +76,27 @@ enum class Alphabet(override val key: String, val label: String) : Keyed {
     }
 }
 
-/** Where dictation comes from (microphone button). */
+/**
+ * Dictation inside the keyboard (microphone button, issue #23) with Android's speech recognition.
+ * The keyboard records nothing itself; the device's speech recognition service does.
+ */
 enum class VoiceInput(override val key: String) : Keyed {
-    /** The system voice input if there is one (later: the offline engine, issue #24). */
+    /** On-device recognition if the device has it, otherwise the device's speech service (may be online). */
     AUTO("auto"),
 
-    /** Only the voice input method installed on the device (e.g. Google Voice Typing). */
-    SYSTEM("system"),
-
-    /** Speech recognition inside the keyboard, on the device – planned (issue #24), until then off. */
+    /** Only on-device recognition (nothing leaves the device); later also our own engine (issue #24). */
     OFFLINE("offline"),
     OFF("off"),
+    ;
+
+    companion object {
+        /** `system` (up to the first test builds: switch to the voice keyboard) now means `auto`. */
+        fun parse(value: String?): VoiceInput? = when (value?.trim()?.lowercase()) {
+            null, "" -> null
+            "system" -> AUTO
+            else -> entries.firstOrNull { it.key == value.trim().lowercase() }
+        }
+    }
 }
 
 enum class NumericOrder(override val key: String) : Keyed {
@@ -215,7 +225,7 @@ data class TypingSettings(
 
 data class FeedbackSettings(
     /** Enlarged preview above a pressed key; off by default like current Gboard. */
-    val keyPopup: Boolean = false,
+    val keyPopup: Boolean = true,
     val sound: Boolean = false,
     /** 0–100, `null` = system default volume. */
     val soundVolume: Int? = null,

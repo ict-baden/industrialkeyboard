@@ -429,11 +429,10 @@
     <string name="key_borders">Bordures des touches</string>
     <string name="key_borders_summary">Lettres en tuiles ; désactivé : seulement les lettres, comme Gboard sans bordures</string>
     <string name="voice_input">Dictée (micro)</string>
-    <string name="voice_system">Saisie vocale de l’appareil</string>
     <string name="delete_gesture">Balayer pour supprimer</string>
     <string name="delete_gesture_summary">Balayer vers la gauche depuis Retour arrière supprime des mots entiers</string>
     <string name="mc_voice_title">Dictée</string>
-    <string name="mc_voice_description">Bouton micro : saisie vocale de l’appareil (auto/system) ou désactivé. « offline » est prévu.</string>
+    <string name="mc_voice_description">Bouton micro : dictée dans le clavier avec la reconnaissance vocale de l’appareil. auto = sur l’appareil si possible, sinon le service vocal (éventuellement en ligne) ; offline = uniquement sur l’appareil ; off = désactivé.</string>
     <string name="mc_symbol_hints_title">Symboles par appui long</string>
     <string name="mc_symbol_hints_description">Symboles sur les touches de lettres qu’un appui long tape.</string>
     <string name="mc_key_borders_title">Bordures des touches</string>
@@ -442,9 +441,20 @@
     <string name="mc_delete_gesture_description">Balayer vers la gauche depuis Retour arrière supprime des mots.</string>
     <string-array name="mc_voice_entries">
         <item>Automatique</item>
-        <item>Saisie vocale de l’appareil</item>
-        <item>Hors ligne (prévu)</item>
+        <item>Uniquement sur l’appareil</item>
         <item>Désactivé</item>
     </string-array>
     <string name="key_none">aucune (pas de touche)</string>
+    <string name="voice_offline">Uniquement sur l’appareil</string>
+    <string name="dictation_speak">Parlez maintenant</string>
+    <string name="dictation_processing">Reconnaissance…</string>
+    <string name="dictation_paused">En pause – touchez le micro</string>
+    <string name="dictation_error_network">La reconnaissance vocale a besoin d’une connexion indisponible.</string>
+    <string name="dictation_error_unavailable">Pas de reconnaissance vocale pour cette langue.</string>
+    <string name="dictation_error_no_match">Pas compris – touchez le micro et parlez à nouveau.</string>
+    <string name="mic_permission_granted">Micro autorisé. Touchez à nouveau le micro.</string>
+    <string name="mic_permission_denied">Sans l’autorisation du micro, le clavier ne peut pas prendre de dictée.</string>
+    <string name="voice_engine_on_device">Ici : reconnaissance sur l’appareil</string>
+    <string name="voice_engine_service">Ici : service vocal de l’appareil (éventuellement en ligne)</string>
+    <string name="voice_engine_none">Non disponible sur cet appareil</string>
 </resources>

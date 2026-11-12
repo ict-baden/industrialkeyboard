@@ -60,7 +60,7 @@ Please report results on other devices in the
 ## Not included, on purpose
 
 - Word suggestions and autocorrection use fixed built-in word lists: they do not learn names or words
-  you type often, and there is no swipe typing and no voice input. Nothing learns or stores what is typed.
+  you type often, and there is no swipe typing. Dictation needs a speech recognizer on the device (on-device on Android 12+ phones like Pixel; AOSP devices without Google usually have none – issue #24). Nothing learns or stores what is typed.
 - The dictionaries are general (Wikipedia-weighted): technical terms and company words are often missing.
 - No internet permission: the keyboard cannot send anything off the device.
 - Camera scan reads one code per tap and has no batch or multi-code mode; a scan engine is faster

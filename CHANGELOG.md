@@ -18,11 +18,11 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
   - Enter 1,5 statt 2 Tasten breit.
   - Zahlen-Taste `?123` unten links wie bei Gboard, auch mit Tab-Leiste (`layout.symbolsKey`, Einstellung „Zahlen-Taste“, MDM `symbols_key`; Standard an wie bei Gboard, gespeicherte Konfigurationen behalten ihren Wert).
   - Buchstaben größer und kräftiger (27 sp, Strichstärke 500).
-- **Diktat** ([#23](https://github.com/ict-baden/industrialkeyboard/issues/23)): Mikrofon rechts in der Tab-Leiste schaltet auf die Spracheingabe des Geräts (z. B. Google Voice Typing), die danach zurückwechselt. Keine Mikrofon-Berechtigung für die Tastatur. `typing.voice` (`auto`, `system`, `off`; `offline` ist für #24 vorgesehen), Einstellung „Diktat“, MDM `voice`.
+- **Diktat in der Tastatur wie bei Gboard** ([#23](https://github.com/ict-baden/industrialkeyboard/issues/23)): 🎤 in der Tab-Leiste und rechts neben den Vorschlägen öffnet an Stelle der Tasten eine Diktat-Ansicht (pulsierendes Mikrofon, ⌨ zurück, ⌫). Der erkannte Text erscheint schon beim Sprechen im Feld, mit Leerzeichen und Großschreibung am Satzanfang; die Tastatur hört weiter zu, bis man 🎤 antippt, ⌨ drückt oder 30 s nichts sagt. Androids Spracherkennung: `typing.voice` `auto` (auf dem Gerät, wenn vorhanden, sonst der Sprachdienst, ggf. online), `offline` (nur auf dem Gerät), `off`; `system` gilt als `auto`. Mikrofon-Berechtigung beim ersten Antippen, Fehlercodes `IK-0210`–`IK-0213`. Kein Umschalten mehr auf eine andere Sprach-Tastatur.
 - **Weiter wie Gboard:**
   - Symbole bei langem Drücken auf allen Buchstaben (a @, s #, d €/$ …), als Hinweis in der Ecke (`appearance.symbolHints`, Standard an).
   - Enter und `?123` als Pillen, Buchstaben mit 6 dp Rundung wie bei Gboard; „Tastenränder“ (`appearance.keyBorders`) aus zeigt nur die Buchstaben.
-  - Tastenvorschau beim Drücken standardmäßig aus (`feedback.keyPopup`; gespeicherte Konfigurationen behalten ihren Wert).
+  - Tastenvorschau beim Drücken wie bei Gboard: Ballon direkt über der Taste (etwa 1,6 × so hoch), erscheint sofort und verschwindet beim Loslassen; standardmäßig an (`feedback.keyPopup`; gespeicherte Konfigurationen behalten ihren Wert).
   - Langes Drücken auf das Komma bietet zuerst ⚙ Einstellungen und 😊 Emoji.
   - Zeichenseite in Gboards Reihenfolge (1–0 · @ # € _ & - + ( ) / · =\< * " ' : ; ! ?), zweite Seite ähnlich Gboards; Währung nach Tastatursprache.
   - Wischen zum Löschen: von der Rücktaste nach links wischen markiert ganze Wörter, Loslassen löscht sie (`typing.deleteGesture`, Standard an).

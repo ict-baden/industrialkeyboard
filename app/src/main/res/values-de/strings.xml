@@ -428,11 +428,10 @@
     <string name="key_borders">Tastenränder</string>
     <string name="key_borders_summary">Buchstaben als Kacheln; aus: nur die Buchstaben, wie Gboard ohne Tastenränder</string>
     <string name="voice_input">Diktat (Mikrofon)</string>
-    <string name="voice_system">Spracheingabe des Geräts</string>
     <string name="delete_gesture">Wischen zum Löschen</string>
     <string name="delete_gesture_summary">Von der Rücktaste nach links wischen löscht ganze Wörter</string>
     <string name="mc_voice_title">Diktat</string>
-    <string name="mc_voice_description">Mikrofon-Knopf: Spracheingabe des Geräts (auto/system) oder aus. „offline“ ist geplant.</string>
+    <string name="mc_voice_description">Mikrofon-Knopf: Diktat in der Tastatur mit der Spracherkennung des Geräts. auto = auf dem Gerät, wenn möglich, sonst der Sprachdienst (ggf. online); offline = nur auf dem Gerät; off = aus.</string>
     <string name="mc_symbol_hints_title">Symbole bei langem Drücken</string>
     <string name="mc_symbol_hints_description">Symbole auf den Buchstabentasten, die langes Drücken tippt.</string>
     <string name="mc_key_borders_title">Tastenränder</string>
@@ -441,9 +440,20 @@
     <string name="mc_delete_gesture_description">Von der Rücktaste nach links wischen löscht Wörter.</string>
     <string-array name="mc_voice_entries">
         <item>Automatisch</item>
-        <item>Spracheingabe des Geräts</item>
-        <item>Offline (geplant)</item>
+        <item>Nur auf dem Gerät</item>
         <item>Aus</item>
     </string-array>
     <string name="key_none">keine (keine Taste)</string>
+    <string name="voice_offline">Nur auf dem Gerät</string>
+    <string name="dictation_speak">Jetzt sprechen</string>
+    <string name="dictation_processing">Wird erkannt …</string>
+    <string name="dictation_paused">Pausiert – Mikrofon antippen</string>
+    <string name="dictation_error_network">Die Spracherkennung braucht eine Verbindung, die nicht da ist.</string>
+    <string name="dictation_error_unavailable">Für diese Sprache gibt es keine Spracherkennung.</string>
+    <string name="dictation_error_no_match">Nicht verstanden – Mikrofon antippen und noch einmal sprechen.</string>
+    <string name="mic_permission_granted">Mikrofon erlaubt. Bitte noch einmal auf das Mikrofon tippen.</string>
+    <string name="mic_permission_denied">Ohne Mikrofon-Berechtigung kann die Tastatur kein Diktat aufnehmen.</string>
+    <string name="voice_engine_on_device">Hier: Erkennung auf dem Gerät</string>
+    <string name="voice_engine_service">Hier: Sprachdienst des Geräts (ggf. online)</string>
+    <string name="voice_engine_none">Auf diesem Gerät nicht verfügbar</string>
 </resources>

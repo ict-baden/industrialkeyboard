@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- Camera scan when the device has no scan engine (scanner.trigger auto/camera). -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Dictation inside the keyboard (typing.voice); the audio goes to the device's speech recognition. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- NFC tags into the focused field (scanner.nfc). -->
     <uses-permission android:name="android.permission.NFC" />
 
@@ -28,6 +30,10 @@
     <queries>
         <package android:name="com.symbol.datawedge" />
         <package android:name="com.intermec.datacollectionservice" />
+        <!-- Dictation: the device's speech recognition service must be visible from Android 11 on. -->
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
     </queries>
 
     <!-- allowBackup="false" already excludes everything up to Android 11, so no fullBackupContent;
@@ -79,6 +85,13 @@
             android:windowSoftInputMode="stateHidden|adjustResize" />
 
         <!-- Asks for the camera permission for the keyboard (an input method cannot). -->
+        <!-- Asks for the microphone permission for dictation (an input method cannot). -->
+        <activity
+            android:name=".app.MicrophonePermissionActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@style/Theme.IndustrialKeyboard.Transparent" />
+
         <activity
             android:name=".app.CameraPermissionActivity"
             android:excludeFromRecents="true"

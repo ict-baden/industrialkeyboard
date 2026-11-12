@@ -211,7 +211,7 @@ Phone, date and time fields show fixed keys instead of the numeric ones.
 | `longPressDelay` | 200–1500 (ms) | `300` (like Gboard; `400` up to 2.1) | Time until a long press shows the alternatives; 500–700 avoids accidental accents with gloves |
 | `suggestions` | `true` / `false` | `true` | Three word suggestions above the keys while a word is typed, like Gboard: from a built-in dictionary of the keyboard language, best one in the middle; tap one to replace the word and add a space. Only in normal text fields – never in passwords, e-mail and web addresses, numbers, dates or fields that set `textNoSuggestions` (barcode fields usually do). Nothing is learnt or stored |
 | `autocorrect` | `true` / `false` | `true` (like Gboard) | Space replaces an obvious typo (one wrong, missing, extra or swapped letter) by the best suggestion; Backspace right after it brings the typed word back. Only in normal text fields with suggestions – never in fields that switch suggestions off (barcode and article number fields usually do); for pure data entry switch it off |
-| `voice` | `auto`, `system`, `offline`, `off` | `auto` | Microphone button at the right of the tab bar (before ⌄). `auto` / `system`: switches to the voice input of the device (e.g. Google Voice Typing), which returns to this keyboard when done – the keyboard itself never records audio and needs no microphone permission. Hidden when the device has no voice input, in password fields and without tab bar. `offline` (speech recognition inside the keyboard for devices without Google, issue #24) is planned; until then it means `off` |
+| `voice` | `auto`, `offline`, `off` | `auto` | Dictation inside the keyboard, like Gboard: the 🎤 in the tab bar (and at the right of the suggestions) replaces the keys with a listening panel; partial text appears in the field while speaking, the keyboard keeps listening until 🎤 is tapped again, ⌨ is pressed or 30 s pass without speech. Uses Android's speech recognition: `auto` = on-device recognition if the device has it (Android 12+, e.g. Pixel), otherwise the device's speech service, which may work online; `offline` = on-device recognition only (later also our own engine, issue #24); `off` = no microphone. Needs the microphone permission (asked on first use). Not in password fields. The old value `system` is read as `auto` |
 | `deleteGesture` | `true` / `false` | `true` | Swipe left from Backspace marks whole words (one more per finger width), lifting the finger deletes them – like Gboard |
 
 Always on: rollover typing with several fingers, key repeat on Backspace, Del and the arrow
@@ -222,7 +222,7 @@ keyboards, double tap on Shift for caps lock, long press on the hide button for 
 
 | Option | Values | Default | Effect |
 |---|---|---|---|
-| `keyPopup` | `true` / `false` | `false` | Preview bubble above the pressed key (off by default like current Gboard); never in password fields (visible ones included) |
+| `keyPopup` | `true` / `false` | `true` | Preview balloon above the pressed key, like Gboard (about 1.6 × the key height, shown on touch-down, gone on release); never in password fields (visible ones included) |
 | `sound` | `true` / `false` | `false` | Click sound (independent of the system's touch sounds) |
 | `soundVolume` | 0–100 | not set = default volume | Click volume |
 | `vibrate` | `true` / `false` | `true` | Short vibration on every key |
