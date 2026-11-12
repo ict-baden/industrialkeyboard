@@ -4,6 +4,9 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ## [Unveröffentlicht]
 
+### Geändert
+- **Standardwerte wie bei Gboard** (gespeicherte Konfigurationen behalten ihre Werte): Autokorrektur an, langes Drücken nach 300 statt 400 ms, keine Tab-Taste unten links (`keys.alpha.p1` leer; wer sie braucht, setzt `{TAB}`), Zahlen-Taste `?123` an, Symbol-Hinweise und Tastenvorschau aus.
+
 ### Neu
 - **Wie Gboard** (gemessen auf einem Pixel 9 Pro):
   - Tastengröße folgt der Bildschirmhöhe (etwa 6,8 % je Reihe, 54–70 dp), Lücken 5,5 dp zwischen Tasten und 12 dp zwischen Reihen; der Regler „Tastenhöhe“ wirkt weiter.
@@ -13,7 +16,7 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
   - Systemfarben (Material You) ab Android 12, solange keine eigene Akzentfarbe gesetzt ist (`appearance.dynamicColor`, Standard an).
   - Haptik: ohne `feedback.vibrationMs` der Tastatur-Tick des Systems statt eines festen 18-ms-Brummens.
   - Enter 1,5 statt 2 Tasten breit.
-  - Zahlen-Taste `?123` unten links wie bei Gboard, auch mit Tab-Leiste (`layout.symbolsKey`, Einstellung „Zahlen-Taste“, MDM `symbols_key`; Standard aus).
+  - Zahlen-Taste `?123` unten links wie bei Gboard, auch mit Tab-Leiste (`layout.symbolsKey`, Einstellung „Zahlen-Taste“, MDM `symbols_key`; Standard an wie bei Gboard, gespeicherte Konfigurationen behalten ihren Wert).
   - Buchstaben größer und kräftiger (27 sp, Strichstärke 500).
 - **Diktat** ([#23](https://github.com/ict-baden/industrialkeyboard/issues/23)): Mikrofon rechts in der Tab-Leiste schaltet auf die Spracheingabe des Geräts (z. B. Google Voice Typing), die danach zurückwechselt. Keine Mikrofon-Berechtigung für die Tastatur. `typing.voice` (`auto`, `system`, `off`; `offline` ist für #24 vorgesehen), Einstellung „Diktat“, MDM `voice`.
 - **Weiter wie Gboard:**

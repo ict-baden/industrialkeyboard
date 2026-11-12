@@ -72,7 +72,7 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
     }
 
     /** Edits a programmable key macro; [onSave] receives the macro or `null` for the default. */
-    fun editMacro(title: String, current: String, default: String, onSave: (String?) -> Unit) {
+    fun editMacro(title: String, current: String, default: String, allowEmpty: Boolean = false, onSave: (String?) -> Unit) {
         val field = ui.textField(s(R.string.macro_hint), current, helper = s(R.string.macro_helper))
         val dialog = MaterialAlertDialogBuilder(activity)
             .setIcon(ui.icon(R.drawable.ic_key))
@@ -85,6 +85,7 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             val macro = field.value
             val error = when {
+                macro.isEmpty() && allowEmpty -> null
                 macro.isEmpty() -> s(R.string.macro_empty)
                 // The parser names the token in English; the code identifies the message in any language.
                 else -> runCatching { Macro.parse(macro) }.exceptionOrNull()?.let {

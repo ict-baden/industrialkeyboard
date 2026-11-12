@@ -444,4 +444,5 @@
         <item>离线（计划中）</item>
         <item>关闭</item>
     </string-array>
+    <string name="key_none">无（不显示按键）</string>
 </resources>

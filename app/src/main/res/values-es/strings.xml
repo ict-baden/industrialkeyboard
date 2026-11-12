@@ -446,4 +446,5 @@
         <item>Sin conexión (previsto)</item>
         <item>Desactivado</item>
     </string-array>
+    <string name="key_none">ninguna (sin tecla)</string>
 </resources>

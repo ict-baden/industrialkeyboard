@@ -83,10 +83,10 @@ class LayoutsTest {
     }
 
     @Test
-    fun `number key like Gboard when switched on`() {
+    fun `number key like Gboard by default, can be switched off`() {
         fun first(config: KeyboardConfig) = Layouts.alpha(config).rows.last().keys.first()
-        assertTrue(first(KeyboardConfig()).label != "?123")
-        val on = KeyboardConfig(layout = LayoutSettings(symbolsKey = true))
+        assertTrue(first(KeyboardConfig(layout = LayoutSettings(symbolsKey = false))).label != "?123")
+        val on = KeyboardConfig()
         assertEquals("?123", first(on).label)
         assertEquals(KeyOutput.ShowTab(Tabs.SYMBOLS), first(on).output)
         // On the symbols page it leads back.
