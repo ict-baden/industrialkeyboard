@@ -166,9 +166,12 @@ class TabBarView(context: Context) : View(context) {
             }
         }
         if (showMic) {
+            // Like Gboard: the microphone sits in a round key-coloured bubble.
+            fill.color = palette.key
+            canvas.drawCircle(micCell.centerX(), micCell.centerY(), dp(20f), fill)
             if (pressedIndex == MIC) {
                 fill.color = palette.pressed
-                canvas.drawCircle(micCell.centerX(), micCell.centerY(), dp(18f), fill)
+                canvas.drawCircle(micCell.centerX(), micCell.centerY(), dp(20f), fill)
             }
             drawIcon(canvas, R.drawable.kb_mic, micCell.centerX(), micCell.centerY(), dp(24f), palette.tabText)
         }
