@@ -15,7 +15,9 @@ permission, so Android does not let it open network connections at all. There is
 no crash reporting, no update check and no account.
 
 What you type is passed to the focused app, and **nothing typed in other apps is stored**: there is
-no dictionary, no word learning, no history and no clipboard access. The only texts the app keeps
+no dictionary, no word learning and no typing history. The clipboard is read only while the keyboard
+is shown, for the 📋 panel, and with `typing.clipboardHistory` copied texts are kept in memory only
+([below](#what-the-keyboard-reads)). The only texts the app keeps
 are [snippets](configuration.md#snippets--snippets) users enter themselves in the app's own
 snippet screen (below).
 
@@ -83,7 +85,8 @@ or rejected – never typed text, barcodes or snippet texts.
 - The **input type** of the focused field (number, e-mail, password …) to choose the matching keys.
 - The **package name, input type and hint** (placeholder or label) of the focused field, only to pick an [app profile](configuration.md#appprofiles--app-profiles) when the field starts – not the text in it. Nothing of it is stored; logcat gets the package name and the profile name, never the hint.
 - The **cursor position** (and, for ← and → on the text editing panel, the one character next to the cursor, to keep the focus in the field) – in memory only, never stored or logged.
-- The **clipboard**, only while the keyboard is shown and only to offer it in the 📋 panel. With `typing.clipboardHistory` (off by default) copied texts are kept **in memory only** – at most 20, unpinned ones for 1 hour, nothing from password fields or clips marked sensitive – and are gone when the keyboard process ends. Nothing is written to storage.
+- The **clipboard**, only while the keyboard is shown and only to offer it in the 📋 panel. With `typing.clipboardHistory` (off by default) copied texts are kept **in memory only** – at most 20, unpinned ones for 1 hour, nothing from password fields or clips marked sensitive – and are gone when the keyboard process ends. An entry removed with × stays removed even while it is still on the clipboard. Nothing is written to storage.
+- The **text of the field**, only for *Select all* on the text editing panel when the app does not support the select-all command: the keyboard then reads the field's text once to find its end and select it. It is held in memory only for that moment – never stored or logged.
 
 ## Connections and broadcasts
 

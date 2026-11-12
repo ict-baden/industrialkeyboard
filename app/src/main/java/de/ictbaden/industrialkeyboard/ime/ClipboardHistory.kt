@@ -12,9 +12,13 @@ class ClipboardHistory(private val max: Int = MAX_ITEMS, private val maxAgeMs: L
     private val items = ArrayList<ClipItem>()
     private var nextId = 1L
 
-    /** Adds [text] as the newest entry; the same text again moves up and keeps its pin. */
+    /** Texts removed with × since the last copy – the clipboard may still hold one of them. In memory only. */
+    private val dismissed = HashSet<String>()
+
+    /** Adds [text] as the newest entry (it was just copied); the same text again moves up and keeps its pin. */
     fun add(text: String, now: Long) {
         if (text.isBlank()) return
+        dismissed.clear()
         val existing = items.firstOrNull { it.text == text }
         items.remove(existing)
         items.add(0, ClipItem(existing?.id ?: nextId++, text, existing?.pinned == true, now))
@@ -22,6 +26,15 @@ class ClipboardHistory(private val max: Int = MAX_ITEMS, private val maxAgeMs: L
             val oldest = items.indexOfLast { !it.pinned }.takeIf { it >= 0 } ?: break
             items.removeAt(oldest)
         }
+    }
+
+    /**
+     * The text on the clipboard when the panel opens (maybe copied while the keyboard was hidden) –
+     * unless the user removed it with ×: it stays removed until something is copied again.
+     */
+    fun offer(text: String, now: Long) {
+        if (text in dismissed || items.any { it.text == text }) return
+        add(text, now)
     }
 
     /** Pinned first, then the rest; newest first; expired unpinned entries are dropped. */
@@ -36,10 +49,14 @@ class ClipboardHistory(private val max: Int = MAX_ITEMS, private val maxAgeMs: L
     }
 
     fun remove(id: Long) {
+        items.firstOrNull { it.id == id }?.let { dismissed += it.text }
         items.removeAll { it.id == id }
     }
 
-    fun clear() = items.clear()
+    fun clear() {
+        items.clear()
+        dismissed.clear()
+    }
 
     companion object {
         const val MAX_ITEMS = 20

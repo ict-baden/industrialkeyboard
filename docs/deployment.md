@@ -99,7 +99,7 @@ The app ships a schema that every EMM with Android Enterprise support shows:
 | `snippets_allow_user` | Bool | Users may add their own snippets (default on) |
 | `snippets_json` | String | The organisation's snippets as a JSON **array** in the format of `snippets.items`, e.g. `[{"label":"Lagerplatz A-01","text":"A-01-03{TAB}"}]`; replaces the list. Empty = unchanged, `[]` = no snippets. Errors are reported like the other keys (`snippets_json[0].label is missing`). Some EMMs limit the length of a string: put big lists into the configuration file |
 | `quick_toggles` | String | [Quick toggles](configuration.md#quicktoggles--quick-toggles-on-the-device) users may change: comma-separated `glove`, `contrast`, `scanner`, `sound`; `none` = none; empty = unchanged (default of the configuration: glove, contrast, sound). Unknown names are reported as provisioning error |
-| `top_bar` | Choice | Above the keys: toolbar like Gboard or tabs |
+| `top_bar` | Choice | Above the keys: toolbar like Gboard or tabs. Default `unchanged`: the current setting stays, so a configuration stored by 2.1 keeps the tabs even when the EMM sends every key with its default |
 | `one_handed` | Choice | One-handed mode: off, left, right |
 | `autocorrect` | Bool | Autocorrection on space (default off) |
 | `emoji_key` | Bool | Emoji key next to the space bar (default on) |

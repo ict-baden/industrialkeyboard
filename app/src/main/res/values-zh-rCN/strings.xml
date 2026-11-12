@@ -515,7 +515,7 @@
     <string name="one_handed_left">左侧</string>
     <string name="one_handed_right">右侧</string>
     <string name="mc_top_bar_title">按键上方</string>
-    <string name="mc_top_bar_description">与 Gboard 相同的工具栏，或 ABC、123、Fn 标签。</string>
+    <string name="mc_top_bar_description">与 Gboard 相同的工具栏，或 ABC、123、Fn 标签。默认：保留当前设置（2.1 保存的配置保留标签）。</string>
     <string name="mc_next_word_title">下一个词建议</string>
     <string name="mc_next_word_description">空格后显示可能的下一个词（固定列表）。</string>
     <string name="mc_clipboard_history_title">剪贴板历史记录</string>
@@ -582,6 +582,7 @@
         <item quantity="other">%1$d 条常用语</item>
     </plurals>
     <string-array name="mc_top_bar_entries">
+        <item>保留当前设置</item>
         <item>与 Gboard 相同的工具栏</item>
         <item>标签（ABC、123、Fn）</item>
     </string-array>

@@ -347,6 +347,27 @@ class ProvisioningTest {
     }
 
     @Test
+    fun `top_bar with its schema default keeps the tabs of a configuration stored by 2_1`() {
+        // Stored by 2.1 (simple managed keys, no topBar): loads with the tabs.
+        File(context.filesDir, "config.json").writeText("""{"layout":{"alphabet":"qwertz"}}""")
+        ConfigStore.reset()
+        assertEquals(TopBar.TABS, store.config.layout.topBar)
+        // The EMM sends every key with its schema default after an unrelated change.
+        restrict("top_bar" to "unchanged", "sound" to false, "next_word" to true)
+        Provisioning.applyAll(context)
+        assertEquals(TopBar.TABS, store.config.layout.topBar)
+        assertFalse(store.config.feedback.sound)
+        // Without the key at all, too.
+        restrict("sound" to true)
+        Provisioning.applyAll(context)
+        assertEquals(TopBar.TABS, store.config.layout.topBar)
+        // Only an explicit choice switches.
+        restrict("top_bar" to "toolbar")
+        Provisioning.applyAll(context)
+        assertEquals(TopBar.TOOLBAR, store.config.layout.topBar)
+    }
+
+    @Test
     fun `managed text editing tile`() {
         restrict("text_editing" to false)
         Provisioning.applyAll(context)

@@ -104,6 +104,27 @@ class GboardPackage2Test {
     }
 
     @Test
+    fun `a clip removed with the cross stays removed until something is copied`() {
+        val history = ClipboardHistory()
+        // Panel opens: the current clip is offered (copied while the keyboard was hidden).
+        history.offer("4711-secret", 0)
+        history.togglePin(history.items(0).single().id)
+        history.remove(history.items(0).single().id)
+        // The clipboard still holds it: opening the panel again does not bring it back, pinned or not.
+        history.offer("4711-secret", 10)
+        assertTrue(history.items(10).isEmpty())
+        // Something else is copied: the history works as before.
+        history.add("Lager Süd", 20)
+        assertEquals(listOf("Lager Süd"), history.items(20).map { it.text })
+        // The same text copied again is a new copy and comes back.
+        history.add("4711-secret", 30)
+        assertEquals(listOf("4711-secret", "Lager Süd"), history.items(30).map { it.text })
+        // Offering what is already listed does not move it up.
+        history.offer("Lager Süd", 40)
+        assertEquals(listOf("4711-secret", "Lager Süd"), history.items(40).map { it.text })
+    }
+
+    @Test
     fun `next words follow the word before a single space`() {
         assertEquals("vielen", NextWordContext.previousWord("Hallo, vielen "))
         assertEquals("Ich", NextWordContext.previousWord("Ich "))

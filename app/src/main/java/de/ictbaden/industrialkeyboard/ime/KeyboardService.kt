@@ -627,6 +627,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         } else if (word.isNotEmpty() || autocorrected != null) {
             endWord()
             render()
+        } else if (dropNextWords()) {
+            render()
         }
         updateAutoShift()
     }
@@ -785,6 +787,17 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         if (words.isEmpty()) return
         suggestions = Suggestions(words.map { Suggestion(it, correction = false, score = 0) }, typedIsWord = false, autocorrection = null)
         render()
+    }
+
+    /**
+     * Next words belong to the text right before the cursor: Enter, a cursor move, a scan or the app
+     * changing the text makes them stale (and they hide the toolbar). True when some were dropped;
+     * the caller renders.
+     */
+    private fun dropNextWords(): Boolean {
+        if (word.isNotEmpty() || suggestions.words.isEmpty()) return false
+        suggestions = Suggestions.NONE
+        return true
     }
 
     private fun backspace() {
@@ -975,6 +988,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     /** Runs the field's editor action (Done, Next, Go …) or sends Enter. */
     private fun enter() {
+        if (dropNextWords()) render()
         sendKeyChar('\n')
         updateAutoShift()
     }
@@ -1021,6 +1035,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         // A Shift tapped by hand also applies to Tab, arrows, Esc … (Shift+Tab, Shift+→ selects). Not the
         // automatic one at a sentence start, and not Caps Lock, which would turn every Tab into Shift+Tab.
         val held = KeyChords.heldMeta(modifiers.keys, manualShift = shift == ShiftState.ONCE && !autoShifted, snippet = snippet)
+        if (steps.any { it is MacroStep.Key || it is MacroStep.Text } && dropNextWords()) render()
         for (step in steps) {
             when (step) {
                 is MacroStep.Text -> currentInputConnection?.commitText(step.text, 1)
@@ -1119,6 +1134,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         closeVoice()
         emojiOpen = false
         toolPanel = null
+        dropNextWords()
         textSelecting = false
         // Shift belongs to the page it was set on (letters vs. F13–F24 on the function keys).
         shift = ShiftState.OFF
@@ -1167,8 +1183,11 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         if (panel != null) endWord()
         if (panel != Tabs.TOOL_EDIT) textSelecting = false
         val editOpened = panel == Tabs.TOOL_EDIT && toolPanel != Tabs.TOOL_EDIT
+        val clipboardOpened = panel == Tabs.TOOL_CLIPBOARD && toolPanel != Tabs.TOOL_CLIPBOARD
         toolPanel = panel
         if (panel == Tabs.TOOL_MENU) root?.featuresPanel?.show(features())
+        // What is on the clipboard now, maybe copied while the keyboard was hidden – unless removed with ×.
+        if (clipboardOpened && config.typing.clipboardHistory) currentClip()?.let { clipboard.offer(it, System.currentTimeMillis()) }
         render()
         // The text editing keys replace the letters in place – no pane, so it gets an announcement.
         if (editOpened) root?.announce(AppLanguage.localized(this).getString(R.string.feature_text_editing))
@@ -1303,10 +1322,9 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     /** What the clipboard panel lists: the history, or only the current item when it is off. */
     private fun clips(): List<ClipItem> {
         if (toolPanel != Tabs.TOOL_CLIPBOARD) return emptyList()
-        if (config.typing.clipboardHistory) {
-            currentClip()?.let { clipboard.add(it, System.currentTimeMillis()) }
-            return clipboard.items(System.currentTimeMillis())
-        }
+        // The current clip comes in from the listener and once when the panel opens (setToolPanel),
+        // not here: × on it must stay removed when the panel is drawn again.
+        if (config.typing.clipboardHistory) return clipboard.items(System.currentTimeMillis())
         return listOfNotNull(currentClip()?.let { ClipItem(0, it, pinned = false, time = 0) })
     }
 
@@ -1482,6 +1500,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     /** Types a formatted barcode: prefix macro, text, suffix macro (or the old Enter/Tab/nothing). */
     private fun typeScan(output: ScanFormatter.Output) {
         val ic = currentInputConnection ?: return
+        if (dropNextWords()) render()
         if (output.prefix.isNotEmpty()) runCatching { Macro.parse(output.prefix) }.getOrNull()?.let(::runMacro)
         val gs = output.gs?.let { runCatching { Macro.parse(it) }.getOrNull() }
         output.parts.forEachIndexed { i, part ->
