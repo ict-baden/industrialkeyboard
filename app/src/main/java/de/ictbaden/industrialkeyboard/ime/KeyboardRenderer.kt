@@ -6,6 +6,7 @@ import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
 import de.ictbaden.industrialkeyboard.config.Navigation
+import de.ictbaden.industrialkeyboard.config.Snippets
 import de.ictbaden.industrialkeyboard.config.Tabs
 import de.ictbaden.industrialkeyboard.config.TopBar
 import de.ictbaden.industrialkeyboard.layout.KeyboardLayout
@@ -14,6 +15,7 @@ import de.ictbaden.industrialkeyboard.layout.ModifierKey
 import de.ictbaden.industrialkeyboard.layout.TextEditState
 import de.ictbaden.industrialkeyboard.ui.ClipItem
 import de.ictbaden.industrialkeyboard.ui.Palette
+import de.ictbaden.industrialkeyboard.ui.PanelSnippet
 import de.ictbaden.industrialkeyboard.ui.RenderState
 import de.ictbaden.industrialkeyboard.ui.ShiftState
 import de.ictbaden.industrialkeyboard.ui.TabBarView
@@ -71,27 +73,47 @@ object KeyboardRenderer {
     /** Gboard's toolbar instead of the tabs (`layout.topBar: toolbar`, only with tab navigation). */
     fun toolbar(config: KeyboardConfig) = config.layout.topBar == TopBar.TOOLBAR && config.layout.navigation == Navigation.TABS
 
-    /** ⊞ features, clipboard, settings, then Fn, scan and custom layouts as far as switched on. */
-    fun toolbarTabs(config: KeyboardConfig, scanAvailable: Boolean): List<TabBarView.Tab> = buildList {
+    /** ⊞ features, clipboard, settings, then Fn, scan, snippets and custom layouts as far as switched on. */
+    fun toolbarTabs(config: KeyboardConfig, scanAvailable: Boolean, passwordField: Boolean = false): List<TabBarView.Tab> = buildList {
         add(TabBarView.Tab(Tabs.TOOL_MENU, null, R.drawable.kb_apps))
         add(TabBarView.Tab(Tabs.TOOL_CLIPBOARD, null, R.drawable.kb_clipboard))
         add(TabBarView.Tab(Tabs.TOOL_SETTINGS, null, R.drawable.kb_settings))
         if (config.tabs.function) add(TabBarView.Tab(Tabs.FUNCTION, "Fn"))
         if (config.tabs.scan && scanAvailable) add(TabBarView.Tab(Tabs.SCAN, null, R.drawable.kb_scan))
+        if (snippetsButton(config, passwordField)) add(SNIPPETS_TAB)
         config.customLayouts.forEach { add(TabBarView.Tab(it.id, it.label)) }
     }
 
-    fun tabs(config: KeyboardConfig, scanAvailable: Boolean): List<TabBarView.Tab>? =
-        if (toolbar(config)) toolbarTabs(config, scanAvailable) else FieldPolicy.tabs(config, scanAvailable).takeIf { it.isNotEmpty() }?.map { id ->
-            when (id) {
-                Tabs.ALPHA -> TabBarView.Tab(id, "ABC")
-                Tabs.NUMERIC -> TabBarView.Tab(id, "123")
-                Tabs.SYMBOLS -> TabBarView.Tab(id, "#+=")
-                Tabs.FUNCTION -> TabBarView.Tab(id, "Fn")
-                Tabs.SCAN -> TabBarView.Tab(id, null, R.drawable.kb_scan)
-                else -> TabBarView.Tab(id, config.customLayout(id)?.label ?: id)
-            }
+    /**
+     * The tab bar: the toolbar, or the tabs plus the snippets button as the last tab. Not part of
+     * [FieldPolicy.tabs], so it is never a start page, `tabs.preferred` or `{SHOW:…}` target; `null`
+     * (no bar) with `navigation: keys`, also with the snippets button.
+     */
+    fun tabs(config: KeyboardConfig, scanAvailable: Boolean, passwordField: Boolean = false): List<TabBarView.Tab>? =
+        if (toolbar(config)) {
+            toolbarTabs(config, scanAvailable, passwordField)
+        } else {
+            FieldPolicy.tabs(config, scanAvailable).takeIf { it.isNotEmpty() }?.map { id ->
+                when (id) {
+                    Tabs.ALPHA -> TabBarView.Tab(id, "ABC")
+                    Tabs.NUMERIC -> TabBarView.Tab(id, "123")
+                    Tabs.SYMBOLS -> TabBarView.Tab(id, "#+=")
+                    Tabs.FUNCTION -> TabBarView.Tab(id, "Fn")
+                    Tabs.SCAN -> TabBarView.Tab(id, null, R.drawable.kb_scan)
+                    else -> TabBarView.Tab(id, config.customLayout(id)?.label ?: id)
+                }
+            }?.let { tabs -> if (snippetsButton(config, passwordField)) tabs + SNIPPETS_TAB else tabs }
         }
+
+    private val SNIPPETS_TAB = TabBarView.Tab(Tabs.TOOL_SNIPPETS, null, R.drawable.kb_snippets)
+
+    /** `snippets.button`, never over a password field, and only with something to show. */
+    private fun snippetsButton(config: KeyboardConfig, passwordField: Boolean) =
+        config.snippets.button && !passwordField && Snippets.reachable(config)
+
+    /** The tab lit in the bar: an open panel or the page (the toolbar marks no ABC; the tab bar marks the snippets tab while it is open). */
+    fun selectedTab(config: KeyboardConfig, page: Page, toolPanel: String?): String? =
+        if (toolbar(config)) toolPanel ?: page.tab.takeIf { it != Tabs.ALPHA } else if (toolPanel == Tabs.TOOL_SNIPPETS) toolPanel else page.tab
 
     fun state(
         context: Context,
@@ -124,6 +146,12 @@ object KeyboardRenderer {
         clipboardHistory: Boolean = false,
         /** Select lit, Cut/Copy dimmed on the text editing panel ([Tabs.TOOL_EDIT]). */
         textEdit: TextEditState? = null,
+        /** Entries of the snippets panel ([Tabs.TOOL_SNIPPETS]). */
+        snippets: List<PanelSnippet> = emptyList(),
+        /** ✎ in the snippets panel (users may keep their own). */
+        snippetsEditable: Boolean = false,
+        /** Label of the snippet whose shortcut was typed (middle of the suggestion strip). */
+        snippetSuggestion: String? = null,
     ): RenderState {
         val appearance = config.appearance
         val rowHeight = (baseRowDp(context) * context.resources.displayMetrics.density * appearance.keyHeight / 100f).toInt()
@@ -131,9 +159,9 @@ object KeyboardRenderer {
         val keys = if (scannerName == null && config.scanner.scanKey) config.copy(scanner = config.scanner.copy(scanKey = false)) else config
         return RenderState(
             palette = Palette.resolve(context, appearance),
-            tabs = tabs(config, scannerName != null),
+            tabs = tabs(config, scannerName != null, passwordField),
             // The toolbar marks an open panel or a page it leads to; ABC needs no mark there.
-            selectedTab = if (toolbar(config)) toolPanel ?: page.tab.takeIf { it != Tabs.ALPHA } else page.tab,
+            selectedTab = selectedTab(config, page, toolPanel),
             // The text editing panel takes the place of the keys, in the same height (heightRows stays).
             layout = if (toolPanel == Tabs.TOOL_EDIT) textEditingLayout(context) else layoutFor(page, keys, shift, languageKey, emojiKey),
             shift = shift,
@@ -158,6 +186,9 @@ object KeyboardRenderer {
             clipboardHistory = clipboardHistory,
             oneHanded = config.appearance.oneHanded,
             textEdit = textEdit.takeIf { toolPanel == Tabs.TOOL_EDIT },
+            snippets = snippets.takeIf { toolPanel == Tabs.TOOL_SNIPPETS }.orEmpty(),
+            snippetsEditable = snippetsEditable,
+            snippetSuggestion = snippetSuggestion,
         )
     }
 }

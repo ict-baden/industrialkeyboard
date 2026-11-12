@@ -529,6 +529,66 @@
     <string name="mc_quick_toggles_description">Séparées par des virgules : glove, contrast, scanner, sound ; none = aucune ; vide = le réglage actuel reste. Par défaut : glove, contrast, sound.</string>
     <string name="mc_one_handed_title">Mode une main</string>
     <string name="mc_one_handed_description">Touches plus étroites à gauche ou à droite.</string>
+    <string name="feature_snippets">Textes types</string>
+    <string name="snippets_title">Textes types</string>
+    <string name="snippets_edit">Modifier les textes types</string>
+    <string name="snippets_empty_user">Aucun texte type pour l’instant. Touchez ✎ pour ajouter les vôtres.</string>
+    <string name="snippets_empty_admin">Votre organisation n’a configuré aucun texte type.</string>
+    <string name="section_snippets">Textes types</string>
+    <string name="snippets_enabled">Textes types</string>
+    <string name="snippets_enabled_summary">Textes prêts à l’emploi dans ⊞ et en suggestion</string>
+    <string name="snippets_shortcuts">Raccourcis</string>
+    <string name="snippets_shortcuts_summary">Taper un raccourci comme « mfg » propose son texte type</string>
+    <string name="snippets_button">Textes types dans la barre</string>
+    <string name="snippets_button_summary">Bouton dédié dans la barre d’outils ou d’onglets</string>
+    <string name="snippets_allow_user">Textes types personnels</string>
+    <string name="snippets_allow_user_summary">Les utilisateurs peuvent ajouter leurs propres textes types</string>
+    <string name="snippets_org">Textes types de l’organisation</string>
+    <string name="snippets_mine">Mes textes types</string>
+    <string name="snippets_mine_summary">Les textes dont vous avez souvent besoin</string>
+    <string name="snippets_managed_note">Définis par votre EMM – modifiez-les là-bas.</string>
+    <string name="snippets_user_off">Votre administrateur a désactivé les textes types personnels.</string>
+    <string name="snippets_off">Les textes types sont désactivés.</string>
+    <string name="snippet_add">Ajouter un texte type</string>
+    <string name="snippet_edit_title">Texte type</string>
+    <string name="snippet_label_hint">Nom</string>
+    <string name="snippet_label_helper">Affiché dans la liste, 40 caractères maximum</string>
+    <string name="snippet_shortcut_hint">Raccourci (facultatif)</string>
+    <string name="snippet_shortcut_helper">2 à 16 lettres, p. ex. mfg</string>
+    <string name="snippet_text_hint">Texte</string>
+    <string name="snippet_text_helper">Les macros comme {TAB} et {ENTER} fonctionnent</string>
+    <string name="snippet_delete">Supprimer</string>
+    <string name="snippet_error_label_empty">Saisissez un nom</string>
+    <string name="snippet_error_text_empty">Saisissez un texte</string>
+    <plurals name="snippet_error_too_long">
+        <item quantity="one">%1$d caractère maximum</item>
+        <item quantity="many">%1$d caractères maximum</item>
+        <item quantity="other">%1$d caractères maximum</item>
+    </plurals>
+    <string name="snippet_error_shortcut">2 à 16 lettres, sans chiffres ni espaces</string>
+    <string name="snippet_error_shortcut_taken">« %1$s » est déjà utilisé par « %2$s »</string>
+    <string name="snippet_error_macro_not_allowed">Textes types personnels : uniquement du texte, {TAB} et {ENTER}</string>
+    <plurals name="snippet_error_full">
+        <item quantity="one">%1$d texte type maximum</item>
+        <item quantity="many">%1$d textes types maximum</item>
+        <item quantity="other">%1$d textes types maximum</item>
+    </plurals>
+    <string name="user_snippets_reset">Vos textes types étaient illisibles et ont été réinitialisés.</string>
+    <string name="mc_snippets_enabled_title">Textes types</string>
+    <string name="mc_snippets_enabled_description">Textes prêts à l’emploi dans le clavier (activé par défaut).</string>
+    <string name="mc_snippets_shortcuts_title">Raccourcis des textes types</string>
+    <string name="mc_snippets_shortcuts_description">Les raccourcis tapés proposent leur texte type (activé par défaut).</string>
+    <string name="mc_snippets_button_title">Bouton des textes types dans la barre</string>
+    <string name="mc_snippets_button_description">Bouton dédié dans la barre d’outils ou d’onglets (désactivé par défaut).</string>
+    <string name="mc_snippets_allow_user_title">Textes types personnels</string>
+    <string name="mc_snippets_allow_user_description">Les utilisateurs peuvent ajouter les leurs (activé par défaut).</string>
+    <string name="mc_snippets_json_title">Textes types (JSON)</string>
+    <string name="mc_snippets_json_description">Tableau JSON de {id, label, text, shortcut} ; [] = aucun ; vide = inchangé. Sans effet tant que config_json est défini.</string>
+    <plurals name="snippets_count">
+        <item quantity="one">%1$d texte type</item>
+        <item quantity="many">%1$d textes types</item>
+        <item quantity="other">%1$d textes types</item>
+    </plurals>
     <string-array name="mc_top_bar_entries">
         <item>Barre d’outils comme Gboard</item>
         <item>Onglets (ABC, 123, Fn)</item>

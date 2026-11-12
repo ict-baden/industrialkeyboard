@@ -344,4 +344,71 @@ class ProvisioningTest {
         Provisioning.applyAll(context)
         assertTrue(store.config.typing.textEditing)
     }
+
+    private val snippetsJson = """[{"id":"regards","label":"Mit freundlichen Grüßen","text":"MfG{ENTER}Lager Süd","shortcut":"mfg"},{"label":"Lagerplatz","text":"A-01{TAB}"}]"""
+
+    @Test
+    fun `managed snippet switches and snippets_json replace the items`() {
+        store.import(KeyboardConfig(snippets = SnippetSettings(items = listOf(Snippet("old", "Old", "old")))))
+        restrict(
+            "snippets_enabled" to false,
+            "snippets_shortcuts" to false,
+            "snippets_button" to true,
+            "snippets_allow_user" to false,
+            "snippets_json" to snippetsJson,
+        )
+        Provisioning.applyAll(context)
+        val s = store.config.snippets
+        assertFalse(s.enabled)
+        assertFalse(s.shortcuts)
+        assertTrue(s.button)
+        assertFalse(s.allowUser)
+        assertEquals(listOf("regards", "s2"), s.items.map { it.id })
+        assertEquals("MfG{ENTER}Lager Süd", s.items[0].text)
+        assertEquals(null, Provisioning.lastError(context))
+        assertTrue(Provisioning.snippetsManaged(context))
+    }
+
+    @Test
+    fun `blank snippets_json leaves the items, an empty array clears them`() {
+        store.import(KeyboardConfig(snippets = SnippetSettings(items = listOf(Snippet("old", "Old", "old")))))
+        restrict("snippets_json" to "  ", "snippets_button" to true)
+        Provisioning.applyAll(context)
+        assertEquals(listOf("old"), store.config.snippets.items.map { it.id })
+        assertTrue(store.config.snippets.button)
+        // Simple switches only: snippets edited in the app stay editable.
+        assertFalse(Provisioning.snippetsManaged(context))
+
+        restrict("snippets_json" to "[]")
+        Provisioning.applyAll(context)
+        assertTrue(store.config.snippets.items.isEmpty())
+    }
+
+    @Test
+    fun `invalid snippets_json is reported`() {
+        store.import(KeyboardConfig(snippets = SnippetSettings(items = listOf(Snippet("old", "Old", "old")))))
+        restrict("snippets_json" to """[{"text":"no label"}]""")
+        Provisioning.applyAll(context)
+        assertTrue(Provisioning.lastError(context).orEmpty(), Provisioning.lastError(context).orEmpty().endsWith("snippets_json[0].label is missing"))
+        assertEquals(listOf("old"), store.config.snippets.items.map { it.id })
+
+        restrict("snippets_json" to """{"label":"secret text"""")
+        Provisioning.applyAll(context)
+        val error = Provisioning.lastError(context).orEmpty()
+        assertTrue(error, error.endsWith("snippets_json: invalid JSON"))
+        assertFalse("the input is not echoed", error.contains("secret"))
+
+        val many = (1..101).joinToString(",", "[", "]") { """{"label":"L$it","text":"t"}""" }
+        restrict("snippets_json" to many)
+        Provisioning.applyAll(context)
+        assertTrue(Provisioning.lastError(context).orEmpty().endsWith("snippets_json: at most 100 snippets"))
+    }
+
+    @Test
+    fun `config_json makes the editor read-only and snippets_json inert`() {
+        restrict("config_json" to """{"snippets":{"items":[{"label":"Org","text":"o"}]}}""", "snippets_json" to snippetsJson)
+        Provisioning.applyAll(context)
+        assertEquals(listOf("Org"), store.config.snippets.items.map { it.label })
+        assertTrue(Provisioning.snippetsManaged(context))
+    }
 }

@@ -93,6 +93,11 @@ The app ships a schema that every EMM with Android Enterprise support shows:
 | `next_word` | Bool | Next-word suggestions after a space (default on) |
 | `clipboard_history` | Bool | Clipboard history in memory for the 📋 panel (default off) |
 | `text_editing` | Bool | Tile *Text editing* in the ⊞ menu: arrows, select, cut, copy and paste (default on) |
+| `snippets_enabled` | Bool | [Snippets](configuration.md#snippets--snippets) in ⊞, the bar and as shortcut suggestions (default on) |
+| `snippets_shortcuts` | Bool | Typed shortcuts offer their snippet (default on) |
+| `snippets_button` | Bool | Own snippets button in the toolbar or as the last tab (default off) |
+| `snippets_allow_user` | Bool | Users may add their own snippets (default on) |
+| `snippets_json` | String | The organisation's snippets as a JSON **array** in the format of `snippets.items`, e.g. `[{"label":"Lagerplatz A-01","text":"A-01-03{TAB}"}]`; replaces the list. Empty = unchanged, `[]` = no snippets. Errors are reported like the other keys (`snippets_json[0].label is missing`). Some EMMs limit the length of a string: put big lists into the configuration file |
 | `quick_toggles` | String | [Quick toggles](configuration.md#quicktoggles--quick-toggles-on-the-device) users may change: comma-separated `glove`, `contrast`, `scanner`, `sound`; `none` = none; empty = unchanged (default of the configuration: glove, contrast, sound). Unknown names are reported as provisioning error |
 | `top_bar` | Choice | Above the keys: toolbar like Gboard or tabs |
 | `one_handed` | Choice | One-handed mode: off, left, right |
@@ -112,7 +117,8 @@ The app ships a schema that every EMM with Android Enterprise support shows:
 The keys are applied as soon as the EMM changes them and whenever the keyboard opens. The
 single keys only change their own option; `config_json` replaces the whole configuration.
 [App profiles](configuration.md#appprofiles--app-profiles) (`appProfiles`) need `config_json` (or a
-file, the broadcast or an import); the single keys cannot carry them.
+file, the broadcast or an import); the single keys cannot carry them. While `config_json` is set,
+the single keys – `snippets_json` included – have no effect.
 Changes made on the device stay until the EMM sends a changed configuration. Errors (such as
 invalid JSON) appear in the keyboard settings under **Configuration → Last provisioning
 error**.

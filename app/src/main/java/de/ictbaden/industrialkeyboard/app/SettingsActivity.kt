@@ -55,6 +55,7 @@ import de.ictbaden.industrialkeyboard.config.QuickToggleStore
 import de.ictbaden.industrialkeyboard.config.QuickToggles
 import de.ictbaden.industrialkeyboard.config.ScanSuffix
 import de.ictbaden.industrialkeyboard.config.ScanTriggerType
+import de.ictbaden.industrialkeyboard.config.SnippetSettings
 import de.ictbaden.industrialkeyboard.config.Symbology
 import de.ictbaden.industrialkeyboard.config.Tabs
 import de.ictbaden.industrialkeyboard.config.TextCase
@@ -467,6 +468,8 @@ class SettingsActivity : AppCompatActivity() {
             ),
         )
 
+        renderSnippets(c)
+
         content.addView(ui.section(getString(R.string.section_feedback)))
         content.addView(
             ui.card(
@@ -640,6 +643,34 @@ class SettingsActivity : AppCompatActivity() {
                     },
                     ui.row(R.drawable.ic_globe, getString(R.string.about_website), WEBSITE) { openLink(WEBSITE) },
                     ui.row(R.drawable.ic_globe, getString(R.string.about_impressum), getString(R.string.about_impressum_summary)) { openLink(IMPRESSUM) },
+                ),
+            ),
+        )
+    }
+
+    /** Snippets: the switches and the administrator's list (users edit their own from the keyboard or the setup screen). */
+    private fun renderSnippets(c: KeyboardConfig) {
+        fun set(transform: (SnippetSettings) -> SnippetSettings) = update { it.copy(snippets = transform(it.snippets)) }
+        val s = c.snippets
+        content.addView(ui.section(getString(R.string.section_snippets)))
+        content.addView(
+            ui.card(
+                listOf(
+                    ui.switchRow(R.drawable.ic_snippets, getString(R.string.snippets_enabled), getString(R.string.snippets_enabled_summary), s.enabled) { on ->
+                        set { it.copy(enabled = on) }
+                    },
+                    ui.switchRow(R.drawable.ic_snippets, getString(R.string.snippets_shortcuts), getString(R.string.snippets_shortcuts_summary), s.shortcuts, enabled = s.enabled) { on ->
+                        set { it.copy(shortcuts = on) }
+                    },
+                    ui.switchRow(R.drawable.ic_snippets, getString(R.string.snippets_button), getString(R.string.snippets_button_summary), s.button, enabled = s.enabled) { on ->
+                        set { it.copy(button = on) }
+                    },
+                    ui.switchRow(R.drawable.ic_snippets, getString(R.string.snippets_allow_user), getString(R.string.snippets_allow_user_summary), s.allowUser) { on ->
+                        set { it.copy(allowUser = on) }
+                    },
+                    ui.row(R.drawable.ic_snippets, getString(R.string.snippets_org), resources.getQuantityString(R.plurals.snippets_count, s.items.size, s.items.size)) {
+                        startActivity(SnippetsActivity.intent(this, admin = true))
+                    },
                 ),
             ),
         )

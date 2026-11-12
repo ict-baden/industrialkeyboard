@@ -595,6 +595,63 @@
     <string name="mc_quick_toggles_description">Comma-separated: glove, contrast, scanner, sound; none = no quick toggles; empty = keep the current setting. Default: glove, contrast, sound.</string>
     <string name="mc_one_handed_title">One-handed mode</string>
     <string name="mc_one_handed_description">Keys narrower at the left or right.</string>
+    <string name="feature_snippets">Snippets</string>
+    <string name="snippets_title">Snippets</string>
+    <string name="snippets_edit">Edit snippets</string>
+    <string name="snippets_empty_user">No snippets yet. Tap ✎ to add your own.</string>
+    <string name="snippets_empty_admin">Your organisation has not set up any snippets.</string>
+    <string name="section_snippets">Snippets</string>
+    <string name="snippets_enabled">Snippets</string>
+    <string name="snippets_enabled_summary">Ready-made texts in ⊞ and as suggestions</string>
+    <string name="snippets_shortcuts">Shortcuts</string>
+    <string name="snippets_shortcuts_summary">Typing a shortcut such as “mfg” offers its snippet</string>
+    <string name="snippets_button">Snippets in the bar</string>
+    <string name="snippets_button_summary">Own button in the toolbar or tab bar</string>
+    <string name="snippets_allow_user">Own snippets</string>
+    <string name="snippets_allow_user_summary">Users may add their own snippets</string>
+    <string name="snippets_org">Organisation snippets</string>
+    <string name="snippets_mine">My snippets</string>
+    <string name="snippets_mine_summary">Texts you need often</string>
+    <string name="snippets_managed_note">Set by your EMM – change them there.</string>
+    <string name="snippets_user_off">Your administrator has switched off own snippets.</string>
+    <string name="snippets_off">Snippets are switched off.</string>
+    <string name="snippet_add">Add snippet</string>
+    <string name="snippet_edit_title">Snippet</string>
+    <string name="snippet_label_hint">Name</string>
+    <string name="snippet_label_helper">Shown in the list, up to 40 characters</string>
+    <string name="snippet_shortcut_hint">Shortcut (optional)</string>
+    <string name="snippet_shortcut_helper">2–16 letters, e.g. mfg</string>
+    <string name="snippet_text_hint">Text</string>
+    <string name="snippet_text_helper">Macros such as {TAB} and {ENTER} work</string>
+    <string name="snippet_delete">Delete</string>
+    <string name="snippet_error_label_empty">Enter a name</string>
+    <string name="snippet_error_text_empty">Enter a text</string>
+    <plurals name="snippet_error_too_long">
+        <item quantity="one">At most %1$d character</item>
+        <item quantity="other">At most %1$d characters</item>
+    </plurals>
+    <string name="snippet_error_shortcut">2–16 letters, no digits or spaces</string>
+    <string name="snippet_error_shortcut_taken">“%1$s” is already used by “%2$s”</string>
+    <string name="snippet_error_macro_not_allowed">Own snippets may only contain text, {TAB} and {ENTER}</string>
+    <plurals name="snippet_error_full">
+        <item quantity="one">At most %1$d snippet</item>
+        <item quantity="other">At most %1$d snippets</item>
+    </plurals>
+    <string name="user_snippets_reset">Your snippets could not be read and were reset.</string>
+    <string name="mc_snippets_enabled_title">Snippets</string>
+    <string name="mc_snippets_enabled_description">Ready-made texts in the keyboard (default on).</string>
+    <string name="mc_snippets_shortcuts_title">Snippet shortcuts</string>
+    <string name="mc_snippets_shortcuts_description">Typed shortcuts offer their snippet (default on).</string>
+    <string name="mc_snippets_button_title">Snippets button in the bar</string>
+    <string name="mc_snippets_button_description">Own button in the toolbar or tab bar (default off).</string>
+    <string name="mc_snippets_allow_user_title">Own snippets</string>
+    <string name="mc_snippets_allow_user_description">Users may add their own (default on).</string>
+    <string name="mc_snippets_json_title">Snippets (JSON)</string>
+    <string name="mc_snippets_json_description">JSON array of {id, label, text, shortcut}; [] = none; empty = unchanged. Ignored when config_json is set.</string>
+    <plurals name="snippets_count">
+        <item quantity="one">%1$d snippet</item>
+        <item quantity="other">%1$d snippets</item>
+    </plurals>
     <string-array name="mc_top_bar_entries">
         <item>Toolbar like Gboard</item>
         <item>Tabs (ABC, 123, Fn)</item>

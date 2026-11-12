@@ -116,6 +116,17 @@ object FieldPolicy {
         }
     }
 
+    /** Snippets panel, ⊞ tile and bar button: everywhere but in password fields. */
+    fun snippetsAllowed(inputType: Int): Boolean = !isPassword(inputType)
+
+    /**
+     * Snippet shortcuts in the suggestion strip: text fields that are no password fields. On purpose
+     * also fields with `textNoSuggestions` (barcode, article number): a shortcut only offers its
+     * snippet and never replaces by itself.
+     */
+    fun snippetShortcutsAllowed(inputType: Int): Boolean =
+        inputType and InputType.TYPE_MASK_CLASS == InputType.TYPE_CLASS_TEXT && !isPassword(inputType)
+
     /** Tab bar entries in display order; empty with classic navigation. */
     fun tabs(config: KeyboardConfig, scanAvailable: Boolean): List<String> {
         if (config.layout.navigation == Navigation.KEYS) return emptyList()

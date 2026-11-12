@@ -40,6 +40,7 @@ object ConfigJson {
             customLayouts = custom,
             adminPasswordHash = passwordHash(root),
             language = language(root.optNonBlank("language")),
+            snippets = parseSnippets(root.optJSONObject("snippets"), defaults.snippets),
             appProfiles = parseAppProfiles(root.opt("appProfiles"), custom),
             quickToggles = parseQuickToggles(root.optJSONObject("quickToggles"), defaults.quickToggles),
         )
@@ -192,6 +193,14 @@ object ConfigJson {
                 put("vibrate", n.vibrate)
             })
         })
+        root.put("snippets", JSONObject().apply {
+            val s = config.snippets
+            put("enabled", s.enabled)
+            put("shortcuts", s.shortcuts)
+            put("button", s.button)
+            put("allowUser", s.allowUser)
+            put("items", writeSnippetItems(s.items))
+        })
         // Always the array, `[]` included, so that "none" survives a round trip.
         root.put("quickToggles", JSONObject().apply {
             put("allowed", JSONArray(config.quickToggles.allowed.sortedBy { it.ordinal }.map { it.key }))
@@ -226,6 +235,68 @@ object ConfigJson {
             root.put("appProfiles", JSONArray().apply { config.appProfiles.forEach { put(writeAppProfile(it)) } })
         }
         return root.toString(2)
+    }
+
+    /** `id`, `label`, `text` exactly as stored, `shortcut` only when set; also the file of the user's own. */
+    internal fun writeSnippetItems(items: List<Snippet>) = JSONArray().apply {
+        items.forEach { s ->
+            put(JSONObject().apply {
+                put("id", s.id)
+                put("label", s.label)
+                put("text", s.text)
+                putOpt("shortcut", s.shortcut)
+            })
+        }
+    }
+
+    private fun parseSnippets(json: JSONObject?, d: SnippetSettings): SnippetSettings {
+        json ?: return d
+        val items = if (!json.has("items") || json.isNull("items")) {
+            d.items
+        } else {
+            parseSnippetItems(json.opt("items") as? JSONArray ?: throw ConfigException("snippets.items: array expected"), "snippets.items", Snippets.MAX_ADMIN)
+        }
+        return SnippetSettings(
+            enabled = json.optBoolean("enabled", d.enabled),
+            shortcuts = json.optBoolean("shortcuts", d.shortcuts),
+            button = json.optBoolean("button", d.button),
+            allowUser = json.optBoolean("allowUser", d.allowUser),
+            items = items,
+        )
+    }
+
+    /**
+     * Snippets of [array] with every check of the format; messages name [where] (`snippets.items`,
+     * the managed key `snippets_json`, the file `user-snippets`). [user]: own snippets, limited to
+     * text, `{TAB}` and `{ENTER}` ([Snippets.problem]).
+     */
+    internal fun parseSnippetItems(array: JSONArray, where: String, max: Int, user: Boolean = false): List<Snippet> {
+        if (array.length() > max) throw ConfigException("$where: at most $max snippets")
+        val items = (0 until array.length()).map { i ->
+            val at = "$where[$i]"
+            val json = array.opt(i) as? JSONObject ?: throw ConfigException("$at: object expected")
+            val id = json.optNonBlank("id") ?: "s${i + 1}"
+            if (!id.matches(ID)) throw ConfigException("$at.id: \"$id\" may only contain a-z, 0-9, - and _ (max. 24)")
+            val label = json.optNonBlank("label") ?: throw ConfigException("$at.label is missing")
+            val text = json.optRaw("text")
+            val shortcut = json.optNonBlank("shortcut")
+            when (Snippets.problem(label, text, shortcut, emptySet(), user)) {
+                null, Snippets.Problem.LABEL_EMPTY, Snippets.Problem.SHORTCUT_TAKEN -> Unit
+                Snippets.Problem.LABEL_TOO_LONG -> throw ConfigException("$at.label: at most ${Snippets.MAX_LABEL} characters")
+                Snippets.Problem.TEXT_EMPTY -> throw ConfigException("$at.text is missing")
+                Snippets.Problem.TEXT_TOO_LONG -> throw ConfigException("$at.text: at most ${Snippets.MAX_TEXT} characters")
+                Snippets.Problem.MACRO -> checkMacro(text, "$at.text")
+                Snippets.Problem.MACRO_NOT_ALLOWED -> throw ConfigException("$at.text: own snippets may only contain text, {TAB} and {ENTER}")
+                Snippets.Problem.SHORTCUT_FORMAT ->
+                    throw ConfigException("$at.shortcut: \"$shortcut\" must be ${Snippets.MIN_SHORTCUT}–${Snippets.MAX_SHORTCUT} letters")
+            }
+            Snippet(id = id, label = label, text = text, shortcut = shortcut)
+        }
+        items.groupBy { it.id }.filterValues { it.size > 1 }.keys.firstOrNull()?.let { throw ConfigException("$where: id \"$it\" is used twice") }
+        items.mapNotNull { it.shortcut?.let(Snippets::key) }.groupBy { it }.filterValues { it.size > 1 }.keys.firstOrNull()?.let {
+            throw ConfigException("$where: shortcut \"$it\" is used twice")
+        }
+        return items
     }
 
     /** Only what the profile sets, in the documented order; `scanSuffix: ""` is kept (= nothing). */

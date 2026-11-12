@@ -9,6 +9,8 @@ import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import de.ictbaden.industrialkeyboard.layout.Macro
+import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.util.concurrent.Executors
@@ -28,6 +30,7 @@ object Provisioning {
     private const val TAG = "Provisioning"
     private const val PREFS = "provisioning"
     private const val KEY_LAST_ERROR = "last_error"
+    private const val SNIPPETS_JSON = "snippets_json"
 
     private val worker = Executors.newSingleThreadExecutor { Thread(it, "provisioning").apply { isDaemon = true } }
     private val queued = AtomicBoolean(false)
@@ -162,7 +165,35 @@ object Provisioning {
                 ),
             ),
             quickToggles = values.getString("quick_toggles")?.takeIf { it.isNotBlank() }?.let(::quickToggleList) ?: config.quickToggles,
+            snippets = config.snippets.copy(
+                enabled = bool("snippets_enabled", config.snippets.enabled),
+                shortcuts = bool("snippets_shortcuts", config.snippets.shortcuts),
+                button = bool("snippets_button", config.snippets.button),
+                allowUser = bool("snippets_allow_user", config.snippets.allowUser),
+                // Empty = unchanged; `[]` clears the list.
+                items = values.getString(SNIPPETS_JSON)?.takeIf { it.isNotBlank() }?.let(::snippetList) ?: config.snippets.items,
+            ),
         )
+    }
+
+    /** `snippets_json`: a JSON array like `snippets.items`; the input is never echoed in the error. */
+    private fun snippetList(text: String): List<Snippet> {
+        val array = try {
+            JSONArray(text.trim())
+        } catch (_: JSONException) {
+            throw ConfigException("$SNIPPETS_JSON: invalid JSON")
+        }
+        return ConfigJson.parseSnippetItems(array, SNIPPETS_JSON, Snippets.MAX_ADMIN)
+    }
+
+    /**
+     * The EMM sets the administrator's snippets (`config_json` or `snippets_json`): the editor in
+     * the settings is read-only then, since the next push would undo every change. With only the
+     * simple switches, snippets edited on the device stay and remain editable.
+     */
+    fun snippetsManaged(context: Context): Boolean {
+        val restrictions = context.getSystemService(RestrictionsManager::class.java)?.applicationRestrictions ?: return false
+        return listOf("config_json", SNIPPETS_JSON).any { !restrictions.getString(it).isNullOrBlank() }
     }
 
     /**

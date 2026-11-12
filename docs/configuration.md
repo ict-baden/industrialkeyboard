@@ -31,7 +31,8 @@ configuration changes – never per key. From lowest to highest:
 4. **Field rules**, which always win: number, phone and date fields open their pad; password
    fields get no suggestions, no autocorrection and no key preview.
 
-Admin gates – what users may change (`quickToggles.allowed`, `typing.textEditing`) – are read from
+Admin gates – what users may change (`quickToggles.allowed`, `typing.textEditing`, `snippets.enabled`,
+`snippets.allowUser`) – are read from
 the stored configuration only; an app profile cannot change them.
 
 The page that opens: a `SHOW_TAB` request or [`{SHOW:…}`](#macros) > the field type (number,
@@ -142,6 +143,13 @@ phone, date) > the app profile's `page` > [`tabs.preferred`](#tabs).
       "vibrate": true
     }
   },
+  "snippets": {
+    "enabled": true,
+    "shortcuts": true,
+    "button": false,
+    "allowUser": true,
+    "items": []
+  },
   "quickToggles": { "allowed": ["glove", "contrast", "sound"] },
   "appProfiles": []
 }
@@ -196,7 +204,7 @@ every language: [Error codes](error-codes.md).
 | Option | Values | Default | Effect |
 |---|---|---|---|
 | `alphabet` | `auto`, `qwerty`, `qwertz`, `azerty`, `nordic`, `spanish` | `auto` | Letter layout. `auto` follows the selected keyboard language (Android keyboard languages, switched with 🌐; before one is known: the first system language) (German, Czech, Swiss … → `qwertz`, French and Belgian → `azerty`, Swedish, Danish, Norwegian, Finnish → `nordic`, Spanish and Catalan → `spanish`, everything else `qwerty`) and changes with it. `qwertz` has ä ö ü ß first on long press (own keys with `umlautKeys`), `nordic` adds å ö ä, `spanish` ñ. Accents and special letters (ß, é, ç …) on long press |
-| `topBar` | `toolbar`, `tabs` | `toolbar` | Above the keys while no word is typed. `toolbar` like Gboard: ⊞ (tiles for function keys, scan, number pad, clipboard, text editing ([`typing.textEditing`](#typing)), one-handed mode, languages, settings), 📋 clipboard, ⚙ settings, `Fn`, scan (with a scanner), custom layouts, 🎤 and hide; a second tap on `Fn`/scan goes back to the letters. `tabs`: ABC · 123 · #+= · Fn · Scan as up to 2.1. A configuration **stored** by 2.1 or older keeps `tabs`; new installations and files without the field get `toolbar`. Only with `navigation: "tabs"` |
+| `topBar` | `toolbar`, `tabs` | `toolbar` | Above the keys while no word is typed. `toolbar` like Gboard: ⊞ (tiles for function keys, scan, number pad, clipboard, [snippets](#snippets--snippets), text editing ([`typing.textEditing`](#typing)), one-handed mode, languages, settings), 📋 clipboard, ⚙ settings, `Fn`, scan (with a scanner), custom layouts, 🎤 and hide; a second tap on `Fn`/scan goes back to the letters. `tabs`: ABC · 123 · #+= · Fn · Scan as up to 2.1. A configuration **stored** by 2.1 or older keeps `tabs`; new installations and files without the field get `toolbar`. Only with `navigation: "tabs"` |
 | `symbolsKey` | `true` / `false` | `true` | `?123` key at the left of the bottom row like Gboard (`ABC` on the symbols page), also with `navigation: "tabs"`; with `"keys"` it is always there |
 | `umlautKeys` | `true` / `false` | `false` | QWERTZ with ü, ö and ä as own keys (11 keys per row). Off: like Gboard, ä, ö, ü and ß come first on long press of a, o, u and s |
 | `navigation` | `tabs`, `keys` | `tabs` | `tabs`: tab bar above the keys (ABC, 123, #+=, Fn, scan, custom layouts, hide button). `keys`: no tab bar, `?123` / `ABC` keys like a phone keyboard; on the numeric pad the last side key becomes `ABC`. Other pages are then reachable with [`{SHOW:…}`](#macros) on a programmable key |
@@ -259,6 +267,82 @@ keyboards, double tap on Shift for caps lock, long press on the hide button for 
 | `soundVolume` | 0–100 | not set = default volume | Click volume |
 | `vibrate` | `true` / `false` | `true` | Short vibration on every key |
 | `vibrationMs` | 5–100 (ms) | not set = the system's keyboard haptic | Vibration length; 30–40 can be felt through gloves. Not set: the device's tuned keyboard tick, like Gboard |
+
+## `snippets` – snippets
+
+Ready-made texts (German *Textbausteine*): the administrator's, and the users' own. Tapping one
+types its text, which is a [macro](#macros) – so `{TAB}` moves to the next field and `{ENTER}`
+runs the field's action (next field, search, send …) or starts a new line in multi-line fields.
+
+```json
+{
+  "snippets": {
+    "button": true,
+    "items": [
+      { "id": "damaged", "label": "Ware beschädigt", "text": "Ware bei Anlieferung beschädigt, Foto folgt.", "shortcut": "wb" },
+      { "id": "regards", "label": "Mit freundlichen Grüßen", "text": "Mit freundlichen Grüßen{ENTER}Lager Süd", "shortcut": "mfg" },
+      { "id": "bin", "label": "Lagerplatz A-01", "text": "A-01-03{TAB}" }
+    ]
+  }
+}
+```
+
+The whole file: [`examples/snippets.json`](../examples/snippets.json).
+
+| Option | Values | Default | Effect |
+|---|---|---|---|
+| `enabled` | `true` / `false` | `true` | Off: no ⊞ tile, no bar button, no shortcuts; the panel never opens |
+| `shortcuts` | `true` / `false` | `true` | A typed shortcut offers its snippet in the suggestion strip |
+| `button` | `true` / `false` | `false` | Own button in the bar: an icon in the toolbar (after `Fn` and scan), or the **last tab** with `topBar: tabs`. With `navigation: keys` there is no bar and so no button. Never over password fields |
+| `allowUser` | `true` / `false` | `true` | Users may keep their own snippets. Off: the keyboard ignores them (the file on the device stays) and the ✎ button is hidden |
+| `items` | array, at most **100** | `[]` | The administrator's snippets, shown first |
+
+Each snippet:
+
+| Option | Values | Default | Effect |
+|---|---|---|---|
+| `id` | `a`–`z`, `0`–`9`, `-`, `_`, up to 24 characters, unique | `s1`, `s2` … by position | Name of the snippet |
+| `label` | text, 1–40 characters (trimmed) | required | Shown in the panel and in the suggestion strip |
+| `text` | [macro](#macros), 1–2000 characters, **not** trimmed | required | What is typed. Every macro works, also `{SCAN}`, `{SHOW:…}` and key combinations |
+| `shortcut` | 2–16 letters (trimmed) | none | Typed as a word, it offers the snippet |
+
+Where snippets show up:
+
+- **⊞ → Snippets** (toolbar) or the **bar button** (`button: true`, in both bar kinds): a panel in
+  place of the keys, in their height. Tapping a card types the text and closes the panel; **ABC**
+  goes back; ✎ opens the app's snippet screen (only with `allowUser`). The cards are at least
+  56 dp high, for gloves.
+- **Shortcut:** while the word being typed equals a shortcut (whole word, **not** case-sensitive:
+  `Mfg` after auto-capitals matches `mfg`), the snippet takes the middle of the suggestion strip,
+  on an accent-coloured pill. Tapping it deletes the typed shortcut and types the text (no space
+  after it). A shortcut is never replaced by itself, and a word with a shortcut on offer is not
+  autocorrected (`mfg` + space stays `mfg`). Shortcuts work in every text field that is no password
+  field – also in fields without suggestions (barcode and article number fields), so use
+  **non-words** such as `mfg` or `wb` that never come up as a code. Only letters count, because the
+  keyboard tracks only letters as a word. When an own snippet has the same shortcut as one of the
+  organisation, the organisation's wins.
+- Never in password fields (no tile, no button, no shortcuts).
+
+**Own snippets.** Users add them in the app only: ✎ in the panel or **My snippets** on the start
+screen – never from typed text, the clipboard or a selection. At most 50, and only text, `{TAB}`
+and `{ENTER}` (no commands, key combinations or `{SHOW:…}`), so an own snippet cannot open the
+settings or switch keyboards. They are stored on the device in `files/user-snippets.json`, apart
+from the configuration: an MDM push, an import or `INSTALL_CONFIG` does not remove them, and they
+are not part of the export, the QR code or **Reset to defaults**. A shortcut that the organisation
+or another own snippet already uses is refused in the editor (`IK-0107`).
+
+**The organisation's snippets** come from the configuration: `snippets.items` (JSON, file,
+broadcast, import), the managed configuration key `snippets_json`, or **Settings → Snippets →
+Organisation snippets**, which edits them on the device. While the EMM sets them (`config_json` or
+`snippets_json`), that screen is read-only, since the next push would undo the change. Snippets are
+an admin gate: an [app profile](#appprofiles--app-profiles) cannot change them.
+
+Mistakes are rejected with the position, e.g. `snippets.items[2].label is missing`,
+`snippets.items[2].shortcut: "lp1" must be 2–16 letters` or
+`snippets.items: shortcut "mfg" is used twice`. Many long snippets make the configuration large
+(100 × 2000 characters are about 200 KB): such a list no longer fits into a QR code, and some
+EMMs limit the length of a managed configuration string – use the configuration file or
+`/enterprise/usr` for big lists.
 
 ## `quickToggles` – quick toggles on the device
 
@@ -515,6 +599,9 @@ A key is either a **string** – a [macro](#macros); the key shows its text, key
 
 The rows share the height of the letter page, so a layout with three rows gets taller keys –
 ideal for a handful of big buttons.
+
+The [snippets](#snippets--snippets) button in the tab bar is no layout and takes no tab id: it
+cannot be used in `tabs.preferred`, `{SHOW:…}` or `SHOW_TAB`.
 
 ## `appProfiles` – app profiles
 

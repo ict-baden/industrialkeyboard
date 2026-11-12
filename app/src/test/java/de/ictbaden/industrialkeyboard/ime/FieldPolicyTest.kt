@@ -104,4 +104,26 @@ class FieldPolicyTest {
         // Barcode fields usually ask for no suggestions; emoji are still fine there.
         assertEquals(false, FieldPolicy.suggestionsAllowed(text or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS))
     }
+
+    @Test
+    fun `snippet shortcuts in text fields, also without suggestions, never in passwords`() {
+        assertEquals(true, FieldPolicy.snippetShortcutsAllowed(text))
+        assertEquals(true, FieldPolicy.snippetShortcutsAllowed(text or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS))
+        assertEquals(true, FieldPolicy.snippetShortcutsAllowed(text or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES))
+        assertEquals(false, FieldPolicy.snippetShortcutsAllowed(text or InputType.TYPE_TEXT_VARIATION_PASSWORD))
+        assertEquals(false, FieldPolicy.snippetShortcutsAllowed(text or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD))
+        assertEquals(false, FieldPolicy.snippetShortcutsAllowed(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD))
+        assertEquals(false, FieldPolicy.snippetShortcutsAllowed(InputType.TYPE_CLASS_NUMBER))
+        assertEquals(false, FieldPolicy.snippetShortcutsAllowed(InputType.TYPE_NULL))
+    }
+
+    @Test
+    fun `snippets panel everywhere but in passwords`() {
+        assertEquals(true, FieldPolicy.snippetsAllowed(text))
+        assertEquals(true, FieldPolicy.snippetsAllowed(InputType.TYPE_CLASS_NUMBER))
+        assertEquals(false, FieldPolicy.snippetsAllowed(text or InputType.TYPE_TEXT_VARIATION_PASSWORD))
+        assertEquals(false, FieldPolicy.snippetsAllowed(text or InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD))
+        assertEquals(false, FieldPolicy.snippetsAllowed(text or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD))
+        assertEquals(false, FieldPolicy.snippetsAllowed(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD))
+    }
 }

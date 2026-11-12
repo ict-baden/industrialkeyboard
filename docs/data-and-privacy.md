@@ -14,8 +14,10 @@ Industrial Keyboard **sends no data to ICT-Baden or anyone else**. The app has n
 permission, so Android does not let it open network connections at all. There is no telemetry,
 no crash reporting, no update check and no account.
 
-What you type is passed to the focused app and **not stored**: there is no dictionary, no word
-learning, no history and no clipboard access.
+What you type is passed to the focused app, and **nothing typed in other apps is stored**: there is
+no dictionary, no word learning, no history and no clipboard access. The only texts the app keeps
+are [snippets](configuration.md#snippets--snippets) users enter themselves in the app's own
+snippet screen (below).
 
 **Word suggestions** come from built-in word lists (AOSP dictionaries) of the keyboard language. Only
 the word being typed is held in memory to look it up; it is dropped when the word ends. Nothing is
@@ -46,8 +48,8 @@ ICT-Baden processes none of it.
 
 ## What is stored on the device
 
-Only the configuration and what belongs to it, in the app's private storage (other apps cannot
-read it):
+Only the configuration and what belongs to it, plus the user's own snippets, in the app's private
+storage (other apps cannot read it):
 
 | File | Content |
 |---|---|
@@ -56,13 +58,16 @@ read it):
 | `shared_prefs/provisioning.xml` | Which configuration sources were applied already (time stamp and size of the file, a hash of the managed configuration) and the last provisioning error. |
 | `shared_prefs/password_guard_settings.xml`, `password_guard_remote.xml` | Number of wrong admin passwords in a row and the end of the 5-minute lock – one file for the settings screen, one for broadcasts and files. No passwords. |
 | `shared_prefs/migrations.xml` | Which one-time changes after an update were done. |
+| `files/user-snippets.json` | [Snippets](configuration.md#snippets--snippets) the user entered in the app's snippet screen (name, text, shortcut) – never text typed in other apps, the clipboard or a selection. Not part of the configuration, export, QR code or *Reset to defaults*; *Clear storage* removes it. |
+| `files/user-snippets.json.invalid` | Only if that file was damaged once: the broken copy (`IK-0108`), the list started empty. |
 | `shared_prefs/quick_toggles.xml` | Quick toggles switched on this device (glove mode, contrast, scanner, sound) – on/off only, no text. Not part of the configuration, export or QR code; *Reset quick toggles* or *Clear storage* removes it. |
 
 All of it is excluded from Android backup and device transfer, because the configuration is
-provisioned per device and contains the password hash.
+provisioned per device and contains the password hash; the user's snippets stay on the device too.
+Nothing leaves it: the app has no internet permission.
 
 The keyboard writes short messages to the system log (logcat) when a configuration is applied
-or rejected – never typed text or barcodes.
+or rejected – never typed text, barcodes or snippet texts.
 
 ## What the keyboard reads
 
@@ -91,5 +96,5 @@ tap them.
 
 ## Deleting everything
 
-- *Settings → Configuration → Reset to defaults* removes the configuration (the admin password stays).
-- Android *Settings → Apps → Industrial Keyboard → Storage → Clear storage*, or uninstalling the app, removes all of it.
+- *Settings → Configuration → Reset to defaults* removes the configuration (the admin password stays); the user's own snippets stay – delete them in *My snippets*.
+- Android *Settings → Apps → Industrial Keyboard → Storage → Clear storage*, or uninstalling the app, removes all of it, the user's own snippets included.

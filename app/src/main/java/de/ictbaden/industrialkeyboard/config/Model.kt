@@ -381,6 +381,26 @@ data class AppProfile(
     }
 }
 
+/** A ready-made text (Textbaustein); [text] is a macro, [shortcut] offers it in the suggestion strip. */
+data class Snippet(val id: String, val label: String, val text: String, val shortcut: String? = null)
+
+/**
+ * Snippets (`snippets`): the administrator's [items] plus the user's own (kept apart from the
+ * configuration in `files/user-snippets.json`, see [UserSnippets]). Admin gates, never changed by
+ * an app profile.
+ */
+data class SnippetSettings(
+    /** Off: no ⊞ tile, no bar button, no shortcuts, the panel never opens. */
+    val enabled: Boolean = true,
+    /** A typed shortcut (`mfg`) offers its snippet in the middle of the suggestion strip. */
+    val shortcuts: Boolean = true,
+    /** Own button in the bar: an icon in the toolbar, or the last tab in the tab bar. */
+    val button: Boolean = false,
+    /** Users may keep their own snippets; off: they are ignored (the file stays). */
+    val allowUser: Boolean = true,
+    val items: List<Snippet> = emptyList(),
+)
+
 /** A layout of the administrator's own keys, shown as an extra tab. */
 data class CustomLayout(
     val id: String,
@@ -402,6 +422,8 @@ data class KeyboardConfig(
     val language: String = Languages.AUTO,
     // New sections go here, after `language`, in this agreed order: snippets, appProfiles,
     // quickToggles, accessibility – so that positional calls keep working (ConfigJson uses names).
+    /** Ready-made texts in ⊞, the bar and as shortcut suggestions; the user's own are stored apart. */
+    val snippets: SnippetSettings = SnippetSettings(),
     /** Per-app overrides (first match wins); applied on top of this configuration, never stored into it. */
     val appProfiles: List<AppProfile> = emptyList(),
     /** Which quick toggles users may switch on the device (⊞, settings, `{TOGGLE:…}`). */
@@ -434,4 +456,10 @@ object Tabs {
 
     /** The text editing panel (⊞ → Text editing, `{EDIT}`); a panel, not a page, like [TOOL_CLIPBOARD]. */
     const val TOOL_EDIT = "tool:edit"
+
+    /**
+     * The snippets panel (⊞ → Snippets, the bar button with `snippets.button`). Contains `:`, so it
+     * never clashes with a custom layout id; never a start page, `tabs.preferred` or `{SHOW:…}` target.
+     */
+    const val TOOL_SNIPPETS = "tool:snippets"
 }

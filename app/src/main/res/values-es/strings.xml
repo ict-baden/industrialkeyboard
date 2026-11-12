@@ -529,6 +529,66 @@
     <string name="mc_quick_toggles_description">Separados por comas: glove, contrast, scanner, sound; none = ninguno; vacío = se mantiene el ajuste actual. Predeterminado: glove, contrast, sound.</string>
     <string name="mc_one_handed_title">Modo de una mano</string>
     <string name="mc_one_handed_description">Teclas más estrechas a la izquierda o a la derecha.</string>
+    <string name="feature_snippets">Fragmentos</string>
+    <string name="snippets_title">Fragmentos de texto</string>
+    <string name="snippets_edit">Editar fragmentos</string>
+    <string name="snippets_empty_user">Aún no hay fragmentos. Toque ✎ para añadir los suyos.</string>
+    <string name="snippets_empty_admin">Su organización no ha configurado ningún fragmento.</string>
+    <string name="section_snippets">Fragmentos de texto</string>
+    <string name="snippets_enabled">Fragmentos de texto</string>
+    <string name="snippets_enabled_summary">Textos predefinidos en ⊞ y como sugerencia</string>
+    <string name="snippets_shortcuts">Abreviaturas</string>
+    <string name="snippets_shortcuts_summary">Al escribir una abreviatura como «mfg» se ofrece su fragmento</string>
+    <string name="snippets_button">Fragmentos en la barra</string>
+    <string name="snippets_button_summary">Botón propio en la barra de herramientas o de pestañas</string>
+    <string name="snippets_allow_user">Fragmentos propios</string>
+    <string name="snippets_allow_user_summary">Los usuarios pueden añadir sus propios fragmentos</string>
+    <string name="snippets_org">Fragmentos de la organización</string>
+    <string name="snippets_mine">Mis fragmentos</string>
+    <string name="snippets_mine_summary">Textos que necesita a menudo</string>
+    <string name="snippets_managed_note">Definidos por su EMM: modifíquelos allí.</string>
+    <string name="snippets_user_off">Su administrador ha desactivado los fragmentos propios.</string>
+    <string name="snippets_off">Los fragmentos de texto están desactivados.</string>
+    <string name="snippet_add">Añadir fragmento</string>
+    <string name="snippet_edit_title">Fragmento de texto</string>
+    <string name="snippet_label_hint">Nombre</string>
+    <string name="snippet_label_helper">Se muestra en la lista, hasta 40 caracteres</string>
+    <string name="snippet_shortcut_hint">Abreviatura (opcional)</string>
+    <string name="snippet_shortcut_helper">2–16 letras, p. ej. mfg</string>
+    <string name="snippet_text_hint">Texto</string>
+    <string name="snippet_text_helper">Funcionan macros como {TAB} y {ENTER}</string>
+    <string name="snippet_delete">Eliminar</string>
+    <string name="snippet_error_label_empty">Introduzca un nombre</string>
+    <string name="snippet_error_text_empty">Introduzca un texto</string>
+    <plurals name="snippet_error_too_long">
+        <item quantity="one">Como máximo %1$d carácter</item>
+        <item quantity="many">Como máximo %1$d caracteres</item>
+        <item quantity="other">Como máximo %1$d caracteres</item>
+    </plurals>
+    <string name="snippet_error_shortcut">2–16 letras, sin cifras ni espacios</string>
+    <string name="snippet_error_shortcut_taken">«%1$s» ya lo usa «%2$s»</string>
+    <string name="snippet_error_macro_not_allowed">En los fragmentos propios solo texto, {TAB} y {ENTER}</string>
+    <plurals name="snippet_error_full">
+        <item quantity="one">Como máximo %1$d fragmento</item>
+        <item quantity="many">Como máximo %1$d fragmentos</item>
+        <item quantity="other">Como máximo %1$d fragmentos</item>
+    </plurals>
+    <string name="user_snippets_reset">Sus fragmentos no se podían leer y se han restablecido.</string>
+    <string name="mc_snippets_enabled_title">Fragmentos de texto</string>
+    <string name="mc_snippets_enabled_description">Textos predefinidos en el teclado (activado por defecto).</string>
+    <string name="mc_snippets_shortcuts_title">Abreviaturas de fragmentos</string>
+    <string name="mc_snippets_shortcuts_description">Las abreviaturas escritas ofrecen su fragmento (activado por defecto).</string>
+    <string name="mc_snippets_button_title">Botón de fragmentos en la barra</string>
+    <string name="mc_snippets_button_description">Botón propio en la barra de herramientas o de pestañas (desactivado por defecto).</string>
+    <string name="mc_snippets_allow_user_title">Fragmentos propios</string>
+    <string name="mc_snippets_allow_user_description">Los usuarios pueden añadir los suyos (activado por defecto).</string>
+    <string name="mc_snippets_json_title">Fragmentos de texto (JSON)</string>
+    <string name="mc_snippets_json_description">Array JSON de {id, label, text, shortcut}; [] = ninguno; vacío = sin cambios. Sin efecto mientras config_json esté definido.</string>
+    <plurals name="snippets_count">
+        <item quantity="one">%1$d fragmento</item>
+        <item quantity="many">%1$d fragmentos</item>
+        <item quantity="other">%1$d fragmentos</item>
+    </plurals>
     <string-array name="mc_top_bar_entries">
         <item>Barra de herramientas como Gboard</item>
         <item>Pestañas (ABC, 123, Fn)</item>

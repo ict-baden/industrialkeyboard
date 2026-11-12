@@ -61,6 +61,12 @@ data class RenderState(
     val oneHanded: OneHanded = OneHanded.OFF,
     /** Text editing panel open ([Tabs.TOOL_EDIT], drawn as [layout]): Select lit, Cut/Copy dimmed. */
     val textEdit: TextEditState? = null,
+    /** Entries of the snippets panel ([Tabs.TOOL_SNIPPETS]); empty while it is closed. */
+    val snippets: List<PanelSnippet> = emptyList(),
+    /** ✎ in the snippets panel: users may keep their own snippets. */
+    val snippetsEditable: Boolean = false,
+    /** Label of the snippet whose shortcut was typed: the middle of the suggestion strip. */
+    val snippetSuggestion: String? = null,
 )
 
 /**
@@ -102,6 +108,9 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
     /** Toolbar 📋: clipboard entries in place of the keys. */
     val clipboardPanel = ClipboardPanelView(context).apply { visibility = GONE }
 
+    /** Snippets (⊞ → Snippets, the bar button) in place of the keys. */
+    val snippetsPanel = SnippetsPanelView(context).apply { visibility = GONE }
+
     /** One-handed mode: the free side with ⇄ and ⤢ (left column when the keys sit right, and the other way). */
     val oneHandedLeft = OneHandedColumn(context).apply { visibility = GONE }
     val oneHandedRight = OneHandedColumn(context).apply { visibility = GONE }
@@ -134,6 +143,7 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         content.addView(voicePanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         content.addView(featuresScroll, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         content.addView(clipboardPanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        content.addView(snippetsPanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         addView(panel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM).apply { topMargin = headroom })
         addView(overlay, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         keyboard.popupHost = overlay
@@ -192,13 +202,14 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         overlay.palette = p
         tabBar.palette = p
         // Like Gboard: while a word is typed, suggestions take the place of the tab bar.
-        val suggesting = state.suggestions.isNotEmpty() && !state.emojiOpen
+        val suggesting = (state.suggestions.isNotEmpty() || state.snippetSuggestion != null) && !state.emojiOpen
         tabBar.showMic = state.mic
         tabBar.spread = state.toolbar
         tabBar.isVisible = state.tabs != null && !suggesting
         suggestionStrip.isVisible = suggesting
         suggestionStrip.palette = p
         suggestionStrip.words = state.suggestions
+        suggestionStrip.snippet = state.snippetSuggestion
         suggestionStrip.showMic = state.mic
         emojiPanel.palette = p
         if (state.emojiOpen) emojiPanel.open()
@@ -224,6 +235,9 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         if (panelOpen == Tabs.TOOL_MENU && previous?.toolPanel != Tabs.TOOL_MENU) featuresScroll.scrollTo(0, 0)
         clipboardPanel.isVisible = panelOpen == Tabs.TOOL_CLIPBOARD
         if (panelOpen == Tabs.TOOL_CLIPBOARD) clipboardPanel.show(state.clips, state.clipboardHistory)
+        snippetsPanel.palette = p
+        snippetsPanel.isVisible = panelOpen == Tabs.TOOL_SNIPPETS
+        if (panelOpen == Tabs.TOOL_SNIPPETS) snippetsPanel.show(state.snippets, state.snippetsEditable)
         listOf(keyboard, scanRow).forEach {
             it.palette = p
             it.shift = state.shift
@@ -257,8 +271,10 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         (voicePanel.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
         (featuresScroll.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
         (clipboardPanel.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
+        (snippetsPanel.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
         featuresScroll.requestLayout()
         clipboardPanel.requestLayout()
+        snippetsPanel.requestLayout()
         contentRow.requestLayout()
         voicePanel.palette = p
         voicePanel.requestLayout()

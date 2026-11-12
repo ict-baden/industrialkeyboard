@@ -527,6 +527,60 @@
     <string name="mc_quick_toggles_description">用逗号分隔：glove, contrast, scanner, sound；none = 无快捷开关；留空 = 保留当前设置。默认：glove, contrast, sound。</string>
     <string name="mc_one_handed_title">单手模式</string>
     <string name="mc_one_handed_description">按键变窄并靠左或靠右。</string>
+    <string name="feature_snippets">常用语</string>
+    <string name="snippets_title">常用语</string>
+    <string name="snippets_edit">编辑常用语</string>
+    <string name="snippets_empty_user">还没有常用语。点按 ✎ 添加你自己的常用语。</string>
+    <string name="snippets_empty_admin">你的组织尚未设置任何常用语。</string>
+    <string name="section_snippets">常用语</string>
+    <string name="snippets_enabled">常用语</string>
+    <string name="snippets_enabled_summary">⊞ 菜单中和建议栏里的现成文本</string>
+    <string name="snippets_shortcuts">缩写</string>
+    <string name="snippets_shortcuts_summary">输入“mfg”等缩写时会提示对应的常用语</string>
+    <string name="snippets_button">栏中的常用语按钮</string>
+    <string name="snippets_button_summary">在工具栏或标签栏中单独显示一个按钮</string>
+    <string name="snippets_allow_user">自己的常用语</string>
+    <string name="snippets_allow_user_summary">用户可以添加自己的常用语</string>
+    <string name="snippets_org">组织的常用语</string>
+    <string name="snippets_mine">我的常用语</string>
+    <string name="snippets_mine_summary">经常需要的文本</string>
+    <string name="snippets_managed_note">由 EMM 设定，请在那里更改。</string>
+    <string name="snippets_user_off">管理员已关闭自己的常用语。</string>
+    <string name="snippets_off">常用语已关闭。</string>
+    <string name="snippet_add">添加常用语</string>
+    <string name="snippet_edit_title">常用语</string>
+    <string name="snippet_label_hint">名称</string>
+    <string name="snippet_label_helper">显示在列表中，最多 40 个字符</string>
+    <string name="snippet_shortcut_hint">缩写（可选）</string>
+    <string name="snippet_shortcut_helper">2–16 个字母，例如 mfg</string>
+    <string name="snippet_text_hint">文本</string>
+    <string name="snippet_text_helper">可使用 {TAB} 和 {ENTER} 等宏</string>
+    <string name="snippet_delete">删除</string>
+    <string name="snippet_error_label_empty">请输入名称</string>
+    <string name="snippet_error_text_empty">请输入文本</string>
+    <plurals name="snippet_error_too_long">
+        <item quantity="other">最多 %1$d 个字符</item>
+    </plurals>
+    <string name="snippet_error_shortcut">2–16 个字母，不含数字和空格</string>
+    <string name="snippet_error_shortcut_taken">“%1$s”已被“%2$s”使用</string>
+    <string name="snippet_error_macro_not_allowed">自己的常用语只能包含文本、{TAB} 和 {ENTER}</string>
+    <plurals name="snippet_error_full">
+        <item quantity="other">最多 %1$d 条常用语</item>
+    </plurals>
+    <string name="user_snippets_reset">无法读取你的常用语，已重置。</string>
+    <string name="mc_snippets_enabled_title">常用语</string>
+    <string name="mc_snippets_enabled_description">键盘中的现成文本（默认开启）。</string>
+    <string name="mc_snippets_shortcuts_title">常用语缩写</string>
+    <string name="mc_snippets_shortcuts_description">输入的缩写会提示对应的常用语（默认开启）。</string>
+    <string name="mc_snippets_button_title">栏中的常用语按钮</string>
+    <string name="mc_snippets_button_description">在工具栏或标签栏中单独显示按钮（默认关闭）。</string>
+    <string name="mc_snippets_allow_user_title">自己的常用语</string>
+    <string name="mc_snippets_allow_user_description">用户可以添加自己的常用语（默认开启）。</string>
+    <string name="mc_snippets_json_title">常用语 (JSON)</string>
+    <string name="mc_snippets_json_description">由 {id, label, text, shortcut} 组成的 JSON 数组；[] = 无；留空 = 不变。设置了 config_json 时无效。</string>
+    <plurals name="snippets_count">
+        <item quantity="other">%1$d 条常用语</item>
+    </plurals>
     <string-array name="mc_top_bar_entries">
         <item>与 Gboard 相同的工具栏</item>
         <item>标签（ABC、123、Fn）</item>

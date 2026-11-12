@@ -33,6 +33,7 @@ import de.ictbaden.industrialkeyboard.app.CameraPermissionActivity
 import de.ictbaden.industrialkeyboard.app.ErrorCodes
 import de.ictbaden.industrialkeyboard.app.MicrophonePermissionActivity
 import de.ictbaden.industrialkeyboard.app.SettingsActivity
+import de.ictbaden.industrialkeyboard.app.SnippetsActivity
 import de.ictbaden.industrialkeyboard.config.Alphabet
 import de.ictbaden.industrialkeyboard.config.ConfigStore
 import de.ictbaden.industrialkeyboard.config.EffectiveConfig
@@ -45,8 +46,11 @@ import de.ictbaden.industrialkeyboard.config.QuickToggles
 import de.ictbaden.industrialkeyboard.config.ScanInputSettings
 import de.ictbaden.industrialkeyboard.config.ScanSuffix
 import de.ictbaden.industrialkeyboard.config.ScanTriggerType
+import de.ictbaden.industrialkeyboard.config.Snippet
+import de.ictbaden.industrialkeyboard.config.Snippets
 import de.ictbaden.industrialkeyboard.config.Symbology
 import de.ictbaden.industrialkeyboard.config.Tabs
+import de.ictbaden.industrialkeyboard.config.UserSnippets
 import de.ictbaden.industrialkeyboard.config.VoiceInput
 import de.ictbaden.industrialkeyboard.layout.EditAction
 import de.ictbaden.industrialkeyboard.layout.Key
@@ -75,6 +79,7 @@ import de.ictbaden.industrialkeyboard.ui.FeaturesPanelView
 import de.ictbaden.industrialkeyboard.ui.Feedback
 import de.ictbaden.industrialkeyboard.ui.KeyboardRootView
 import de.ictbaden.industrialkeyboard.ui.KeyboardView
+import de.ictbaden.industrialkeyboard.ui.PanelSnippet
 import de.ictbaden.industrialkeyboard.ui.ScanPadView
 import de.ictbaden.industrialkeyboard.ui.ShiftState
 import java.util.Locale
@@ -159,6 +164,17 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         render()
     }
 
+    /** The user's own snippets (entered in the app's snippet screen); read from memory, never per key from disk. */
+    private val userSnippets by lazy { UserSnippets.get(this) }
+
+    /** Own snippets changed in the app: the open panel and a shortcut on offer follow at once. */
+    private val userSnippetsListener: (List<Snippet>) -> Unit = {
+        if (updateSnippetMatch() || toolPanel == Tabs.TOOL_SNIPPETS) render()
+    }
+
+    /** The snippet whose shortcut is the word being typed; in memory only, gone with the word. */
+    private var snippetMatch: Snippet? = null
+
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
@@ -196,6 +212,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         applyConfig(store.config)
         store.addListener(configListener)
         toggles.addListener(togglesListener)
+        userSnippets.addListener(userSnippetsListener)
         KeyboardBus.onShowTab = { tab -> root?.isShown == true && showTab(tab) }
         KeyboardBus.onNfc = ::typeNfc
     }
@@ -205,6 +222,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         clipboard.clear()
         store.removeListener(configListener)
         toggles.removeListener(togglesListener)
+        userSnippets.removeListener(userSnippetsListener)
         KeyboardBus.onShowTab = null
         KeyboardBus.onNfc = null
         KeyboardBus.keyboardShown = false
@@ -225,6 +243,9 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun applyConfig(stored: KeyboardConfig) {
         storedConfig = stored
         useEffective(configChanged = true)
+        // Snippets switched off (or nothing left to show) while the panel is open: back to the keys.
+        if (toolPanel == Tabs.TOOL_SNIPPETS && !Snippets.reachable(config)) toolPanel = null
+        updateSnippetMatch()
         refreshFeatures()
         render()
     }
@@ -302,6 +323,12 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             onFeature(it)
         }
         view.clipboardPanel.onBack = { setToolPanel(null) }
+        view.snippetsPanel.onPick = ::insertSnippet
+        view.snippetsPanel.onBack = { setToolPanel(null) }
+        view.snippetsPanel.onEdit = {
+            setToolPanel(null)
+            startActivity(SnippetsActivity.intent(this, admin = false).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        }
         view.clipboardPanel.onPaste = { item -> pasteClip(item.text) }
         view.clipboardPanel.onTogglePin = { item ->
             clipboard.togglePin(item.id)
@@ -324,6 +351,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         view.onSystemImeButtonsChanged = { render() }
         view.suggestionStrip.onPress = { feedback.keyDown(null) }
         view.suggestionStrip.onPick = ::pickSuggestion
+        view.suggestionStrip.onPickSnippet = ::pickSnippet
         view.emojiPanel.onEmoji = { emoji ->
             feedback.keyDown(null)
             endWord()
@@ -749,6 +777,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         word.setLength(0)
         autocorrected = null
         suggestions = Suggestions.NONE
+        snippetMatch = null
     }
 
     private fun suggestionsWanted(): Boolean {
@@ -773,7 +802,57 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
                 }
             } ?: Suggestions.NONE
         }
-        if (before.words != suggestions.words) render()
+        // Also where no suggestions are wanted (barcode fields): a shortcut only offers its snippet.
+        val matchChanged = updateSnippetMatch()
+        if (before.words != suggestions.words || matchChanged) render()
+    }
+
+    /** Recomputes [snippetMatch] for the word being typed (in memory, no system calls); true when it changed. */
+    private fun updateSnippetMatch(): Boolean {
+        val info = currentInputEditorInfo
+        val match = if (word.isEmpty() || info == null) null else Snippets.matchFor(word, page, info.inputType, toolPanel, config, userSnippets.items)
+        if (match == snippetMatch) return false
+        snippetMatch = match
+        return true
+    }
+
+    /** [snippetMatch] while it can be offered: still on the letters, no panel over the keys. */
+    private fun offeredSnippet(): Snippet? = snippetMatch?.takeIf { page is Page.Alpha && toolPanel == null }
+
+    /**
+     * The snippet in the middle of the strip: the typed shortcut goes, the snippet's text is typed
+     * as a macro (no space after it, `{ENTER}` runs the field action).
+     */
+    private fun pickSnippet() {
+        val snippet = offeredSnippet() ?: return
+        val ic = currentInputConnection ?: return
+        val steps = runCatching { Macro.parse(snippet.text) }.getOrNull() ?: return
+        val typed = word.toString()
+        if (typed.isNotEmpty() && ic.getTextBeforeCursor(typed.length, 0)?.toString() == typed) ic.deleteSurroundingText(typed.length, 0)
+        endWord()
+        if (shift == ShiftState.ONCE && !autoShifted) shift = ShiftState.OFF
+        runCatching { runMacro(steps) }.onFailure { Log.w(TAG, "Snippet could not be typed (${it.javaClass.simpleName})") }
+        updateAutoShift()
+        render()
+    }
+
+    /** A card of the snippets panel: the panel closes first, so a `{SHOW:…}` in an admin snippet works. */
+    private fun insertSnippet(item: PanelSnippet) {
+        feedback.keyDown(null)
+        endWord()
+        setToolPanel(null)
+        // Never shown there; defensive, since the field may have changed under the panel.
+        if (!FieldPolicy.snippetsAllowed(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)) return
+        // A stored snippet is valid by construction; stay defensive anyway.
+        runCatching { runMacro(Macro.parse(item.text)) }.onFailure { Log.w(TAG, "Snippet could not be typed (${it.javaClass.simpleName})") }
+    }
+
+    /** What the snippets panel lists: the administrator's, then the user's own (with `allowUser`). */
+    private fun panelSnippets(): List<PanelSnippet> {
+        if (toolPanel != Tabs.TOOL_SNIPPETS) return emptyList()
+        return Snippets.all(config, userSnippets.items).map { (s, admin) ->
+            PanelSnippet(if (admin) "a:${s.id}" else "u:${s.id}", s.label, Snippets.preview(s.text), s.text)
+        }
     }
 
     private fun suggesterNow(): Suggester? {
@@ -806,6 +885,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     /** Space after an obvious typo: the best suggestion instead (`typing.autocorrect`). */
     private fun autocorrect(ic: InputConnection): Boolean {
         val info = currentInputEditorInfo ?: return false
+        // "mfg" + space must stay "mfg", not become "mag": a shortcut on offer is no typo.
+        if (snippetMatch != null) return false
         val replacement = suggestions.autocorrection
             ?.takeIf { config.typing.autocorrect && suggestionsWanted() && FieldPolicy.autocorrectAllowed(info.inputType, info.imeOptions) } ?: return false
         val typed = word.toString()
@@ -1014,7 +1095,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     // region toolbar (layout.topBar: toolbar)
 
-    /** Open panel ([Tabs.TOOL_MENU], [Tabs.TOOL_CLIPBOARD] or [Tabs.TOOL_EDIT]) in place of the keys, or null. */
+    /** Open panel ([Tabs.TOOL_MENU], [Tabs.TOOL_CLIPBOARD], [Tabs.TOOL_EDIT] or [Tabs.TOOL_SNIPPETS]) in place of the keys, or null. */
     private var toolPanel: String? = null
 
     /** Copied texts, only in memory and only with `typing.clipboardHistory`. */
@@ -1025,7 +1106,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     /** A tap in the toolbar or tab bar: panels and settings, or a page (a second tap on it goes back to ABC). */
     private fun onBarTab(id: String) {
         when (id) {
-            Tabs.TOOL_MENU, Tabs.TOOL_CLIPBOARD -> setToolPanel(if (toolPanel == id) null else id)
+            Tabs.TOOL_MENU, Tabs.TOOL_CLIPBOARD, Tabs.TOOL_SNIPPETS -> setToolPanel(if (toolPanel == id) null else id)
             Tabs.TOOL_SETTINGS -> openSettings()
             else -> if (KeyboardRenderer.toolbar(config) && page.tab == id && toolPanel == null) showTab(Tabs.ALPHA) else showTab(id)
         }
@@ -1054,6 +1135,9 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         if (scanner.available) add(FeaturesPanelView.Feature(FeaturesPanelView.SCAN, R.drawable.kb_scan, R.string.feature_scan))
         add(FeaturesPanelView.Feature(FeaturesPanelView.NUMBER_PAD, R.drawable.kb_numpad, R.string.feature_numpad))
         add(FeaturesPanelView.Feature(FeaturesPanelView.CLIPBOARD, R.drawable.kb_clipboard, R.string.feature_clipboard))
+        if (Snippets.reachable(config) && FieldPolicy.snippetsAllowed(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)) {
+            add(FeaturesPanelView.Feature(FeaturesPanelView.SNIPPETS, R.drawable.kb_snippets, R.string.feature_snippets))
+        }
         if (config.typing.textEditing) add(FeaturesPanelView.Feature(FeaturesPanelView.TEXT_EDITING, R.drawable.kb_text_edit, R.string.feature_text_editing))
         add(FeaturesPanelView.Feature(FeaturesPanelView.ONE_HANDED, R.drawable.kb_onehand, R.string.feature_one_handed))
         add(FeaturesPanelView.Feature(FeaturesPanelView.LANGUAGES, R.drawable.kb_globe, R.string.feature_languages))
@@ -1105,6 +1189,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             FeaturesPanelView.SCAN -> showTab(Tabs.SCAN)
             FeaturesPanelView.NUMBER_PAD -> showTab(Tabs.NUMERIC)
             FeaturesPanelView.CLIPBOARD -> setToolPanel(Tabs.TOOL_CLIPBOARD)
+            FeaturesPanelView.SNIPPETS -> setToolPanel(Tabs.TOOL_SNIPPETS)
             FeaturesPanelView.TEXT_EDITING -> setToolPanel(Tabs.TOOL_EDIT)
             FeaturesPanelView.ONE_HANDED -> {
                 setToolPanel(null)
@@ -1457,7 +1542,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun render() {
         val root = root ?: return
         val secret = FieldPolicy.isPassword(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)
-        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey(), emojiKey = emojiKey(), suggestions = suggestions.words.map { it.text }, emojiOpen = emojiOpen, mic = voiceEngine != Dictation.Engine.NONE && !voiceOpen, toolPanel = toolPanel, clips = clips(), clipboardHistory = config.typing.clipboardHistory, textEdit = if (toolPanel == Tabs.TOOL_EDIT) editState() else null))
+        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey(), emojiKey = emojiKey(), suggestions = suggestions.words.map { it.text }, emojiOpen = emojiOpen, mic = voiceEngine != Dictation.Engine.NONE && !voiceOpen, toolPanel = toolPanel, clips = clips(), clipboardHistory = config.typing.clipboardHistory, textEdit = if (toolPanel == Tabs.TOOL_EDIT) editState() else null, snippets = panelSnippets(), snippetsEditable = Snippets.userAllowed(config), snippetSuggestion = offeredSnippet()?.label))
     }
 
     private fun enterIcon(): Int {

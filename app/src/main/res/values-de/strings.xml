@@ -528,6 +528,63 @@
     <string name="mc_quick_toggles_description">Durch Kommas getrennt: glove, contrast, scanner, sound; none = keine Schnellschalter; leer = aktuelle Einstellung bleibt. Standard: glove, contrast, sound.</string>
     <string name="mc_one_handed_title">Einhandmodus</string>
     <string name="mc_one_handed_description">Tasten schmaler links oder rechts.</string>
+    <string name="feature_snippets">Textbausteine</string>
+    <string name="snippets_title">Textbausteine</string>
+    <string name="snippets_edit">Textbausteine bearbeiten</string>
+    <string name="snippets_empty_user">Noch keine Textbausteine. Mit ✎ eigene anlegen.</string>
+    <string name="snippets_empty_admin">Ihre Organisation hat keine Textbausteine eingerichtet.</string>
+    <string name="section_snippets">Textbausteine</string>
+    <string name="snippets_enabled">Textbausteine</string>
+    <string name="snippets_enabled_summary">Fertige Texte im ⊞-Menü und als Vorschlag</string>
+    <string name="snippets_shortcuts">Kürzel</string>
+    <string name="snippets_shortcuts_summary">Ein getipptes Kürzel wie „mfg“ bietet seinen Baustein an</string>
+    <string name="snippets_button">Bausteine in der Leiste</string>
+    <string name="snippets_button_summary">Eigener Knopf in der Werkzeug- oder Tab-Leiste</string>
+    <string name="snippets_allow_user">Eigene Bausteine</string>
+    <string name="snippets_allow_user_summary">Nutzer dürfen eigene Bausteine anlegen</string>
+    <string name="snippets_org">Bausteine der Organisation</string>
+    <string name="snippets_mine">Meine Textbausteine</string>
+    <string name="snippets_mine_summary">Texte, die Sie oft brauchen</string>
+    <string name="snippets_managed_note">Vom EMM vorgegeben – bitte dort ändern.</string>
+    <string name="snippets_user_off">Ihr Administrator hat eigene Bausteine abgeschaltet.</string>
+    <string name="snippets_off">Textbausteine sind abgeschaltet.</string>
+    <string name="snippet_add">Baustein hinzufügen</string>
+    <string name="snippet_edit_title">Textbaustein</string>
+    <string name="snippet_label_hint">Name</string>
+    <string name="snippet_label_helper">Steht in der Liste, bis 40 Zeichen</string>
+    <string name="snippet_shortcut_hint">Kürzel (optional)</string>
+    <string name="snippet_shortcut_helper">2–16 Buchstaben, z. B. mfg</string>
+    <string name="snippet_text_hint">Text</string>
+    <string name="snippet_text_helper">Makros wie {TAB} und {ENTER} gehen</string>
+    <string name="snippet_delete">Löschen</string>
+    <string name="snippet_error_label_empty">Bitte einen Namen eingeben</string>
+    <string name="snippet_error_text_empty">Bitte einen Text eingeben</string>
+    <plurals name="snippet_error_too_long">
+        <item quantity="one">Höchstens %1$d Zeichen</item>
+        <item quantity="other">Höchstens %1$d Zeichen</item>
+    </plurals>
+    <string name="snippet_error_shortcut">2–16 Buchstaben, ohne Ziffern und Leerzeichen</string>
+    <string name="snippet_error_shortcut_taken">„%1$s“ gehört schon zu „%2$s“</string>
+    <string name="snippet_error_macro_not_allowed">In eigenen Bausteinen nur Text, {TAB} und {ENTER}</string>
+    <plurals name="snippet_error_full">
+        <item quantity="one">Höchstens %1$d Baustein</item>
+        <item quantity="other">Höchstens %1$d Bausteine</item>
+    </plurals>
+    <string name="user_snippets_reset">Ihre Bausteine waren nicht lesbar und wurden zurückgesetzt.</string>
+    <string name="mc_snippets_enabled_title">Textbausteine</string>
+    <string name="mc_snippets_enabled_description">Fertige Texte in der Tastatur (Standard an).</string>
+    <string name="mc_snippets_shortcuts_title">Kürzel für Bausteine</string>
+    <string name="mc_snippets_shortcuts_description">Getippte Kürzel bieten ihren Baustein an (Standard an).</string>
+    <string name="mc_snippets_button_title">Bausteine in der Leiste</string>
+    <string name="mc_snippets_button_description">Eigener Knopf in der Leiste (Standard aus).</string>
+    <string name="mc_snippets_allow_user_title">Eigene Bausteine</string>
+    <string name="mc_snippets_allow_user_description">Nutzer dürfen eigene anlegen (Standard an).</string>
+    <string name="mc_snippets_json_title">Textbausteine (JSON)</string>
+    <string name="mc_snippets_json_description">JSON-Array aus {id, label, text, shortcut}; [] = keine; leer = unverändert. Wirkungslos, solange config_json gesetzt ist.</string>
+    <plurals name="snippets_count">
+        <item quantity="one">%1$d Baustein</item>
+        <item quantity="other">%1$d Bausteine</item>
+    </plurals>
     <string-array name="mc_top_bar_entries">
         <item>Werkzeugleiste wie Gboard</item>
         <item>Tabs (ABC, 123, Fn)</item>
