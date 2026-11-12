@@ -679,10 +679,6 @@ class SettingsActivity : AppCompatActivity() {
         )
     }
 
-    /**
-     * Quick toggles: switches for this device (effective state, like ⊞ on the keyboard), the admin
-     * part (which ones users may switch, written to the configuration) and a reset.
-     */
     /** Screen readers and large fonts (`accessibility`), between the quick toggles and the scanner. */
     private fun renderAccessibility(c: KeyboardConfig) {
         val screenReader = getSystemService(AccessibilityManager::class.java)?.isTouchExplorationEnabled == true
@@ -732,6 +728,10 @@ class SettingsActivity : AppCompatActivity() {
         PasswordKeySpeech.NEVER -> R.string.password_keys_never
     }
 
+    /**
+     * Quick toggles: switches for this device (effective state, like ⊞ on the keyboard), the admin
+     * part (which ones users may switch, written to the configuration) and a reset.
+     */
     private fun renderQuickToggles(c: KeyboardConfig) {
         scanner.settings = c.scanner
         val scanBase = scanner.available

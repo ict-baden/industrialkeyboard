@@ -331,8 +331,11 @@ enum class PasswordKeySpeech(override val key: String) : Keyed {
 }
 
 data class AccessibilitySettings(
-    /** TalkBack on: lifting the finger types the explored key; false = double-tap only. */
-    val liftToType: Boolean = true,
+    /**
+     * TalkBack on: the keyboard itself types the explored key when the finger is lifted. Off by
+     * default: TalkBack's own typing preference (lift to type / double-tap to type) decides.
+     */
+    val liftToType: Boolean = false,
     val speakPasswordKeys: PasswordKeySpeech = PasswordKeySpeech.HEADSET,
     /** Key rows grow with the system font size (up to 130 %, at most 60 % of the screen). */
     val followFontSize: Boolean = false,

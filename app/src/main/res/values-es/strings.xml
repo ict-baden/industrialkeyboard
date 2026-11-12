@@ -643,13 +643,14 @@
     <string name="a11y_key_page_up">Retroceder página</string>
     <string name="a11y_key_page_down">Avanzar página</string>
     <string name="a11y_key_insert">Insertar</string>
+    <string name="a11y_key_forward_delete">Suprimir hacia delante</string>
     <string name="a11y_key_escape">Escape</string>
     <string name="a11y_key_print">Imprimir pantalla</string>
     <string name="a11y_key_pause">Pausa</string>
     <string name="a11y_key_menu">Menú</string>
     <string name="section_accessibility">Accesibilidad</string>
     <string name="lift_to_type">Escribir al levantar el dedo</string>
-    <string name="lift_to_type_summary">Con TalkBack: al levantar el dedo se escribe la tecla. Desactivado: tocar dos veces</string>
+    <string name="lift_to_type_summary">Con TalkBack: el teclado escribe la tecla al levantar el dedo. Desactivado: decide la preferencia de escritura de TalkBack</string>
     <string name="speak_password_keys">Teclas en campos de contraseña</string>
     <string name="password_keys_headset">Solo con auriculares</string>
     <string name="password_keys_always">Leer siempre</string>
@@ -660,7 +661,7 @@
     <string name="screen_reader_on">Lector de pantalla activo</string>
     <string name="screen_reader_off">Ningún lector de pantalla activo</string>
     <string name="mc_lift_to_type_title">Escribir al levantar el dedo</string>
-    <string name="mc_lift_to_type_description">Con TalkBack, al levantar el dedo se escribe la tecla (activado por defecto).</string>
+    <string name="mc_lift_to_type_description">Con TalkBack, el teclado escribe la tecla al levantar el dedo (desactivado por defecto: se aplica la preferencia de escritura de TalkBack).</string>
     <string name="mc_speak_password_keys_title">Teclas en campos de contraseña</string>
     <string name="mc_speak_password_keys_description">Cómo lee un lector de pantalla las teclas en campos de contraseña: solo con auriculares, siempre, nunca.</string>
     <string name="mc_follow_font_size_title">Teclas más grandes con letra grande</string>

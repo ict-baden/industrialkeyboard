@@ -11,10 +11,13 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.ictbaden.industrialkeyboard.R
+import de.ictbaden.industrialkeyboard.config.AccessibilitySettings
 import de.ictbaden.industrialkeyboard.config.Alphabet
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
 import de.ictbaden.industrialkeyboard.config.Tabs
 import de.ictbaden.industrialkeyboard.ime.KeyboardRenderer
+import de.ictbaden.industrialkeyboard.ime.Page
+import de.ictbaden.industrialkeyboard.layout.AlphaVariant
 import de.ictbaden.industrialkeyboard.layout.Key
 import de.ictbaden.industrialkeyboard.layout.KeyOutput
 import de.ictbaden.industrialkeyboard.layout.Layouts
@@ -129,7 +132,10 @@ class KeyboardAccessibilityTest {
 
     @Test
     fun `a lift right after a click on the same key is not typed again`() {
-        val view = keyboard().apply { touchExploration = true }
+        val view = keyboard().apply {
+            touchExploration = true
+            liftToType = true
+        }
         val center = view.keyCenter("q")!!
         provider(view).performAction(idOf(view, "q"), AccessibilityNodeInfoCompat.ACTION_CLICK, null)
         hover(view, MotionEvent.ACTION_HOVER_ENTER, center.x, center.y)
@@ -139,7 +145,10 @@ class KeyboardAccessibilityTest {
 
     @Test
     fun `leaving the keyboard types nothing`() {
-        val view = keyboard().apply { touchExploration = true }
+        val view = keyboard().apply {
+            touchExploration = true
+            liftToType = true
+        }
         val center = view.keyCenter("q")!!
         hover(view, MotionEvent.ACTION_HOVER_ENTER, center.x, center.y)
         hover(view, MotionEvent.ACTION_HOVER_MOVE, center.x, 10f)
@@ -261,5 +270,72 @@ class KeyboardAccessibilityTest {
         assertEquals(1, presses)
         assertNotNull(released)
         assertEquals(0L, released)
+    }
+
+    /** The whole keyboard frame with TalkBack and lift-to-type on; [toolPanel] open over the keys. */
+    private fun root(toolPanel: String? = null): KeyboardRootView = KeyboardRootView(context).apply {
+        keyboard.listener = this@KeyboardAccessibilityTest.listener
+        val config = KeyboardConfig(accessibility = AccessibilitySettings(liftToType = true))
+        render(KeyboardRenderer.state(context, config, Page.Alpha(AlphaVariant.TEXT), ShiftState.OFF, null, toolPanel = toolPanel, touchExploration = true))
+        measure(View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+        (this as View).layout(0, 0, 1080, measuredHeight)
+    }
+
+    /** Explores key [label] through the frame (as the window dispatches it) and lifts the finger there. */
+    private fun liftOn(root: KeyboardRootView, label: String) {
+        val center = root.keyboard.keyCenter(label)!!
+        var x = center.x
+        var y = center.y
+        var v: View = root.keyboard
+        while (v !== root) {
+            x += v.left - v.scrollX
+            y += v.top - v.scrollY
+            v = v.parent as View
+        }
+        hover(root, MotionEvent.ACTION_HOVER_ENTER, x, y)
+        hover(root, MotionEvent.ACTION_HOVER_MOVE, x, y)
+        hover(root, MotionEvent.ACTION_HOVER_EXIT, x, y)
+    }
+
+    @Test
+    fun `lifting through the frame types the key when nothing covers it`() {
+        val root = root()
+        assertFalse(root.keyboard.covered)
+        liftOn(root, "q")
+        assertEquals(listOf("q"), typed.map { it.first.label })
+    }
+
+    @Test
+    fun `keys under the features panel are neither explored nor typed`() {
+        // An empty ⊞ panel: all of it is a gap that does not take the hover.
+        val root = root(toolPanel = Tabs.TOOL_MENU)
+        assertTrue(root.keyboard.covered)
+        assertEquals(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS, root.keyboard.importantForAccessibility)
+        liftOn(root, "q")
+        assertTrue(typed.isEmpty())
+        // No key nodes for swiping, and a stale node does nothing.
+        assertEquals(0, provider(root.keyboard).createAccessibilityNodeInfo(View.NO_ID)!!.childCount)
+        assertFalse(provider(root.keyboard).performAction(idOf(root.keyboard, "q"), AccessibilityNodeInfoCompat.ACTION_CLICK, null))
+        assertTrue(typed.isEmpty())
+    }
+
+    @Test
+    fun `keys under the dictation and camera panels are not typed, and come back when they close`() {
+        val root = root()
+        root.voicePanel.visibility = View.VISIBLE
+        root.updateKeysCovered()
+        liftOn(root, "w")
+        root.voicePanel.visibility = View.GONE
+        root.camera.visibility = View.VISIBLE
+        root.updateKeysCovered()
+        assertTrue(root.scanRow.covered)
+        liftOn(root, "e")
+        assertTrue(typed.isEmpty())
+        root.camera.visibility = View.GONE
+        root.updateKeysCovered()
+        assertFalse(root.keyboard.covered)
+        assertEquals(View.IMPORTANT_FOR_ACCESSIBILITY_YES, root.keyboard.importantForAccessibility)
+        liftOn(root, "r")
+        assertEquals(listOf("r"), typed.map { it.first.label })
     }
 }

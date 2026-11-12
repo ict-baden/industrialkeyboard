@@ -252,7 +252,7 @@
         android:restrictionType="string"
         android:title="@string/mc_snippets_json_title" />
     <restriction
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:description="@string/mc_lift_to_type_description"
         android:key="lift_to_type"
         android:restrictionType="bool"

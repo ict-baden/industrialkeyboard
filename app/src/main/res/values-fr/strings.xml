@@ -643,13 +643,14 @@
     <string name="a11y_key_page_up">Page précédente</string>
     <string name="a11y_key_page_down">Page suivante</string>
     <string name="a11y_key_insert">Insérer</string>
+    <string name="a11y_key_forward_delete">Supprimer vers l\'avant</string>
     <string name="a11y_key_escape">Échap</string>
     <string name="a11y_key_print">Impression écran</string>
     <string name="a11y_key_pause">Pause</string>
     <string name="a11y_key_menu">Menu</string>
     <string name="section_accessibility">Accessibilité</string>
     <string name="lift_to_type">Saisir en levant le doigt</string>
-    <string name="lift_to_type_summary">Avec TalkBack : lever le doigt saisit la touche. Désactivé : appuyer deux fois</string>
+    <string name="lift_to_type_summary">Avec TalkBack : le clavier saisit la touche en levant le doigt. Désactivé : la préférence de saisie de TalkBack décide</string>
     <string name="speak_password_keys">Touches dans les champs de mot de passe</string>
     <string name="password_keys_headset">Uniquement avec un casque</string>
     <string name="password_keys_always">Toujours énoncer</string>
@@ -660,7 +661,7 @@
     <string name="screen_reader_on">Lecteur d’écran actif</string>
     <string name="screen_reader_off">Aucun lecteur d’écran actif</string>
     <string name="mc_lift_to_type_title">Saisir en levant le doigt</string>
-    <string name="mc_lift_to_type_description">Avec TalkBack, lever le doigt saisit la touche (activé par défaut).</string>
+    <string name="mc_lift_to_type_description">Avec TalkBack, le clavier saisit la touche en levant le doigt (désactivé par défaut : la préférence de saisie de TalkBack s’applique).</string>
     <string name="mc_speak_password_keys_title">Touches dans les champs de mot de passe</string>
     <string name="mc_speak_password_keys_description">Comment un lecteur d’écran énonce les touches dans les champs de mot de passe : uniquement avec un casque, toujours, jamais.</string>
     <string name="mc_follow_font_size_title">Touches plus grandes avec une grande police</string>

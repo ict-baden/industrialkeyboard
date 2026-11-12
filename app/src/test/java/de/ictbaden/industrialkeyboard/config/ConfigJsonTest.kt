@@ -42,7 +42,7 @@ class ConfigJsonTest {
             ),
             adminPasswordHash = PasswordHasher.hash("secret"),
             quickToggles = QuickToggleSettings(setOf(QuickToggle.GLOVE, QuickToggle.SOUND)),
-            accessibility = AccessibilitySettings(liftToType = false, speakPasswordKeys = PasswordKeySpeech.NEVER, followFontSize = true),
+            accessibility = AccessibilitySettings(liftToType = true, speakPasswordKeys = PasswordKeySpeech.NEVER, followFontSize = true),
         )
         assertEquals(config, ConfigJson.parse(ConfigJson.write(config)))
     }
@@ -169,12 +169,13 @@ class ConfigJsonTest {
     @Test
     fun `accessibility defaults change nothing and booleans are lenient`() {
         val defaults = ConfigJson.parse("{}").accessibility
-        assertTrue(defaults.liftToType)
+        // Off: TalkBack's own typing preference (lift or double tap) decides.
+        assertFalse(defaults.liftToType)
         assertEquals(PasswordKeySpeech.HEADSET, defaults.speakPasswordKeys)
         assertFalse(defaults.followFontSize)
         assertEquals(defaults, ConfigJson.parse("""{"accessibility":{}}""").accessibility)
-        val set = ConfigJson.parse("""{"accessibility":{"liftToType":"false","speakPasswordKeys":"ALWAYS","followFontSize":true}}""").accessibility
-        assertFalse(set.liftToType)
+        val set = ConfigJson.parse("""{"accessibility":{"liftToType":"true","speakPasswordKeys":"ALWAYS","followFontSize":true}}""").accessibility
+        assertTrue(set.liftToType)
         assertEquals(PasswordKeySpeech.ALWAYS, set.speakPasswordKeys)
         assertTrue(set.followFontSize)
     }
