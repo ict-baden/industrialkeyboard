@@ -112,6 +112,9 @@ The app ships a schema that every EMM with Android Enterprise support shows:
 | `ocr_pattern` | String | Regular expression for the pattern mode; empty = unchanged. Pattern mode without a pattern is reported as provisioning error |
 | `nfc_enabled` | Bool | Type NFC tags (default on) |
 | `nfc_read` | Choice | NFC: text on the tag, else UID / UID / text on the tag ([`scanner.nfc`](configuration.md#scannernfc--nfc-tags)) |
+| `lift_to_type` | Bool | With TalkBack, lifting the finger types the key (default on, [`accessibility.liftToType`](configuration.md#accessibility--screen-readers-and-large-fonts)) |
+| `speak_password_keys` | Choice | How a screen reader speaks keys in password fields: only with headphones (default), always, never |
+| `follow_font_size` | Bool | Key rows grow with the system font size, up to 130 %, at most 60 % of the screen (default off) |
 | `admin_password` | String | Protects the keyboard settings and configuration broadcasts |
 
 The keys are applied as soon as the EMM changes them and whenever the keyboard opens. The

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -12,6 +13,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
+import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.config.Tabs
 import de.ictbaden.industrialkeyboard.config.OneHanded
@@ -67,6 +69,18 @@ data class RenderState(
     val snippetsEditable: Boolean = false,
     /** Label of the snippet whose shortcut was typed: the middle of the suggestion strip. */
     val snippetSuggestion: String? = null,
+    /** TalkBack's touch exploration is on (lift-to-type, announcements). */
+    val touchExploration: Boolean = false,
+    /** `accessibility.liftToType`. */
+    val liftToType: Boolean = true,
+    /** Password field without a headset: character keys are spoken as "Key". */
+    val obscureKeys: Boolean = false,
+    /** `IME_ACTION_*` of the field for the spoken name of Enter ([KeyDescriber.enterAction]). */
+    val enterAction: Int = EditorInfo.IME_ACTION_UNSPECIFIED,
+    /** The app's name for the Enter action (`EditorInfo.actionLabel`). */
+    val enterLabel: String? = null,
+    /** Height factor of the tab bar and the suggestion strip (`accessibility.followFontSize`). */
+    val barScale: Float = 1f,
 )
 
 /**
@@ -124,6 +138,9 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
     private val headroom = (headroomDp * resources.displayMetrics.density).toInt()
     private var state: RenderState? = null
     private var navigationInset = 0
+
+    /** Language the pane titles were set in (they change only with it, not per key). */
+    private var paneTitleLanguage: String? = null
 
     init {
         clipChildren = false
@@ -194,9 +211,35 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         setMeasuredDimension(width, height)
     }
 
+    /**
+     * Speaks [text] with a screen reader (page changes, autocorrections) – only while touch
+     * exploration is on. Never logged. Deprecated in API 36 without a replacement for an input method;
+     * the panels also have pane titles.
+     */
+    fun announce(text: String) {
+        if (state?.touchExploration != true) return
+        @Suppress("DEPRECATION")
+        panel.announceForAccessibility(text)
+    }
+
+    /** TalkBack says a panel's title when it appears; set before it is shown. */
+    private fun paneTitles() {
+        val res = AppLanguage.localized(context)
+        val language = res.resources.configuration.locales.toLanguageTags()
+        if (language == paneTitleLanguage) return
+        paneTitleLanguage = language
+        ViewCompat.setAccessibilityPaneTitle(emojiPanel, res.getString(R.string.a11y_emoji))
+        ViewCompat.setAccessibilityPaneTitle(voicePanel, res.getString(R.string.a11y_dictation))
+        ViewCompat.setAccessibilityPaneTitle(featuresScroll, res.getString(R.string.a11y_more_features))
+        ViewCompat.setAccessibilityPaneTitle(clipboardPanel, res.getString(R.string.clipboard_title))
+        ViewCompat.setAccessibilityPaneTitle(snippetsPanel, res.getString(R.string.snippets_title))
+        ViewCompat.setAccessibilityPaneTitle(camera, res.getString(R.string.a11y_camera))
+    }
+
     fun render(state: RenderState) {
         val previous = this.state
         this.state = state
+        paneTitles()
         val p = state.palette
         panel.setBackgroundColor(p.background)
         overlay.palette = p
@@ -205,6 +248,8 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         val suggesting = (state.suggestions.isNotEmpty() || state.snippetSuggestion != null) && !state.emojiOpen
         tabBar.showMic = state.mic
         tabBar.spread = state.toolbar
+        tabBar.heightScale = state.barScale
+        suggestionStrip.heightScale = state.barScale
         tabBar.isVisible = state.tabs != null && !suggesting
         suggestionStrip.isVisible = suggesting
         suggestionStrip.palette = p
@@ -248,6 +293,11 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
             it.keyBorders = state.keyBorders
             it.deleteGesture = state.deleteGesture
             it.longPressDelay = state.longPressDelay
+            it.touchExploration = state.touchExploration
+            it.liftToType = state.liftToType
+            it.obscureKeys = state.obscureKeys
+            it.enterAction = state.enterAction
+            it.enterLabel = state.enterLabel
         }
         keyboard.heightRows = state.heightRows
         // Separate from the layout: a new layout would stop the key repeat of a held ←.

@@ -43,6 +43,7 @@ object ConfigJson {
             snippets = parseSnippets(root.optJSONObject("snippets"), defaults.snippets),
             appProfiles = parseAppProfiles(root.opt("appProfiles"), custom),
             quickToggles = parseQuickToggles(root.optJSONObject("quickToggles"), defaults.quickToggles),
+            accessibility = parseAccessibility(root.optJSONObject("accessibility"), defaults.accessibility),
         )
     }
 
@@ -105,6 +106,12 @@ object ConfigJson {
             putOpt("soundVolume", f.soundVolume)
             put("vibrate", f.vibrate)
             putOpt("vibrationMs", f.vibrationMs)
+        })
+        root.put("accessibility", JSONObject().apply {
+            val a = config.accessibility
+            put("liftToType", a.liftToType)
+            put("speakPasswordKeys", a.speakPasswordKeys.key)
+            put("followFontSize", a.followFontSize)
         })
         root.put("scanner", JSONObject().apply {
             val s = config.scanner
@@ -421,6 +428,16 @@ object ConfigJson {
                 QuickToggle.byKey(name)
                     ?: throw ConfigException("quickToggles.allowed[$i]: unknown toggle \"$name\" (${QuickToggle.entries.joinToString { it.key }})")
             }.toSet(),
+        )
+    }
+
+    /** Lenient booleans like `typing` (a missing section or field = the default). */
+    private fun parseAccessibility(json: JSONObject?, d: AccessibilitySettings): AccessibilitySettings {
+        json ?: return d
+        return AccessibilitySettings(
+            liftToType = json.optBoolean("liftToType", d.liftToType),
+            speakPasswordKeys = enumValue(json, "speakPasswordKeys", "accessibility", d.speakPasswordKeys),
+            followFontSize = json.optBoolean("followFontSize", d.followFontSize),
         )
     }
 

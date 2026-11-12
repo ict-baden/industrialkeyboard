@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
-import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.widget.GridLayout
@@ -103,14 +102,15 @@ class FeaturesPanelView(context: Context) : GridLayout(context) {
             val glyph = if (feature.icon == null) {
                 TextView(context).apply {
                     text = feature.text
-                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+                    FontCap.apply(this, 18f)
                     gravity = Gravity.CENTER
                 }.also { view.addView(it, LinearLayout.LayoutParams(dp(48), dp(28))) }
             } else {
                 null
             }
             val label = TextView(context).apply {
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+                // The tile has a fixed height: the label follows large fonts only up to FontCap.
+                FontCap.apply(this, 12f)
                 gravity = Gravity.CENTER
                 maxLines = 2
             }
@@ -120,6 +120,8 @@ class FeaturesPanelView(context: Context) : GridLayout(context) {
                 height = dp(84)
                 setMargins(dp(4), dp(4), dp(4), dp(4))
             })
+            // The tile speaks for itself (its content description); its parts would be read twice.
+            listOfNotNull(icon, glyph, label).forEach { it.importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO }
             tiles += Tile(view, icon, glyph, label)
         }
     }

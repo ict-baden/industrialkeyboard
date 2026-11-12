@@ -322,6 +322,22 @@ enum class QuickToggle(override val key: String) : Keyed {
     }
 }
 
+/** How keys are spoken by a screen reader in password fields. */
+enum class PasswordKeySpeech(override val key: String) : Keyed {
+    /** Only with headphones, a headset or a hearing aid connected (like Android and Gboard). */
+    HEADSET("headset"),
+    ALWAYS("always"),
+    NEVER("never"),
+}
+
+data class AccessibilitySettings(
+    /** TalkBack on: lifting the finger types the explored key; false = double-tap only. */
+    val liftToType: Boolean = true,
+    val speakPasswordKeys: PasswordKeySpeech = PasswordKeySpeech.HEADSET,
+    /** Key rows grow with the system font size (up to 130 %, at most 60 % of the screen). */
+    val followFontSize: Boolean = false,
+)
+
 data class QuickToggleSettings(
     /**
      * Toggles users may change; not allowed = hidden in ⊞, locked in the settings, and an override
@@ -428,6 +444,8 @@ data class KeyboardConfig(
     val appProfiles: List<AppProfile> = emptyList(),
     /** Which quick toggles users may switch on the device (⊞, settings, `{TOGGLE:…}`). */
     val quickToggles: QuickToggleSettings = QuickToggleSettings(),
+    /** Screen readers (TalkBack) and large fonts; the defaults change nothing visible. */
+    val accessibility: AccessibilitySettings = AccessibilitySettings(),
 ) {
     fun programmable(key: ProgrammableKey): String = keys.programmable[key.id] ?: key.default
 

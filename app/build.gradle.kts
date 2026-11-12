@@ -99,6 +99,9 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.8.0")
     implementation("androidx.activity:activity-ktx:1.11.0")
     implementation("com.google.android.material:material:1.14.0")
+    // ExploreByTouchHelper: screen-reader nodes for the canvas-drawn keys. Already transitive (and in
+    // THIRD-PARTY-NOTICES.txt); listed to pin the API in use.
+    implementation("androidx.customview:customview:1.2.0")
     // Camera scan on devices without a scan engine (issue #17): CameraX for the picture,
     // zxing-cpp (the same engine as Lupe) for decoding. Both Apache-2.0.
     implementation("androidx.camera:camera-camera2:1.5.2")

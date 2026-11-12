@@ -7,6 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.inputmethodservice.InputMethodService
+import android.media.AudioDeviceCallback
+import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Build
@@ -18,6 +20,7 @@ import android.util.Log
 import android.view.KeyCharacterMap
 import android.view.KeyEvent
 import android.view.View
+import android.view.accessibility.AccessibilityManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
@@ -77,6 +80,7 @@ import de.ictbaden.industrialkeyboard.suggest.WordList
 import de.ictbaden.industrialkeyboard.ui.ClipItem
 import de.ictbaden.industrialkeyboard.ui.FeaturesPanelView
 import de.ictbaden.industrialkeyboard.ui.Feedback
+import de.ictbaden.industrialkeyboard.ui.KeyDescriber
 import de.ictbaden.industrialkeyboard.ui.KeyboardRootView
 import de.ictbaden.industrialkeyboard.ui.KeyboardView
 import de.ictbaden.industrialkeyboard.ui.PanelSnippet
@@ -175,6 +179,25 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     /** The snippet whose shortcut is the word being typed; in memory only, gone with the word. */
     private var snippetMatch: Snippet? = null
 
+    // Screen readers: both states are kept up to date by listeners, never asked for per key.
+    private var accessibility: AccessibilityManager? = null
+    private var touchExploration = false
+    private val touchExplorationListener = AccessibilityManager.TouchExplorationStateChangeListener { on ->
+        touchExploration = on
+        render()
+    }
+
+    /** Headphones, a headset or a hearing aid are connected (password keys may be spoken). */
+    private var headset = false
+    private var audio: AudioManager? = null
+    private val audioDevices = object : AudioDeviceCallback() {
+        override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>?) = updateHeadset()
+        override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>?) = updateHeadset()
+    }
+
+    /** Spoken names of pages for announcements. */
+    private val describer by lazy { KeyDescriber(this) }
+
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
@@ -215,6 +238,19 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         userSnippets.addListener(userSnippetsListener)
         KeyboardBus.onShowTab = { tab -> root?.isShown == true && showTab(tab) }
         KeyboardBus.onNfc = ::typeNfc
+        accessibility = getSystemService(AccessibilityManager::class.java)?.also { manager ->
+            touchExploration = manager.isTouchExplorationEnabled
+            manager.addTouchExplorationStateChangeListener(touchExplorationListener)
+        }
+        // The callback reports the connected devices once right away, then each change.
+        audio = getSystemService(AudioManager::class.java)?.also { it.registerAudioDeviceCallback(audioDevices, handler) }
+    }
+
+    private fun updateHeadset() {
+        val now = PasswordSpeech.headsetConnected(audio)
+        if (now == headset) return
+        headset = now
+        if (FieldPolicy.isPassword(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)) render()
     }
 
     override fun onDestroy() {
@@ -226,6 +262,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         KeyboardBus.onShowTab = null
         KeyboardBus.onNfc = null
         KeyboardBus.keyboardShown = false
+        accessibility?.removeTouchExplorationStateChangeListener(touchExplorationListener)
+        audio?.unregisterAudioDeviceCallback(audioDevices)
         HardwareScanner.removeListener(engineListener)
         camera?.destroy()
         camera = null
@@ -627,7 +665,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         when (val output = key.output) {
             is KeyOutput.Text -> if (held) typeWithModifiers(key, output.text) else commit(if (key.letter && shift != ShiftState.OFF) output.text.uppercase(Locale.getDefault()) else output.text)
             is KeyOutput.Macro -> runMacro(output.steps)
-            is KeyOutput.ShowTab -> showTab(output.tab)
+            is KeyOutput.ShowTab -> if (showTab(output.tab)) announcePage()
             is KeyOutput.Modifier -> tapModifier(output.modifier)
             KeyOutput.Shift -> toggleShift()
             KeyOutput.Backspace -> {
@@ -646,6 +684,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
                 val current = page as? Page.Symbols
                 page = Page.Symbols(if (current?.page == 2) 1 else 2, field.alpha)
                 render()
+                announcePage()
             }
             is KeyOutput.Edit -> textEdit(output.action)
             KeyOutput.None -> Unit
@@ -904,6 +943,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         autocorrected = typed to "$replacement "
         updateAutoShift()
         render()
+        // A silent correction is a trap for screen-reader users; only spoken, never logged.
+        root?.announce(AppLanguage.localized(this).getString(R.string.a11y_autocorrected, replacement))
         return true
     }
 
@@ -1112,7 +1153,10 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         when (id) {
             Tabs.TOOL_MENU, Tabs.TOOL_CLIPBOARD, Tabs.TOOL_SNIPPETS -> setToolPanel(if (toolPanel == id) null else id)
             Tabs.TOOL_SETTINGS -> openSettings()
-            else -> if (KeyboardRenderer.toolbar(config) && page.tab == id && toolPanel == null) showTab(Tabs.ALPHA) else showTab(id)
+            else -> {
+                val switched = if (KeyboardRenderer.toolbar(config) && page.tab == id && toolPanel == null) showTab(Tabs.ALPHA) else showTab(id)
+                if (switched) announcePage()
+            }
         }
     }
 
@@ -1122,9 +1166,23 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         emojiOpen = false
         if (panel != null) endWord()
         if (panel != Tabs.TOOL_EDIT) textSelecting = false
+        val editOpened = panel == Tabs.TOOL_EDIT && toolPanel != Tabs.TOOL_EDIT
         toolPanel = panel
         if (panel == Tabs.TOOL_MENU) root?.featuresPanel?.show(features())
         render()
+        // The text editing keys replace the letters in place – no pane, so it gets an announcement.
+        if (editOpened) root?.announce(AppLanguage.localized(this).getString(R.string.feature_text_editing))
+    }
+
+    /** Says the page after a switch by the user ("Symbols", "Function keys" …), with TalkBack only. */
+    private fun announcePage() {
+        if (!touchExploration) return
+        val name = when (val p = page) {
+            is Page.Symbols -> describer.pageName(Tabs.SYMBOLS, symbolsPage = p.page)
+            is Page.Custom -> describer.pageName(p.id, config.customLayout(p.id)?.label)
+            else -> describer.pageName(p.tab)
+        }
+        root?.announce(name)
     }
 
     /**
@@ -1546,20 +1604,33 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun render() {
         val root = root ?: return
         val secret = FieldPolicy.isPassword(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)
-        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey(), emojiKey = emojiKey(), suggestions = suggestions.words.map { it.text }, emojiOpen = emojiOpen, mic = voiceEngine != Dictation.Engine.NONE && !voiceOpen, toolPanel = toolPanel, clips = clips(), clipboardHistory = config.typing.clipboardHistory, textEdit = if (toolPanel == Tabs.TOOL_EDIT) editState() else null, snippets = panelSnippets(), snippetsEditable = Snippets.userAllowed(config), snippetSuggestion = offeredSnippet()?.label))
+        val enterAction = enterAction()
+        root.render(
+            KeyboardRenderer.state(
+                this, config, page, shift, scanner.name, enterIcon(enterAction), scanning, passwordField = secret, modifiers = modifiers.toMap(),
+                camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey(), emojiKey = emojiKey(), suggestions = suggestions.words.map { it.text },
+                emojiOpen = emojiOpen, mic = voiceEngine != Dictation.Engine.NONE && !voiceOpen, toolPanel = toolPanel, clips = clips(),
+                clipboardHistory = config.typing.clipboardHistory, textEdit = if (toolPanel == Tabs.TOOL_EDIT) editState() else null, snippets = panelSnippets(),
+                snippetsEditable = Snippets.userAllowed(config), snippetSuggestion = offeredSnippet()?.label,
+                touchExploration = touchExploration,
+                // Only in password fields; the headset state comes from the device callback, not from here.
+                obscureKeys = secret && PasswordSpeech.obscure(config.accessibility.speakPasswordKeys, passwordField = true, headset = headset),
+                enterAction = enterAction,
+                enterLabel = currentInputEditorInfo?.actionLabel?.toString()?.takeIf { enterAction != EditorInfo.IME_ACTION_UNSPECIFIED },
+            ),
+        )
     }
 
-    private fun enterIcon(): Int {
-        val info = currentInputEditorInfo ?: return R.drawable.kb_enter
-        if (info.imeOptions and EditorInfo.IME_FLAG_NO_ENTER_ACTION != 0) return R.drawable.kb_enter
-        return when (info.imeOptions and EditorInfo.IME_MASK_ACTION) {
-            EditorInfo.IME_ACTION_GO, EditorInfo.IME_ACTION_NEXT -> R.drawable.kb_next
-            EditorInfo.IME_ACTION_SEARCH -> R.drawable.kb_search
-            EditorInfo.IME_ACTION_SEND -> R.drawable.kb_send
-            EditorInfo.IME_ACTION_DONE -> R.drawable.kb_done
-            EditorInfo.IME_ACTION_PREVIOUS -> R.drawable.kb_left
-            else -> R.drawable.kb_enter
-        }
+    /** The field's Enter action; [EditorInfo.IME_ACTION_UNSPECIFIED] for a plain Enter (also with `IME_FLAG_NO_ENTER_ACTION`). */
+    private fun enterAction(): Int = currentInputEditorInfo?.let { KeyDescriber.enterAction(it.imeOptions) } ?: EditorInfo.IME_ACTION_UNSPECIFIED
+
+    private fun enterIcon(action: Int): Int = when (action) {
+        EditorInfo.IME_ACTION_GO, EditorInfo.IME_ACTION_NEXT -> R.drawable.kb_next
+        EditorInfo.IME_ACTION_SEARCH -> R.drawable.kb_search
+        EditorInfo.IME_ACTION_SEND -> R.drawable.kb_send
+        EditorInfo.IME_ACTION_DONE -> R.drawable.kb_done
+        EditorInfo.IME_ACTION_PREVIOUS -> R.drawable.kb_left
+        else -> R.drawable.kb_enter
     }
 
     private companion object {

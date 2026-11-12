@@ -42,15 +42,19 @@ class ScanPadView(context: Context) : View(context) {
     /** Name of the scanner integration, or null when no scanner was found. */
     var scannerName: String? = null
         set(value) {
+            if (field == value) return
             field = value
             invalidate()
+            describe()
         }
 
     /** The camera scans once per tap; holding does not keep it running. */
     var camera = false
         set(value) {
+            if (field == value) return
             field = value
             invalidate()
+            describe()
         }
     var scanning = false
         set(value) {
@@ -58,6 +62,7 @@ class ScanPadView(context: Context) : View(context) {
                 field = value
                 scanStarted = SystemClock.uptimeMillis()
                 invalidate()
+                describe()
             }
         }
 
@@ -81,7 +86,37 @@ class ScanPadView(context: Context) : View(context) {
     init {
         // Blur mask filters need software rendering.
         setLayerType(LAYER_TYPE_SOFTWARE, null)
-        contentDescription = text(R.string.scan_pad_description)
+        // One control for screen readers: double tap scans once (or opens the camera); TalkBack's
+        // double-tap-and-hold arrives as a real touch, so holding still scans continuously.
+        isClickable = true
+        accessibilityLiveRegion = ACCESSIBILITY_LIVE_REGION_POLITE
+        describe()
+    }
+
+    /** "<title>. <hint>", the same texts the pad draws; the live region announces "Scanning …". */
+    private fun describe() {
+        contentDescription = "${title()}. ${hint()}"
+    }
+
+    private fun title(): String = when {
+        scannerName == null -> text(R.string.scan_pad_no_scanner)
+        scanning -> text(R.string.scan_pad_scanning)
+        else -> text(R.string.scan_pad_tap)
+    }
+
+    private fun hint(): String = when {
+        scannerName == null -> text(R.string.scan_pad_configure)
+        camera -> text(R.string.scan_pad_hint_camera, scannerName)
+        else -> text(R.string.scan_pad_hint, scannerName)
+    }
+
+    /** A screen reader's double tap: one scan, or the camera (a tap of length 0). */
+    override fun performClick(): Boolean {
+        super.performClick()
+        if (scannerName == null) return true
+        listener?.onScanPress()
+        listener?.onScanRelease(0)
+        return true
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -124,20 +159,12 @@ class ScanPadView(context: Context) : View(context) {
 
             title.color = foreground
             title.textSize = min(sp(19f), pad.height() * 0.11f)
-            val label = when {
-                !available -> text(R.string.scan_pad_no_scanner)
-                scanning -> text(R.string.scan_pad_scanning)
-                else -> text(R.string.scan_pad_tap)
-            }
+            val label = title()
             val titleY = iconTop + iconSize + dp(10f) - title.ascent()
             canvas.drawText(label, pad.centerX(), titleY, title)
             subtitle.color = ColorUtils.setAlphaComponent(foreground, 190)
             subtitle.textSize = min(sp(12.5f), pad.height() * 0.075f)
-            val hint = when {
-                !available -> text(R.string.scan_pad_configure)
-                camera -> text(R.string.scan_pad_hint_camera, scannerName)
-                else -> text(R.string.scan_pad_hint, scannerName)
-            }
+            val hint = hint()
             canvas.drawText(hint, pad.centerX(), titleY + dp(6f) - subtitle.ascent() + subtitle.descent(), subtitle)
         }
         if (scanning) postInvalidateOnAnimation()

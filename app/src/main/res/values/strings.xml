@@ -330,7 +330,6 @@
     <string name="sample_email_helper">@ next to the space bar</string>
 
     <!-- Scan pad in the keyboard -->
-    <string name="scan_pad_description">Scan</string>
     <string name="scan_pad_no_scanner">No scanner found</string>
     <string name="scan_pad_scanning">Scanning…</string>
     <string name="scan_pad_tap">Tap to scan</string>
@@ -670,5 +669,82 @@
         <item>off</item>
         <item>left</item>
         <item>right</item>
+    </string-array>
+    <!-- Accessibility (TalkBack): spoken names of keys, tabs and panels. -->
+    <string name="a11y_key_obscured">Key</string>
+    <string name="a11y_alternative">Character %1$d</string>
+    <string name="a11y_capital">Capital %1$s</string>
+    <string name="a11y_shift">Shift</string>
+    <string name="a11y_shift_on">Shift on</string>
+    <string name="a11y_caps_lock">Caps lock on</string>
+    <string name="a11y_backspace">Delete</string>
+    <string name="a11y_delete_word">Delete word</string>
+    <string name="a11y_enter">Enter</string>
+    <string name="a11y_enter_done">Done</string>
+    <string name="a11y_enter_go">Go</string>
+    <string name="a11y_enter_next">Next</string>
+    <string name="a11y_enter_previous">Previous</string>
+    <string name="a11y_enter_search">Search</string>
+    <string name="a11y_enter_send">Send</string>
+    <string name="a11y_space">Space</string>
+    <string name="a11y_space_language">Space, %1$s</string>
+    <string name="a11y_tab_key">Tab</string>
+    <string name="a11y_next_language">Next language</string>
+    <string name="a11y_switch_keyboard">Switch keyboard</string>
+    <string name="a11y_lock">Lock</string>
+    <string name="a11y_emoji">Emoji</string>
+    <string name="a11y_hide">Hide keyboard</string>
+    <string name="a11y_arrow_left">Left arrow</string>
+    <string name="a11y_arrow_right">Right arrow</string>
+    <string name="a11y_arrow_up">Up arrow</string>
+    <string name="a11y_arrow_down">Down arrow</string>
+    <string name="a11y_letters">Letters</string>
+    <string name="a11y_symbols">Symbols</string>
+    <string name="a11y_more_symbols">More symbols</string>
+    <string name="a11y_more_features">More features</string>
+    <string name="a11y_dictation">Dictation</string>
+    <string name="a11y_voice_start">Start dictation</string>
+    <string name="a11y_voice_pause">Pause dictation</string>
+    <string name="a11y_voice_resume">Continue dictation</string>
+    <string name="a11y_camera">Camera scan</string>
+    <string name="a11y_state_locked">locked</string>
+    <string name="a11y_autocorrected">Corrected to %1$s</string>
+    <string name="a11y_pin">Pin</string>
+    <string name="a11y_unpin">Unpin</string>
+    <string name="a11y_snippet">Snippet: %1$s</string>
+    <string name="a11y_key_page_up">Page up</string>
+    <string name="a11y_key_page_down">Page down</string>
+    <string name="a11y_key_insert">Insert</string>
+    <string name="a11y_key_escape">Escape</string>
+    <string name="a11y_key_print">Print screen</string>
+    <string name="a11y_key_pause">Pause</string>
+    <string name="a11y_key_menu">Menu</string>
+    <string name="section_accessibility">Accessibility</string>
+    <string name="lift_to_type">Lift to type</string>
+    <string name="lift_to_type_summary">With TalkBack: lifting the finger types the key. Off: double-tap to type</string>
+    <string name="speak_password_keys">Keys in password fields</string>
+    <string name="password_keys_headset">Spoken only with headphones</string>
+    <string name="password_keys_always">Always spoken</string>
+    <string name="password_keys_never">Never spoken</string>
+    <string name="follow_font_size">Larger keys with large font</string>
+    <string name="follow_font_size_summary">Keys grow with the system font size, up to %1$d %%</string>
+    <string name="accessibility_settings">Android accessibility</string>
+    <string name="screen_reader_on">Screen reader active</string>
+    <string name="screen_reader_off">No screen reader active</string>
+    <string name="mc_lift_to_type_title">Lift to type</string>
+    <string name="mc_lift_to_type_description">With TalkBack, lifting the finger types the key (default on).</string>
+    <string name="mc_speak_password_keys_title">Keys in password fields</string>
+    <string name="mc_speak_password_keys_description">How a screen reader speaks keys in password fields: only with headphones, always, never.</string>
+    <string name="mc_follow_font_size_title">Larger keys with large font</string>
+    <string name="mc_follow_font_size_description">Key rows grow with the system font size, up to 1.3 times (default off).</string>
+    <string-array name="mc_speak_password_keys_entries">
+        <item>Only with headphones</item>
+        <item>Always</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="mc_speak_password_keys_values" translatable="false">
+        <item>headset</item>
+        <item>always</item>
+        <item>never</item>
     </string-array>
 </resources>

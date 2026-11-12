@@ -310,7 +310,6 @@
     <string name="sample_email">电子邮件</string>
     <string name="sample_email_helper">@ 在空格键旁边</string>
 
-    <string name="scan_pad_description">扫描</string>
     <string name="scan_pad_no_scanner">未找到扫描器</string>
     <string name="scan_pad_scanning">正在扫描…</string>
     <string name="scan_pad_tap">点按扫描</string>
@@ -590,5 +589,77 @@
         <item>关闭</item>
         <item>左侧</item>
         <item>右侧</item>
+    </string-array>
+    <!-- Accessibility (TalkBack): spoken names of keys, tabs and panels. -->
+    <string name="a11y_key_obscured">按键</string>
+    <string name="a11y_alternative">字符 %1$d</string>
+    <string name="a11y_capital">大写 %1$s</string>
+    <string name="a11y_shift">Shift 键</string>
+    <string name="a11y_shift_on">Shift 已开启</string>
+    <string name="a11y_caps_lock">大写锁定已开启</string>
+    <string name="a11y_backspace">删除</string>
+    <string name="a11y_delete_word">删除单词</string>
+    <string name="a11y_enter">回车</string>
+    <string name="a11y_enter_done">完成</string>
+    <string name="a11y_enter_go">前往</string>
+    <string name="a11y_enter_next">下一项</string>
+    <string name="a11y_enter_previous">上一项</string>
+    <string name="a11y_enter_search">搜索</string>
+    <string name="a11y_enter_send">发送</string>
+    <string name="a11y_space">空格</string>
+    <string name="a11y_space_language">空格，%1$s</string>
+    <string name="a11y_tab_key">Tab 键</string>
+    <string name="a11y_next_language">下一种语言</string>
+    <string name="a11y_switch_keyboard">切换键盘</string>
+    <string name="a11y_lock">锁定</string>
+    <string name="a11y_emoji">表情符号</string>
+    <string name="a11y_hide">隐藏键盘</string>
+    <string name="a11y_arrow_left">左箭头</string>
+    <string name="a11y_arrow_right">右箭头</string>
+    <string name="a11y_arrow_up">上箭头</string>
+    <string name="a11y_arrow_down">下箭头</string>
+    <string name="a11y_letters">字母</string>
+    <string name="a11y_symbols">符号</string>
+    <string name="a11y_more_symbols">更多符号</string>
+    <string name="a11y_more_features">更多功能</string>
+    <string name="a11y_dictation">语音输入</string>
+    <string name="a11y_voice_start">开始语音输入</string>
+    <string name="a11y_voice_pause">暂停语音输入</string>
+    <string name="a11y_voice_resume">继续语音输入</string>
+    <string name="a11y_camera">相机扫描</string>
+    <string name="a11y_state_locked">已锁定</string>
+    <string name="a11y_autocorrected">已更正为 %1$s</string>
+    <string name="a11y_pin">固定</string>
+    <string name="a11y_unpin">取消固定</string>
+    <string name="a11y_snippet">常用语：%1$s</string>
+    <string name="a11y_key_page_up">上一页</string>
+    <string name="a11y_key_page_down">下一页</string>
+    <string name="a11y_key_insert">插入</string>
+    <string name="a11y_key_escape">Esc 键</string>
+    <string name="a11y_key_print">打印屏幕</string>
+    <string name="a11y_key_pause">暂停</string>
+    <string name="a11y_key_menu">菜单</string>
+    <string name="section_accessibility">无障碍</string>
+    <string name="lift_to_type">抬起手指即输入</string>
+    <string name="lift_to_type_summary">使用 TalkBack 时：抬起手指即输入该键。关闭：点按两次输入</string>
+    <string name="speak_password_keys">密码字段中的按键</string>
+    <string name="password_keys_headset">仅在连接耳机时朗读</string>
+    <string name="password_keys_always">始终朗读</string>
+    <string name="password_keys_never">从不朗读</string>
+    <string name="follow_font_size">大字体时放大按键</string>
+    <string name="follow_font_size_summary">按键随系统字体大小放大，最多 %1$d%%</string>
+    <string name="accessibility_settings">Android 无障碍设置</string>
+    <string name="screen_reader_on">屏幕阅读器已开启</string>
+    <string name="screen_reader_off">未开启屏幕阅读器</string>
+    <string name="mc_lift_to_type_title">抬起手指即输入</string>
+    <string name="mc_lift_to_type_description">使用 TalkBack 时，抬起手指即输入该键（默认开启）。</string>
+    <string name="mc_speak_password_keys_title">密码字段中的按键</string>
+    <string name="mc_speak_password_keys_description">屏幕阅读器如何朗读密码字段中的按键：仅在连接耳机时、始终、从不。</string>
+    <string name="mc_follow_font_size_title">大字体时放大按键</string>
+    <string name="mc_follow_font_size_description">按键行随系统字体大小放大，最多 1.3 倍（默认关闭）。</string>
+    <string-array name="mc_speak_password_keys_entries">
+        <item>仅在连接耳机时</item>
+        <item>始终</item>
+        <item>从不</item>
     </string-array>
 </resources>

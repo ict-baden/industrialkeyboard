@@ -251,4 +251,24 @@
         android:key="snippets_json"
         android:restrictionType="string"
         android:title="@string/mc_snippets_json_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_lift_to_type_description"
+        android:key="lift_to_type"
+        android:restrictionType="bool"
+        android:title="@string/mc_lift_to_type_title" />
+    <restriction
+        android:defaultValue="headset"
+        android:description="@string/mc_speak_password_keys_description"
+        android:entries="@array/mc_speak_password_keys_entries"
+        android:entryValues="@array/mc_speak_password_keys_values"
+        android:key="speak_password_keys"
+        android:restrictionType="choice"
+        android:title="@string/mc_speak_password_keys_title" />
+    <restriction
+        android:defaultValue="false"
+        android:description="@string/mc_follow_font_size_description"
+        android:key="follow_font_size"
+        android:restrictionType="bool"
+        android:title="@string/mc_follow_font_size_title" />
 </restrictions>

@@ -173,6 +173,11 @@ object Provisioning {
                 // Empty = unchanged; `[]` clears the list.
                 items = values.getString(SNIPPETS_JSON)?.takeIf { it.isNotBlank() }?.let(::snippetList) ?: config.snippets.items,
             ),
+            accessibility = config.accessibility.copy(
+                liftToType = bool("lift_to_type", config.accessibility.liftToType),
+                speakPasswordKeys = choice("speak_password_keys", PasswordKeySpeech.entries.toTypedArray(), config.accessibility.speakPasswordKeys),
+                followFontSize = bool("follow_font_size", config.accessibility.followFontSize),
+            ),
         )
     }
 

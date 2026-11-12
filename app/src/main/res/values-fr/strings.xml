@@ -310,7 +310,6 @@
     <string name="sample_email">E-mail</string>
     <string name="sample_email_helper">@ à côté de la barre d\'espace</string>
 
-    <string name="scan_pad_description">Scanner</string>
     <string name="scan_pad_no_scanner">Aucun scanner trouvé</string>
     <string name="scan_pad_scanning">Scan en cours…</string>
     <string name="scan_pad_tap">Touchez pour scanner</string>
@@ -598,5 +597,77 @@
         <item>Désactivé</item>
         <item>Gauche</item>
         <item>Droite</item>
+    </string-array>
+    <!-- Accessibility (TalkBack): spoken names of keys, tabs and panels. -->
+    <string name="a11y_key_obscured">Touche</string>
+    <string name="a11y_alternative">Caractère %1$d</string>
+    <string name="a11y_capital">%1$s majuscule</string>
+    <string name="a11y_shift">Maj</string>
+    <string name="a11y_shift_on">Maj activée</string>
+    <string name="a11y_caps_lock">Verrouillage des majuscules activé</string>
+    <string name="a11y_backspace">Supprimer</string>
+    <string name="a11y_delete_word">Supprimer le mot</string>
+    <string name="a11y_enter">Entrée</string>
+    <string name="a11y_enter_done">OK</string>
+    <string name="a11y_enter_go">Aller</string>
+    <string name="a11y_enter_next">Suivant</string>
+    <string name="a11y_enter_previous">Précédent</string>
+    <string name="a11y_enter_search">Rechercher</string>
+    <string name="a11y_enter_send">Envoyer</string>
+    <string name="a11y_space">Espace</string>
+    <string name="a11y_space_language">Espace, %1$s</string>
+    <string name="a11y_tab_key">Tabulation</string>
+    <string name="a11y_next_language">Langue suivante</string>
+    <string name="a11y_switch_keyboard">Changer de clavier</string>
+    <string name="a11y_lock">Verrouiller</string>
+    <string name="a11y_emoji">Emoji</string>
+    <string name="a11y_hide">Masquer le clavier</string>
+    <string name="a11y_arrow_left">Flèche gauche</string>
+    <string name="a11y_arrow_right">Flèche droite</string>
+    <string name="a11y_arrow_up">Flèche haut</string>
+    <string name="a11y_arrow_down">Flèche bas</string>
+    <string name="a11y_letters">Lettres</string>
+    <string name="a11y_symbols">Symboles</string>
+    <string name="a11y_more_symbols">Plus de symboles</string>
+    <string name="a11y_more_features">Plus de fonctions</string>
+    <string name="a11y_dictation">Dictée</string>
+    <string name="a11y_voice_start">Démarrer la dictée</string>
+    <string name="a11y_voice_pause">Mettre la dictée en pause</string>
+    <string name="a11y_voice_resume">Reprendre la dictée</string>
+    <string name="a11y_camera">Scan par caméra</string>
+    <string name="a11y_state_locked">verrouillé</string>
+    <string name="a11y_autocorrected">Corrigé en %1$s</string>
+    <string name="a11y_pin">Épingler</string>
+    <string name="a11y_unpin">Désépingler</string>
+    <string name="a11y_snippet">Texte type : %1$s</string>
+    <string name="a11y_key_page_up">Page précédente</string>
+    <string name="a11y_key_page_down">Page suivante</string>
+    <string name="a11y_key_insert">Insérer</string>
+    <string name="a11y_key_escape">Échap</string>
+    <string name="a11y_key_print">Impression écran</string>
+    <string name="a11y_key_pause">Pause</string>
+    <string name="a11y_key_menu">Menu</string>
+    <string name="section_accessibility">Accessibilité</string>
+    <string name="lift_to_type">Saisir en levant le doigt</string>
+    <string name="lift_to_type_summary">Avec TalkBack : lever le doigt saisit la touche. Désactivé : appuyer deux fois</string>
+    <string name="speak_password_keys">Touches dans les champs de mot de passe</string>
+    <string name="password_keys_headset">Uniquement avec un casque</string>
+    <string name="password_keys_always">Toujours énoncer</string>
+    <string name="password_keys_never">Ne jamais énoncer</string>
+    <string name="follow_font_size">Touches plus grandes avec une grande police</string>
+    <string name="follow_font_size_summary">Les touches grandissent avec la taille de police du système, jusqu’à %1$d %%</string>
+    <string name="accessibility_settings">Accessibilité Android</string>
+    <string name="screen_reader_on">Lecteur d’écran actif</string>
+    <string name="screen_reader_off">Aucun lecteur d’écran actif</string>
+    <string name="mc_lift_to_type_title">Saisir en levant le doigt</string>
+    <string name="mc_lift_to_type_description">Avec TalkBack, lever le doigt saisit la touche (activé par défaut).</string>
+    <string name="mc_speak_password_keys_title">Touches dans les champs de mot de passe</string>
+    <string name="mc_speak_password_keys_description">Comment un lecteur d’écran énonce les touches dans les champs de mot de passe : uniquement avec un casque, toujours, jamais.</string>
+    <string name="mc_follow_font_size_title">Touches plus grandes avec une grande police</string>
+    <string name="mc_follow_font_size_description">Les rangées de touches grandissent avec la taille de police du système, jusqu’à 1,3 fois (désactivé par défaut).</string>
+    <string-array name="mc_speak_password_keys_entries">
+        <item>Uniquement avec un casque</item>
+        <item>Toujours</item>
+        <item>Jamais</item>
     </string-array>
 </resources>
