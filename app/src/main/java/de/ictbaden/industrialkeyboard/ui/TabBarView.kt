@@ -36,6 +36,15 @@ class TabBarView(context: Context) : View(context) {
         }
     var showHide = true
 
+    /** Toolbar: icons spread evenly over the width like Gboard, instead of tabs packed at the left. */
+    var spread = false
+        set(value) {
+            if (field == value) return
+            field = value
+            computeCells()
+            invalidate()
+        }
+
     /** Microphone for dictation, left of the hide button – at the right end like in Gboard. */
     var showMic = false
         set(value) {
@@ -107,7 +116,7 @@ class TabBarView(context: Context) : View(context) {
         val micWidth = if (showMic) dp(52f) else 0f
         micCell.set(hideCell.left - micWidth, 0f, hideCell.left, height.toFloat())
         val area = width - hideWidth - micWidth - dp(8f)
-        val cellWidth = if (tabs.isEmpty()) 0f else min(area / tabs.size, dp(92f))
+        val cellWidth = if (tabs.isEmpty()) 0f else if (spread) area / tabs.size else min(area / tabs.size, dp(92f))
         var x = dp(6f)
         tabs.forEach { _ ->
             cells += RectF(x, dp(6f), x + cellWidth, height - dp(6f))

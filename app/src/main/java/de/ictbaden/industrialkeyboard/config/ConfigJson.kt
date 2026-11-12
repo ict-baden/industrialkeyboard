@@ -55,6 +55,7 @@ object ConfigJson {
             put("emojiKey", a.emojiKey)
             put("symbolHints", a.symbolHints)
             put("keyBorders", a.keyBorders)
+            put("oneHanded", a.oneHanded.key)
             put("keyHeight", a.keyHeight)
             put("width", a.width)
             put("numberRow", a.numberRow)
@@ -69,6 +70,7 @@ object ConfigJson {
             put("numericOrder", config.layout.numericOrder.key)
             put("umlautKeys", config.layout.umlautKeys)
             put("symbolsKey", config.layout.symbolsKey)
+            put("topBar", config.layout.topBar.key)
         })
         root.put("tabs", JSONObject().apply {
             val t = config.tabs
@@ -88,6 +90,8 @@ object ConfigJson {
             put("autocorrect", config.typing.autocorrect)
             put("voice", config.typing.voice.key)
             put("deleteGesture", config.typing.deleteGesture)
+            put("nextWord", config.typing.nextWord)
+            put("clipboardHistory", config.typing.clipboardHistory)
         })
         root.put("feedback", JSONObject().apply {
             val f = config.feedback
@@ -232,6 +236,7 @@ object ConfigJson {
             emojiKey = json.optBoolean("emojiKey", d.emojiKey),
             symbolHints = json.optBoolean("symbolHints", d.symbolHints),
             keyBorders = json.optBoolean("keyBorders", d.keyBorders),
+            oneHanded = enumValue(json, "oneHanded", "appearance", d.oneHanded),
         )
     }
 
@@ -243,6 +248,7 @@ object ConfigJson {
             numericOrder = enumValue(json, "numericOrder", "layout", d.numericOrder),
             umlautKeys = json.optBoolean("umlautKeys", d.umlautKeys),
             symbolsKey = json.optBoolean("symbolsKey", d.symbolsKey),
+            topBar = enumValue(json, "topBar", "layout", d.topBar),
         )
     }
 
@@ -294,6 +300,8 @@ object ConfigJson {
                 VoiceInput.parse(raw) ?: throw ConfigException("typing.voice: unknown value \"$raw\" (auto, offline, off)")
             } ?: d.voice,
             deleteGesture = json.optBoolean("deleteGesture", d.deleteGesture),
+            nextWord = json.optBoolean("nextWord", d.nextWord),
+            clipboardHistory = json.optBoolean("clipboardHistory", d.clipboardHistory),
         )
     }
 

@@ -12,6 +12,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import de.ictbaden.industrialkeyboard.R
+import de.ictbaden.industrialkeyboard.config.Tabs
+import de.ictbaden.industrialkeyboard.config.OneHanded
 import de.ictbaden.industrialkeyboard.layout.KeyboardLayout
 import de.ictbaden.industrialkeyboard.layout.Layouts
 import de.ictbaden.industrialkeyboard.layout.ModifierKey
@@ -47,6 +49,14 @@ data class RenderState(
     val suggestions: List<String> = emptyList(),
     /** The emoji panel replaces the keys. */
     val emojiOpen: Boolean = false,
+    /** Gboard's toolbar instead of the tabs (icons evenly spread). */
+    val toolbar: Boolean = false,
+    /** Open toolbar panel (features ⊞ or clipboard) in place of the keys. */
+    val toolPanel: String? = null,
+    val clips: List<ClipItem> = emptyList(),
+    val clipboardHistory: Boolean = false,
+    /** One-handed mode: keys narrower at one side. */
+    val oneHanded: OneHanded = OneHanded.OFF,
 )
 
 /**
@@ -72,10 +82,21 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
     /** Dictation in place of the keys (issue #23); gone otherwise. */
     val voicePanel = VoicePanelView(context).apply { visibility = GONE }
 
+    /** Toolbar ⊞: tiles for the keyboard's features, in place of the keys. */
+    val featuresPanel = FeaturesPanelView(context).apply { visibility = GONE }
+
+    /** Toolbar 📋: clipboard entries in place of the keys. */
+    val clipboardPanel = ClipboardPanelView(context).apply { visibility = GONE }
+
+    /** One-handed mode: the free side with ⇄ and ⤢ (left column when the keys sit right, and the other way). */
+    val oneHandedLeft = OneHandedColumn(context).apply { visibility = GONE }
+    val oneHandedRight = OneHandedColumn(context).apply { visibility = GONE }
+
     /** Camera picture over the keys while scanning with the camera; gone otherwise. */
     val camera = CameraScanView(context).apply { visibility = GONE }
 
     private val content = FrameLayout(context)
+    private val contentRow = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
     private val scanPage = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
     private val headroom = (headroomDp * resources.displayMetrics.density).toInt()
     private var state: RenderState? = null
@@ -85,7 +106,10 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         clipChildren = false
         panel.addView(tabBar, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         panel.addView(suggestionStrip, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
-        panel.addView(content, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        contentRow.addView(oneHandedLeft, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT))
+        contentRow.addView(content, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        contentRow.addView(oneHandedRight, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT))
+        panel.addView(contentRow, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         content.addView(keyboard, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
         scanPage.addView(scanPad, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0))
         scanPage.addView(scanRow, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
@@ -94,6 +118,8 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         content.addView(camera, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         content.addView(emojiPanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         content.addView(voicePanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        content.addView(featuresPanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        content.addView(clipboardPanel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         addView(panel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM).apply { topMargin = headroom })
         addView(overlay, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         keyboard.popupHost = overlay
@@ -154,6 +180,7 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         // Like Gboard: while a word is typed, suggestions take the place of the tab bar.
         val suggesting = state.suggestions.isNotEmpty() && !state.emojiOpen
         tabBar.showMic = state.mic
+        tabBar.spread = state.toolbar
         tabBar.isVisible = state.tabs != null && !suggesting
         suggestionStrip.isVisible = suggesting
         suggestionStrip.palette = p
@@ -164,8 +191,22 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         emojiPanel.isVisible = state.emojiOpen
         state.tabs?.let { tabBar.setTabs(it, state.selectedTab, animate = previous != null) }
 
-        val sidePadding = if (state.widthPercent < 100) (width * (100 - state.widthPercent) / 200) else 0
+        // One-handed (Gboard): keys about 80 % wide, the buttons ⇄/⤢ on the free side.
+        val side = if (state.oneHanded == OneHanded.OFF) 0 else (width * ONE_HANDED_SIDE).toInt()
+        oneHandedLeft.isVisible = state.oneHanded == OneHanded.RIGHT
+        oneHandedRight.isVisible = state.oneHanded == OneHanded.LEFT
+        listOf(oneHandedLeft, oneHandedRight).forEach {
+            it.palette = p
+            (it.layoutParams as LinearLayout.LayoutParams).width = side
+        }
+        val sidePadding = if (state.widthPercent < 100 && side == 0) (width * (100 - state.widthPercent) / 200) else 0
         content.updatePadding(left = sidePadding, right = sidePadding)
+        val panelOpen = state.toolPanel
+        featuresPanel.palette = p
+        clipboardPanel.palette = p
+        featuresPanel.isVisible = panelOpen == Tabs.TOOL_MENU
+        clipboardPanel.isVisible = panelOpen == Tabs.TOOL_CLIPBOARD
+        if (panelOpen == Tabs.TOOL_CLIPBOARD) clipboardPanel.show(state.clips, state.clipboardHistory)
         listOf(keyboard, scanRow).forEach {
             it.palette = p
             it.shift = state.shift
@@ -195,6 +236,11 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         (camera.layoutParams as LayoutParams).height = state.rowHeight * state.heightRows + keyboard.paddingTop + keyboard.paddingBottom
         (emojiPanel.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
         (voicePanel.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
+        (featuresPanel.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
+        (clipboardPanel.layoutParams as LayoutParams).height = (camera.layoutParams as LayoutParams).height
+        featuresPanel.requestLayout()
+        clipboardPanel.requestLayout()
+        contentRow.requestLayout()
         voicePanel.palette = p
         voicePanel.requestLayout()
         emojiPanel.requestLayout()
@@ -208,4 +254,9 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
     }
 
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
+
+    private companion object {
+        /** Share of the width the free side takes in one-handed mode (Gboard: about a fifth). */
+        const val ONE_HANDED_SIDE = 0.2f
+    }
 }

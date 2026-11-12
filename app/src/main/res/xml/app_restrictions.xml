@@ -179,4 +179,32 @@
         android:key="delete_gesture"
         android:restrictionType="bool"
         android:title="@string/mc_delete_gesture_title" />
+    <restriction
+        android:defaultValue="toolbar"
+        android:description="@string/mc_top_bar_description"
+        android:entries="@array/mc_top_bar_entries"
+        android:entryValues="@array/mc_top_bar_values"
+        android:key="top_bar"
+        android:restrictionType="choice"
+        android:title="@string/mc_top_bar_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_next_word_description"
+        android:key="next_word"
+        android:restrictionType="bool"
+        android:title="@string/mc_next_word_title" />
+    <restriction
+        android:defaultValue="false"
+        android:description="@string/mc_clipboard_history_description"
+        android:key="clipboard_history"
+        android:restrictionType="bool"
+        android:title="@string/mc_clipboard_history_title" />
+    <restriction
+        android:defaultValue="off"
+        android:description="@string/mc_one_handed_description"
+        android:entries="@array/mc_one_handed_entries"
+        android:entryValues="@array/mc_one_handed_values"
+        android:key="one_handed"
+        android:restrictionType="choice"
+        android:title="@string/mc_one_handed_title" />
 </restrictions>

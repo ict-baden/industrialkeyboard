@@ -80,6 +80,22 @@ enum class Alphabet(override val key: String, val label: String) : Keyed {
  * Dictation inside the keyboard (microphone button, issue #23) with Android's speech recognition.
  * The keyboard records nothing itself; the device's speech recognition service does.
  */
+/** What sits above the keys when no word is being typed. */
+enum class TopBar(override val key: String) : Keyed {
+    /** Like Gboard: ⊞ features, clipboard, settings, Fn, scan, microphone, hide. */
+    TOOLBAR("toolbar"),
+
+    /** The tabs ABC · 123 · #+= · Fn · Scan (up to 2.1 the only kind). */
+    TABS("tabs"),
+}
+
+/** One-handed mode like Gboard: the keys narrower and at one side. */
+enum class OneHanded(override val key: String) : Keyed {
+    OFF("off"),
+    LEFT("left"),
+    RIGHT("right"),
+}
+
 enum class VoiceInput(override val key: String) : Keyed {
     /** On-device recognition if the device has it, otherwise the device's speech service (may be online). */
     AUTO("auto"),
@@ -167,6 +183,8 @@ data class Appearance(
     val symbolHints: Boolean = false,
     /** Letter keys drawn as tiles; off: only the labels on the keyboard background (Gboard "Key borders" off). */
     val keyBorders: Boolean = true,
+    /** One-handed mode: about 80 % wide at the left or right, with buttons to switch side or go back. */
+    val oneHanded: OneHanded = OneHanded.OFF,
 )
 
 data class LayoutSettings(
@@ -177,6 +195,8 @@ data class LayoutSettings(
     val umlautKeys: Boolean = false,
     /** "?123" / "ABC" at the left of the bottom row like Gboard, also with the tab bar. */
     val symbolsKey: Boolean = true,
+    /** Above the keys: Gboard's toolbar (default) or the tabs. Stored configurations without it keep the tabs. */
+    val topBar: TopBar = TopBar.TOOLBAR,
 )
 
 data class TabSettings(
@@ -221,6 +241,10 @@ data class TypingSettings(
     val voice: VoiceInput = VoiceInput.AUTO,
     /** Swipe left from Backspace deletes word by word, like Gboard. */
     val deleteGesture: Boolean = true,
+    /** After a space, three likely next words (built-in list, nothing learnt). */
+    val nextWord: Boolean = true,
+    /** Remember copied text (max. 20 items, 1 h, in memory only) for the clipboard panel; off = only the current item. */
+    val clipboardHistory: Boolean = false,
 )
 
 data class FeedbackSettings(
@@ -319,4 +343,9 @@ object Tabs {
     const val FUNCTION = "function"
     const val SCAN = "scan"
     val BUILT_IN = listOf(ALPHA, NUMERIC, SYMBOLS, FUNCTION, SCAN)
+
+    /** Toolbar buttons (`layout.topBar: toolbar`); not pages, so not usable in `tabs.preferred` or `{SHOW:…}`. */
+    const val TOOL_MENU = "tool:menu"
+    const val TOOL_CLIPBOARD = "tool:clipboard"
+    const val TOOL_SETTINGS = "tool:settings"
 }

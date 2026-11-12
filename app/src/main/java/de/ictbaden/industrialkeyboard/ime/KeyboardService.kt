@@ -1,6 +1,8 @@
 package de.ictbaden.industrialkeyboard.ime
 
 import android.content.BroadcastReceiver
+import android.content.ClipDescription
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -27,36 +29,42 @@ import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.api.KeyboardApi
 import de.ictbaden.industrialkeyboard.api.KeyboardBus
+import de.ictbaden.industrialkeyboard.app.CameraPermissionActivity
+import de.ictbaden.industrialkeyboard.app.ErrorCodes
+import de.ictbaden.industrialkeyboard.app.MicrophonePermissionActivity
 import de.ictbaden.industrialkeyboard.app.SettingsActivity
 import de.ictbaden.industrialkeyboard.config.Alphabet
 import de.ictbaden.industrialkeyboard.config.ConfigStore
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
+import de.ictbaden.industrialkeyboard.config.OneHanded
 import de.ictbaden.industrialkeyboard.config.Provisioning
 import de.ictbaden.industrialkeyboard.config.ScanInputSettings
 import de.ictbaden.industrialkeyboard.config.ScanSuffix
+import de.ictbaden.industrialkeyboard.config.ScanTriggerType
+import de.ictbaden.industrialkeyboard.config.Symbology
+import de.ictbaden.industrialkeyboard.config.Tabs
+import de.ictbaden.industrialkeyboard.config.VoiceInput
 import de.ictbaden.industrialkeyboard.layout.Key
+import de.ictbaden.industrialkeyboard.layout.KeyChords
 import de.ictbaden.industrialkeyboard.layout.KeyCommand
 import de.ictbaden.industrialkeyboard.layout.KeyOutput
-import de.ictbaden.industrialkeyboard.layout.KeyChords
+import de.ictbaden.industrialkeyboard.layout.Layouts
 import de.ictbaden.industrialkeyboard.layout.Macro
 import de.ictbaden.industrialkeyboard.layout.MacroStep
 import de.ictbaden.industrialkeyboard.layout.ModifierKey
-import de.ictbaden.industrialkeyboard.app.CameraPermissionActivity
-import de.ictbaden.industrialkeyboard.app.MicrophonePermissionActivity
-import de.ictbaden.industrialkeyboard.app.ErrorCodes
-import de.ictbaden.industrialkeyboard.config.ScanTriggerType
-import de.ictbaden.industrialkeyboard.config.VoiceInput
-import de.ictbaden.industrialkeyboard.config.Symbology
 import de.ictbaden.industrialkeyboard.scanner.CameraScanner
 import de.ictbaden.industrialkeyboard.scanner.HardwareScanner
 import de.ictbaden.industrialkeyboard.scanner.ScanFormatter
 import de.ictbaden.industrialkeyboard.scanner.ScanTrigger
+import de.ictbaden.industrialkeyboard.scanner.Symbologies
 import de.ictbaden.industrialkeyboard.suggest.Dictionaries
+import de.ictbaden.industrialkeyboard.suggest.NextWordContext
 import de.ictbaden.industrialkeyboard.suggest.Suggester
+import de.ictbaden.industrialkeyboard.suggest.Suggestion
 import de.ictbaden.industrialkeyboard.suggest.Suggestions
 import de.ictbaden.industrialkeyboard.suggest.WordList
-import de.ictbaden.industrialkeyboard.layout.Layouts
-import de.ictbaden.industrialkeyboard.scanner.Symbologies
+import de.ictbaden.industrialkeyboard.ui.ClipItem
+import de.ictbaden.industrialkeyboard.ui.FeaturesPanelView
 import de.ictbaden.industrialkeyboard.ui.Feedback
 import de.ictbaden.industrialkeyboard.ui.KeyboardRootView
 import de.ictbaden.industrialkeyboard.ui.KeyboardView
@@ -149,6 +157,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     }
 
     override fun onDestroy() {
+        watchClipboard(false)
+        clipboard.clear()
         store.removeListener(configListener)
         KeyboardBus.onShowTab = null
         KeyboardBus.onNfc = null
@@ -197,7 +207,25 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         view.keyboard.listener = this
         view.scanRow.listener = this
         view.scanPad.listener = this
-        view.tabBar.onTab = { showTab(it) }
+        view.tabBar.onTab = { onBarTab(it) }
+        view.featuresPanel.onFeature = {
+            feedback.keyDown(null)
+            onFeature(it)
+        }
+        view.clipboardPanel.onBack = { setToolPanel(null) }
+        view.clipboardPanel.onPaste = { item -> pasteClip(item.text) }
+        view.clipboardPanel.onTogglePin = { item ->
+            clipboard.togglePin(item.id)
+            render()
+        }
+        view.clipboardPanel.onDelete = { item ->
+            clipboard.remove(item.id)
+            render()
+        }
+        listOf(view.oneHandedLeft, view.oneHandedRight).forEach { column ->
+            column.onSwap = { setOneHanded(if (config.appearance.oneHanded == OneHanded.LEFT) OneHanded.RIGHT else OneHanded.LEFT) }
+            column.onFull = { setOneHanded(OneHanded.OFF) }
+        }
         view.tabBar.onHide = { requestHideSelf(0) }
         view.tabBar.onMic = { startVoice() }
         view.suggestionStrip.onMic = { startVoice() }
@@ -377,6 +405,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     override fun onStartInputView(info: EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
+        toolPanel = null
+        watchClipboard(true)
         useSubtype(getSystemService(InputMethodManager::class.java)?.currentInputMethodSubtype)
         findVoiceInput(info)
         endWord()
@@ -409,6 +439,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         closeVoice()
         endWord()
         emojiOpen = false
+        toolPanel = null
+        watchClipboard(false)
     }
 
     override fun onUpdateSelection(oldSelStart: Int, oldSelEnd: Int, newSelStart: Int, newSelEnd: Int, candidatesStart: Int, candidatesEnd: Int) {
@@ -551,8 +583,25 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             }
         }
         lastSpace = now
-        if (autocorrect(ic)) return
-        commit(" ")
+        if (!autocorrect(ic)) commit(" ")
+        showNextWords()
+    }
+
+    /**
+     * After a space: likely next words for the word before it ("vielen " → Dank, Grüße), like Gboard
+     * (`typing.nextWord`). Tapping one inserts it with a space; typing a letter replaces them.
+     */
+    private fun showNextWords() {
+        if (!config.typing.nextWord || !suggestionsWanted() || word.isNotEmpty()) return
+        val before = currentInputConnection?.getTextBeforeCursor(NEXT_WORD_CONTEXT, 0)?.toString() ?: return
+        val previous = NextWordContext.previousWord(before) ?: return
+        val locale = Alphabet.keyboardLocale()
+        val sentenceStart = shift == ShiftState.ONCE && autoShifted
+        val words = dictionaries.next.after(previous, locale)
+            .map { if (sentenceStart) it.replaceFirstChar { c -> c.titlecase(locale) } else it }
+        if (words.isEmpty()) return
+        suggestions = Suggestions(words.map { Suggestion(it, correction = false, score = 0) }, typedIsWord = false, autocorrection = null)
+        render()
     }
 
     private fun backspace() {
@@ -633,12 +682,15 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         endWord()
         if (shift == ShiftState.ONCE && !autoShifted) shift = ShiftState.OFF
         updateAutoShift()
+        showNextWords()
         render()
     }
 
     /** Space after an obvious typo: the best suggestion instead (`typing.autocorrect`). */
     private fun autocorrect(ic: InputConnection): Boolean {
-        val replacement = suggestions.autocorrection?.takeIf { config.typing.autocorrect && suggestionsWanted() } ?: return false
+        val info = currentInputEditorInfo ?: return false
+        val replacement = suggestions.autocorrection
+            ?.takeIf { config.typing.autocorrect && suggestionsWanted() && FieldPolicy.autocorrectAllowed(info.inputType, info.imeOptions) } ?: return false
         val typed = word.toString()
         if (ic.getTextBeforeCursor(typed.length, 0)?.toString() != typed) return false
         ic.beginBatchEdit()
@@ -821,6 +873,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         closeCamera()
         closeVoice()
         emojiOpen = false
+        toolPanel = null
         // Shift belongs to the page it was set on (letters vs. F13–F24 on the function keys).
         shift = ShiftState.OFF
         autoShifted = false
@@ -838,6 +891,119 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
             getSystemService(InputMethodManager::class.java)?.switchToNextInputMethod(token, false)
         }
     }
+
+    // region toolbar (layout.topBar: toolbar)
+
+    /** Open toolbar panel ([Tabs.TOOL_MENU] or [Tabs.TOOL_CLIPBOARD]) in place of the keys, or null. */
+    private var toolPanel: String? = null
+
+    /** Copied texts, only in memory and only with `typing.clipboardHistory`. */
+    private val clipboard = ClipboardHistory()
+    private var clipboardWatched = false
+    private val clipListener = ClipboardManager.OnPrimaryClipChangedListener { rememberClip() }
+
+    /** A tap in the toolbar or tab bar: panels and settings, or a page (a second tap on it goes back to ABC). */
+    private fun onBarTab(id: String) {
+        when (id) {
+            Tabs.TOOL_MENU, Tabs.TOOL_CLIPBOARD -> setToolPanel(if (toolPanel == id) null else id)
+            Tabs.TOOL_SETTINGS -> openSettings()
+            else -> if (KeyboardRenderer.toolbar(config) && page.tab == id && toolPanel == null) showTab(Tabs.ALPHA) else showTab(id)
+        }
+    }
+
+    private fun setToolPanel(panel: String?) {
+        closeCamera()
+        closeVoice()
+        emojiOpen = false
+        if (panel != null) endWord()
+        toolPanel = panel
+        if (panel == Tabs.TOOL_MENU) root?.featuresPanel?.show(features())
+        render()
+    }
+
+    /** The tiles of the ⊞ panel; scan only with a scanner. */
+    private fun features(): List<FeaturesPanelView.Feature> = buildList {
+        add(FeaturesPanelView.Feature(FeaturesPanelView.FUNCTION_KEYS, null, R.string.feature_function, "Fn"))
+        if (scanner.available) add(FeaturesPanelView.Feature(FeaturesPanelView.SCAN, R.drawable.kb_scan, R.string.feature_scan))
+        add(FeaturesPanelView.Feature(FeaturesPanelView.NUMBER_PAD, R.drawable.kb_numpad, R.string.feature_numpad))
+        add(FeaturesPanelView.Feature(FeaturesPanelView.CLIPBOARD, R.drawable.kb_clipboard, R.string.feature_clipboard))
+        add(FeaturesPanelView.Feature(FeaturesPanelView.ONE_HANDED, R.drawable.kb_onehand, R.string.feature_one_handed))
+        add(FeaturesPanelView.Feature(FeaturesPanelView.LANGUAGES, R.drawable.kb_globe, R.string.feature_languages))
+        add(FeaturesPanelView.Feature(FeaturesPanelView.SETTINGS, R.drawable.kb_settings, R.string.feature_settings))
+    }
+
+    private fun onFeature(id: String) {
+        when (id) {
+            FeaturesPanelView.FUNCTION_KEYS -> showTab(Tabs.FUNCTION)
+            FeaturesPanelView.SCAN -> showTab(Tabs.SCAN)
+            FeaturesPanelView.NUMBER_PAD -> showTab(Tabs.NUMERIC)
+            FeaturesPanelView.CLIPBOARD -> setToolPanel(Tabs.TOOL_CLIPBOARD)
+            FeaturesPanelView.ONE_HANDED -> {
+                setToolPanel(null)
+                setOneHanded(if (config.appearance.oneHanded == OneHanded.OFF) OneHanded.RIGHT else OneHanded.OFF)
+            }
+            FeaturesPanelView.LANGUAGES -> {
+                setToolPanel(null)
+                getSystemService(InputMethodManager::class.java)?.showInputMethodPicker()
+            }
+            FeaturesPanelView.SETTINGS -> openSettings()
+        }
+    }
+
+    /** One-handed mode is a setting (it stays after a restart), like in Gboard. */
+    private fun setOneHanded(mode: OneHanded) {
+        store.update { it.copy(appearance = it.appearance.copy(oneHanded = mode)) }
+    }
+
+    /** The default keyboard may read the clipboard; only while it is shown. */
+    private fun watchClipboard(on: Boolean) {
+        val manager = getSystemService(ClipboardManager::class.java) ?: return
+        if (on && !clipboardWatched) {
+            manager.addPrimaryClipChangedListener(clipListener)
+            clipboardWatched = true
+        } else if (!on && clipboardWatched) {
+            manager.removePrimaryClipChangedListener(clipListener)
+            clipboardWatched = false
+        }
+    }
+
+    /** Text copied while the keyboard is shown goes into the history – never from password fields or sensitive clips. */
+    private fun rememberClip() {
+        if (!config.typing.clipboardHistory) return
+        val text = currentClip() ?: return
+        clipboard.add(text, System.currentTimeMillis())
+        if (toolPanel == Tabs.TOOL_CLIPBOARD) render()
+    }
+
+    /** The current clipboard text, unless it is marked sensitive or the field is a password field. */
+    private fun currentClip(): String? {
+        if (FieldPolicy.isPassword(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)) return null
+        val clip = runCatching { getSystemService(ClipboardManager::class.java)?.primaryClip }.getOrNull() ?: return null
+        val sensitive = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            clip.description?.extras?.getBoolean(ClipDescription.EXTRA_IS_SENSITIVE) == true
+        if (sensitive || clip.itemCount == 0) return null
+        return clip.getItemAt(0)?.coerceToText(this)?.toString()?.takeIf { it.isNotBlank() }
+    }
+
+    /** What the clipboard panel lists: the history, or only the current item when it is off. */
+    private fun clips(): List<ClipItem> {
+        if (toolPanel != Tabs.TOOL_CLIPBOARD) return emptyList()
+        if (config.typing.clipboardHistory) {
+            currentClip()?.let { clipboard.add(it, System.currentTimeMillis()) }
+            return clipboard.items(System.currentTimeMillis())
+        }
+        return listOfNotNull(currentClip()?.let { ClipItem(0, it, pinned = false, time = 0) })
+    }
+
+    private fun pasteClip(text: String) {
+        feedback.keyDown(null)
+        endWord()
+        ownEdits++
+        currentInputConnection?.commitText(text, 1)
+        setToolPanel(null)
+    }
+
+    // endregion
 
     private fun openSettings() {
         startActivity(Intent(this, SettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
@@ -1020,7 +1186,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun render() {
         val root = root ?: return
         val secret = FieldPolicy.isPassword(currentInputEditorInfo?.inputType ?: InputType.TYPE_NULL)
-        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey(), emojiKey = emojiKey(), suggestions = suggestions.words.map { it.text }, emojiOpen = emojiOpen, mic = voiceEngine != Dictation.Engine.NONE && !voiceOpen))
+        root.render(KeyboardRenderer.state(this, config, page, shift, scanner.name, enterIcon(), scanning, passwordField = secret, modifiers = modifiers.toMap(), camera = scanner.type == ScanTriggerType.CAMERA, languageKey = languageKey(), emojiKey = emojiKey(), suggestions = suggestions.words.map { it.text }, emojiOpen = emojiOpen, mic = voiceEngine != Dictation.Engine.NONE && !voiceOpen, toolPanel = toolPanel, clips = clips(), clipboardHistory = config.typing.clipboardHistory))
     }
 
     private fun enterIcon(): Int {
@@ -1044,6 +1210,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         const val DOUBLE_SPACE_MS = 450L
         const val DOUBLE_TAP_MS = 350L
         const val HOLD_TO_SCAN_MS = 600L
+        const val NEXT_WORD_CONTEXT = 48
         const val SCAN_ANIMATION_MS = 5_000L
         const val DELETE_LOOKBACK = 1000
         const val BEEP_MS = 120

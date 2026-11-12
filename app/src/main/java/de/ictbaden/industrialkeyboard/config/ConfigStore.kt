@@ -79,7 +79,7 @@ class ConfigStore @VisibleForTesting internal constructor(
     }
 
     private fun parse(text: String): KeyboardConfig = try {
-        ConfigJson.parse(text)
+        withStoredDefaults(text, ConfigJson.parse(text))
     } catch (e: ConfigException) {
         recover(text, e)
     }
@@ -161,5 +161,12 @@ class ConfigStore @VisibleForTesting internal constructor(
         internal fun reset() {
             instance = null
         }
+
+        /**
+         * A configuration stored by version 2.1 or older has no `topBar`: it keeps the tabs it had,
+         * new installations get Gboard's toolbar.
+         */
+        fun withStoredDefaults(text: String, config: KeyboardConfig): KeyboardConfig =
+            if ("\"topBar\"" in text) config else config.copy(layout = config.layout.copy(topBar = TopBar.TABS))
     }
 }

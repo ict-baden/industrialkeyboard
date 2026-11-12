@@ -456,4 +456,46 @@
     <string name="voice_engine_service">此处：设备的语音服务（可能联网）</string>
     <string name="voice_engine_none">此设备不可用</string>
     <string name="dictation_error_language_pack">正在下载设备端识别所需的语言包。请几分钟后重试，或将听写设置为“自动”。</string>
+    <string name="clipboard_title">剪贴板</string>
+    <string name="clipboard_history_off_hint">仅显示当前复制的内容。历史记录：设置 → 剪贴板历史记录。</string>
+    <string name="clipboard_history_on_hint">点按粘贴 · 长按固定 · 保留 1 小时，仅到键盘重启为止</string>
+    <string name="clipboard_empty">尚未复制任何内容</string>
+    <string name="clipboard_delete">移除</string>
+    <string name="one_handed_swap">换到另一侧</string>
+    <string name="one_handed_full">全宽</string>
+    <string name="feature_function">功能键</string>
+    <string name="feature_scan">扫描</string>
+    <string name="feature_numpad">数字键盘</string>
+    <string name="feature_clipboard">剪贴板</string>
+    <string name="feature_one_handed">单手模式</string>
+    <string name="feature_languages">语言</string>
+    <string name="feature_settings">设置</string>
+    <string name="top_bar">按键上方</string>
+    <string name="top_bar_toolbar">与 Gboard 相同的工具栏</string>
+    <string name="top_bar_tabs">标签（ABC、123、Fn …）</string>
+    <string name="next_word">下一个词建议</string>
+    <string name="next_word_summary">输入空格后显示可能的下一个词——来自固定列表，不会学习</string>
+    <string name="clipboard_history">剪贴板历史记录</string>
+    <string name="clipboard_history_summary">保存复制的文本 1 小时，最多 20 条，仅在内存中；从不保存密码字段的内容</string>
+    <string name="one_handed">单手模式</string>
+    <string name="one_handed_off">关闭</string>
+    <string name="one_handed_left">左侧</string>
+    <string name="one_handed_right">右侧</string>
+    <string name="mc_top_bar_title">按键上方</string>
+    <string name="mc_top_bar_description">与 Gboard 相同的工具栏，或 ABC、123、Fn 标签。</string>
+    <string name="mc_next_word_title">下一个词建议</string>
+    <string name="mc_next_word_description">空格后显示可能的下一个词（固定列表）。</string>
+    <string name="mc_clipboard_history_title">剪贴板历史记录</string>
+    <string name="mc_clipboard_history_description">在内存中保留复制的文本 1 小时，供剪贴板面板使用。</string>
+    <string name="mc_one_handed_title">单手模式</string>
+    <string name="mc_one_handed_description">按键变窄并靠左或靠右。</string>
+    <string-array name="mc_top_bar_entries">
+        <item>与 Gboard 相同的工具栏</item>
+        <item>标签（ABC、123、Fn）</item>
+    </string-array>
+    <string-array name="mc_one_handed_entries">
+        <item>关闭</item>
+        <item>左侧</item>
+        <item>右侧</item>
+    </string-array>
 </resources>

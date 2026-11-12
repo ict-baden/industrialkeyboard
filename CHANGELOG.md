@@ -8,6 +8,12 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 - **Standardwerte wie bei Gboard** (gespeicherte Konfigurationen behalten ihre Werte): Autokorrektur an, langes Drücken nach 300 statt 400 ms, keine Tab-Taste unten links (`keys.alpha.p1` leer; wer sie braucht, setzt `{TAB}`), Zahlen-Taste `?123` an, Symbol-Hinweise und Tastenvorschau aus.
 
 ### Neu
+- **Werkzeugleiste wie Gboard** (`layout.topBar: "toolbar"`, neuer Standard; von 2.1 gespeicherte Konfigurationen behalten die Tabs): ⊞ mit Kacheln für Funktionstasten, Scannen, Ziffernblock, Zwischenablage, Einhandmodus, Sprachen und Einstellungen, dazu 📋, ⚙, `Fn`, Scan, 🎤 und ⌄.
+- **Zwischenablage** (📋): einfügen per Tippen; mit `typing.clipboardHistory` (Standard aus) ein Verlauf nur im Arbeitsspeicher, höchstens 20 Einträge, 1 Stunde, anheften per langem Druck, nie aus Passwortfeldern.
+- **Vorschläge fürs nächste Wort** nach einem Leerzeichen (`typing.nextWord`), aus einer kleinen festen Liste für Deutsch und Englisch – die AOSP-Wortlisten haben keine Wortpaare, gelernt wird nichts.
+- **Einhandmodus** (`appearance.oneHanded`: `left`/`right`), Tasten etwa 80 % breit, mit ⇄ und ⤢ auf der freien Seite.
+- Wortvorschläge auch in **Suchfeldern** (ohne Autokorrektur); Alltagswörter wie „Hallo“, Wochentage und Grüße weiter oben; ein getipptes Wort aus dem Wörterbuch bleibt in der Mitte.
+- MDM: `top_bar`, `next_word`, `clipboard_history`, `one_handed`.
 - **Wie Gboard** (gemessen auf einem Pixel 9 Pro):
   - Tastengröße folgt der Bildschirmhöhe (etwa 6,8 % je Reihe, 54–70 dp), Lücken 5,5 dp zwischen Tasten und 12 dp zwischen Reihen; der Regler „Tastenhöhe“ wirkt weiter.
   - Abstand unten: die Tasten bleiben über Androids eigenen Knöpfen ⌄ und 🌐 bei Gestensteuerung (bisher ragten sie hinein).

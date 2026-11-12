@@ -90,6 +90,10 @@ The app ships a schema that every EMM with Android Enterprise support shows:
 | `sound` | Bool | Click sound (default off) |
 | `vibrate` | Bool | Vibration (default on) |
 | `suggestions` | Bool | Word suggestions (default on) |
+| `next_word` | Bool | Next-word suggestions after a space (default on) |
+| `clipboard_history` | Bool | Clipboard history in memory for the 📋 panel (default off) |
+| `top_bar` | Choice | Above the keys: toolbar like Gboard or tabs |
+| `one_handed` | Choice | One-handed mode: off, left, right |
 | `autocorrect` | Bool | Autocorrection on space (default off) |
 | `emoji_key` | Bool | Emoji key next to the space bar (default on) |
 | `scan_prefix` | String | Macro typed before every barcode ([`scanner.data.prefix`](configuration.md#scannerdata--scan-data-formatting)); empty = unchanged |

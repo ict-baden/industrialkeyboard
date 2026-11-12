@@ -120,17 +120,21 @@ object Provisioning {
                 emojiKey = bool("emoji_key", config.appearance.emojiKey),
                 symbolHints = bool("symbol_hints", config.appearance.symbolHints),
                 keyBorders = bool("key_borders", config.appearance.keyBorders),
+                oneHanded = choice("one_handed", OneHanded.entries.toTypedArray(), config.appearance.oneHanded),
             ),
             typing = config.typing.copy(
                 suggestions = bool("suggestions", config.typing.suggestions),
                 autocorrect = bool("autocorrect", config.typing.autocorrect),
                 voice = values.getString("voice")?.let(VoiceInput::parse) ?: config.typing.voice,
                 deleteGesture = bool("delete_gesture", config.typing.deleteGesture),
+                nextWord = bool("next_word", config.typing.nextWord),
+                clipboardHistory = bool("clipboard_history", config.typing.clipboardHistory),
             ),
             layout = config.layout.copy(
                 alphabet = choice("alphabet", Alphabet.entries.toTypedArray(), config.layout.alphabet),
                 numericOrder = choice("numeric_order", NumericOrder.entries.toTypedArray(), config.layout.numericOrder),
                 symbolsKey = bool("symbols_key", config.layout.symbolsKey),
+                topBar = choice("top_bar", TopBar.entries.toTypedArray(), config.layout.topBar),
             ),
             tabs = config.tabs.copy(
                 scan = bool("scan_tab", config.tabs.scan),

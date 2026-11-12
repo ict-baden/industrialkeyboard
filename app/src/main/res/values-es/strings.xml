@@ -458,4 +458,46 @@
     <string name="voice_engine_service">Aquí: servicio de voz del dispositivo (puede ser en línea)</string>
     <string name="voice_engine_none">No disponible en este dispositivo</string>
     <string name="dictation_error_language_pack">Se está descargando el paquete de idioma para el reconocimiento en el dispositivo. Inténtelo de nuevo en unos minutos o ponga el dictado en «Automático».</string>
+    <string name="clipboard_title">Portapapeles</string>
+    <string name="clipboard_history_off_hint">Solo lo copiado ahora. Historial: Ajustes → Historial del portapapeles.</string>
+    <string name="clipboard_history_on_hint">Toque para pegar · mantenga pulsado para fijar · 1 hora, solo hasta reiniciar el teclado</string>
+    <string name="clipboard_empty">Aún no se ha copiado nada</string>
+    <string name="clipboard_delete">Quitar</string>
+    <string name="one_handed_swap">Otro lado</string>
+    <string name="one_handed_full">Ancho completo</string>
+    <string name="feature_function">Teclas de función</string>
+    <string name="feature_scan">Escanear</string>
+    <string name="feature_numpad">Teclado numérico</string>
+    <string name="feature_clipboard">Portapapeles</string>
+    <string name="feature_one_handed">Una mano</string>
+    <string name="feature_languages">Idiomas</string>
+    <string name="feature_settings">Ajustes</string>
+    <string name="top_bar">Sobre las teclas</string>
+    <string name="top_bar_toolbar">Barra de herramientas como Gboard</string>
+    <string name="top_bar_tabs">Pestañas (ABC, 123, Fn …)</string>
+    <string name="next_word">Sugerencias de la siguiente palabra</string>
+    <string name="next_word_summary">Tras un espacio, palabras probables – de una lista fija, no se aprende nada</string>
+    <string name="clipboard_history">Historial del portapapeles</string>
+    <string name="clipboard_history_summary">Guarda lo copiado 1 hora, máx. 20 elementos, solo en memoria; nunca de campos de contraseña</string>
+    <string name="one_handed">Modo de una mano</string>
+    <string name="one_handed_off">Desactivado</string>
+    <string name="one_handed_left">Izquierda</string>
+    <string name="one_handed_right">Derecha</string>
+    <string name="mc_top_bar_title">Sobre las teclas</string>
+    <string name="mc_top_bar_description">Barra de herramientas como Gboard o las pestañas ABC, 123, Fn.</string>
+    <string name="mc_next_word_title">Sugerencias de la siguiente palabra</string>
+    <string name="mc_next_word_description">Palabras probables tras un espacio (lista fija).</string>
+    <string name="mc_clipboard_history_title">Historial del portapapeles</string>
+    <string name="mc_clipboard_history_description">Guardar el texto copiado 1 hora en memoria para el portapapeles.</string>
+    <string name="mc_one_handed_title">Modo de una mano</string>
+    <string name="mc_one_handed_description">Teclas más estrechas a la izquierda o a la derecha.</string>
+    <string-array name="mc_top_bar_entries">
+        <item>Barra de herramientas como Gboard</item>
+        <item>Pestañas (ABC, 123, Fn)</item>
+    </string-array>
+    <string-array name="mc_one_handed_entries">
+        <item>Desactivado</item>
+        <item>Izquierda</item>
+        <item>Derecha</item>
+    </string-array>
 </resources>

@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.annotation.DrawableRes
 import de.ictbaden.industrialkeyboard.R
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
+import de.ictbaden.industrialkeyboard.config.Navigation
 import de.ictbaden.industrialkeyboard.config.Tabs
+import de.ictbaden.industrialkeyboard.config.TopBar
 import de.ictbaden.industrialkeyboard.layout.KeyboardLayout
 import de.ictbaden.industrialkeyboard.layout.Layouts
 import de.ictbaden.industrialkeyboard.layout.ModifierKey
+import de.ictbaden.industrialkeyboard.ui.ClipItem
 import de.ictbaden.industrialkeyboard.ui.Palette
 import de.ictbaden.industrialkeyboard.ui.RenderState
 import de.ictbaden.industrialkeyboard.ui.ShiftState
@@ -46,8 +49,21 @@ object KeyboardRenderer {
         return maxOf(alpha, function)
     }
 
+    /** Gboard's toolbar instead of the tabs (`layout.topBar: toolbar`, only with tab navigation). */
+    fun toolbar(config: KeyboardConfig) = config.layout.topBar == TopBar.TOOLBAR && config.layout.navigation == Navigation.TABS
+
+    /** ⊞ features, clipboard, settings, then Fn, scan and custom layouts as far as switched on. */
+    fun toolbarTabs(config: KeyboardConfig, scanAvailable: Boolean): List<TabBarView.Tab> = buildList {
+        add(TabBarView.Tab(Tabs.TOOL_MENU, null, R.drawable.kb_apps))
+        add(TabBarView.Tab(Tabs.TOOL_CLIPBOARD, null, R.drawable.kb_clipboard))
+        add(TabBarView.Tab(Tabs.TOOL_SETTINGS, null, R.drawable.kb_settings))
+        if (config.tabs.function) add(TabBarView.Tab(Tabs.FUNCTION, "Fn"))
+        if (config.tabs.scan && scanAvailable) add(TabBarView.Tab(Tabs.SCAN, null, R.drawable.kb_scan))
+        config.customLayouts.forEach { add(TabBarView.Tab(it.id, it.label)) }
+    }
+
     fun tabs(config: KeyboardConfig, scanAvailable: Boolean): List<TabBarView.Tab>? =
-        FieldPolicy.tabs(config, scanAvailable).takeIf { it.isNotEmpty() }?.map { id ->
+        if (toolbar(config)) toolbarTabs(config, scanAvailable) else FieldPolicy.tabs(config, scanAvailable).takeIf { it.isNotEmpty() }?.map { id ->
             when (id) {
                 Tabs.ALPHA -> TabBarView.Tab(id, "ABC")
                 Tabs.NUMERIC -> TabBarView.Tab(id, "123")
@@ -81,6 +97,12 @@ object KeyboardRenderer {
         emojiOpen: Boolean = false,
         /** Microphone in the tab bar (a voice input method exists). */
         mic: Boolean = false,
+        /** Open toolbar panel: [Tabs.TOOL_MENU] or [Tabs.TOOL_CLIPBOARD], else null. */
+        toolPanel: String? = null,
+        /** Clipboard items for the clipboard panel, newest first. */
+        clips: List<ClipItem> = emptyList(),
+        /** Clipboard history is switched on (otherwise the panel explains how). */
+        clipboardHistory: Boolean = false,
     ): RenderState {
         val appearance = config.appearance
         val rowHeight = (baseRowDp(context) * context.resources.displayMetrics.density * appearance.keyHeight / 100f).toInt()
@@ -89,7 +111,8 @@ object KeyboardRenderer {
         return RenderState(
             palette = Palette.resolve(context, appearance),
             tabs = tabs(config, scannerName != null),
-            selectedTab = page.tab,
+            // The toolbar marks an open panel or a page it leads to; ABC needs no mark there.
+            selectedTab = if (toolbar(config)) toolPanel ?: page.tab.takeIf { it != Tabs.ALPHA } else page.tab,
             layout = layoutFor(page, keys, shift, languageKey, emojiKey),
             shift = shift,
             modifiers = modifiers,
@@ -107,6 +130,11 @@ object KeyboardRenderer {
             suggestions = suggestions,
             emojiOpen = emojiOpen,
             mic = mic,
+            toolbar = toolbar(config),
+            toolPanel = toolPanel,
+            clips = clips,
+            clipboardHistory = clipboardHistory,
+            oneHanded = config.appearance.oneHanded,
         )
     }
 }

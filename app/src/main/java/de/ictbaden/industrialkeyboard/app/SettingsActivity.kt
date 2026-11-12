@@ -46,6 +46,7 @@ import de.ictbaden.industrialkeyboard.config.NumericOrder
 import de.ictbaden.industrialkeyboard.config.OcrCharset
 import de.ictbaden.industrialkeyboard.config.OcrMode
 import de.ictbaden.industrialkeyboard.config.OcrSettings
+import de.ictbaden.industrialkeyboard.config.OneHanded
 import de.ictbaden.industrialkeyboard.config.ProgrammableKey
 import de.ictbaden.industrialkeyboard.config.Provisioning
 import de.ictbaden.industrialkeyboard.config.ScanSuffix
@@ -54,10 +55,11 @@ import de.ictbaden.industrialkeyboard.config.Symbology
 import de.ictbaden.industrialkeyboard.config.Tabs
 import de.ictbaden.industrialkeyboard.config.TextCase
 import de.ictbaden.industrialkeyboard.config.ThemeMode
+import de.ictbaden.industrialkeyboard.config.TopBar
+import de.ictbaden.industrialkeyboard.config.UidFormat
 import de.ictbaden.industrialkeyboard.config.VoiceInput
 import de.ictbaden.industrialkeyboard.ime.Dictation
 import de.ictbaden.industrialkeyboard.ime.DictationController
-import de.ictbaden.industrialkeyboard.config.UidFormat
 import de.ictbaden.industrialkeyboard.ime.Field
 import de.ictbaden.industrialkeyboard.ime.FieldPolicy
 import de.ictbaden.industrialkeyboard.ime.KeyboardRenderer
@@ -309,6 +311,22 @@ class SettingsActivity : AppCompatActivity() {
                     ) { on -> update { it.copy(layout = it.layout.copy(symbolsKey = on)) } },
                     ui.choiceRow(
                         R.drawable.ic_keyboard,
+                        getString(R.string.top_bar),
+                        listOf(TopBar.TOOLBAR to getString(R.string.top_bar_toolbar), TopBar.TABS to getString(R.string.top_bar_tabs)),
+                        c.layout.topBar,
+                    ) { bar -> update { it.copy(layout = it.layout.copy(topBar = bar)) } },
+                    ui.choiceRow(
+                        R.drawable.ic_keyboard,
+                        getString(R.string.one_handed),
+                        listOf(
+                            OneHanded.OFF to getString(R.string.one_handed_off),
+                            OneHanded.LEFT to getString(R.string.one_handed_left),
+                            OneHanded.RIGHT to getString(R.string.one_handed_right),
+                        ),
+                        c.appearance.oneHanded,
+                    ) { mode -> update { it.copy(appearance = it.appearance.copy(oneHanded = mode)) } },
+                    ui.choiceRow(
+                        R.drawable.ic_keyboard,
                         getString(R.string.navigation),
                         listOf(Navigation.TABS to getString(R.string.navigation_tabs), Navigation.KEYS to getString(R.string.navigation_keys)),
                         c.layout.navigation,
@@ -387,6 +405,12 @@ class SettingsActivity : AppCompatActivity() {
                     },
                     ui.switchRow(R.drawable.ic_keyboard, getString(R.string.autocorrect), getString(R.string.autocorrect_summary), c.typing.autocorrect, enabled = c.typing.suggestions) { on ->
                         update { it.copy(typing = it.typing.copy(autocorrect = on)) }
+                    },
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.next_word), getString(R.string.next_word_summary), c.typing.nextWord, enabled = c.typing.suggestions) { on ->
+                        update { it.copy(typing = it.typing.copy(nextWord = on)) }
+                    },
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.clipboard_history), getString(R.string.clipboard_history_summary), c.typing.clipboardHistory) { on ->
+                        update { it.copy(typing = it.typing.copy(clipboardHistory = on)) }
                     },
                     ui.choiceRow(
                         R.drawable.ic_mic,
