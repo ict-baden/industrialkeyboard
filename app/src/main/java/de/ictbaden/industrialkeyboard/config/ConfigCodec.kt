@@ -31,7 +31,8 @@ object ConfigCodec {
     /**
      * [json] without every value that equals the one in [defaults] (objects compared key by key,
      * arrays and plain values as a whole). The parser fills in the defaults again, so the result
-     * means the same configuration; `version` stays.
+     * means the same configuration; `version` and `configVersion` stay (without `configVersion`
+     * the parser would fill in the defaults of 2.1 instead of those of [defaults]).
      */
     fun compact(json: String, defaults: String): String {
         val config = JSONObject(json)
@@ -41,7 +42,7 @@ object ConfigCodec {
 
     private fun prune(config: JSONObject, defaults: JSONObject, top: Boolean) {
         for (key in config.keys().asSequence().toList()) {
-            if (top && key == "version") continue
+            if (top && (key == "version" || key == ConfigVersion.KEY)) continue
             if (!defaults.has(key)) continue
             val value = config.opt(key)
             val default = defaults.opt(key)

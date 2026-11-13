@@ -27,13 +27,14 @@ object ConfigJson {
         }
         val version = root.optInt("version", VERSION)
         if (version > VERSION) throw ConfigException("Configuration version $version is newer than this app supports ($VERSION)")
-        val defaults = KeyboardConfig()
+        // Options left out get the defaults of the version the configuration was written for.
+        val defaults = ConfigVersion.defaults(configVersion(root))
         val custom = parseCustomLayouts(root.optJSONArray("customLayouts"))
         return KeyboardConfig(
             appearance = parseAppearance(root.optJSONObject("appearance"), defaults.appearance),
             layout = parseLayout(root.optJSONObject("layout"), defaults.layout),
             tabs = parseTabs(root.optJSONObject("tabs"), defaults.tabs, custom),
-            keys = parseKeys(root.optJSONObject("keys")),
+            keys = parseKeys(root.optJSONObject("keys"), defaults.keys),
             typing = parseTyping(root.optJSONObject("typing"), defaults.typing),
             feedback = parseFeedback(root.optJSONObject("feedback"), defaults.feedback),
             scanner = parseScanner(root.optJSONObject("scanner"), defaults.scanner),
@@ -47,9 +48,23 @@ object ConfigJson {
         )
     }
 
+    /** `configVersion` as a whole number from 1; `null` when missing. */
+    private fun configVersion(root: JSONObject): Int? {
+        val key = ConfigVersion.KEY
+        if (!root.has(key) || root.isNull(key)) return null
+        val value = root.opt(key)
+        val number = (value as? Number)?.toDouble() ?: (value as? String)?.trim()?.toDoubleOrNull()
+        if (number == null || number.isNaN() || number < 1 || number != Math.floor(number)) {
+            throw ConfigException("$key: a whole number from 1 expected (${ConfigVersion.CURRENT} = the current defaults)")
+        }
+        return number.coerceAtMost(Int.MAX_VALUE.toDouble()).toInt()
+    }
+
+    /** Every option with its value and [ConfigVersion.CURRENT], so the file means the same in any later version. */
     fun write(config: KeyboardConfig): String {
         val root = JSONObject()
         root.put("version", VERSION)
+        root.put(ConfigVersion.KEY, ConfigVersion.CURRENT)
         root.putOpt("adminPasswordHash", config.adminPasswordHash)
         root.put("language", config.language)
         root.put("appearance", JSONObject().apply {
@@ -491,9 +506,9 @@ object ConfigJson {
         )
     }
 
-    private fun parseKeys(json: JSONObject?): KeySettings {
-        json ?: return KeySettings()
-        val keys = ProgrammableKey.DEFAULTS.toMutableMap()
+    private fun parseKeys(json: JSONObject?, d: KeySettings): KeySettings {
+        json ?: return d
+        val keys = (ProgrammableKey.DEFAULTS + d.programmable).toMutableMap()
         json.keys().forEach { id ->
             if (ProgrammableKey.byId(id) == null) {
                 throw ConfigException("keys: unknown key \"$id\" (${ProgrammableKey.entries.joinToString { it.id }})")
@@ -534,9 +549,10 @@ object ConfigJson {
         return FeedbackSettings(
             keyPopup = json.optBoolean("keyPopup", d.keyPopup),
             sound = json.optBoolean("sound", d.sound),
-            soundVolume = json.optIntOrNull("soundVolume")?.coerceIn(0, 100),
+            // Missing = the default; `null` = not set (the system's volume and keyboard tick).
+            soundVolume = if (json.has("soundVolume")) json.optIntOrNull("soundVolume")?.coerceIn(0, 100) else d.soundVolume,
             vibrate = json.optBoolean("vibrate", d.vibrate),
-            vibrationMs = json.optIntOrNull("vibrationMs")?.coerceIn(5, 100),
+            vibrationMs = if (json.has("vibrationMs")) json.optIntOrNull("vibrationMs")?.coerceIn(5, 100) else d.vibrationMs,
         )
     }
 

@@ -4,7 +4,6 @@ import android.text.InputType
 import android.view.inputmethod.EditorInfo
 import de.ictbaden.industrialkeyboard.config.Appearance
 import de.ictbaden.industrialkeyboard.config.ConfigJson
-import de.ictbaden.industrialkeyboard.config.ConfigStore
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
 import de.ictbaden.industrialkeyboard.config.LayoutSettings
 import de.ictbaden.industrialkeyboard.config.Navigation
@@ -54,13 +53,13 @@ class GboardPackage2Test {
     }
 
     @Test
-    fun `a configuration stored by 2_1 keeps its tabs, a new one gets the toolbar`() {
+    fun `a configuration written for 2_1 keeps its tabs, a new one gets the toolbar`() {
+        // Stored, imported or pushed by the MDM: without configVersion the tabs of 2.1.
         val old = """{"layout":{"alphabet":"qwertz"}}"""
-        assertEquals(TopBar.TABS, ConfigStore.withStoredDefaults(old, ConfigJson.parse(old)).layout.topBar)
+        assertEquals(TopBar.TABS, ConfigJson.parse(old).layout.topBar)
         val new = ConfigJson.write(KeyboardConfig())
-        assertEquals(TopBar.TOOLBAR, ConfigStore.withStoredDefaults(new, ConfigJson.parse(new)).layout.topBar)
-        // An imported file or the MDM without topBar: the default (toolbar).
-        assertEquals(TopBar.TOOLBAR, ConfigJson.parse(old).layout.topBar)
+        assertEquals(TopBar.TOOLBAR, ConfigJson.parse(new).layout.topBar)
+        assertEquals(TopBar.TOOLBAR, ConfigJson.parse("""{"configVersion":3,"layout":{"alphabet":"qwertz"}}""").layout.topBar)
     }
 
     @Test

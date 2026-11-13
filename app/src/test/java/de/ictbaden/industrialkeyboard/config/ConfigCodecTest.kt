@@ -44,7 +44,10 @@ class ConfigCodecTest {
         assertEquals(1, json.getInt("version"))
         assertFalse(json.has("typing"))
         assertFalse(json.getJSONObject("scanner").getJSONObject("camera").has("zoom"))
-        assertEquals("""{"version":1}""", ConfigCodec.compact(defaults, defaults))
+        // configVersion stays, or the parser would fill in the defaults of 2.1.
+        assertEquals(ConfigVersion.CURRENT, json.getInt("configVersion"))
+        val empty = org.json.JSONObject(ConfigCodec.compact(defaults, defaults))
+        assertEquals(setOf("version", "configVersion"), empty.keys().asSequence().toSet())
         assertEquals(KeyboardConfig(), ConfigJson.parse(ConfigCodec.compact(defaults, defaults)))
         assertTrue(compact.length < ConfigJson.write(config).length / 3)
     }

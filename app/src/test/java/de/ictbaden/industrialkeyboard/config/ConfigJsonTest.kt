@@ -11,7 +11,9 @@ class ConfigJsonTest {
 
     @Test
     fun `empty object gives defaults`() {
-        assertEquals(KeyboardConfig(), ConfigJson.parse("{}"))
+        assertEquals(KeyboardConfig(), ConfigJson.parse("""{"configVersion":3}"""))
+        // Without configVersion: written for 2.1, so the defaults of 2.1.
+        assertEquals(ConfigVersion.LEGACY, ConfigJson.parse("{}"))
     }
 
     @Test

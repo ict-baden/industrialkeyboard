@@ -78,8 +78,13 @@ class ConfigStore @VisibleForTesting internal constructor(
         if (text.all { it == '\u0000' || it.isWhitespace() }) throw IOException("the file is empty")
     }
 
+    /**
+     * A file stored by 2.1 or older has no `configVersion`: what it leaves out gets the 2.1
+     * defaults ([ConfigVersion.LEGACY]), so an update changes nothing on it. The next save writes
+     * every value with the current `configVersion`.
+     */
     private fun parse(text: String): KeyboardConfig = try {
-        withStoredDefaults(text, ConfigJson.parse(text))
+        ConfigJson.parse(text)
     } catch (e: ConfigException) {
         recover(text, e)
     }
@@ -161,12 +166,5 @@ class ConfigStore @VisibleForTesting internal constructor(
         internal fun reset() {
             instance = null
         }
-
-        /**
-         * A configuration stored by version 2.1 or older has no `topBar`: it keeps the tabs it had,
-         * new installations get Gboard's toolbar.
-         */
-        fun withStoredDefaults(text: String, config: KeyboardConfig): KeyboardConfig =
-            if ("\"topBar\"" in text) config else config.copy(layout = config.layout.copy(topBar = TopBar.TABS))
     }
 }
