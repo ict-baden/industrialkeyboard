@@ -665,6 +665,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     override fun onInlineSuggestionsResponse(response: InlineSuggestionsResponse): Boolean {
         if (!config.typing.autofillSuggestions) return false
         val generation = ++inlineGeneration
+        Log.i(TAG, "Autofill offers ${response.inlineSuggestions.size} chips")
         InlineAutofill.inflate(this, response) { views ->
             // A later response (or the field closed) meanwhile: these chips are stale.
             if (generation == inlineGeneration) {

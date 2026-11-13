@@ -271,7 +271,12 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         inlineRow.removeAllViews()
         val gap = dp(6)
         views.forEach { v ->
-            inlineRow.addView(v, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { setMargins(gap, 0, 0, 0) })
+            // The system puts the chip's rendered size into its layout params; an InlineContentView
+            // cannot measure itself, so replacing them with WRAP_CONTENT leaves it 0 px wide (invisible).
+            val size = v.layoutParams
+            val width = size?.width?.takeIf { it > 0 } ?: ViewGroup.LayoutParams.WRAP_CONTENT
+            val height = size?.height?.takeIf { it > 0 } ?: ViewGroup.LayoutParams.WRAP_CONTENT
+            inlineRow.addView(v, LinearLayout.LayoutParams(width, height).apply { setMargins(gap, 0, 0, 0) })
         }
         inlineStrip.scrollTo(0, 0)
     }
