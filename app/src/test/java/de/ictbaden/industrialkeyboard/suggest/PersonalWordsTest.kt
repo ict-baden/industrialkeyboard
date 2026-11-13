@@ -34,7 +34,7 @@ class PersonalWordsTest {
 
     @Test
     fun `gboard lines with and without shortcut and locale`() {
-        val r = PersonalWords.parseText(header + "Lagerplatz\t\tde-DE\nmfg-Wort\tmfg\t\nICT-Baden\t\t\nKommissionierung\tkom\tde_DE\n")
+        val r = PersonalWords.parseText(header + "\tLagerplatz\tde-DE\nmfg\tmfg-Wort\t\n\tICT-Baden\t\nkom\tKommissionierung\tde_DE\n")
         assertEquals(0, r.skipped)
         assertEquals(
             listOf(
@@ -48,8 +48,20 @@ class PersonalWordsTest {
     }
 
     @Test
+    fun `gboard version 2 names its columns`() {
+        val v2 = "# Gboard Dictionary version:2\n# Gboard Dictionary format:shortcut\tword\tlanguage_tag\tpos_tag\n"
+        // Exactly what Gboard writes when "My dictionary" is empty: nothing to import, no error.
+        assertEquals(ImportResult(emptyList(), 0), PersonalWords.parseGboard(zip("dictionary.txt" to v2.toByteArray())))
+        val r = PersonalWords.parseText(v2 + "mfg\tMit freundlichen Grüßen\tde-DE\tNOUN\n\tICT-Baden\t\t\n")
+        assertEquals(listOf(PersonalWord("Mit freundlichen Grüßen", "mfg", "de-DE"), PersonalWord("ICT-Baden")), r.words)
+        // Other column order, as the format line says.
+        val swapped = "# Gboard Dictionary format:word\tshortcut\tlanguage_tag\nPalette\tpal\tde\n"
+        assertEquals(listOf(PersonalWord("Palette", "pal", "de")), PersonalWords.parseText(swapped).words)
+    }
+
+    @Test
     fun `BOM, CRLF, comments and bad lines`() {
-        val text = "﻿" + header.replace("\n", "\r\n") + "# a comment\r\n\r\nWort\t\tde\r\n\tleer\t\n" + "x".repeat(65) + "\t\t\nKurz\tmit leerzeichen\t\n"
+        val text = "﻿" + header.replace("\n", "\r\n") + "# a comment\r\n\r\n\tWort\tde\r\n\t\tde\n" + "x".repeat(65) + "\t\t\nmit leerzeichen\tKurz\t\n"
         val r = PersonalWords.parseText(text)
         assertEquals(listOf(PersonalWord("Wort", null, "de")), r.words)
         assertEquals(3, r.skipped)
@@ -74,7 +86,7 @@ class PersonalWordsTest {
 
     @Test
     fun `zip with dictionary_txt, also in a folder`() {
-        val bytes = zip("readme.txt" to "x".toByteArray(), "export/dictionary.txt" to (header + "Palette\tpal\tde\n").toByteArray())
+        val bytes = zip("readme.txt" to "x".toByteArray(), "export/dictionary.txt" to (header + "pal\tPalette\tde\n").toByteArray())
         assertEquals(listOf(PersonalWord("Palette", "pal", "de")), PersonalWords.parseGboard(bytes).words)
     }
 

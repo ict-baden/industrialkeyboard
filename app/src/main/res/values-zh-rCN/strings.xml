@@ -704,6 +704,7 @@
     </plurals>
     <string name="personal_dictionary_import_done">导入完成</string>
     <string name="personal_dictionary_import_result">已导入：%1$d\n已存在：%2$d\n已跳过：%3$d</string>
+    <string name="personal_dictionary_import_empty">文件中没有词语。Gboard 只导出“个人词典”中的词语（Gboard 设置 → 词典 → 个人词典）。来自 Google 帐号的建议（例如电子邮件地址）不包含在导出中。</string>
     <string name="personal_dictionary_import_failed">导入失败</string>
     <string name="personal_dictionary_import_invalid">不是 Gboard 词典导出文件或词语列表（%1$s）。</string>
     <string name="personal_dictionary_save_failed">无法保存个人词典。</string>

@@ -221,6 +221,11 @@ class PersonalDictionaryActivity : AppCompatActivity() {
             )
             return
         }
+        if (parsed.words.isEmpty() && parsed.skipped == 0) {
+            // A valid export of an empty "Personal dictionary" (Gboard writes only the header then).
+            dialogs.message(getString(R.string.personal_dictionary_import_done), getString(R.string.personal_dictionary_import_empty))
+            return
+        }
         var added = 0
         var duplicates = 0
         if (!save { dictionary.import(parsed.words).also { added = it.first; duplicates = it.second } }) return

@@ -4,6 +4,12 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ## [Unveröffentlicht]
 
+## [2.2.2] – 2026-11-13
+
+### Behoben
+- Gboard-Import: Die Spalten wurden in der falschen Reihenfolge gelesen. Gboard schreibt `Kürzel⇥Wort⇥Sprache` (Version 2 zusätzlich `pos_tag` und eine Zeile `# Gboard Dictionary format:` mit den Spaltennamen, die jetzt ausgewertet wird). Eine Zeile mit nur einem Wert gilt als Wort.
+- Ein leerer Gboard-Export (nur der Kopf, „Mein Wörterbuch“ ist leer) meldet jetzt, dass die Datei keine Wörter enthält, und dass Vorschläge aus dem Google-Konto wie die eigene E-Mail-Adresse nicht im Export stehen.
+
 ## [2.2.1] – 2026-11-13
 
 ### Geändert
