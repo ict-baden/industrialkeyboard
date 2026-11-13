@@ -112,6 +112,9 @@ object ConfigJson {
             put("deleteGesture", config.typing.deleteGesture)
             put("nextWord", config.typing.nextWord)
             put("clipboardHistory", config.typing.clipboardHistory)
+            put("autofillSuggestions", config.typing.autofillSuggestions)
+            put("systemDictionary", config.typing.systemDictionary)
+            put("personalDictionary", config.typing.personalDictionary)
             put("textEditing", config.typing.textEditing)
         })
         root.put("feedback", JSONObject().apply {
@@ -540,6 +543,9 @@ object ConfigJson {
             deleteGesture = json.optBoolean("deleteGesture", d.deleteGesture),
             nextWord = json.optBoolean("nextWord", d.nextWord),
             clipboardHistory = json.optBoolean("clipboardHistory", d.clipboardHistory),
+            autofillSuggestions = json.optBoolean("autofillSuggestions", d.autofillSuggestions),
+            systemDictionary = json.optBoolean("systemDictionary", d.systemDictionary),
+            personalDictionary = json.optBoolean("personalDictionary", d.personalDictionary),
             textEditing = json.optBoolean("textEditing", d.textEditing),
         )
     }

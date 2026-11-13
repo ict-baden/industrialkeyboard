@@ -21,6 +21,12 @@ object ErrorCodes {
 
     /** An own snippet could not be written to `files/user-snippets.json` (storage full, rename failed). */
     const val USER_SNIPPETS_SAVE_FAILED = "IK-0109"
+
+    /** Import into the personal dictionary rejected: no Gboard export or word list, larger than 1 MB, no dictionary.txt in the ZIP. */
+    const val PERSONAL_DICTIONARY_IMPORT_INVALID = "IK-0110"
+
+    /** The personal dictionary could not be written to `files/personal-dictionary.json`; also an invalid word in its editor. */
+    const val PERSONAL_DICTIONARY_SAVE_FAILED = "IK-0111"
     const val CAMERA_PERMISSION = "IK-0200"
     const val CAMERA_FAILED = "IK-0201"
     const val MIC_PERMISSION = "IK-0210"

@@ -247,6 +247,12 @@ data class TypingSettings(
     val clipboardHistory: Boolean = false,
     /** Tile "Text editing" in the ⊞ grid (arrows, select, cut/copy/paste in place of the keys); `{EDIT}` works regardless. */
     val textEditing: Boolean = true,
+    /** Android 11+: chips of the autofill service (e-mail, address, password) in the strip, drawn by the system. */
+    val autofillSuggestions: Boolean = true,
+    /** Words and shortcuts of Android's user dictionary (where Gboard keeps the personal dictionary) in the suggestions. */
+    val systemDictionary: Boolean = true,
+    /** The keyboard's own personal dictionary (settings, Gboard import) in the suggestions. */
+    val personalDictionary: Boolean = true,
 )
 
 data class FeedbackSettings(

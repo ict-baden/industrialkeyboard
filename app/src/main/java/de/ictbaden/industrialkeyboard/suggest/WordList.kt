@@ -49,6 +49,39 @@ class WordList private constructor(
         if (best.size > limit) best.removeAt(best.size - 1)
     }
 
+    /**
+     * This list plus the user's own words ([extra]: key, spelling, frequency). A word in both keeps
+     * the higher frequency and the user's spelling. One merge of two sorted lists – done when the
+     * personal words or the language change, never per key.
+     */
+    fun withExtra(extra: List<Triple<String, String, Int>>): WordList {
+        if (extra.isEmpty()) return this
+        val add = of(extra)
+        val n = keys.size + add.keys.size
+        val k = ArrayList<String>(n)
+        val w = ArrayList<String>(n)
+        val f = ArrayList<Int>(n)
+        var i = 0
+        var j = 0
+        while (i < keys.size || j < add.keys.size) {
+            val takeAdd = i >= keys.size || (j < add.keys.size && add.keys[j] <= keys[i])
+            if (takeAdd) {
+                val same = i < keys.size && add.keys[j] == keys[i]
+                k += add.keys[j]
+                w += add.words[j]
+                f += if (same) maxOf(add.freqs[j], freqs[i]) else add.freqs[j]
+                if (same) i++
+                j++
+            } else {
+                k += keys[i]
+                w += words[i]
+                f += freqs[i]
+                i++
+            }
+        }
+        return WordList(k.toTypedArray(), w.toTypedArray(), f.toIntArray())
+    }
+
     private fun lowerBound(key: String): Int {
         var lo = 0
         var hi = keys.size

@@ -752,4 +752,58 @@
     </string-array>
     <string name="settings_search_hint">Search settings</string>
     <string name="settings_search_empty">No matches</string>
+    <string name="personal_dictionary_switch">Personal words</string>
+    <string name="personal_dictionary_switch_summary">Words of your personal dictionary in the suggestions</string>
+    <string name="personal_dictionary_title">Personal dictionary</string>
+    <string name="system_dictionary">Android user dictionary</string>
+    <string name="system_dictionary_summary">Words and shortcuts of the system’s personal dictionary (e.g. from Gboard)</string>
+    <string name="autofill_suggestions">Autofill suggestions</string>
+    <string name="autofill_suggestions_summary">E-mail, address and password suggestions of the autofill service above the keys (Android 11+)</string>
+    <string name="personal_dictionary_add">Add word</string>
+    <string name="personal_dictionary_import">Import</string>
+    <string name="personal_dictionary_import_summary">ZIP exported from Gboard, or a dictionary.txt</string>
+    <string name="personal_dictionary_delete_all">Delete all words</string>
+    <plurals name="personal_dictionary_delete_all_confirm">
+        <item quantity="one">Delete the %1$d word of the personal dictionary?</item>
+        <item quantity="other">Delete all %1$d words of the personal dictionary?</item>
+    </plurals>
+    <string name="personal_dictionary_empty">No words yet. Add your own or import them from Gboard.</string>
+    <string name="personal_dictionary_filter">Search words</string>
+    <plurals name="personal_dictionary_more">
+        <item quantity="one">%1$d more word – narrow the search</item>
+        <item quantity="other">%1$d more words – narrow the search</item>
+    </plurals>
+    <string name="personal_dictionary_section_words">Words</string>
+    <string name="personal_dictionary_note">Only words you add or import are kept – the keyboard never learns from typing. Stored on this device only, not in backups.</string>
+    <string name="personal_dictionary_edit_title">Word</string>
+    <string name="personal_dictionary_word_hint">Word or phrase</string>
+    <string name="personal_dictionary_word_helper">Up to 64 characters</string>
+    <string name="personal_dictionary_shortcut_hint">Shortcut (optional)</string>
+    <string name="personal_dictionary_shortcut_helper">Typing it offers the word, e.g. mfg</string>
+    <string name="personal_dictionary_language_hint">Language (optional)</string>
+    <string name="personal_dictionary_language_helper">e.g. de or en-US; empty = all languages</string>
+    <string name="personal_dictionary_all_languages">All languages</string>
+    <string name="personal_dictionary_delete">Delete</string>
+    <string name="personal_dictionary_error_word">Enter a word of up to 64 characters</string>
+    <string name="personal_dictionary_error_shortcut">Up to 16 characters, no spaces</string>
+    <string name="personal_dictionary_error_language">Unknown language – e.g. de or en-US</string>
+    <plurals name="personal_dictionary_full">
+        <item quantity="one">At most %1$d word</item>
+        <item quantity="other">At most %1$d words</item>
+    </plurals>
+    <string name="personal_dictionary_import_done">Import finished</string>
+    <string name="personal_dictionary_import_result">Imported: %1$d\nAlready there: %2$d\nSkipped: %3$d</string>
+    <string name="personal_dictionary_import_failed">Import failed</string>
+    <string name="personal_dictionary_import_invalid">Not a Gboard dictionary export or word list (%1$s).</string>
+    <string name="personal_dictionary_save_failed">The personal dictionary could not be saved.</string>
+    <string name="mc_autofill_suggestions_title">Autofill suggestions</string>
+    <string name="mc_autofill_suggestions_description">Android 11+: chips of the autofill service (e-mail, address, password) above the keys (default on).</string>
+    <string name="mc_system_dictionary_title">Android user dictionary</string>
+    <string name="mc_system_dictionary_description">Words and shortcuts of the system’s personal dictionary in the suggestions (default on).</string>
+    <string name="mc_personal_dictionary_title">Personal dictionary</string>
+    <string name="mc_personal_dictionary_description">Words the user added or imported (Gboard) in the suggestions (default on).</string>
+    <plurals name="personal_dictionary_count">
+        <item quantity="one">%1$d word · add, import from Gboard</item>
+        <item quantity="other">%1$d words · add, import from Gboard</item>
+    </plurals>
 </resources>

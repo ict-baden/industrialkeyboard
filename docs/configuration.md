@@ -208,6 +208,9 @@ Options with a different default without `configVersion` 3:
 | `typing.nextWord` | `false` | `true` |
 | `typing.deleteGesture` | `false` | `true` |
 | `typing.voice` | `off` | `auto` |
+| `typing.autofillSuggestions` | `false` | `true` |
+| `typing.systemDictionary` | `false` | `true` |
+| `typing.personalDictionary` | `false` | `true` |
 | `appearance.dynamicColor` | `false` | `true` |
 | `appearance.emojiKey` | `false` | `true` |
 | `feedback.vibrationMs` | `18` – the fixed vibration of 2.1 | not set – the system's keyboard tick |
@@ -340,6 +343,9 @@ Phone, date and time fields show fixed keys instead of the numeric ones.
 | `clipboardHistory` | `true` / `false` | `false` | Clipboard history for the toolbar's 📋 panel: text copied while the keyboard is shown and what is on the clipboard when the panel opens, newest first, at most 20 entries, unpinned ones for 1 hour, **only in memory** (gone when the keyboard restarts). Never from password fields or clips marked sensitive. Off: the panel offers only what is copied right now |
 | `deleteGesture` | `true` / `false` | `true` | Swipe left from Backspace marks whole words (one more per finger width), lifting the finger deletes them – like Gboard |
 | `textEditing` | `true` / `false` | `true` | Tile *Text editing* in the ⊞ menu: a panel in place of the keys with ← ↑ → ↓, Home, End, Select (the arrows then extend the selection, like holding Shift), Select all, Cut, Copy, Paste, Del and ⌫; ABC goes back to the page shown before. In single-line fields ↑/↓ act as Home/End, so the focus stays in the field. Cut and Copy only with a selection and never in password fields. [`{EDIT}`](#macros) opens it from any key, also with `topBar: tabs` (no ⊞ there) and when this option is off. Nothing is stored |
+| `personalDictionary` | `true` / `false` | `true` | Words of the keyboard's own **personal dictionary** in the suggestions, ranked high (like Gboard). Users keep it in *Settings → Typing → Personal dictionary*: add, edit and delete words (word or phrase up to 64 characters, optional shortcut up to 16 characters, language or all languages) or **import** a Gboard export (the ZIP from Gboard's *Dictionary → Personal dictionary → Export*, with `dictionary.txt`) or a plain `dictionary.txt` (lines `word<TAB>shortcut<TAB>locale`). At most 5000 words and 1 MB per file; duplicates (same word and language) are skipped, the import shows how many words were added, already there and skipped. A shortcut (e.g. `mfg`) offers its word in the middle of the strip like a [snippet](#snippets--snippets) shortcut. Only what the user adds or imports, never typed text; stored in `files/personal-dictionary.json`, not in the configuration, export or backup. Off: the words stay stored but are not offered |
+| `systemDictionary` | `true` / `false` | `true` | Words and shortcuts of **Android's user dictionary** (`UserDictionary`, where Gboard and *Settings → Languages → Personal dictionary* keep words) in the suggestions; shortcuts as above. Words of the keyboard language and those for all languages. Read off the main thread when a field starts and again only when the dictionary changes, never per key; nothing is copied. Android lets only the current keyboard read it; where the provider is missing, there are simply no words |
+| `autofillSuggestions` | `true` / `false` | `true` | Android 11+: chips of the **autofill service** (Google, a password manager) for e-mail addresses, addresses, passwords and one-time codes in place of the tab bar or toolbar, scrolling sideways, styled in the keyboard's colours; they step aside while a word is typed. The autofill service draws them – the keyboard never sees their content. Which service and what it offers is set in Android (*Settings → Passwords & accounts → Autofill service*) |
 
 Always on: rollover typing with several fingers, key repeat on Backspace, Del and the arrow
 keys, slide on the space bar to move the cursor, long press on the space bar to switch

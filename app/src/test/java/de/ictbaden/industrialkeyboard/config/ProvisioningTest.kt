@@ -368,6 +368,19 @@ class ProvisioningTest {
     }
 
     @Test
+    fun `managed personal words and autofill switches`() {
+        restrict("autofill_suggestions" to false, "system_dictionary" to false, "personal_dictionary" to false)
+        Provisioning.applyAll(context)
+        assertFalse(store.config.typing.autofillSuggestions)
+        assertFalse(store.config.typing.systemDictionary)
+        assertFalse(store.config.typing.personalDictionary)
+        restrict("personal_dictionary" to true)
+        Provisioning.applyAll(context)
+        assertTrue(store.config.typing.personalDictionary)
+        assertFalse(store.config.typing.systemDictionary)
+    }
+
+    @Test
     fun `managed text editing tile`() {
         restrict("text_editing" to false)
         Provisioning.applyAll(context)

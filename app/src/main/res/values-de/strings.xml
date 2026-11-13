@@ -670,4 +670,58 @@
     </string-array>
     <string name="settings_search_hint">Einstellungen durchsuchen</string>
     <string name="settings_search_empty">Keine Treffer</string>
+    <string name="personal_dictionary_switch">Persönliche Wörter</string>
+    <string name="personal_dictionary_switch_summary">Wörter aus dem persönlichen Wörterbuch in den Vorschlägen</string>
+    <string name="personal_dictionary_title">Persönliches Wörterbuch</string>
+    <string name="system_dictionary">Android-Benutzerwörterbuch</string>
+    <string name="system_dictionary_summary">Wörter und Kürzel aus dem persönlichen Wörterbuch des Systems (z. B. von Gboard)</string>
+    <string name="autofill_suggestions">Autofill-Vorschläge</string>
+    <string name="autofill_suggestions_summary">E-Mail-, Adress- und Passwortvorschläge des Autofill-Dienstes über den Tasten (Android 11+)</string>
+    <string name="personal_dictionary_add">Wort hinzufügen</string>
+    <string name="personal_dictionary_import">Importieren</string>
+    <string name="personal_dictionary_import_summary">ZIP-Export aus Gboard oder eine dictionary.txt</string>
+    <string name="personal_dictionary_delete_all">Alle Wörter löschen</string>
+    <plurals name="personal_dictionary_delete_all_confirm">
+        <item quantity="one">Das %1$d Wort des persönlichen Wörterbuchs löschen?</item>
+        <item quantity="other">Alle %1$d Wörter des persönlichen Wörterbuchs löschen?</item>
+    </plurals>
+    <string name="personal_dictionary_empty">Noch keine Wörter. Eigene hinzufügen oder aus Gboard importieren.</string>
+    <string name="personal_dictionary_filter">Wörter suchen</string>
+    <plurals name="personal_dictionary_more">
+        <item quantity="one">%1$d weiteres Wort – Suche eingrenzen</item>
+        <item quantity="other">%1$d weitere Wörter – Suche eingrenzen</item>
+    </plurals>
+    <string name="personal_dictionary_section_words">Wörter</string>
+    <string name="personal_dictionary_note">Nur Wörter, die du hinzufügst oder importierst – die Tastatur lernt nichts beim Tippen. Nur auf diesem Gerät gespeichert, nicht im Backup.</string>
+    <string name="personal_dictionary_edit_title">Wort</string>
+    <string name="personal_dictionary_word_hint">Wort oder Wortgruppe</string>
+    <string name="personal_dictionary_word_helper">Bis zu 64 Zeichen</string>
+    <string name="personal_dictionary_shortcut_hint">Kürzel (optional)</string>
+    <string name="personal_dictionary_shortcut_helper">Beim Tippen wird das Wort angeboten, z. B. mfg</string>
+    <string name="personal_dictionary_language_hint">Sprache (optional)</string>
+    <string name="personal_dictionary_language_helper">z. B. de oder en-US; leer = alle Sprachen</string>
+    <string name="personal_dictionary_all_languages">Alle Sprachen</string>
+    <string name="personal_dictionary_delete">Löschen</string>
+    <string name="personal_dictionary_error_word">Ein Wort mit bis zu 64 Zeichen eingeben</string>
+    <string name="personal_dictionary_error_shortcut">Bis zu 16 Zeichen, keine Leerzeichen</string>
+    <string name="personal_dictionary_error_language">Unbekannte Sprache – z. B. de oder en-US</string>
+    <plurals name="personal_dictionary_full">
+        <item quantity="one">Höchstens %1$d Wort</item>
+        <item quantity="other">Höchstens %1$d Wörter</item>
+    </plurals>
+    <string name="personal_dictionary_import_done">Import abgeschlossen</string>
+    <string name="personal_dictionary_import_result">Importiert: %1$d\nSchon vorhanden: %2$d\nÜbersprungen: %3$d</string>
+    <string name="personal_dictionary_import_failed">Import fehlgeschlagen</string>
+    <string name="personal_dictionary_import_invalid">Kein Gboard-Wörterbuchexport und keine Wortliste (%1$s).</string>
+    <string name="personal_dictionary_save_failed">Das persönliche Wörterbuch konnte nicht gespeichert werden.</string>
+    <string name="mc_autofill_suggestions_title">Autofill-Vorschläge</string>
+    <string name="mc_autofill_suggestions_description">Android 11+: Chips des Autofill-Dienstes (E-Mail, Adresse, Passwort) über den Tasten (Standard an).</string>
+    <string name="mc_system_dictionary_title">Android-Benutzerwörterbuch</string>
+    <string name="mc_system_dictionary_description">Wörter und Kürzel aus dem persönlichen Wörterbuch des Systems in den Vorschlägen (Standard an).</string>
+    <string name="mc_personal_dictionary_title">Persönliches Wörterbuch</string>
+    <string name="mc_personal_dictionary_description">Vom Benutzer hinzugefügte oder importierte Wörter (Gboard) in den Vorschlägen (Standard an).</string>
+    <plurals name="personal_dictionary_count">
+        <item quantity="one">%1$d Wort · hinzufügen, aus Gboard importieren</item>
+        <item quantity="other">%1$d Wörter · hinzufügen, aus Gboard importieren</item>
+    </plurals>
 </resources>

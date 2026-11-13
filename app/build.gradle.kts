@@ -102,6 +102,8 @@ dependencies {
     // ExploreByTouchHelper: screen-reader nodes for the canvas-drawn keys. Already transitive (and in
     // THIRD-PARTY-NOTICES.txt); listed to pin the API in use.
     implementation("androidx.customview:customview:1.2.0")
+    // Inline autofill suggestions (Android 11+): the styles of the chips the autofill service draws.
+    implementation("androidx.autofill:autofill:1.3.0")
     // Camera scan on devices without a scan engine (issue #17): CameraX for the picture,
     // zxing-cpp (the same engine as Lupe) for decoding. Both Apache-2.0.
     implementation("androidx.camera:camera-camera2:1.5.2")

@@ -674,4 +674,62 @@
     </string-array>
     <string name="settings_search_hint">Buscar en los ajustes</string>
     <string name="settings_search_empty">No hay resultados</string>
+    <string name="personal_dictionary_switch">Palabras personales</string>
+    <string name="personal_dictionary_switch_summary">Palabras del diccionario personal en las sugerencias</string>
+    <string name="personal_dictionary_title">Diccionario personal</string>
+    <string name="system_dictionary">Diccionario de usuario de Android</string>
+    <string name="system_dictionary_summary">Palabras y atajos del diccionario personal del sistema (p. ej. de Gboard)</string>
+    <string name="autofill_suggestions">Sugerencias de autocompletar</string>
+    <string name="autofill_suggestions_summary">Sugerencias de correo, dirección y contraseña del servicio de autocompletar sobre las teclas (Android 11+)</string>
+    <string name="personal_dictionary_add">Añadir palabra</string>
+    <string name="personal_dictionary_import">Importar</string>
+    <string name="personal_dictionary_import_summary">ZIP exportado de Gboard o un dictionary.txt</string>
+    <string name="personal_dictionary_delete_all">Borrar todas las palabras</string>
+    <plurals name="personal_dictionary_delete_all_confirm">
+        <item quantity="one">¿Borrar la %1$d palabra del diccionario personal?</item>
+        <item quantity="many">¿Borrar las %1$d palabras del diccionario personal?</item>
+        <item quantity="other">¿Borrar las %1$d palabras del diccionario personal?</item>
+    </plurals>
+    <string name="personal_dictionary_empty">Aún no hay palabras. Añade las tuyas o impórtalas de Gboard.</string>
+    <string name="personal_dictionary_filter">Buscar palabras</string>
+    <plurals name="personal_dictionary_more">
+        <item quantity="one">%1$d palabra más – acota la búsqueda</item>
+        <item quantity="many">%1$d palabras más – acota la búsqueda</item>
+        <item quantity="other">%1$d palabras más – acota la búsqueda</item>
+    </plurals>
+    <string name="personal_dictionary_section_words">Palabras</string>
+    <string name="personal_dictionary_note">Solo las palabras que añades o importas – el teclado no aprende al escribir. Guardadas solo en este dispositivo, no en copias de seguridad.</string>
+    <string name="personal_dictionary_edit_title">Palabra</string>
+    <string name="personal_dictionary_word_hint">Palabra o frase</string>
+    <string name="personal_dictionary_word_helper">Hasta 64 caracteres</string>
+    <string name="personal_dictionary_shortcut_hint">Atajo (opcional)</string>
+    <string name="personal_dictionary_shortcut_helper">Al escribirlo se ofrece la palabra, p. ej. mfg</string>
+    <string name="personal_dictionary_language_hint">Idioma (opcional)</string>
+    <string name="personal_dictionary_language_helper">p. ej. es o en-US; vacío = todos los idiomas</string>
+    <string name="personal_dictionary_all_languages">Todos los idiomas</string>
+    <string name="personal_dictionary_delete">Borrar</string>
+    <string name="personal_dictionary_error_word">Introduce una palabra de hasta 64 caracteres</string>
+    <string name="personal_dictionary_error_shortcut">Hasta 16 caracteres, sin espacios</string>
+    <string name="personal_dictionary_error_language">Idioma desconocido – p. ej. es o en-US</string>
+    <plurals name="personal_dictionary_full">
+        <item quantity="one">Como máximo %1$d palabra</item>
+        <item quantity="many">Como máximo %1$d palabras</item>
+        <item quantity="other">Como máximo %1$d palabras</item>
+    </plurals>
+    <string name="personal_dictionary_import_done">Importación terminada</string>
+    <string name="personal_dictionary_import_result">Importadas: %1$d\nYa existentes: %2$d\nOmitidas: %3$d</string>
+    <string name="personal_dictionary_import_failed">Error al importar</string>
+    <string name="personal_dictionary_import_invalid">No es una exportación del diccionario de Gboard ni una lista de palabras (%1$s).</string>
+    <string name="personal_dictionary_save_failed">No se pudo guardar el diccionario personal.</string>
+    <string name="mc_autofill_suggestions_title">Sugerencias de autocompletar</string>
+    <string name="mc_autofill_suggestions_description">Android 11+: chips del servicio de autocompletar (correo, dirección, contraseña) sobre las teclas (por defecto activado).</string>
+    <string name="mc_system_dictionary_title">Diccionario de usuario de Android</string>
+    <string name="mc_system_dictionary_description">Palabras y atajos del diccionario personal del sistema en las sugerencias (por defecto activado).</string>
+    <string name="mc_personal_dictionary_title">Diccionario personal</string>
+    <string name="mc_personal_dictionary_description">Palabras añadidas o importadas (Gboard) por el usuario en las sugerencias (por defecto activado).</string>
+    <plurals name="personal_dictionary_count">
+        <item quantity="one">%1$d palabra · añadir, importar de Gboard</item>
+        <item quantity="many">%1$d palabras · añadir, importar de Gboard</item>
+        <item quantity="other">%1$d palabras · añadir, importar de Gboard</item>
+    </plurals>
 </resources>
