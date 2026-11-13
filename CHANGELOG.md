@@ -4,6 +4,12 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ## [Unveröffentlicht]
 
+## [2.2.3] – 2026-11-13
+
+### Geändert
+- **Vibration wie Gboard** (Einstellungen → Rückmeldung): Schalter für den kurzen Tastatur-Tick des Geräts statt einer festen Dauer (`feedback.vibrationMs` leer). Konfigurationen aus 2.1 vibrieren fest 18 ms, was sich deutlich gröber anfühlt als Gboard; der Schalter stellt um, der Regler für die Dauer erscheint nur noch ohne ihn. Kann das Gerät den Tick nicht über die Tastaturansicht spielen, nimmt die Tastatur ab Android 10 den vordefinierten „Click“ des Geräts statt 18 ms.
+- **Persönliches Wörterbuch:** Der Schalter „Persönliche Wörter“ steht jetzt auch oben im Wörterbuch selbst. Wer ein Wort hinzufügt oder Wörter importiert, während er aus ist (Konfigurationen aus 2.1), schaltet ihn damit ein – vorher wurden die Wörter gespeichert, aber nie vorgeschlagen.
+
 ## [2.2.2] – 2026-11-13
 
 ### Behoben

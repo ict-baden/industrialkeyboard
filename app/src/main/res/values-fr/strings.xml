@@ -77,6 +77,8 @@
     <string name="key_popup_summary">Caractère agrandi au-dessus de la touche enfoncée</string>
     <string name="vibration">Vibration</string>
     <string name="vibration_length">Durée de la vibration</string>
+    <string name="vibration_system">Vibration comme Gboard</string>
+    <string name="vibration_system_summary">Le bref retour haptique du clavier de l’appareil au lieu d’une durée fixe</string>
     <string name="sound">Son</string>
     <string name="volume">Volume</string>
 
@@ -719,6 +721,7 @@
     <string name="personal_dictionary_import_done">Importation terminée</string>
     <string name="personal_dictionary_import_result">Importés : %1$d\nDéjà présents : %2$d\nIgnorés : %3$d</string>
     <string name="personal_dictionary_import_empty">Le fichier ne contient aucun mot. Gboard exporte uniquement les mots du « Dictionnaire personnel » (paramètres de Gboard → Dictionnaire → Dictionnaire personnel). Les suggestions du compte Google, comme l’adresse e-mail, ne font pas partie de l’export.</string>
+    <string name="personal_dictionary_switched_on">Mots personnels activés</string>
     <string name="personal_dictionary_import_failed">Échec de l’importation</string>
     <string name="personal_dictionary_import_invalid">Ni un export du dictionnaire Gboard ni une liste de mots (%1$s).</string>
     <string name="personal_dictionary_save_failed">Le dictionnaire personnel n’a pas pu être enregistré.</string>

@@ -24,6 +24,7 @@ import androidx.core.widget.NestedScrollView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.ictbaden.industrialkeyboard.R
+import de.ictbaden.industrialkeyboard.config.ConfigStore
 import de.ictbaden.industrialkeyboard.suggest.ImportException
 import de.ictbaden.industrialkeyboard.suggest.ImportResult
 import de.ictbaden.industrialkeyboard.suggest.PersonalDictionary
@@ -41,6 +42,7 @@ import java.util.Locale
 class PersonalDictionaryActivity : AppCompatActivity() {
 
     private val dictionary by lazy { PersonalDictionary.get(this) }
+    private val store by lazy { ConfigStore.get(this) }
     private lateinit var ui: Ui
     private lateinit var dialogs: Dialogs
     private lateinit var content: LinearLayout
@@ -99,6 +101,10 @@ class PersonalDictionaryActivity : AppCompatActivity() {
         content.addView(
             ui.card(
                 listOf(
+                    // The same switch as in the settings: a configuration saved by 2.1 has it off.
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.personal_dictionary_switch), getString(R.string.personal_dictionary_switch_summary), store.config.typing.personalDictionary) { on ->
+                        store.update { it.copy(typing = it.typing.copy(personalDictionary = on)) }
+                    },
                     ui.row(R.drawable.ic_text, getString(R.string.personal_dictionary_add), null) { edit(null) },
                     ui.row(R.drawable.ic_text, getString(R.string.personal_dictionary_import), getString(R.string.personal_dictionary_import_summary)) {
                         importFile.launch(arrayOf("application/zip", "application/x-zip-compressed", "text/plain", "application/octet-stream"))
@@ -178,10 +184,22 @@ class PersonalDictionaryActivity : AppCompatActivity() {
                 l.isNotEmpty() && locale == null -> language.error = invalid(getString(R.string.personal_dictionary_error_language))
                 else -> {
                     val saved = save { dictionary.put(PersonalWord(w, s, locale), replacing = current) }
-                    if (saved) dialog.dismiss()
+                    if (saved) {
+                        dialog.dismiss()
+                        switchOn()
+                    }
                 }
             }
         }
+    }
+
+    /** Whoever adds words wants them offered: switches them on (a configuration saved by 2.1 has them off). */
+    private fun switchOn() {
+        if (store.config.typing.personalDictionary) return
+        store.update { it.copy(typing = it.typing.copy(personalDictionary = true)) }
+        content.removeAllViews()
+        build()
+        dialogs.toast(getString(R.string.personal_dictionary_switched_on))
     }
 
     private fun deleteAll() {
@@ -231,6 +249,7 @@ class PersonalDictionaryActivity : AppCompatActivity() {
         if (!save { dictionary.import(parsed.words).also { added = it.first; duplicates = it.second } }) return
         // Words the full list could not take count as skipped.
         val skipped = parsed.skipped + (parsed.words.size - added - duplicates)
+        if (added > 0) switchOn()
         dialogs.message(getString(R.string.personal_dictionary_import_done), getString(R.string.personal_dictionary_import_result, added, duplicates, skipped))
     }
 

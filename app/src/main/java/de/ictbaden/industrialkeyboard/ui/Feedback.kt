@@ -46,6 +46,10 @@ class Feedback(context: Context) {
 
     private fun vibrate() {
         val vibrator = vibrator?.takeIf { it.hasVibrator() } ?: return
+        if (settings.vibrationMs == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // No view for the system tick: the device's tuned "click", what KEYBOARD_TAP plays.
+            if (runCatching { vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)) }.isSuccess) return
+        }
         val ms = (settings.vibrationMs ?: DEFAULT_VIBRATION_MS).coerceIn(5, 100).toLong()
         runCatching { vibrator.vibrate(VibrationEffect.createOneShot(ms, VibrationEffect.DEFAULT_AMPLITUDE)) }
     }

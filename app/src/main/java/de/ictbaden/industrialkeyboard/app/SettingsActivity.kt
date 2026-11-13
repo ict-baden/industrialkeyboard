@@ -565,7 +565,15 @@ class SettingsActivity : AppCompatActivity() {
                         update { it.copy(feedback = it.feedback.copy(vibrate = on)) }
                     },
                     if (c.feedback.vibrate) {
-                        ui.sliderRow(R.drawable.ic_timer, getString(R.string.vibration_length), 5, 100, 5, c.feedback.vibrationMs ?: 20, format = ::millis) { value ->
+                        // Like Gboard: the device's own short keyboard tick instead of a fixed length.
+                        ui.switchRow(R.drawable.ic_keyboard, getString(R.string.vibration_system), getString(R.string.vibration_system_summary), c.feedback.vibrationMs == null) { on ->
+                            update { it.copy(feedback = it.feedback.copy(vibrationMs = if (on) null else DEFAULT_VIBRATION_MS)) }
+                        }.apply { setTag(R.id.settings_search_keywords, "Gboard Haptik haptic Vibration Tick") }
+                    } else {
+                        null
+                    },
+                    if (c.feedback.vibrate && c.feedback.vibrationMs != null) {
+                        ui.sliderRow(R.drawable.ic_timer, getString(R.string.vibration_length), 5, 100, 5, c.feedback.vibrationMs ?: DEFAULT_VIBRATION_MS, format = ::millis) { value ->
                             update { it.copy(feedback = it.feedback.copy(vibrationMs = value)) }
                         }
                     } else {
@@ -1219,6 +1227,9 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     internal companion object {
+        /** Length when the system tick is switched off by hand (like 2.1, rounded to the slider step). */
+        const val DEFAULT_VIBRATION_MS = 20
+
         private const val KEY_UNLOCKED = "unlocked"
 
         /** "Reset to defaults": the configuration (admin password kept) and the quick toggles of this device. */
