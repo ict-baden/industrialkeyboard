@@ -4,6 +4,11 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ## [Unveröffentlicht]
 
+## [2.2.5] – 2026-11-13
+
+### Behoben
+- **Google Play: 455 Geräte wären weggefallen.** Die Berechtigungen für Kamera und Mikrofon machten für Play eine Rückkamera und ein Mikrofon zur Pflicht (vor allem Tablets ohne Rückkamera), und der native Code von ML Kit und zxing-cpp gab es nur für ARM (Chromebooks). Kamera, Autofokus und Mikrofon sind jetzt ausdrücklich optional, Release-Builds enthalten zusätzlich `x86_64`. Die universelle APK wächst dadurch von etwa 39 auf 53 MB; Play liefert aus dem App Bundle nur den Code des jeweiligen Geräts aus.
+
 ## [2.2.4] – 2026-11-13
 
 ### Behoben

@@ -39,11 +39,12 @@ android {
         release {
             isMinifyEnabled = false
             if (keystore != null) signingConfig = signingConfigs.getByName("release")
-            // Rugged Android devices from Android 8 on are ARM only. Without x86 the OCR library of
-            // ML Kit (about 11 MB per ABI) and zxing-cpp are in the APK twice instead of four times.
-            // Debug builds keep x86/x86_64 for the emulator.
+            // Rugged Android devices are ARM; x86_64 is for Chromebooks (2.2.4 without it lost 67 of
+            // 77 in Play). 32-bit x86 is left out: the OCR library of ML Kit is about 11 MB per ABI
+            // in the universal APK, Play delivers only the device's ABI from the bundle.
+            // Debug builds keep all four for the emulator.
             ndk {
-                abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+                abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
             }
         }
     }
@@ -70,7 +71,7 @@ android {
         disable += "AppBundleLocaleChanges"
         // "1-2-3" and "7-8-9" are rows of keys, not ranges: an en dash would be wrong.
         disable += "TypographyDashes"
-        // Release is ARM only on purpose (see buildTypes.release.ndk): no rugged ChromeOS devices.
+        // Release has no 32-bit x86 on purpose (see buildTypes.release.ndk).
         disable += "ChromeOsAbiSupport"
         // Kept visible, but no warning: targetSdk 37 waits until it can be tested on an Android 17
         // device (Play requires it from August 2027); library updates come through Dependabot.
