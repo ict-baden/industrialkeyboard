@@ -133,7 +133,16 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
     val camera = CameraScanView(context).apply { visibility = GONE }
 
     private val content = FrameLayout(context)
-    private val contentRow = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
+    /**
+     * Not baseline-aligned: a horizontal LinearLayout would otherwise first measure the weighted
+     * content with an unspecified width, and the emoji picker keeps the cell size of that pass
+     * (one emoji wider than the screen, the grid looked empty and a tap crashed with OutOfMemoryError,
+     * seen on the HC20).
+     */
+    private val contentRow = LinearLayout(context).apply {
+        orientation = LinearLayout.HORIZONTAL
+        isBaselineAligned = false
+    }
     private val scanPage = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
     private val headroom = (headroomDp * resources.displayMetrics.density).toInt()
     private var state: RenderState? = null
