@@ -806,4 +806,6 @@
         <item quantity="one">%1$d word · add, import from Gboard</item>
         <item quantity="other">%1$d words · add, import from Gboard</item>
     </plurals>
+    <string name="settings_preview">Keyboard preview</string>
+    <string name="settings_preview_summary">Shows the keyboard at the top of these settings</string>
 </resources>

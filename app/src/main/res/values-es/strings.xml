@@ -732,4 +732,6 @@
         <item quantity="many">%1$d palabras · añadir, importar de Gboard</item>
         <item quantity="other">%1$d palabras · añadir, importar de Gboard</item>
     </plurals>
+    <string name="settings_preview">Vista previa del teclado</string>
+    <string name="settings_preview_summary">Muestra el teclado arriba en estos ajustes</string>
 </resources>

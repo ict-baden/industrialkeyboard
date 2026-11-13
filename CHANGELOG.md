@@ -4,6 +4,9 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ## [Unveröffentlicht]
 
+### Geändert
+- Einstellungen: Tastatur-Vorschau oben abschaltbar („Aussehen → Tastatur-Vorschau“); beim Suchen verschwindet sie schon beim Antippen des Suchfelds, damit die Treffer Platz haben.
+
 ## [2.2.0] – 2026-11-13
 
 ### Geändert
