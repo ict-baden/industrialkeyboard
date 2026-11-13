@@ -668,4 +668,6 @@
         <item>Immer</item>
         <item>Nie</item>
     </string-array>
+    <string name="settings_search_hint">Einstellungen durchsuchen</string>
+    <string name="settings_search_empty">Keine Treffer</string>
 </resources>

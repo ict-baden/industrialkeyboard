@@ -672,4 +672,6 @@
         <item>Toujours</item>
         <item>Jamais</item>
     </string-array>
+    <string name="settings_search_hint">Rechercher dans les paramètres</string>
+    <string name="settings_search_empty">Aucun résultat</string>
 </resources>

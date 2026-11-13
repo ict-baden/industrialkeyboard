@@ -672,4 +672,6 @@
         <item>Siempre</item>
         <item>Nunca</item>
     </string-array>
+    <string name="settings_search_hint">Buscar en los ajustes</string>
+    <string name="settings_search_empty">No hay resultados</string>
 </resources>

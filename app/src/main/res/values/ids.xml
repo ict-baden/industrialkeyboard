@@ -11,4 +11,8 @@
     <item name="a11y_alt_7" type="id" />
     <item name="a11y_alt_8" type="id" />
     <item name="a11y_alt_9" type="id" />
+    <!-- Settings search: role of a view on a settings screen and extra keywords of a row. -->
+    <item name="settings_search_role" type="id" />
+    <item name="settings_search_keywords" type="id" />
+    <item name="settings_search_field" type="id" />
 </resources>

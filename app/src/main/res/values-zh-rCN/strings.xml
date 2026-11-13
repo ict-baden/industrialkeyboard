@@ -664,4 +664,6 @@
         <item>始终</item>
         <item>从不</item>
     </string-array>
+    <string name="settings_search_hint">搜索设置</string>
+    <string name="settings_search_empty">没有匹配项</string>
 </resources>
