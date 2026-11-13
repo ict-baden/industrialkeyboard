@@ -66,7 +66,8 @@ class PersonalDictionaryActivity : AppCompatActivity() {
         }
         content = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(ui.dp(16), 0, ui.dp(16), ui.dp(32))
+            // The note card comes first: some space below the toolbar.
+            setPadding(ui.dp(16), ui.dp(16), ui.dp(16), ui.dp(32))
         }
         val scroll = NestedScrollView(this).apply { addView(content) }
         val root = LinearLayout(this).apply {
