@@ -408,6 +408,10 @@ class KeyboardView(context: Context) : View(context) {
             KeyIcon.DOWN -> R.drawable.kb_down
             KeyIcon.SETTINGS -> R.drawable.ic_settings
             KeyIcon.TEXT_EDIT -> R.drawable.kb_text_edit
+            KeyIcon.GLOVE -> R.drawable.kb_glove
+            KeyIcon.CONTRAST -> R.drawable.kb_contrast
+            KeyIcon.SCANNER_TOGGLE -> R.drawable.kb_scan_toggle
+            KeyIcon.SOUND -> R.drawable.kb_sound
         }
         val drawable = icon(res)
         val size = min(dp(26f), r.height() * 0.5f).toInt()
