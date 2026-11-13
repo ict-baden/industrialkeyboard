@@ -77,6 +77,8 @@
     <string name="key_popup_summary">Vergrößertes Zeichen über der gedrückten Taste</string>
     <string name="vibration">Vibration</string>
     <string name="vibration_length">Vibrationsdauer</string>
+    <string name="vibration_system">Vibration wie Gboard</string>
+    <string name="vibration_system_summary">Kurzer Tastatur-Tick des Geräts statt fester Dauer</string>
     <string name="sound">Ton</string>
     <string name="volume">Lautstärke</string>
 
@@ -712,6 +714,7 @@
     <string name="personal_dictionary_import_done">Import abgeschlossen</string>
     <string name="personal_dictionary_import_result">Importiert: %1$d\nSchon vorhanden: %2$d\nÜbersprungen: %3$d</string>
     <string name="personal_dictionary_import_empty">Die Datei enthält keine Wörter. Gboard exportiert nur die Wörter aus „Mein Wörterbuch“ (Gboard-Einstellungen → Wörterbuch → Mein Wörterbuch). Vorschläge aus dem Google-Konto, etwa die eigene E-Mail-Adresse, gehören nicht dazu.</string>
+    <string name="personal_dictionary_switched_on">Persönliche Wörter eingeschaltet</string>
     <string name="personal_dictionary_import_failed">Import fehlgeschlagen</string>
     <string name="personal_dictionary_import_invalid">Kein Gboard-Wörterbuchexport und keine Wortliste (%1$s).</string>
     <string name="personal_dictionary_save_failed">Das persönliche Wörterbuch konnte nicht gespeichert werden.</string>
