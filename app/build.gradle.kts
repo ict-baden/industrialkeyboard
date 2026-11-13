@@ -15,7 +15,7 @@ android {
         targetSdk = 36
         // The CI passes -PversionCode (run number) and -PversionName (e.g. 1.0.0-ci.12).
         versionCode = (findProperty("versionCode") as String?)?.toInt() ?: 1
-        versionName = findProperty("versionName") as String? ?: "2.2.5"
+        versionName = findProperty("versionName") as String? ?: "2.2.6"
         buildConfigField("String", "COMMIT", "\"${System.getenv("GITHUB_SHA")?.take(7) ?: "local"}\"")
     }
 
