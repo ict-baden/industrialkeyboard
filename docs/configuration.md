@@ -355,7 +355,7 @@ EMMs limit the length of a managed configuration string – use the configuratio
 
 Users can switch four things on their device without changing the configuration: as tiles at
 the end of the toolbar's ⊞ menu (lit while on), with the macro [`{TOGGLE:name}`](#macros) on any
-key, and under **Settings → Quick toggles**. The settings are behind the
+key (it shows the tile's icon unless the key has a label), and under **Settings → Quick toggles**. The settings are behind the
 [admin password](#admin-password) when one is set, so on protected devices users have only ⊞ and
 `{TOGGLE:…}` keys.
 

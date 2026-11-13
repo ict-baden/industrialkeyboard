@@ -65,6 +65,7 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 - ⊞-Kacheln: lange Beschriftungen werden getrennt statt mitten im Wort umbrochen („Funktionstast|en“); im hohen Kontrast haben Kacheln, Textbausteine und Zwischenablage-Einträge einen Rahmen wie die Tasten (vorher schwarz auf schwarz).
 - Emoji-Auswahl leer, Antippen ließ die Tastatur abstürzen (OutOfMemoryError, Zebra HC20): Seit dem Einhandmodus wurde die Auswahl zuerst ohne feste Breite vermessen, ein Emoji war breiter als der Bildschirm.
 - Werkzeugleiste: Kam der Wechsel von Tabs auf die Werkzeugleiste (z. B. per MDM) mitten im Gleiten der Markierung, blieb ⊞ markiert, bis das Feld wechselte.
+- Tasten mit `{TOGGLE:…}` zeigen das Symbol der ⊞-Kachel statt einer englischen Beschriftung („Glove“ auf einer deutschen Tastatur).
 
 ## [2.1.1] – 2026-10-21
 

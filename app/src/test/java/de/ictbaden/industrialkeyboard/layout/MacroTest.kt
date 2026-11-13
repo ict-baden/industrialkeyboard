@@ -16,6 +16,10 @@ class MacroTest {
         assertEquals(listOf(MacroStep.Toggle(QuickToggle.GLOVE)), Macro.parse("{TOGGLE:glove}"))
         assertEquals(listOf(MacroStep.Toggle(QuickToggle.SCANNER)), Macro.parse("{toggle: Scanner }"))
         assertEquals("Sound", Macro.label(Macro.parse("{TOGGLE:sound}")))
+        // Keys show the tile icon, not the English label.
+        assertEquals(KeyIcon.SOUND, Macro.icon(Macro.parse("{TOGGLE:sound}")))
+        assertEquals(KeyIcon.SCANNER_TOGGLE, Macro.icon(Macro.parse("{TOGGLE:scanner}")))
+        assertNull(Macro.icon(Macro.parse("{TOGGLE:glove}X")))
         assertFalse(Macro.isValid("{TOGGLE:torch}"))
         assertFalse(Macro.isValid("{TOGGLE:}"))
     }

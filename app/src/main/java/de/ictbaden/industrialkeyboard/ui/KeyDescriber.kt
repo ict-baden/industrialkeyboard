@@ -181,6 +181,8 @@ class KeyDescriber(private val context: Context) {
         KeyIcon.DOWN -> s(R.string.a11y_arrow_down)
         KeyIcon.SETTINGS -> s(R.string.feature_settings)
         KeyIcon.TEXT_EDIT -> s(R.string.feature_text_editing)
+        // {TOGGLE:…}: named by the macro ("Handschuhe"), or the administrator's label.
+        KeyIcon.GLOVE, KeyIcon.CONTRAST, KeyIcon.SCANNER_TOGGLE, KeyIcon.SOUND -> null
     }
 
     /**

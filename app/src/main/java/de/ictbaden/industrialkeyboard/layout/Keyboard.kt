@@ -2,7 +2,12 @@ package de.ictbaden.industrialkeyboard.layout
 
 import de.ictbaden.industrialkeyboard.config.KeyStyle
 
-enum class KeyIcon { SHIFT, BACKSPACE, ENTER, TAB, SPACE, SCAN, HIDE, LEFT, RIGHT, UP, DOWN, SETTINGS, GLOBE, EMOJI, TEXT_EDIT }
+enum class KeyIcon {
+    SHIFT, BACKSPACE, ENTER, TAB, SPACE, SCAN, HIDE, LEFT, RIGHT, UP, DOWN, SETTINGS, GLOBE, EMOJI, TEXT_EDIT,
+
+    /** `{TOGGLE:…}` keys: the icons of the ⊞ tiles instead of an English label. */
+    GLOVE, CONTRAST, SCANNER_TOGGLE, SOUND,
+}
 
 /** What a key does when it is released. */
 sealed interface KeyOutput {

@@ -5,7 +5,9 @@ import android.view.inputmethod.EditorInfo
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.ictbaden.industrialkeyboard.config.Alphabet
+import de.ictbaden.industrialkeyboard.config.KeySettings
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
+import de.ictbaden.industrialkeyboard.config.ProgrammableKey
 import de.ictbaden.industrialkeyboard.config.Tabs
 import de.ictbaden.industrialkeyboard.ime.KeyboardRenderer
 import de.ictbaden.industrialkeyboard.layout.EditAction
@@ -183,6 +185,19 @@ class KeyDescriberTest {
         // The {EDIT} key and its icon.
         val editKey = Key(icon = KeyIcon.TEXT_EDIT, output = KeyOutput.Macro(Macro.parse("{EDIT}")))
         assertEquals("Text bearbeiten", describer.describe(editKey, KeyDescriber.KeyContext()))
+    }
+
+    @Test
+    fun `a quick toggle key shows the tile icon and says the toggle`() {
+        // HC20 test: {TOGGLE:glove} on alpha.p1 read "Glove" on a German keyboard.
+        val config = KeyboardConfig(keys = KeySettings(ProgrammableKey.DEFAULTS + ("alpha.p1" to "{TOGGLE:glove}")))
+        val toggle = Layouts.alpha(config).key { (it.output as? KeyOutput.Macro)?.steps == Macro.parse("{TOGGLE:glove}") }
+        assertEquals(KeyIcon.GLOVE, toggle.icon)
+        assertNull(toggle.label)
+        assertEquals("Handschuhe", describer.describe(toggle, KeyDescriber.KeyContext()))
+        // A label the administrator chose stays.
+        val labelled = Key(label = "HS", output = KeyOutput.Macro(Macro.parse("{TOGGLE:glove}")))
+        assertEquals("HS", describer.describe(labelled, KeyDescriber.KeyContext()))
     }
 
     @Test

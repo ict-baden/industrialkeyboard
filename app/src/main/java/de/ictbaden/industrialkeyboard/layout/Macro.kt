@@ -203,6 +203,13 @@ object Macro {
                 KeyCommand.NEXT_KEYBOARD -> null
                 KeyCommand.TEXT_EDIT -> KeyIcon.TEXT_EDIT
             }
+            // The generated label ("Glove") is English; the tile icon reads in every language.
+            is MacroStep.Toggle -> when (step.toggle) {
+                QuickToggle.GLOVE -> KeyIcon.GLOVE
+                QuickToggle.CONTRAST -> KeyIcon.CONTRAST
+                QuickToggle.SCANNER -> KeyIcon.SCANNER_TOGGLE
+                QuickToggle.SOUND -> KeyIcon.SOUND
+            }
             else -> null
         }
     }
