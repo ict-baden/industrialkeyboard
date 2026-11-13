@@ -31,6 +31,7 @@ class Ui(private val context: Context) {
     fun dp(value: Int) = (value * context.resources.displayMetrics.density).toInt()
 
     fun section(title: String): View = TextView(context).apply {
+        setTag(R.id.settings_search_role, SettingsSearch.ROLE_SECTION)
         text = title
         setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_LabelLarge)
         setTextColor(accent)
@@ -43,6 +44,7 @@ class Ui(private val context: Context) {
             cardElevation = 0f
             strokeWidth = 0
             setCardBackgroundColor(color(com.google.android.material.R.attr.colorSurfaceContainerLow))
+            setTag(R.id.settings_search_role, SettingsSearch.ROLE_CARD)
         }
         val column = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL

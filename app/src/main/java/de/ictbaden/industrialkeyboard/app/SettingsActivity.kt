@@ -11,9 +11,11 @@ import android.provider.Settings
 import android.view.View
 import android.view.ViewGroup
 import android.view.accessibility.AccessibilityManager
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
@@ -24,8 +26,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.core.widget.NestedScrollView
+import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.BuildConfig
 import de.ictbaden.industrialkeyboard.R
@@ -94,6 +99,11 @@ class SettingsActivity : AppCompatActivity() {
     private var previewPage: Page = Page.Alpha(AlphaVariant.TEXT)
     private var previewShift = ShiftState.OFF
     private var unlocked = false
+    private lateinit var previewCard: View
+    private lateinit var searchEmpty: TextView
+
+    /** Settings search: what is typed in the field above the preview. */
+    private var query = ""
     private val listener: (KeyboardConfig) -> Unit = { render() }
 
     /** Quick toggles of this device: shown and switched here, never written to the configuration. */
@@ -134,7 +144,7 @@ class SettingsActivity : AppCompatActivity() {
             keyboard.listener = previewKeys
             scanRow.listener = previewKeys
         }
-        val previewCard = MaterialCardView(this).apply {
+        previewCard = MaterialCardView(this).apply {
             radius = ui.dp(20).toFloat()
             cardElevation = 0f
             strokeWidth = 0
@@ -145,9 +155,13 @@ class SettingsActivity : AppCompatActivity() {
             setPadding(ui.dp(16), 0, ui.dp(16), ui.dp(32))
         }
         val scroll = NestedScrollView(this).apply { addView(content) }
+        val search = searchField(scroll)
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             addView(toolbar, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+            addView(search, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                setMargins(ui.dp(12), ui.dp(8), ui.dp(12), 0)
+            })
             addView(previewCard, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
                 setMargins(ui.dp(12), ui.dp(8), ui.dp(12), ui.dp(4))
             })
@@ -233,6 +247,40 @@ class SettingsActivity : AppCompatActivity() {
         if (config.scanner != stored.scanner) scanner.settings = config.scanner
         if (FieldPolicy.pageForTab(previewPage.tab, field, config, scanner.available) == null) previewPage = Page.Alpha(AlphaVariant.TEXT)
         preview.render(KeyboardRenderer.state(this, config, previewPage, previewShift, scanner.name).copy(keyPopups = false))
+    }
+
+    /** Search field above the preview: filters the rows below (see [SettingsSearch]). */
+    private fun searchField(scroll: NestedScrollView): TextInputLayout = TextInputLayout(this, null, com.google.android.material.R.attr.textInputOutlinedStyle).apply {
+        hint = getString(R.string.settings_search_hint)
+        startIconDrawable = ui.icon(R.drawable.kb_search)
+        endIconMode = TextInputLayout.END_ICON_CLEAR_TEXT
+        setBoxCornerRadii(ui.dp(28).toFloat(), ui.dp(28).toFloat(), ui.dp(28).toFloat(), ui.dp(28).toFloat())
+        addView(TextInputEditText(context).apply {
+            // A fixed id: Android restores the typed query after a rotation.
+            id = R.id.settings_search_field
+            isSingleLine = true
+            imeOptions = EditorInfo.IME_ACTION_SEARCH
+            doAfterTextChanged {
+                query = it?.toString().orEmpty()
+                applySearch()
+                scroll.scrollTo(0, 0)
+            }
+        })
+    }
+
+    /** Shows only matching rows; the keyboard preview gives way to the results while searching. */
+    @VisibleForTesting
+    internal fun applySearch() {
+        if (!::content.isInitialized || !::searchEmpty.isInitialized) return
+        val visible = SettingsSearch.filter(content, query)
+        val searching = query.isNotBlank()
+        previewCard.visibility = if (searching) View.GONE else View.VISIBLE
+        searchEmpty.visibility = if (searching && visible == 0) View.VISIBLE else View.GONE
+    }
+
+    @VisibleForTesting
+    internal fun search(text: String) {
+        findViewById<TextInputEditText>(R.id.settings_search_field).setText(text)
     }
 
     private fun update(transform: (KeyboardConfig) -> KeyboardConfig) {
@@ -649,6 +697,15 @@ class SettingsActivity : AppCompatActivity() {
                 ),
             ),
         )
+        searchEmpty = TextView(this).apply {
+            setTag(R.id.settings_search_role, SettingsSearch.ROLE_EMPTY)
+            text = getString(R.string.settings_search_empty)
+            setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
+            setPadding(ui.dp(8), ui.dp(32), ui.dp(8), ui.dp(8))
+            gravity = android.view.Gravity.CENTER
+        }
+        content.addView(searchEmpty)
+        applySearch()
     }
 
     /** Snippets: the switches and the administrator's list (users edit their own from the keyboard or the setup screen). */

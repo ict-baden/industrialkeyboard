@@ -750,4 +750,6 @@
         <item>always</item>
         <item>never</item>
     </string-array>
+    <string name="settings_search_hint">Search settings</string>
+    <string name="settings_search_empty">No matches</string>
 </resources>
