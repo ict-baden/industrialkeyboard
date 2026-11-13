@@ -3,10 +3,14 @@
      added under Settings → System → Keyboard → Industrial Keyboard → Languages. With
      layout.alphabet "auto" the letter layout follows the selected language (Alphabet.forLocale);
      only Latin-script languages, because the keyboard has no other scripts. -->
+<!-- supportsInlineSuggestions (Android 11+): the autofill chips of typing.autofillSuggestions. -->
 <input-method xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:isDefault="false"
     android:settingsActivity="de.ictbaden.industrialkeyboard.app.SettingsActivity"
-    android:supportsSwitchingToNextInputMethod="true">
+    android:supportsInlineSuggestions="true"
+    android:supportsSwitchingToNextInputMethod="true"
+    tools:targetApi="r">
     <subtype
         android:icon="@drawable/kb_globe"
         android:imeSubtypeLocale="en_US"
