@@ -63,6 +63,8 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 ### Behoben
 - Makros und Textbausteine mit `{ENTER}` und Text dahinter in mehrzeiligen Feldern: Der Zeilenumbruch kam erst nach dem folgenden Text an („Mit freundlichen GrüßenLager Süd⏎“, Zebra HC20). Dort wird er jetzt als Text getippt; ein `{ENTER}` am Ende eines Makros und in anderen Feldern bleibt die Enter-Taste.
 - ⊞-Kacheln: lange Beschriftungen werden getrennt statt mitten im Wort umbrochen („Funktionstast|en“); im hohen Kontrast haben Kacheln, Textbausteine und Zwischenablage-Einträge einen Rahmen wie die Tasten (vorher schwarz auf schwarz).
+- Emoji-Auswahl leer, Antippen ließ die Tastatur abstürzen (OutOfMemoryError, Zebra HC20): Seit dem Einhandmodus wurde die Auswahl zuerst ohne feste Breite vermessen, ein Emoji war breiter als der Bildschirm.
+- Werkzeugleiste: Kam der Wechsel von Tabs auf die Werkzeugleiste (z. B. per MDM) mitten im Gleiten der Markierung, blieb ⊞ markiert, bis das Feld wechselte.
 
 ## [2.1.1] – 2026-10-21
 

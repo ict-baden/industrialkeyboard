@@ -85,6 +85,9 @@ class TabBarView(context: Context) : View(context) {
     private val cells = mutableListOf<RectF>()
     private val hideCell = RectF()
     private val pill = RectF()
+
+    /** Where the selection pill is drawn; empty = none (for tests). */
+    internal val pillBounds: RectF get() = RectF(pill)
     private var pillFrom = RectF()
     private var pillTo = RectF()
     private var animator: ValueAnimator? = null
@@ -122,6 +125,9 @@ class TabBarView(context: Context) : View(context) {
         if (changed || previous != selected) a11y.invalidateRoot()
         val target = selectedCell()
         if (target == null) {
+            // A pill still sliding (e.g. #+= → ABC) would otherwise land on the first cell again
+            // after a switch to the toolbar, which marks no ABC (seen on the HC20 after an MDM push).
+            animator?.cancel()
             pill.setEmpty()
         } else if (!animate || previous == null || pill.isEmpty || changed) {
             animator?.cancel()
