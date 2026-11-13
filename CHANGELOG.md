@@ -7,7 +7,7 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 ## [2.2.4] – 2026-11-13
 
 ### Behoben
-- **Autofill-Vorschläge waren unsichtbar:** Die Chips (z. B. die eigene E-Mail-Adresse aus dem Google-Konto) kamen an, wurden aber 0 Pixel breit eingefügt, weil die Tastatur die vom System gemessene Größe durch „Inhalt umschließen“ ersetzte. Jetzt behalten sie die Größe des Systems. Am Pixel 9 Pro (Android 16) mit „Autofill mit Google“ geprüft.
+- **Autofill-Vorschläge waren unsichtbar:** Die Chips (z. B. die eigene E-Mail-Adresse aus dem Google-Konto) kamen an, wurden aber 0 Pixel breit eingefügt, weil die Tastatur die vom System gemessene Größe durch „Inhalt umschließen“ ersetzte. Jetzt behalten sie die Größe des Systems. Am Pixel 9 Pro (Android 17) mit „Autofill mit Google“ geprüft.
 
 ## [2.2.3] – 2026-11-13
 
