@@ -15,15 +15,27 @@ permission, so Android does not let it open network connections at all. There is
 no crash reporting, no update check and no account.
 
 What you type is passed to the focused app, and **nothing typed in other apps is stored**: there is
-no dictionary, no word learning and no typing history. The clipboard is read only while the keyboard
+no word learning and no typing history. The clipboard is read only while the keyboard
 is shown, for the 📋 panel, and with `typing.clipboardHistory` copied texts are kept in memory only
 ([below](#what-the-keyboard-reads)). The only texts the app keeps
-are [snippets](configuration.md#snippets--snippets) users enter themselves in the app's own
-snippet screen (below).
+are [snippets](configuration.md#snippets--snippets) and words of the **personal dictionary** users
+enter or import themselves in the app's own screens (below).
 
 **Word suggestions** come from built-in word lists (AOSP dictionaries) of the keyboard language. Only
 the word being typed is held in memory to look it up; it is dropped when the word ends. Nothing is
-learnt, no personal dictionary is built, nothing is written to storage. **Emoji:** the emoji panel keeps
+learnt from typing, nothing typed is written to storage.
+
+**Personal words** ([`typing.personalDictionary`, `systemDictionary`](configuration.md#typing)): the
+suggestions also offer words the user put into the keyboard's personal dictionary on purpose – added
+in *Settings → Typing → Personal dictionary* or imported from a file the user picks there (a Gboard
+export or a word list; read once, at most 1 MB, nothing of the file but the words is kept) – and the
+words of Android's user dictionary (`UserDictionary`, e.g. Gboard's personal dictionary). The latter
+is only read (when a field starts and when it changes), never written or copied.
+
+**Autofill** ([`typing.autofillSuggestions`](configuration.md#typing), Android 11+): the keyboard
+asks Android for the chips of the autofill service chosen in Android (Google, a password manager)
+and shows them above the keys. The system draws them; their content (e-mail addresses, passwords …)
+never reaches the keyboard. **Emoji:** the emoji panel keeps
 recently used emoji in memory only; the AndroidX picker stores the preferred skin tone per emoji on the
 device (no text).
 
@@ -73,6 +85,7 @@ storage (other apps cannot read it):
 | `shared_prefs/password_guard_settings.xml`, `password_guard_remote.xml` | Number of wrong admin passwords in a row and the end of the 5-minute lock – one file for the settings screen, one for broadcasts and files. No passwords. |
 | `shared_prefs/migrations.xml` | Which one-time changes after an update were done. |
 | `files/user-snippets.json` | [Snippets](configuration.md#snippets--snippets) the user entered in the app's snippet screen (name, text, shortcut) – never text typed in other apps, the clipboard or a selection. Not part of the configuration, export, QR code or *Reset to defaults*; *Clear storage* removes it. |
+| `files/personal-dictionary.json` | The [personal dictionary](configuration.md#typing): words, optional shortcuts and languages the user added or imported – never text typed in other apps. Not part of the configuration, export, QR code or *Reset to defaults*; *Delete all words* in its screen or *Clear storage* removes it. |
 | `files/user-snippets.json.invalid` | Only if that file was damaged once: the broken copy (`IK-0108`), the list started empty. |
 | `shared_prefs/quick_toggles.xml` | Quick toggles switched on this device (glove mode, contrast, scanner, sound) – on/off only, no text. Not part of the configuration, export or QR code; *Reset quick toggles* or *Clear storage* removes it. |
 
@@ -90,6 +103,8 @@ or rejected – never typed text, barcodes or snippet texts.
 - The **input type** of the focused field (number, e-mail, password …) to choose the matching keys.
 - The **package name, input type and hint** (placeholder or label) of the focused field, only to pick an [app profile](configuration.md#appprofiles--app-profiles) when the field starts – not the text in it. Nothing of it is stored; logcat gets the package name and the profile name, never the hint.
 - The **cursor position** (and, for ← and → on the text editing panel, the one character next to the cursor, to keep the focus in the field) – in memory only, never stored or logged.
+- **Android's user dictionary** (words, shortcuts, language, frequency), with `typing.systemDictionary`, when a field starts and when it changes – in memory only.
+- A **file the user picks** for the personal dictionary import (system file picker; the app gets access to that one file only).
 - The **clipboard**, only while the keyboard is shown and only to offer it in the 📋 panel. With `typing.clipboardHistory` (off by default) copied texts are kept **in memory only** – at most 20, unpinned ones for 1 hour, nothing from password fields or clips marked sensitive – and are gone when the keyboard process ends. An entry removed with × stays removed even while it is still on the clipboard. Nothing is written to storage.
 - The **text of the field**, only for *Select all* on the text editing panel when the app does not support the select-all command: the keyboard then reads the field's text once to find its end and select it. It is held in memory only for that moment – never stored or logged.
 

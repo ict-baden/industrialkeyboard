@@ -201,6 +201,24 @@
         android:title="@string/mc_clipboard_history_title" />
     <restriction
         android:defaultValue="true"
+        android:description="@string/mc_autofill_suggestions_description"
+        android:key="autofill_suggestions"
+        android:restrictionType="bool"
+        android:title="@string/mc_autofill_suggestions_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_system_dictionary_description"
+        android:key="system_dictionary"
+        android:restrictionType="bool"
+        android:title="@string/mc_system_dictionary_title" />
+    <restriction
+        android:defaultValue="true"
+        android:description="@string/mc_personal_dictionary_description"
+        android:key="personal_dictionary"
+        android:restrictionType="bool"
+        android:title="@string/mc_personal_dictionary_title" />
+    <restriction
+        android:defaultValue="true"
         android:description="@string/mc_text_editing_description"
         android:key="text_editing"
         android:restrictionType="bool"

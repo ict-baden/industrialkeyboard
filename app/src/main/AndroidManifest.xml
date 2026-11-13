@@ -91,6 +91,11 @@
             android:exported="false"
             android:label="@string/snippets_title"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".app.PersonalDictionaryActivity"
+            android:exported="false"
+            android:label="@string/personal_dictionary_title"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- Asks for the camera permission for the keyboard (an input method cannot). -->
         <!-- Asks for the microphone permission for dictation (an input method cannot). -->

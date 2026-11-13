@@ -51,6 +51,10 @@ object ConfigVersion {
                 voice = VoiceInput.OFF,
                 deleteGesture = false,
                 nextWord = false,
+                // Did not exist in 2.1: off, so an old configuration suggests nothing new.
+                autofillSuggestions = false,
+                systemDictionary = false,
+                personalDictionary = false,
             ),
             feedback = d.feedback.copy(vibrationMs = LEGACY_VIBRATION_MS),
             scanner = d.scanner.copy(

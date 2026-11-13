@@ -80,6 +80,7 @@ import de.ictbaden.industrialkeyboard.layout.AlphaVariant
 import de.ictbaden.industrialkeyboard.layout.Key
 import de.ictbaden.industrialkeyboard.layout.KeyOutput
 import de.ictbaden.industrialkeyboard.scanner.ScanTrigger
+import de.ictbaden.industrialkeyboard.suggest.PersonalDictionary
 import de.ictbaden.industrialkeyboard.ui.KeyboardRootView
 import de.ictbaden.industrialkeyboard.ui.KeyboardView
 import de.ictbaden.industrialkeyboard.ui.Palette
@@ -216,6 +217,8 @@ class SettingsActivity : AppCompatActivity() {
         Provisioning.applyAllAsync(this)
         render()
     }
+
+    private fun personalWordCount() = PersonalDictionary.get(this).words.size
 
     /** Preview keys: switch pages and shift like the keyboard, but type nothing. */
     private val previewKeys = object : KeyboardView.Listener {
@@ -473,6 +476,21 @@ class SettingsActivity : AppCompatActivity() {
                     ui.switchRow(R.drawable.ic_keyboard, getString(R.string.next_word), getString(R.string.next_word_summary), c.typing.nextWord, enabled = c.typing.suggestions) { on ->
                         update { it.copy(typing = it.typing.copy(nextWord = on)) }
                     },
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.personal_dictionary_switch), getString(R.string.personal_dictionary_switch_summary), c.typing.personalDictionary) { on ->
+                        update { it.copy(typing = it.typing.copy(personalDictionary = on)) }
+                    },
+                    ui.row(
+                        R.drawable.ic_text,
+                        getString(R.string.personal_dictionary_title),
+                        resources.getQuantityString(R.plurals.personal_dictionary_count, personalWordCount(), personalWordCount()),
+                    ) { startActivity(Intent(this, PersonalDictionaryActivity::class.java)) }
+                        .apply { setTag(R.id.settings_search_keywords, "Gboard Wörterbuch dictionary import shortcut Kürzel") },
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.system_dictionary), getString(R.string.system_dictionary_summary), c.typing.systemDictionary) { on ->
+                        update { it.copy(typing = it.typing.copy(systemDictionary = on)) }
+                    }.apply { setTag(R.id.settings_search_keywords, "Gboard Wörterbuch dictionary user dictionary") },
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.autofill_suggestions), getString(R.string.autofill_suggestions_summary), c.typing.autofillSuggestions) { on ->
+                        update { it.copy(typing = it.typing.copy(autofillSuggestions = on)) }
+                    }.apply { setTag(R.id.settings_search_keywords, "Autofill E-Mail email Passwort password Adresse address") },
                     ui.switchRow(R.drawable.ic_keyboard, getString(R.string.clipboard_history), getString(R.string.clipboard_history_summary), c.typing.clipboardHistory) { on ->
                         update { it.copy(typing = it.typing.copy(clipboardHistory = on)) }
                     },

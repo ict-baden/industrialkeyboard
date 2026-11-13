@@ -12,6 +12,7 @@ import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Build
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -23,10 +24,13 @@ import android.view.View
 import android.view.accessibility.AccessibilityManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.ExtractedTextRequest
+import android.view.inputmethod.InlineSuggestionsRequest
+import android.view.inputmethod.InlineSuggestionsResponse
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodSubtype
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
@@ -73,9 +77,13 @@ import de.ictbaden.industrialkeyboard.scanner.ScanTrigger
 import de.ictbaden.industrialkeyboard.scanner.Symbologies
 import de.ictbaden.industrialkeyboard.suggest.Dictionaries
 import de.ictbaden.industrialkeyboard.suggest.NextWordContext
+import de.ictbaden.industrialkeyboard.suggest.PersonalDictionary
+import de.ictbaden.industrialkeyboard.suggest.PersonalWord
+import de.ictbaden.industrialkeyboard.suggest.PersonalWords
 import de.ictbaden.industrialkeyboard.suggest.Suggester
 import de.ictbaden.industrialkeyboard.suggest.Suggestion
 import de.ictbaden.industrialkeyboard.suggest.Suggestions
+import de.ictbaden.industrialkeyboard.suggest.SystemDictionary
 import de.ictbaden.industrialkeyboard.suggest.WordList
 import de.ictbaden.industrialkeyboard.ui.ClipItem
 import de.ictbaden.industrialkeyboard.ui.FeaturesPanelView
@@ -83,6 +91,7 @@ import de.ictbaden.industrialkeyboard.ui.Feedback
 import de.ictbaden.industrialkeyboard.ui.KeyDescriber
 import de.ictbaden.industrialkeyboard.ui.KeyboardRootView
 import de.ictbaden.industrialkeyboard.ui.KeyboardView
+import de.ictbaden.industrialkeyboard.ui.Palette
 import de.ictbaden.industrialkeyboard.ui.PanelSnippet
 import de.ictbaden.industrialkeyboard.ui.ScanPadView
 import de.ictbaden.industrialkeyboard.ui.ShiftState
@@ -143,7 +152,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     // Word suggestions: only the word being typed is kept, in memory, until it ends.
     private lateinit var dictionaries: Dictionaries
     private var suggester: Suggester? = null
-    private var suggesterFor: Pair<WordList, List<String>>? = null
+    private var suggesterFor: Triple<WordList, List<String>, List<Any>>? = null
     private val word = StringBuilder()
     private var suggestions = Suggestions.NONE
     /** Edits of our own that onUpdateSelection still has to report; any other move ends the word. */
@@ -178,6 +187,39 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     /** The snippet whose shortcut is the word being typed; in memory only, gone with the word. */
     private var snippetMatch: Snippet? = null
+
+    /** The keyboard's own personal dictionary (settings, Gboard import). */
+    private val personalDictionary by lazy { PersonalDictionary.get(this) }
+
+    /** Android's user dictionary (Gboard's personal dictionary), read off the main thread when it changes. */
+    private val systemDictionary by lazy { SystemDictionary(this) { personalWordsChanged() } }
+    private val personalListener: (List<PersonalWord>) -> Unit = { personalWordsChanged() }
+
+    /** Changes with every change of the personal words; part of the suggester cache key. */
+    private var personalVersion = 0
+
+    private fun personalWordsChanged() {
+        personalVersion++
+        if (updateSnippetMatch()) render()
+    }
+
+    /** Personal words with a shortcut in the keyboard language; rebuilt when they change, not per key. */
+    private var shortcutCache: Pair<List<Any>, List<PersonalWord>>? = null
+
+    private fun personalShortcuts(): List<PersonalWord> {
+        val locale = Alphabet.keyboardLocale()
+        val key = listOf(personalVersion, locale, config.typing.personalDictionary, config.typing.systemDictionary)
+        shortcutCache?.takeIf { it.first == key }?.let { return it.second }
+        val list = PersonalWords.forLanguage(personalWords(), locale).filter { it.shortcut != null }
+        shortcutCache = key to list
+        return list
+    }
+
+    /** The user's own words for suggestions and shortcuts, as far as the configuration allows them. */
+    private fun personalWords(): List<PersonalWord> = buildList {
+        if (config.typing.personalDictionary) addAll(personalDictionary.words)
+        if (config.typing.systemDictionary) addAll(systemDictionary.words)
+    }
 
     // Screen readers: both states are kept up to date by listeners, never asked for per key.
     private var accessibility: AccessibilityManager? = null
@@ -236,6 +278,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         store.addListener(configListener)
         toggles.addListener(togglesListener)
         userSnippets.addListener(userSnippetsListener)
+        personalDictionary.addListener(personalListener)
         KeyboardBus.onShowTab = { tab -> root?.isShown == true && showTab(tab) }
         KeyboardBus.onNfc = ::typeNfc
         accessibility = getSystemService(AccessibilityManager::class.java)?.also { manager ->
@@ -259,6 +302,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         store.removeListener(configListener)
         toggles.removeListener(togglesListener)
         userSnippets.removeListener(userSnippetsListener)
+        personalDictionary.removeListener(personalListener)
+        systemDictionary.close()
         KeyboardBus.onShowTab = null
         KeyboardBus.onNfc = null
         KeyboardBus.keyboardShown = false
@@ -283,9 +328,18 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         useEffective(configChanged = true)
         // Snippets switched off (or nothing left to show) while the panel is open: back to the keys.
         if (toolPanel == Tabs.TOOL_SNIPPETS && !Snippets.reachable(config)) toolPanel = null
+        useSystemDictionary()
         updateSnippetMatch()
         refreshFeatures()
         render()
+    }
+
+    /**
+     * Reads Android's user dictionary when the field starts (off the main thread, then only on
+     * changes); stops reading when the configuration switches it off.
+     */
+    private fun useSystemDictionary() {
+        if (config.typing.systemDictionary) systemDictionary.start() else systemDictionary.stop()
     }
 
     /**
@@ -578,6 +632,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         findVoiceInput(info)
         endWord()
         emojiOpen = false
+        useSystemDictionary()
         Provisioning.applyAllAsync(this)
         val newField = FieldPolicy.field(info.inputType)
         if (!restarting || newField != field || effectiveChanged) {
@@ -594,8 +649,43 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         KeyboardBus.takePendingNfc(SystemClock.elapsedRealtime())?.let { text -> handler.post { typeNfc(text) } }
     }
 
+    /**
+     * Android 11+: asks the autofill service for chips (e-mail, address, password, one-time code) in
+     * our colours. Null (no chips) when `typing.autofillSuggestions` is off.
+     */
+    @RequiresApi(Build.VERSION_CODES.R)
+    override fun onCreateInlineSuggestionsRequest(uiExtras: Bundle): InlineSuggestionsRequest? {
+        if (!config.typing.autofillSuggestions) return null
+        return runCatching { InlineAutofill.request(this, Palette.resolve(this, config.appearance), uiExtras) }
+            .onFailure { Log.i(TAG, "No inline suggestions (${it.javaClass.simpleName})") }
+            .getOrNull()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    override fun onInlineSuggestionsResponse(response: InlineSuggestionsResponse): Boolean {
+        if (!config.typing.autofillSuggestions) return false
+        val generation = ++inlineGeneration
+        InlineAutofill.inflate(this, response) { views ->
+            // A later response (or the field closed) meanwhile: these chips are stale.
+            if (generation == inlineGeneration) {
+                root?.setInlineSuggestions(views)
+                render()
+            }
+        }
+        return true
+    }
+
+    /** Counts autofill responses and field ends, so chips inflated late do not show in another field. */
+    private var inlineGeneration = 0
+
+    private fun clearInlineSuggestions() {
+        inlineGeneration++
+        root?.setInlineSuggestions(emptyList())
+    }
+
     override fun onFinishInputView(finishingInput: Boolean) {
         super.onFinishInputView(finishingInput)
+        clearInlineSuggestions()
         KeyboardBus.keyboardShown = false
         KeyboardBus.hiddenAt = SystemClock.elapsedRealtime()
         if (scanning) {
@@ -862,7 +952,14 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     /** Recomputes [snippetMatch] for the word being typed (in memory, no system calls); true when it changed. */
     private fun updateSnippetMatch(): Boolean {
         val info = currentInputEditorInfo
-        val match = if (word.isEmpty() || info == null) null else Snippets.matchFor(word, page, info.inputType, toolPanel, config, userSnippets.items)
+        val match = if (word.isEmpty() || info == null) {
+            null
+        } else {
+            Snippets.matchFor(word, page, info.inputType, toolPanel, config, userSnippets.items)
+                // A shortcut of a personal word (own or Android's dictionary): offered like a snippet.
+                ?: PersonalWords.shortcutSnippet(word.toString(), personalShortcuts())
+                    ?.takeIf { page is Page.Alpha && toolPanel == null && FieldPolicy.snippetShortcutsAllowed(info.inputType) }
+        }
         if (match == snippetMatch) return false
         snippetMatch = match
         return true
@@ -914,9 +1011,13 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun suggesterNow(): Suggester? {
         val list = dictionaries.current ?: return null
         val rows = Layouts.letterRows(config, config.layout.alphabet.resolve())
-        if (suggesterFor != list to rows) {
-            suggester = Suggester(list, Alphabet.keyboardLocale(), rows)
-            suggesterFor = list to rows
+        // The personal words are merged in once per change (language, words, switches), not per key.
+        val key = Triple(list, rows, listOf(personalVersion, config.typing.personalDictionary, config.typing.systemDictionary))
+        if (suggesterFor != key) {
+            val locale = Alphabet.keyboardLocale()
+            val own = PersonalWords.entries(PersonalWords.forLanguage(personalWords(), locale), locale)
+            suggester = Suggester(list.withExtra(own), locale, rows)
+            suggesterFor = key
         }
         return suggester
     }
@@ -1643,7 +1744,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
                 obscureKeys = secret && PasswordSpeech.obscure(config.accessibility.speakPasswordKeys, passwordField = true, headset = headset),
                 enterAction = enterAction,
                 enterLabel = currentInputEditorInfo?.actionLabel?.toString()?.takeIf { enterAction != EditorInfo.IME_ACTION_UNSPECIFIED },
-            ),
+            ).copy(wordTyped = word.isNotEmpty()),
         )
     }
 

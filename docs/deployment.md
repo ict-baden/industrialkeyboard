@@ -93,6 +93,9 @@ The app ships a schema that every EMM with Android Enterprise support shows:
 | `next_word` | Bool | Next-word suggestions after a space (default on) |
 | `clipboard_history` | Bool | Clipboard history in memory for the 📋 panel (default off) |
 | `text_editing` | Bool | Tile *Text editing* in the ⊞ menu: arrows, select, cut, copy and paste (default on) |
+| `autofill_suggestions` | Bool | Android 11+: chips of the autofill service (e-mail, address, password) above the keys (default on) |
+| `system_dictionary` | Bool | Words and shortcuts of Android's user dictionary in the suggestions (default on) |
+| `personal_dictionary` | Bool | Words of the keyboard's own personal dictionary (added or imported from Gboard by the user) in the suggestions (default on) |
 | `snippets_enabled` | Bool | [Snippets](configuration.md#snippets--snippets) in ⊞, the bar and as shortcut suggestions (default on) |
 | `snippets_shortcuts` | Bool | Typed shortcuts offer their snippet (default on) |
 | `snippets_button` | Bool | Own snippets button in the toolbar or as the last tab (default off) |

@@ -132,6 +132,9 @@ object Provisioning {
                 deleteGesture = bool("delete_gesture", config.typing.deleteGesture),
                 nextWord = bool("next_word", config.typing.nextWord),
                 clipboardHistory = bool("clipboard_history", config.typing.clipboardHistory),
+                autofillSuggestions = bool("autofill_suggestions", config.typing.autofillSuggestions),
+                systemDictionary = bool("system_dictionary", config.typing.systemDictionary),
+                personalDictionary = bool("personal_dictionary", config.typing.personalDictionary),
                 textEditing = bool("text_editing", config.typing.textEditing),
             ),
             layout = config.layout.copy(

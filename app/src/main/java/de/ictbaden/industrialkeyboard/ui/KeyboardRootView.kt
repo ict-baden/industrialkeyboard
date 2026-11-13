@@ -3,9 +3,11 @@ package de.ictbaden.industrialkeyboard.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
+import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import androidx.annotation.DrawableRes
@@ -15,8 +17,8 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import de.ictbaden.industrialkeyboard.AppLanguage
 import de.ictbaden.industrialkeyboard.R
-import de.ictbaden.industrialkeyboard.config.Tabs
 import de.ictbaden.industrialkeyboard.config.OneHanded
+import de.ictbaden.industrialkeyboard.config.Tabs
 import de.ictbaden.industrialkeyboard.layout.KeyboardLayout
 import de.ictbaden.industrialkeyboard.layout.Layouts
 import de.ictbaden.industrialkeyboard.layout.ModifierKey
@@ -81,6 +83,8 @@ data class RenderState(
     val enterLabel: String? = null,
     /** Height factor of the tab bar and the suggestion strip (`accessibility.followFontSize`). */
     val barScale: Float = 1f,
+    /** A word is being typed: the autofill chips step aside. */
+    val wordTyped: Boolean = false,
 )
 
 /**
@@ -99,6 +103,21 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
 
     /** Word suggestions in place of the tab bar while typing a word. */
     val suggestionStrip = SuggestionStripView(context).apply { visibility = GONE }
+
+    /**
+     * Autofill chips (Android 11+, drawn by the system) in place of the tab bar while no word is
+     * typed; scrolls sideways when there are more than fit.
+     */
+    private val inlineRow = LinearLayout(context).apply {
+        orientation = LinearLayout.HORIZONTAL
+        gravity = Gravity.CENTER_VERTICAL
+    }
+    val inlineStrip = HorizontalScrollView(context).apply {
+        isHorizontalScrollBarEnabled = false
+        visibility = GONE
+        addView(inlineRow, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT))
+    }
+    private var inlineViews: List<View> = emptyList()
 
     /** Emoji in place of the keys. */
     val emojiPanel = EmojiPanelView(context).apply { visibility = GONE }
@@ -155,6 +174,7 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         clipChildren = false
         panel.addView(tabBar, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         panel.addView(suggestionStrip, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        panel.addView(inlineStrip, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)))
         contentRow.addView(oneHandedLeft, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT))
         contentRow.addView(content, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         contentRow.addView(oneHandedRight, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT))
@@ -245,6 +265,17 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         ViewCompat.setAccessibilityPaneTitle(camera, res.getString(R.string.a11y_camera))
     }
 
+    /** Replaces the autofill chips ([InlineAutofill]); empty removes them. Shown with the next [render]. */
+    fun setInlineSuggestions(views: List<View>) {
+        inlineViews = views
+        inlineRow.removeAllViews()
+        val gap = dp(6)
+        views.forEach { v ->
+            inlineRow.addView(v, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { setMargins(gap, 0, 0, 0) })
+        }
+        inlineStrip.scrollTo(0, 0)
+    }
+
     fun render(state: RenderState) {
         val previous = this.state
         this.state = state
@@ -259,7 +290,10 @@ class KeyboardRootView(context: Context, headroomDp: Float = 76f) : FrameLayout(
         tabBar.spread = state.toolbar
         tabBar.heightScale = state.barScale
         suggestionStrip.heightScale = state.barScale
-        tabBar.isVisible = state.tabs != null && !suggesting
+        val autofill = inlineViews.isNotEmpty() && !suggesting && !state.wordTyped && !state.emojiOpen && state.toolPanel == null
+        tabBar.isVisible = state.tabs != null && !suggesting && !autofill
+        inlineStrip.isVisible = autofill
+        inlineStrip.setBackgroundColor(p.tabBar)
         suggestionStrip.isVisible = suggesting
         suggestionStrip.palette = p
         suggestionStrip.words = state.suggestions

@@ -666,4 +666,54 @@
     </string-array>
     <string name="settings_search_hint">搜索设置</string>
     <string name="settings_search_empty">没有匹配项</string>
+    <string name="personal_dictionary_switch">个人词语</string>
+    <string name="personal_dictionary_switch_summary">在建议中显示个人词典中的词语</string>
+    <string name="personal_dictionary_title">个人词典</string>
+    <string name="system_dictionary">Android 用户词典</string>
+    <string name="system_dictionary_summary">系统个人词典中的词语和快捷词（例如来自 Gboard）</string>
+    <string name="autofill_suggestions">自动填充建议</string>
+    <string name="autofill_suggestions_summary">在按键上方显示自动填充服务的电子邮件、地址和密码建议（Android 11+）</string>
+    <string name="personal_dictionary_add">添加词语</string>
+    <string name="personal_dictionary_import">导入</string>
+    <string name="personal_dictionary_import_summary">从 Gboard 导出的 ZIP 或 dictionary.txt</string>
+    <string name="personal_dictionary_delete_all">删除所有词语</string>
+    <plurals name="personal_dictionary_delete_all_confirm">
+        <item quantity="other">删除个人词典中的全部 %1$d 个词语？</item>
+    </plurals>
+    <string name="personal_dictionary_empty">还没有词语。可自行添加或从 Gboard 导入。</string>
+    <string name="personal_dictionary_filter">搜索词语</string>
+    <plurals name="personal_dictionary_more">
+        <item quantity="other">还有 %1$d 个词语 – 请缩小搜索范围</item>
+    </plurals>
+    <string name="personal_dictionary_section_words">词语</string>
+    <string name="personal_dictionary_note">仅保存您添加或导入的词语 – 键盘不会从输入中学习。仅保存在本设备上，不包含在备份中。</string>
+    <string name="personal_dictionary_edit_title">词语</string>
+    <string name="personal_dictionary_word_hint">词语或短语</string>
+    <string name="personal_dictionary_word_helper">最多 64 个字符</string>
+    <string name="personal_dictionary_shortcut_hint">快捷词（可选）</string>
+    <string name="personal_dictionary_shortcut_helper">输入它时会提示该词语，例如 mfg</string>
+    <string name="personal_dictionary_language_hint">语言（可选）</string>
+    <string name="personal_dictionary_language_helper">例如 zh 或 en-US；留空 = 所有语言</string>
+    <string name="personal_dictionary_all_languages">所有语言</string>
+    <string name="personal_dictionary_delete">删除</string>
+    <string name="personal_dictionary_error_word">请输入最多 64 个字符的词语</string>
+    <string name="personal_dictionary_error_shortcut">最多 16 个字符，不含空格</string>
+    <string name="personal_dictionary_error_language">未知语言 – 例如 zh 或 en-US</string>
+    <plurals name="personal_dictionary_full">
+        <item quantity="other">最多 %1$d 个词语</item>
+    </plurals>
+    <string name="personal_dictionary_import_done">导入完成</string>
+    <string name="personal_dictionary_import_result">已导入：%1$d\n已存在：%2$d\n已跳过：%3$d</string>
+    <string name="personal_dictionary_import_failed">导入失败</string>
+    <string name="personal_dictionary_import_invalid">不是 Gboard 词典导出文件或词语列表（%1$s）。</string>
+    <string name="personal_dictionary_save_failed">无法保存个人词典。</string>
+    <string name="mc_autofill_suggestions_title">自动填充建议</string>
+    <string name="mc_autofill_suggestions_description">Android 11+：在按键上方显示自动填充服务的提示块（电子邮件、地址、密码）（默认开启）。</string>
+    <string name="mc_system_dictionary_title">Android 用户词典</string>
+    <string name="mc_system_dictionary_description">在建议中使用系统个人词典的词语和快捷词（默认开启）。</string>
+    <string name="mc_personal_dictionary_title">个人词典</string>
+    <string name="mc_personal_dictionary_description">在建议中使用用户添加或导入（Gboard）的词语（默认开启）。</string>
+    <plurals name="personal_dictionary_count">
+        <item quantity="other">%1$d 个词语 · 添加、从 Gboard 导入</item>
+    </plurals>
 </resources>
