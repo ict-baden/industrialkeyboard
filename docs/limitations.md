@@ -80,6 +80,15 @@ Please report results on other devices in the
 - In select mode ←/→ set the selection directly; ↑/↓, Home and End send Shift with the key,
   which an editor may ignore.
 
+## Macros
+
+- Keys in a macro (`{TAB}`, arrows, `{ENTER}` in fields with an action) reach the app after text
+  the keyboard types straight away. Text after such a key in the same macro can therefore land
+  before the key, or in the previous field after `{TAB}` (seen on a Zebra HC20, Android 15:
+  `12{LEFT}{LEFT}X` gives `12X`). Put keys at the end of a macro, or use one key per field.
+  Exception: `{ENTER}` followed by text in a multi-line field is typed as a line break, so
+  snippets with several lines work.
+
 ## App profiles
 
 - Browsers and WebView apps report the browser's package name for every page, so one profile

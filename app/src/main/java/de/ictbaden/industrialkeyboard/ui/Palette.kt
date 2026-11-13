@@ -3,12 +3,14 @@ package de.ictbaden.industrialkeyboard.ui
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.toColorInt
 import de.ictbaden.industrialkeyboard.config.Appearance
 import de.ictbaden.industrialkeyboard.config.ThemeMode
+import kotlin.math.roundToInt
 
 /** Colors of one keyboard theme. */
 data class Palette(
@@ -164,4 +166,12 @@ data class Palette(
         fun isNight(context: Context): Boolean =
             (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
     }
+}
+
+/**
+ * The key outline ([Palette.border], high contrast) around a tile or card of a panel, which lies on the
+ * same colour as the panel and would otherwise be invisible. Nothing for themes without an outline.
+ */
+fun Palette.outline(drawable: GradientDrawable, density: Float) {
+    if (border != 0) drawable.setStroke((1.5f * density).roundToInt().coerceAtLeast(1), border)
 }

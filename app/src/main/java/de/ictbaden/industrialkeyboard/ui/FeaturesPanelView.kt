@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
+import android.text.Layout
 import android.view.Gravity
 import android.view.View
 import android.widget.GridLayout
@@ -113,6 +114,10 @@ class FeaturesPanelView(context: Context) : GridLayout(context) {
                 FontCap.apply(this, 12f)
                 gravity = Gravity.CENTER
                 maxLines = 2
+                // German labels are long ("Funktionstasten", "Zwischenablage"): hyphenate them in the
+                // keyboard's language instead of breaking anywhere ("Funktionstast|en" on the HC20).
+                // TextView already breaks with the high-quality strategy, which hyphenation needs.
+                hyphenationFrequency = Layout.HYPHENATION_FREQUENCY_NORMAL
             }
             view.addView(label, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(4) })
             addView(view, LayoutParams(spec(UNDEFINED, 1f), spec(UNDEFINED, 1f)).apply {
@@ -137,8 +142,12 @@ class FeaturesPanelView(context: Context) : GridLayout(context) {
             tile.view.background = GradientDrawable().apply {
                 setColor(if (on) palette.accent else palette.key)
                 cornerRadius = dp(14).toFloat()
+                // High contrast: black tiles on black only show their outline, like the keys.
+                if (!on) palette.outline(this, resources.displayMetrics.density)
             }
             val label = res.getString(feature.label)
+            // Hyphenation follows the text's language, which is the keyboard's, not always the device's.
+            tile.label.textLocales = res.resources.configuration.locales
             tile.view.contentDescription = label
             tile.icon?.imageTintList = ColorStateList.valueOf(foreground)
             tile.glyph?.setTextColor(foreground)

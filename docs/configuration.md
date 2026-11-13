@@ -737,7 +737,11 @@ when the configuration is loaded.
 | Commands | `{SCAN}` start/stop the scanner, `{HIDE}` hide the keyboard, `{SETTINGS}` open the settings, `{NEXT-KEYBOARD}` switch to the next keyboard, `{EDIT}` open/close the text editing panel ([`typing.textEditing`](#typing)), `{TOGGLE:glove}` / `{TOGGLE:contrast}` / `{TOGGLE:scanner}` / `{TOGGLE:sound}` switch a [quick toggle](#quicktoggles--quick-toggles-on-the-device) (only if allowed), `{SHOW:tab}` show a tab (`alpha`, `numeric`, `symbols`, `function`, `scan` or a custom layout id) |
 
 `{ENTER}` behaves like the Enter key: it runs the field's action (next field, search, send …)
-or starts a new line in multi-line fields.
+or starts a new line in multi-line fields. When more text follows it in a multi-line field without
+an action (`Mit freundlichen Grüßen{ENTER}Lager Süd`), the line break is typed as text, as the
+AOSP keyboard does: sent as a key, it would reach the app after the text that follows. An `{ENTER}`
+at the end of a macro, and every `{ENTER}` in other fields, stays the Enter key. Text after other
+keys (`{TAB}`, arrows) can still arrive before the key – see [limitations](limitations.md#macros).
 
 Examples: `OK{ENTER}` · `{F13}` · `{TAB}{TAB}` · `{U+00E4}` · `{SHOW:picking}` · `{ESC}{F3}` · `{CTRL+C}` · `{WIN}notepad{ENTER}`
 

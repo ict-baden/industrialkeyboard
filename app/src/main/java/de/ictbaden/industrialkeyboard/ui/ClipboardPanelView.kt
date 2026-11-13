@@ -134,6 +134,8 @@ class ClipboardPanelView(context: Context) : LinearLayout(context) {
     private fun rounded(color: Int) = GradientDrawable().apply {
         setColor(color)
         cornerRadius = dp(10).toFloat()
+        // Cards are key-coloured on the panel: in high contrast only the outline shows them.
+        if (color == palette.key) palette.outline(this, resources.displayMetrics.density)
     }
 
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()

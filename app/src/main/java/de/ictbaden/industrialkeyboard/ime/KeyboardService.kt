@@ -1036,10 +1036,15 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         // automatic one at a sentence start, and not Caps Lock, which would turn every Tab into Shift+Tab.
         val held = KeyChords.heldMeta(modifiers.keys, manualShift = shift == ShiftState.ONCE && !autoShifted, snippet = snippet)
         if (steps.any { it is MacroStep.Key || it is MacroStep.Text } && dropNextWords()) render()
-        for (step in steps) {
+        val info = currentInputEditorInfo
+        val newlineAsText = info != null && FieldPolicy.newlineAsText(info.inputType, info.imeOptions)
+        for ((index, step) in steps.withIndex()) {
             when (step) {
                 is MacroStep.Text -> currentInputConnection?.commitText(step.text, 1)
                 is MacroStep.Key -> when {
+                    // "Line 1{ENTER}Line 2" in a multi-line field: the Enter key would arrive after "Line 2".
+                    step.keyCode == KeyEvent.KEYCODE_ENTER && step.meta == 0 && held == 0 && newlineAsText && Macro.textFollows(steps, index) ->
+                        currentInputConnection?.commitText("\n", 1)
                     step.keyCode == KeyEvent.KEYCODE_ENTER && step.meta == 0 && held == 0 -> sendKeyChar('\n')
                     step.meta != 0 || held != 0 -> sendKey(step.keyCode, step.meta or held)
                     else -> sendDownUpKeyEvents(step.keyCode)
