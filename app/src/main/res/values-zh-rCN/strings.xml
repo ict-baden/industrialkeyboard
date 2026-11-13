@@ -716,4 +716,6 @@
     <plurals name="personal_dictionary_count">
         <item quantity="other">%1$d 个词语 · 添加、从 Gboard 导入</item>
     </plurals>
+    <string name="settings_preview">键盘预览</string>
+    <string name="settings_preview_summary">在这些设置顶部显示键盘</string>
 </resources>

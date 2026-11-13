@@ -724,4 +724,6 @@
         <item quantity="one">%1$d Wort · hinzufügen, aus Gboard importieren</item>
         <item quantity="other">%1$d Wörter · hinzufügen, aus Gboard importieren</item>
     </plurals>
+    <string name="settings_preview">Tastatur-Vorschau</string>
+    <string name="settings_preview_summary">Zeigt die Tastatur oben in diesen Einstellungen</string>
 </resources>

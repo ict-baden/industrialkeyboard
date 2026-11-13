@@ -252,6 +252,13 @@ class SettingsActivity : AppCompatActivity() {
         preview.render(KeyboardRenderer.state(this, config, previewPage, previewShift, scanner.name).copy(keyPopups = false))
     }
 
+    private val uiPrefs by lazy { getSharedPreferences(UI_PREFS, MODE_PRIVATE) }
+    private val showPreviewDefault by lazy { uiPrefs.getBoolean(PREF_SHOW_PREVIEW, true) }
+    private var showPreviewOverride: Boolean? = null
+    private var showPreview: Boolean
+        get() = showPreviewOverride ?: showPreviewDefault
+        set(value) { showPreviewOverride = value }
+
     /** Search field above the preview: filters the rows below (see [SettingsSearch]). */
     private fun searchField(scroll: NestedScrollView): TextInputLayout = TextInputLayout(this, null, com.google.android.material.R.attr.textInputOutlinedStyle).apply {
         hint = getString(R.string.settings_search_hint)
@@ -268,6 +275,8 @@ class SettingsActivity : AppCompatActivity() {
                 applySearch()
                 scroll.scrollTo(0, 0)
             }
+            // While searching the real keyboard is open: the preview would only take the space for results.
+            viewTreeObserver.addOnGlobalFocusChangeListener { _, _ -> applySearch() }
         })
     }
 
@@ -277,7 +286,8 @@ class SettingsActivity : AppCompatActivity() {
         if (!::content.isInitialized || !::searchEmpty.isInitialized) return
         val visible = SettingsSearch.filter(content, query)
         val searching = query.isNotBlank()
-        previewCard.visibility = if (searching) View.GONE else View.VISIBLE
+        val searchFocused = findViewById<View>(R.id.settings_search_field)?.hasFocus() == true
+        previewCard.visibility = if (searching || searchFocused || !showPreview) View.GONE else View.VISIBLE
         searchEmpty.visibility = if (searching && visible == 0) View.VISIBLE else View.GONE
     }
 
@@ -300,6 +310,12 @@ class SettingsActivity : AppCompatActivity() {
         content.addView(
             ui.card(
                 listOf(
+                    // Stored for this screen only (not part of the keyboard configuration).
+                    ui.switchRow(R.drawable.ic_keyboard, getString(R.string.settings_preview), getString(R.string.settings_preview_summary), showPreview) { on ->
+                        showPreview = on
+                        uiPrefs.edit().putBoolean(PREF_SHOW_PREVIEW, on).apply()
+                        applySearch()
+                    },
                     ui.row(R.drawable.ic_globe, getString(R.string.language), languageName(c.language)) { pickLanguage() },
                     ui.choiceRow(
                         R.drawable.ic_palette,
@@ -1226,3 +1242,6 @@ private object NoDictation : DictationController.Listener {
     override fun onFinal(text: String) = Unit
     override fun onLevel(level: Float) = Unit
 }
+
+private const val UI_PREFS = "settings_ui"
+private const val PREF_SHOW_PREVIEW = "show_preview"
