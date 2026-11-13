@@ -21,6 +21,20 @@ class MacroTest {
     }
 
     @Test
+    fun `text follows a step`() {
+        // The snippet from examples/snippets.json: "Lager Süd" comes after the Enter (HC20 test).
+        val regards = Macro.parse("Mit freundlichen Grüßen{ENTER}Lager Süd")
+        assertTrue(Macro.textFollows(regards, 1))
+        assertFalse(Macro.textFollows(regards, 2))
+        // A command in between types nothing, the text after it still counts.
+        assertTrue(Macro.textFollows(Macro.parse("{ENTER}{TOGGLE:glove}X"), 0))
+        // A scan suffix or an "OK{ENTER}" key: nothing after the Enter, it stays a key.
+        assertFalse(Macro.textFollows(Macro.parse("OK{ENTER}"), 1))
+        assertFalse(Macro.textFollows(Macro.parse("{ENTER}{SCAN}"), 0))
+        assertFalse(Macro.textFollows(emptyList(), 0))
+    }
+
+    @Test
     fun `text and keys`() {
         assertEquals(
             listOf(MacroStep.Text("OK"), MacroStep.Key(KeyEvent.KEYCODE_ENTER)),

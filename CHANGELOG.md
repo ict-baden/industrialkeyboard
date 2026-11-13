@@ -60,6 +60,10 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 ### Geändert
 - **Release-APK nur noch für ARM** (`arm64-v8a`, `armeabi-v7a`): Robuste Android-Geräte ab Android 8 sind ARM. Ohne x86 ist die APK etwa 30 statt 57 MB groß (die OCR-Bibliothek von ML Kit hat rund 11 MB pro Architektur). Debug-Builds behalten x86 für den Emulator.
 
+### Behoben
+- Makros und Textbausteine mit `{ENTER}` und Text dahinter in mehrzeiligen Feldern: Der Zeilenumbruch kam erst nach dem folgenden Text an („Mit freundlichen GrüßenLager Süd⏎“, Zebra HC20). Dort wird er jetzt als Text getippt; ein `{ENTER}` am Ende eines Makros und in anderen Feldern bleibt die Enter-Taste.
+- ⊞-Kacheln: lange Beschriftungen werden getrennt statt mitten im Wort umbrochen („Funktionstast|en“); im hohen Kontrast haben Kacheln, Textbausteine und Zwischenablage-Einträge einen Rahmen wie die Tasten (vorher schwarz auf schwarz).
+
 ## [2.1.1] – 2026-10-21
 
 ### Sicherheit

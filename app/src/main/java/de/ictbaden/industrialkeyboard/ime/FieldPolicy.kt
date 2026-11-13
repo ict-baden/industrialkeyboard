@@ -116,6 +116,20 @@ object FieldPolicy {
         }
     }
 
+    /**
+     * `{ENTER}` with more text after it in a macro (a snippet "Line 1{ENTER}Line 2") types a line
+     * break as text: in a multi-line text field without an editor action, where Enter only inserts a
+     * line break. As a key it reached the app after the text that followed it (HC20, Android 15);
+     * AOSP's keyboard also commits "\n" there. Single-line fields keep their action (Next, Done …),
+     * terminals (no text class) the key, and an Enter at the end of a macro stays a key everywhere.
+     */
+    fun newlineAsText(inputType: Int, imeOptions: Int): Boolean {
+        if (inputType and InputType.TYPE_MASK_CLASS != InputType.TYPE_CLASS_TEXT) return false
+        if (inputType and InputType.TYPE_TEXT_FLAG_MULTI_LINE == 0) return false
+        return imeOptions and EditorInfo.IME_FLAG_NO_ENTER_ACTION != 0 ||
+            imeOptions and EditorInfo.IME_MASK_ACTION == EditorInfo.IME_ACTION_NONE
+    }
+
     /** Snippets panel, ⊞ tile and bar button: everywhere but in password fields. */
     fun snippetsAllowed(inputType: Int): Boolean = !isPassword(inputType)
 

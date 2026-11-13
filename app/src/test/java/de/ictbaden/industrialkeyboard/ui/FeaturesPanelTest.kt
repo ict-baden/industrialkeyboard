@@ -1,7 +1,11 @@
 package de.ictbaden.industrialkeyboard.ui
 
 import android.content.Context
+import android.graphics.drawable.GradientDrawable
+import android.text.Layout
 import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.core.app.ApplicationProvider
@@ -20,6 +24,7 @@ import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 
 /** The ⊞ panel: on/off tiles and scrolling when the tiles are taller than the keys. */
@@ -123,6 +128,32 @@ class FeaturesPanelTest {
         root.render(open)
         layout(root)
         assertEquals(0, root.featuresScroll.scrollY)
+    }
+
+    @Test
+    fun `long labels are hyphenated, not broken anywhere`() {
+        // On the HC20 "Funktionstasten" was split "Funktionstast|en", worse at 130 % font size.
+        val panel = FeaturesPanelView(context)
+        panel.show(listOf(feature(0)))
+        val tile = panel.getChildAt(0) as ViewGroup
+        val label = tile.getChildAt(tile.childCount - 1) as TextView
+        assertEquals(Layout.HYPHENATION_FREQUENCY_NORMAL, label.hyphenationFrequency)
+        assertEquals(context.resources.configuration.locales, label.textLocales)
+    }
+
+    @Test
+    fun `tiles have the key outline in high contrast`() {
+        // Black tiles on the black panel were invisible on the HC20 – only their labels showed.
+        val panel = FeaturesPanelView(context)
+        panel.show(listOf(feature(0), feature(1, checked = true)))
+        panel.palette = Palette.contrast(Palette.CONTRAST_ACCENT)
+        val action = shadowOf(panel.getChildAt(0).background as GradientDrawable)
+        assertTrue(action.strokeWidth > 0)
+        assertEquals(Palette.contrast(Palette.CONTRAST_ACCENT).border, action.strokeColor)
+        assertEquals("a lit tile needs none", 0, shadowOf(panel.getChildAt(1).background as GradientDrawable).strokeWidth)
+
+        panel.palette = Palette.dark(Palette.DEFAULT_ACCENT)
+        assertEquals("no outline in the other themes", 0, shadowOf(panel.getChildAt(0).background as GradientDrawable).strokeWidth)
     }
 
     @Test

@@ -160,6 +160,14 @@ object Macro {
 
     fun isValid(macro: String): Boolean = runCatching { parse(macro) }.isSuccess
 
+    /**
+     * True when text is typed after step [index]. A key reaches the app later than text from the
+     * keyboard: "Line 1{ENTER}Line 2" arrived as "Line 1Line 2⏎" on the HC20 (Android 15) in a
+     * multi-line field, so such an Enter is typed as a line break instead (see KeyboardService.runMacro).
+     */
+    fun textFollows(steps: List<MacroStep>, index: Int): Boolean =
+        steps.subList((index + 1).coerceAtMost(steps.size), steps.size).any { it is MacroStep.Text }
+
     /** Short label for a key that runs [steps]: its text, otherwise the name of the first key or command. */
     fun label(steps: List<MacroStep>): String {
         val text = steps.filterIsInstance<MacroStep.Text>().joinToString("") { it.text }.trim()

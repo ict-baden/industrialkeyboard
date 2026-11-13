@@ -1,6 +1,7 @@
 package de.ictbaden.industrialkeyboard.ime
 
 import android.text.InputType
+import android.view.inputmethod.EditorInfo
 import de.ictbaden.industrialkeyboard.config.CustomKey
 import de.ictbaden.industrialkeyboard.config.CustomLayout
 import de.ictbaden.industrialkeyboard.config.KeyboardConfig
@@ -115,6 +116,20 @@ class FieldPolicyTest {
         assertEquals(false, FieldPolicy.snippetShortcutsAllowed(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD))
         assertEquals(false, FieldPolicy.snippetShortcutsAllowed(InputType.TYPE_CLASS_NUMBER))
         assertEquals(false, FieldPolicy.snippetShortcutsAllowed(InputType.TYPE_NULL))
+    }
+
+    @Test
+    fun `a line break in a macro is text only in multi-line fields without an action`() {
+        val multi = text or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+        // What a multi-line TextView reports (the Try-it "Note" field on the HC20).
+        assertEquals(true, FieldPolicy.newlineAsText(multi, EditorInfo.IME_FLAG_NO_ENTER_ACTION))
+        assertEquals(true, FieldPolicy.newlineAsText(multi or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES, EditorInfo.IME_ACTION_NONE))
+        // An action (Send in a chat app) keeps the key, which runs it.
+        assertEquals(false, FieldPolicy.newlineAsText(multi, EditorInfo.IME_ACTION_SEND))
+        assertEquals(false, FieldPolicy.newlineAsText(text, EditorInfo.IME_FLAG_NO_ENTER_ACTION))
+        assertEquals(false, FieldPolicy.newlineAsText(text, EditorInfo.IME_ACTION_NEXT))
+        assertEquals(false, FieldPolicy.newlineAsText(InputType.TYPE_NULL, EditorInfo.IME_FLAG_NO_ENTER_ACTION))
+        assertEquals(false, FieldPolicy.newlineAsText(InputType.TYPE_CLASS_NUMBER, EditorInfo.IME_FLAG_NO_ENTER_ACTION))
     }
 
     @Test
