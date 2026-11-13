@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "configVersion": 3,
   "snippets": {
     "enabled": true,
     "shortcuts": true,

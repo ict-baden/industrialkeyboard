@@ -106,6 +106,11 @@ best-before date, PIN and e-mail. Every field opens the matching keys.
 | [`custom-layout.json`](examples/custom-layout.json) | A *Pick* tab with OK / Skip / Short / Damaged / Scan / Numbers |
 | [`classic-keys.json`](examples/classic-keys.json) | No tab bar: `?123` / `ABC` keys, AZERTY with number row, DataWedge trigger |
 
+A configuration without `"configVersion": 3` keeps the defaults of 2.1 for everything it leaves out
+(tabs instead of the toolbar, no suggestions …), so configurations written for 2.1 work unchanged.
+Add `"configVersion": 3` for today's Gboard-like defaults –
+[`configVersion`](docs/configuration.md#configversion--defaults-of-21-or-todays).
+
 Deploy it as managed configuration (key `config_json`) or as a file – over USB (open the app once so
 the folder exists; the keyboard picks the file up the next time it opens):
 

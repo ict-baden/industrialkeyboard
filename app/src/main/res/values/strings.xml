@@ -339,7 +339,7 @@
 
     <!-- Managed configuration schema shown by EMMs -->
     <string name="mc_config_json_title">Configuration (JSON)</string>
-    <string name="mc_config_json_description">Complete configuration in the Industrial Keyboard JSON format. Takes precedence over the single options below.</string>
+    <string name="mc_config_json_description">Complete configuration in the Industrial Keyboard JSON format. Takes precedence over the single options below. Without configVersion 3, options it leaves out keep the defaults of version 2.1.</string>
     <string name="mc_language_title">Language</string>
     <string name="mc_language_description">Language of the settings screens. Automatic follows the device.</string>
     <string name="mc_theme_title">Theme</string>

@@ -318,7 +318,7 @@
     <string name="scan_pad_configure">请在键盘设置中配置扫描器</string>
 
     <string name="mc_config_json_title">配置（JSON）</string>
-    <string name="mc_config_json_description">Industrial Keyboard JSON 格式的完整配置。优先于下面的单项设置。</string>
+    <string name="mc_config_json_description">Industrial Keyboard JSON 格式的完整配置。优先于下面的单项设置。没有 configVersion 3 时，省略的选项保留 2.1 版的默认值。</string>
     <string name="mc_language_title">语言</string>
     <string name="mc_language_description">设置页面的语言。自动表示跟随设备。</string>
     <string name="mc_theme_title">主题</string>

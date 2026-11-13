@@ -18,7 +18,9 @@ class ConfigBarcodeTest {
     @Test
     fun `default configuration is tiny`() {
         val payload = ConfigBarcode.payload(KeyboardConfig())
-        assertEquals("""{"version":1}""", payload)
+        val json = org.json.JSONObject(payload)
+        assertEquals(setOf("version", "configVersion"), json.keys().asSequence().toSet())
+        assertEquals(3, json.getInt("configVersion"))
         val code = ConfigBarcode.qr(payload)
         assertNotNull(code)
         assertTrue(code!!.errorCorrectionLevel.ordinal >= QrCode.Ecc.MEDIUM.ordinal)
@@ -29,7 +31,7 @@ class ConfigBarcodeTest {
     fun `payload is the shorter form`() {
         val small = ConfigBarcode.payload(KeyboardConfig(language = "fr"))
         val json = org.json.JSONObject(small)
-        assertEquals(setOf("version", "language"), json.keys().asSequence().toSet())
+        assertEquals(setOf("version", "configVersion", "language"), json.keys().asSequence().toSet())
         assertEquals("fr", json.getString("language"))
         val config = KeyboardConfig(
             customLayouts = (1..4).map { n -> CustomLayout("l$n", "Layout $n", listOf((1..10).map { CustomKey("Key $it of layout $n", "{F$it}") })) },

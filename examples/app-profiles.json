@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "configVersion": 3,
   "customLayouts": [
     {
       "id": "host",

@@ -195,7 +195,7 @@ data class LayoutSettings(
     val umlautKeys: Boolean = false,
     /** "?123" / "ABC" at the left of the bottom row like Gboard, also with the tab bar. */
     val symbolsKey: Boolean = true,
-    /** Above the keys: Gboard's toolbar (default) or the tabs. Stored configurations without it keep the tabs. */
+    /** Above the keys: Gboard's toolbar (default) or the tabs (the default below `configVersion` 3, see [ConfigVersion]). */
     val topBar: TopBar = TopBar.TOOLBAR,
 )
 

@@ -100,6 +100,18 @@ Please report results on other devices in the
 - `scanSuffix` does not change DataWedge or Honeywell keystroke output; set the suffix there.
 - Profiles match by app, field type and hint only – not by activity, screen or web address.
 
+## Configurations written for 2.1
+
+- A configuration without `"configVersion": 3` keeps the 2.1 defaults for the options it leaves
+  out ([`configVersion`](configuration.md#configversion--defaults-of-21-or-todays)). It does not
+  bring back what is no option: the Gboard-like look and key sizes, and the camera that
+  `scanner.trigger: "auto"` now uses on devices without a scan engine.
+- Managed configuration single keys that an EMM sends with their schema default (for example
+  `suggestions`, `emoji_key`, `alphabet`) override the 2.1 values like an explicit choice; only
+  `top_bar` has an `unchanged` default.
+- A broken stored configuration is reset to today's defaults (with the admin password kept), not
+  to those of 2.1.
+
 ## Not included, on purpose
 
 - Word suggestions and autocorrection use fixed built-in word lists: they do not learn names or words

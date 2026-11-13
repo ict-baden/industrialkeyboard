@@ -6,6 +6,9 @@ as managed configuration (`config_json`), as a file, as a broadcast, or imported
 [Deployment](deployment.md). Ready-made templates: [`examples/`](../examples).
 
 - Every option is optional – missing options keep their defaults, `{}` is a valid configuration.
+  **Which** defaults depends on [`configVersion`](#configversion--defaults-of-21-or-todays):
+  without it, a configuration counts as written for 2.1 and keeps the 2.1 defaults. Write
+  `"configVersion": 3` into new configurations to get today's defaults.
 - A new configuration **replaces** the current one (including changes made in the settings).
   Only the admin password is kept when the new configuration does not set one.
 - Mistakes are rejected as a whole with a precise message, e.g.
@@ -43,6 +46,7 @@ phone, date) > the app profile's `page` > [`tabs.preferred`](#tabs).
 ```json
 {
   "version": 1,
+  "configVersion": 3,
   "language": "auto",
   "appearance": {
     "theme": "system",
@@ -165,6 +169,84 @@ phone, date) > the app profile's `page` > [`tabs.preferred`](#tabs).
 `version` is `1`. A configuration with a higher version is rejected, so an old app never
 misreads a newer file.
 
+## `configVersion` – defaults of 2.1 or today's
+
+Many defaults changed after 2.1.1 to work like Gboard (toolbar, suggestions, autocorrection, no
+Tab key at the bottom left …), and new features are on by default. A configuration written for
+2.1 relies on the old defaults for everything it leaves out – so an EMM that pushes its old
+`config_json` or file again after the update would silently change a whole fleet. To prevent
+that, `configVersion` says which defaults fill in the options a configuration leaves out:
+
+| `configVersion` | Meaning | Missing options get |
+|---|---|---|
+| missing, `1`, `2` | Written for 2.1 or older (`1` = 1.x, `2` = 2.0 and 2.1) | the **defaults of 2.1** (table below): the keyboard behaves as it did in 2.1 |
+| `3` | Written for this version | **today's defaults**, as listed in the sections of this page |
+| higher | Written by a newer app | today's defaults (the newest this version knows) |
+
+`configVersion` is not the format version: `version` stays `1`. It must be a whole number from 1;
+anything else is rejected (`configVersion: a whole number from 1 expected …`).
+
+It applies to every way a configuration arrives: `config_json`, the configuration file in the
+app folder or `/enterprise/usr`, the `INSTALL_CONFIG` broadcast, **Import** in the app, and the
+configuration a device stored with 2.1. The keyboard always **writes** `configVersion: 3` with every
+value – the stored configuration, **Export to file** and the QR code – so a configuration saved or
+exported once keeps its values, whatever defaults it was read with. A device that never had a
+configuration (nothing stored, nothing from the EMM) and *Reset to defaults* get today's defaults.
+
+Options with a different default without `configVersion` 3:
+
+| Option | Without `configVersion` (as in 2.1) | `configVersion: 3` |
+|---|---|---|
+| `layout.topBar` | `tabs` | `toolbar` |
+| `layout.alphabet` | `qwerty` | `auto` |
+| `layout.umlautKeys` | `true` – QWERTZ with ü, ö, ä as own keys, as in 2.1 | `false` |
+| `layout.symbolsKey` | `false` | `true` |
+| `keys.alpha.p1` | `{TAB}` | empty (no key) |
+| `typing.longPressDelay` | `400` | `300` |
+| `typing.suggestions` | `false` | `true` |
+| `typing.autocorrect` | `false` | `true` |
+| `typing.nextWord` | `false` | `true` |
+| `typing.deleteGesture` | `false` | `true` |
+| `typing.voice` | `off` | `auto` |
+| `appearance.dynamicColor` | `false` | `true` |
+| `appearance.emojiKey` | `false` | `true` |
+| `feedback.vibrationMs` | `18` – the fixed vibration of 2.1 | not set – the system's keyboard tick |
+| `scanner.data.trim` | `false` – scan broadcasts typed exactly as received, as in 2.1 | `true` |
+| `scanner.nfc.enabled` | `false` | `true` |
+| `snippets.allowUser` | `false` – no own snippets | `true` |
+
+Every other option has the same default in both. That includes options 2.1 did not have but that
+change nothing visible by themselves: `typing.textEditing`, `snippets.enabled` and
+`quickToggles.allowed` only add tiles to the toolbar's ⊞ (with `topBar: tabs` there is no ⊞, and
+without `snippets.items` there are no snippets), `scanner.camera` and `scanner.ocr` only apply
+when the camera scans, `appearance.modifierRow`, `functionModifiers`, `symbolHints`,
+`clipboardHistory`, `oneHanded`, `appProfiles` and `accessibility` are off or empty, and
+`feedback.keyPopup` was already on in 2.1.
+
+**Not covered** by `configVersion`, because they are no default of an option:
+
+- `scanner.trigger: "auto"` uses the camera on devices **without** a scan engine (2.1: no
+  scanner there, so no scan tab). Zebra and Honeywell devices with a scan engine are not affected.
+  For the 2.1 behaviour on such devices set `"trigger": "none"` for them.
+- The look like Gboard: key height follows the screen height, Enter 1.5 keys wide, bigger
+  letters, rounded keys and the new symbol pages.
+- Single options of the managed configuration change the stored configuration with what the EMM
+  sends. Some EMMs send **every** key with its schema default (for example `suggestions` on); such
+  a key then counts like an explicit value. Only `top_bar` has the default `unchanged`. Leave the
+  single options unset, or use `config_json`.
+
+**Migration for administrators:**
+
+1. Nothing to do to keep the 2.1 behaviour: old configurations, files and broadcasts keep working
+   as before.
+2. To get the new defaults, add `"configVersion": 3` to the configuration. Check the table above
+   first: everything your configuration leaves out switches to the right-hand column – for
+   example the toolbar, suggestions, autocorrection, dictation and no Tab key left of the comma.
+   Set the options you want to keep explicitly, e.g. `"keys": { "alpha.p1": "{TAB}" }` or
+   `"typing": { "autocorrect": false }`.
+3. Or configure one device in the settings and export it: the export always has
+   `configVersion: 3` and every value.
+
 ## `language`
 
 Language of the setup and settings screens and of the scan pad:
@@ -198,7 +280,7 @@ every language: [Error codes](error-codes.md).
 | `numberRow` | `true` / `false` | `false` | Row with 1–0 above the letters |
 | `functionRow` | `true` / `false` | `false` | Row with F1–F12 above the letters (and above the number row) |
 | `keyHints` | `true` / `false` | `true` | Small digits on the top letter row – long press types them (only without number row) |
-| `symbolHints` | `true` / `false` | `true` | Small symbols on the second and third letter row like Gboard ("Long press for symbols"): a @, s #, d € (or $ / £ by keyboard language), f _, g &, h -, j +, k (, l ), y *, x ", c ', v :, b ;, n !, m ?. A long press types the symbol first |
+| `symbolHints` | `true` / `false` | `false` | Small symbols on the second and third letter row like Gboard ("Long press for symbols"): a @, s #, d € (or $ / £ by keyboard language), f _, g &, h -, j +, k (, l ), y *, x ", c ', v :, b ;, n !, m ?. A long press types the symbol first |
 | `modifierRow` | `true` / `false` | `false` | Row with **Ctrl, Win, Alt**, Esc, Tab and Del above the letters (above the number and function rows) – for remote desktop and PC shortcuts, see [Ctrl, Win and Alt](#ctrl-win-and-alt) |
 | `functionModifiers` | `true` / `false` | `false` | Extra row on the Fn tab with Ctrl, Win, Alt, Menu (context menu key), Print (Print Screen) and Pause (Alt+F4, Ctrl+Home …). All pages then get the height of five rows |
 
@@ -209,7 +291,7 @@ every language: [Error codes](error-codes.md).
 | Option | Values | Default | Effect |
 |---|---|---|---|
 | `alphabet` | `auto`, `qwerty`, `qwertz`, `azerty`, `nordic`, `spanish` | `auto` | Letter layout. `auto` follows the selected keyboard language (Android keyboard languages, switched with 🌐; before one is known: the first system language) (German, Czech, Swiss … → `qwertz`, French and Belgian → `azerty`, Swedish, Danish, Norwegian, Finnish → `nordic`, Spanish and Catalan → `spanish`, everything else `qwerty`) and changes with it. `qwertz` has ä ö ü ß first on long press (own keys with `umlautKeys`), `nordic` adds å ö ä, `spanish` ñ. Accents and special letters (ß, é, ç …) on long press |
-| `topBar` | `toolbar`, `tabs` | `toolbar` | Above the keys while no word is typed. `toolbar` like Gboard: ⊞ (tiles for function keys, scan, number pad, clipboard, [snippets](#snippets--snippets), text editing ([`typing.textEditing`](#typing)), one-handed mode, languages, settings), 📋 clipboard, ⚙ settings, `Fn`, scan (with a scanner), custom layouts, 🎤 and hide; a second tap on `Fn`/scan goes back to the letters. `tabs`: ABC · 123 · #+= · Fn · Scan as up to 2.1. A configuration **stored** by 2.1 or older keeps `tabs`; new installations and files without the field get `toolbar`. Only with `navigation: "tabs"` |
+| `topBar` | `toolbar`, `tabs` | `toolbar` | Above the keys while no word is typed. `toolbar` like Gboard: ⊞ (tiles for function keys, scan, number pad, clipboard, [snippets](#snippets--snippets), text editing ([`typing.textEditing`](#typing)), one-handed mode, languages, settings), 📋 clipboard, ⚙ settings, `Fn`, scan (with a scanner), custom layouts, 🎤 and hide; a second tap on `Fn`/scan goes back to the letters. `tabs`: ABC · 123 · #+= · Fn · Scan as up to 2.1. Configurations without [`configVersion`](#configversion--defaults-of-21-or-todays) `3` – also the one a device stored with 2.1 – get `tabs` when they leave it out; new installations and `configVersion: 3` get `toolbar`. Only with `navigation: "tabs"` |
 | `symbolsKey` | `true` / `false` | `true` | `?123` key at the left of the bottom row like Gboard (`ABC` on the symbols page), also with `navigation: "tabs"`; with `"keys"` it is always there |
 | `umlautKeys` | `true` / `false` | `false` | QWERTZ with ü, ö and ä as own keys (11 keys per row). Off: like Gboard, ä, ö, ü and ß come first on long press of a, o, u and s |
 | `navigation` | `tabs`, `keys` | `tabs` | `tabs`: tab bar above the keys (ABC, 123, #+=, Fn, scan, custom layouts, hide button). `keys`: no tab bar, `?123` / `ABC` keys like a phone keyboard; on the numeric pad the last side key becomes `ABC`. Other pages are then reachable with [`{SHOW:…}`](#macros) on a programmable key |

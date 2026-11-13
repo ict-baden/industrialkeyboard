@@ -38,9 +38,12 @@ class SnippetsJsonTest {
 
     @Test
     fun `defaults without snippets`() {
-        assertEquals(SnippetSettings(), ConfigJson.parse("{}").snippets)
-        assertEquals(SnippetSettings(), ConfigJson.parse("""{"snippets":{}}""").snippets)
-        assertEquals(SnippetSettings(), ConfigJson.parse("""{"snippets":{"items":null}}""").snippets)
+        assertEquals(SnippetSettings(), ConfigJson.parse("""{"configVersion":3}""").snippets)
+        assertEquals(SnippetSettings(), ConfigJson.parse("""{"configVersion":3,"snippets":{}}""").snippets)
+        assertEquals(SnippetSettings(), ConfigJson.parse("""{"configVersion":3,"snippets":{"items":null}}""").snippets)
+        // Written for 2.1: no own snippets unless the configuration allows them.
+        assertEquals(SnippetSettings(allowUser = false), ConfigJson.parse("{}").snippets)
+        assertTrue(ConfigJson.parse("""{"snippets":{"allowUser":true}}""").snippets.allowUser)
         val d = SnippetSettings()
         assertTrue(d.enabled)
         assertTrue(d.shortcuts)

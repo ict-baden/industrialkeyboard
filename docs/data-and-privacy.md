@@ -43,6 +43,11 @@ purpose – so neither pictures, recognised text nor statistics can leave the de
 **NFC:** a tag held to the device is read once (UID or the text stored on it) and typed into the
 field; nothing is kept.
 
+**Configurations written for 2.1** (without `"configVersion": 3`, see
+[`configVersion`](configuration.md#configversion--defaults-of-21-or-todays)) keep the features
+2.1 did not have off unless they switch them on: no word suggestions, no dictation, no NFC and no
+own snippets.
+
 **Screen readers:** with TalkBack on, the keyboard gives the screen reader the names of the keys,
 the suggestions and the words of autocorrection announcements, which TalkBack speaks. Nothing of it
 is stored or logged by the keyboard. In password fields the character keys are spoken only as

@@ -80,7 +80,7 @@ The app ships a schema that every EMM with Android Enterprise support shows:
 
 | Key | Type | Effect |
 |---|---|---|
-| `config_json` | String | **Complete configuration** (contents of a JSON file from `examples/`). Takes precedence over the keys below |
+| `config_json` | String | **Complete configuration** (contents of a JSON file from `examples/`). Takes precedence over the keys below. Without `"configVersion": 3` the options it leaves out keep the defaults of 2.1 ([`configVersion`](configuration.md#configversion--defaults-of-21-or-todays)) |
 | `language` | Choice | Automatic (device language), English, Deutsch, Español, Français, 简体中文 |
 | `theme` | Choice | System, Light, Dark, High contrast |
 | `alphabet` | Choice | Automatic (system language), QWERTY, QWERTZ, AZERTY, Nordic, Spanish |
@@ -122,6 +122,10 @@ single keys only change their own option; `config_json` replaces the whole confi
 [App profiles](configuration.md#appprofiles--app-profiles) (`appProfiles`) need `config_json` (or a
 file, the broadcast or an import); the single keys cannot carry them. While `config_json` is set,
 the single keys – `snippets_json` included – have no effect.
+The single keys work on top of the stored configuration, also on one stored by 2.1: what they do
+not name keeps its value (and with it the 2.1 behaviour). An EMM that sends every key with its
+schema default sets those defaults like explicit values – see
+[`configVersion`](configuration.md#configversion--defaults-of-21-or-todays), *Not covered*.
 Changes made on the device stay until the EMM sends a changed configuration. Errors (such as
 invalid JSON) appear in the keyboard settings under **Configuration → Last provisioning
 error**.
@@ -184,7 +188,8 @@ as barcode** and scan the QR code on the next device with **Import from barcode*
 import asks before it replaces the configuration. Like the JSON export, the code contains the
 admin password as a hash.
 
-The code holds only the settings that differ from the defaults (the import fills in the rest), as
+The code holds only the settings that differ from the defaults and `"configVersion": 3`, so the
+import fills in today's defaults for the rest (not those of 2.1), as
 plain JSON or compressed as `ICTZ1:` + base64url of raw DEFLATE – whichever is shorter; the line
 under the code says which. The JSON file export stays complete. Every place that takes a JSON configuration – file import,
 the app-folder file, `/enterprise/usr`, `config_json`, the `INSTALL_CONFIG` broadcast – also takes

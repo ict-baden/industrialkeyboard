@@ -139,7 +139,8 @@ object Provisioning {
                 numericOrder = choice("numeric_order", NumericOrder.entries.toTypedArray(), config.layout.numericOrder),
                 symbolsKey = bool("symbols_key", config.layout.symbolsKey),
                 // The schema default is `unchanged` (no TopBar key): EMMs that send every key with its
-                // default must not switch configurations stored by 2.1 from the tabs to the toolbar.
+                // default must not switch configurations stored by 2.1 (read with the tabs, see
+                // ConfigVersion) from the tabs to the toolbar.
                 topBar = choice("top_bar", TopBar.entries.toTypedArray(), config.layout.topBar),
             ),
             tabs = config.tabs.copy(

@@ -318,7 +318,7 @@
     <string name="scan_pad_configure">Configure un escáner en la configuración del teclado</string>
 
     <string name="mc_config_json_title">Configuración (JSON)</string>
-    <string name="mc_config_json_description">Configuración completa en el formato JSON de Industrial Keyboard. Tiene prioridad sobre las opciones individuales de abajo.</string>
+    <string name="mc_config_json_description">Configuración completa en el formato JSON de Industrial Keyboard. Tiene prioridad sobre las opciones individuales de abajo. Sin configVersion 3, las opciones omitidas conservan los valores predeterminados de la versión 2.1.</string>
     <string name="mc_language_title">Idioma</string>
     <string name="mc_language_description">Idioma de las pantallas de configuración. Automático sigue al dispositivo.</string>
     <string name="mc_theme_title">Tema</string>
