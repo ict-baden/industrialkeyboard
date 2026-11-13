@@ -35,7 +35,9 @@ object PersonalWords {
 
     /**
      * Reads a Gboard export: the ZIP Gboard writes (with `dictionary.txt`) or that text file itself.
-     * Lines "word<TAB>shortcut<TAB>locale" (shortcut and locale may be empty), `#` lines are comments.
+     * Gboard writes "shortcut<TAB>word<TAB>language_tag" (version 2 adds `pos_tag` and names the
+     * columns in a `# Gboard Dictionary format:` line, which wins when present). Shortcut and
+     * language may be empty, a line with a single value is that word, other `#` lines are comments.
      * Unpacks at most [MAX_FILE_BYTES], so a zip bomb stops early; entry names are only compared,
      * never used as paths.
      */
@@ -51,14 +53,21 @@ object PersonalWords {
         val first = lines.firstOrNull { it.isNotBlank() } ?: throw ImportException("the file is empty")
         val looksGboard = first.startsWith(GBOARD_HEADER) || lines.any { '\t' in it }
         if (!looksGboard) throw ImportException("not a Gboard dictionary export (dictionary.txt)")
+        val columns = columns(lines)
         val words = ArrayList<PersonalWord>()
         var skipped = 0
         for (line in lines) {
             if (line.isBlank() || line.trimStart().startsWith("#")) continue
-            val parts = line.split('\t')
-            val word = parts[0].trim()
-            val shortcut = parts.getOrNull(1)?.trim()?.ifEmpty { null }
-            val locale = parts.getOrNull(2)?.trim()?.ifEmpty { null }?.let(::normalizeLocale)
+            val parts = line.split('\t').map { it.trim() }
+            val filled = parts.filter { it.isNotEmpty() }
+            var word = parts.getOrNull(columns.word).orEmpty()
+            var shortcut = parts.getOrNull(columns.shortcut)?.ifEmpty { null }
+            val locale = parts.getOrNull(columns.locale)?.ifEmpty { null }?.let(::normalizeLocale)
+            // "Wort" alone (own lists, or a shortcut column without a word): that is the word.
+            if (word.isEmpty() && shortcut != null && filled.size == 1) {
+                word = shortcut
+                shortcut = null
+            }
             if (!validWord(word) || (shortcut != null && !validShortcut(shortcut))) {
                 skipped++
                 continue
@@ -70,6 +79,18 @@ object PersonalWords {
             words += PersonalWord(word, shortcut, locale)
         }
         return ImportResult(words, skipped)
+    }
+
+    private class Columns(val shortcut: Int, val word: Int, val locale: Int)
+
+    /** Column order from the `format:` line; without one Gboard's: shortcut, word, language. */
+    private fun columns(lines: List<String>): Columns {
+        val format = lines.firstOrNull { it.startsWith(GBOARD_HEADER) && it.contains("format:") }
+            ?.substringAfter("format:")?.split('\t', ',', ' ')?.map { it.trim().lowercase(Locale.ROOT) }?.filter { it.isNotEmpty() }
+        val word = format?.indexOf("word") ?: -1
+        if (format == null || word < 0) return Columns(0, 1, 2)
+        val locale = format.indexOfFirst { it == "language_tag" || it == "locale" || it == "language" }
+        return Columns(format.indexOf("shortcut"), word, locale)
     }
 
     fun validWord(word: String) = word.isNotEmpty() && word.length <= MAX_WORD_LENGTH && word.none { it == '\t' || it == '\n' || it == '\r' }

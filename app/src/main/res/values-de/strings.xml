@@ -711,6 +711,7 @@
     </plurals>
     <string name="personal_dictionary_import_done">Import abgeschlossen</string>
     <string name="personal_dictionary_import_result">Importiert: %1$d\nSchon vorhanden: %2$d\nÜbersprungen: %3$d</string>
+    <string name="personal_dictionary_import_empty">Die Datei enthält keine Wörter. Gboard exportiert nur die Wörter aus „Mein Wörterbuch“ (Gboard-Einstellungen → Wörterbuch → Mein Wörterbuch). Vorschläge aus dem Google-Konto, etwa die eigene E-Mail-Adresse, gehören nicht dazu.</string>
     <string name="personal_dictionary_import_failed">Import fehlgeschlagen</string>
     <string name="personal_dictionary_import_invalid">Kein Gboard-Wörterbuchexport und keine Wortliste (%1$s).</string>
     <string name="personal_dictionary_save_failed">Das persönliche Wörterbuch konnte nicht gespeichert werden.</string>

@@ -793,6 +793,7 @@
     </plurals>
     <string name="personal_dictionary_import_done">Import finished</string>
     <string name="personal_dictionary_import_result">Imported: %1$d\nAlready there: %2$d\nSkipped: %3$d</string>
+    <string name="personal_dictionary_import_empty">The file contains no words. Gboard only exports the words in “Personal dictionary” (Gboard settings → Dictionary → Personal dictionary). Suggestions from your Google account, such as your e-mail address, are not part of the export.</string>
     <string name="personal_dictionary_import_failed">Import failed</string>
     <string name="personal_dictionary_import_invalid">Not a Gboard dictionary export or word list (%1$s).</string>
     <string name="personal_dictionary_save_failed">The personal dictionary could not be saved.</string>
