@@ -13,7 +13,7 @@ android {
         applicationId = "de.ictbaden.industrialkeyboard"
         minSdk = 26
         targetSdk = 36
-        // The CI passes -PversionCode (run number) and -PversionName (e.g. 1.0.0-ci.12).
+        // The CI passes -PversionCode (run number plus an offset, see build.yml) and -PversionName (e.g. 1.0.0-ci.112).
         versionCode = (findProperty("versionCode") as String?)?.toInt() ?: 1
         versionName = findProperty("versionName") as String? ?: "2.2.6"
         buildConfigField("String", "COMMIT", "\"${System.getenv("GITHUB_SHA")?.take(7) ?: "local"}\"")

@@ -4,6 +4,9 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ## [Unveröffentlicht]
 
+### Geändert
+- **Build: versionCode mit Aufschlag.** Die Laufnummer der CI hat neu bei 1 begonnen; der `versionCode` ist ab jetzt Laufnummer + 100 und bleibt damit über allen früheren Builds (zuletzt 68 bei Google Play). Am Verhalten der App ändert sich nichts.
+
 ## [2.2.5] – 2026-11-13
 
 ### Behoben
