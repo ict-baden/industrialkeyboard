@@ -2,32 +2,53 @@ Industrial Keyboard es un teclado en pantalla para dispositivos Android robustos
 
 PENSADO PARA GUANTES
 • Altura de las teclas del 70 al 160 %, zonas táctiles amplias y vista previa sobre el dedo
+• Modo guantes con un interruptor rápido: teclas de al menos el 130 % de altura, pulsación larga a partir de 600 ms
 • Temas claro, oscuro y de alto contraste, color de acento personalizable
 
 LAS TECLAS ADECUADAS PARA CADA CAMPO
 • Los campos numéricos abren el teclado numérico (orden de teléfono o calculadora, PIN, fecha, hora)
 • Los campos de correo y dirección web incluyen @, / y .com
 • La tecla Intro muestra la acción del campo: siguiente, buscar, enviar, listo
+• Los perfiles de aplicación fijan la página inicial, el orden de los números o el sufijo de escaneo por aplicación o campo
 
 ESCÁNER INTEGRADO
 • Pestaña de escaneo con una gran zona de disparo: toque para escanear, mantenga para escaneo continuo
-• Tecla de escaneo opcional, disparador por software para Zebra DataWedge, Honeywell o cualquier aplicación de escaneo mediante intent
+• Disparador por software para Zebra DataWedge, Honeywell o cualquier aplicación de escaneo mediante intent
+• Sin módulo de escaneo, la cámara lee códigos de barras dentro del propio teclado: marco de enfoque o retícula, escaneo continuo, zoom, linterna
+• Reconocimiento de texto (OCR): leer números de serie, números de lote o una fecha con la cámara, en el dispositivo
+• NFC: escribir en el campo el identificador o el texto guardado de una etiqueta
+• Formato de los datos escaneados: prefijo, sufijo, reemplazos, campos GS1, reglas por tipo de código
 
-TECLAS DE FUNCIÓN
+TECLAS DE FUNCIÓN Y ESCRITORIO REMOTO
 • F1–F12, Mayús para F13–F24, Esc, Insert, Supr, Inicio, Fin, teclas de página y flechas
 • Fila opcional F1–F12 sobre las letras
+• Ctrl, Win y Alt fijables, combinaciones como Ctrl+Alt+Fin como macros
+
+ESCRIBIR COMO SIEMPRE
+• Sugerencias de palabras y autocorrección a partir de diccionarios integrados, sin aprendizaje
+• Diccionario personal, también con importación desde Gboard
+• Dictado en el teclado, selector de emojis, portapapeles, edición de texto, modo a una mano
+• Idiomas de teclado para 40 idiomas con alfabeto latino; QWERTY, QWERTZ, AZERTY, nórdico y español, acentos con pulsación larga
+• Fragmentos de texto del administrador o propios, que se insertan con atajos
 
 SUS PROPIAS TECLAS
 • Teclas programables y diseños propios (por ejemplo OK / Omitir / Dañado) como pestañas adicionales
 • Macros como {TAB}, {F13}, OK{ENTER} o {SCAN}
-• QWERTY, QWERTZ, AZERTY, nórdico y español, acentos con pulsación larga
 
 CONFIGURACIÓN CENTRAL
 • Configuración gestionada desde su MDM (por ejemplo SOTI MobiControl, Microsoft Intune, Workspace ONE)
 • Archivo de configuración o intent de difusión (StageNow), ajustes protegidos con contraseña de administrador
+• Exportar la configuración como código QR y leerla con la cámara en el siguiente dispositivo
+• Las sugerencias, el dictado, los emojis y el NFC se pueden desactivar en la configuración
+
+PARA LECTORES DE PANTALLA
+• Las teclas, las sugerencias y el dictado tienen nombres para TalkBack
 
 PRIVACIDAD DESDE EL DISEÑO
-• Sin permiso de Internet, sin diccionario, sin predicción de palabras: nada de lo que escribe se guarda ni se aprende
+• Sin permiso de Internet: el teclado no puede enviar nada fuera del dispositivo
+• Nada de lo que escribe en otras aplicaciones se guarda ni se aprende
+• Las imágenes de la cámara se procesan en el dispositivo y no se guardan
+• En el dictado, el audio va al reconocimiento de voz del dispositivo; si el dispositivo no reconoce la voz por sí mismo, su servicio de voz puede procesar el audio en línea
 • Sin cuenta, sin publicidad, sin seguimiento. Industrial Keyboard no envía datos a ICT-Baden.
 
 Interfaz en inglés, alemán, español, francés y chino. Gratuito y de código abierto (licencia MIT), de ICT-Baden. Hay contratos de soporte disponibles.

@@ -2,32 +2,53 @@ Industrial Keyboard est un clavier à l’écran pour appareils Android durcis e
 
 CONÇU POUR LES GANTS
 • Hauteur des touches de 70 à 160 %, zones tactiles généreuses et aperçu au-dessus du doigt
+• Mode gants en bascule rapide : touches d’au moins 130 % de hauteur, appui long seulement après 600 ms
 • Thèmes clair, sombre et contraste élevé, couleur d’accent personnalisable
 
 LES BONNES TOUCHES POUR CHAQUE CHAMP
 • Les champs numériques ouvrent le pavé numérique (ordre téléphone ou calculatrice, PIN, date, heure)
 • Les champs e-mail et adresse web proposent @, / et .com
-• La touche Entrée affiche l’action du champ : suivant, rechercher, envoyer, terminé
+• La touche Entrée affiche l’action du champ : suivant, rechercher, envoyer, terminé
+• Les profils d’application fixent la page de départ, l’ordre des chiffres ou le suffixe de scan par application ou par champ
 
 SCANNER INTÉGRÉ
-• Onglet de scan avec une grande zone de déclenchement : appuyer pour scanner, maintenir pour un scan continu
-• Touche de scan en option, déclencheur logiciel pour Zebra DataWedge, Honeywell ou toute application de scan via intent
+• Onglet de scan avec une grande zone de déclenchement : appuyer pour scanner, maintenir pour un scan continu
+• Déclencheur logiciel pour Zebra DataWedge, Honeywell ou toute application de scan via intent
+• Sans module de scan, la caméra lit les codes-barres directement dans le clavier : cadre de visée ou réticule, scan continu, zoom, lampe torche
+• Reconnaissance de texte (OCR) : lire des numéros de série, des numéros de lot ou une date avec la caméra, sur l’appareil
+• NFC : saisir dans le champ l’identifiant ou le texte enregistré d’une étiquette
+• Mise en forme des données scannées : préfixe, suffixe, remplacements, champs GS1, règles par type de code
 
-TOUCHES DE FONCTION
+TOUCHES DE FONCTION ET BUREAU À DISTANCE
 • F1–F12, Maj pour F13–F24, Échap, Inser, Suppr, Début, Fin, touches de page et flèches
 • Rangée F1–F12 en option au-dessus des lettres
+• Ctrl, Win et Alt verrouillables, combinaisons comme Ctrl+Alt+Fin en macros
+
+SAISIR COMME D’HABITUDE
+• Suggestions de mots et correction automatique à partir de dictionnaires intégrés, sans apprentissage
+• Dictionnaire personnel, avec import depuis Gboard
+• Dictée dans le clavier, sélecteur d’emoji, presse-papiers, édition de texte, mode une main
+• Langues de clavier pour 40 langues à alphabet latin ; QWERTY, QWERTZ, AZERTY, nordique et espagnol, accents par appui long
+• Blocs de texte de l’administrateur ou personnels, insérés par des raccourcis
 
 VOS PROPRES TOUCHES
 • Touches programmables et dispositions personnalisées (par exemple OK / Passer / Endommagé) en onglets supplémentaires
 • Macros comme {TAB}, {F13}, OK{ENTER} ou {SCAN}
-• QWERTY, QWERTZ, AZERTY, nordique et espagnol, accents par appui long
 
 CONFIGURATION CENTRALISÉE
 • Configuration gérée depuis votre MDM (par exemple SOTI MobiControl, Microsoft Intune, Workspace ONE)
 • Fichier de configuration ou intent de diffusion (StageNow), réglages protégés par un mot de passe administrateur
+• Exporter la configuration en code QR et la lire avec la caméra sur l’appareil suivant
+• Suggestions, dictée, emoji et NFC peuvent être désactivés dans la configuration
+
+POUR LES LECTEURS D’ÉCRAN
+• Touches, suggestions et dictée sont nommées pour TalkBack
 
 CONFIDENTIALITÉ DÈS LA CONCEPTION
-• Pas d’autorisation Internet, pas de dictionnaire, pas de prédiction de mots : rien de ce que vous tapez n’est enregistré ni appris
+• Pas d’autorisation Internet : le clavier ne peut rien envoyer hors de l’appareil
+• Rien de ce que vous tapez dans d’autres applications n’est enregistré ni appris
+• Les images de la caméra sont traitées sur l’appareil et ne sont pas enregistrées
+• Pour la dictée, l’audio est transmis à la reconnaissance vocale de l’appareil ; si l’appareil ne reconnaît pas la parole lui-même, son service vocal peut traiter l’audio en ligne
 • Pas de compte, pas de publicité, pas de suivi. Industrial Keyboard n’envoie aucune donnée à ICT-Baden.
 
 Interface en anglais, allemand, espagnol, français et chinois. Gratuit et open source (licence MIT), par ICT-Baden. Des contrats de support sont disponibles.

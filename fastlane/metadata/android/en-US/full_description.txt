@@ -2,32 +2,53 @@ Industrial Keyboard is an on-screen keyboard for rugged Android devices in wareh
 
 MADE FOR GLOVES
 • Key height from 70 to 160 %, forgiving touch targets and a preview above the finger
+• Glove mode as a quick toggle: keys at least 130 % high, long press only after 600 ms
 • Light, dark and high-contrast themes, custom accent color
 
 THE RIGHT KEYS FOR EVERY FIELD
 • Number fields open the numeric pad (phone or calculator order, PIN, date, time)
 • E-mail and web address fields get @, / and .com
 • The Enter key shows the field's action: next, search, send, done
+• App profiles set the start page, number order or scan suffix per app or field
 
 SCANNER BUILT IN
 • Scan tab with a large trigger area: tap to scan, hold for continuous scanning
-• Optional scan key, soft trigger for Zebra DataWedge, Honeywell or any scanner app via intent
+• Soft trigger for Zebra DataWedge, Honeywell or any scanner app via intent
+• Without a scan engine, the camera reads barcodes right inside the keyboard: aiming frame or crosshair, continuous scanning, zoom, torch
+• Text recognition (OCR): read serial numbers, batch numbers or a date with the camera, on the device
+• NFC: type a tag's ID or stored text into the field
+• Scan data formatting: prefix, suffix, replace, GS1 fields, rules per barcode type
 
-FUNCTION KEYS
+FUNCTION KEYS AND REMOTE DESKTOP
 • F1–F12, Shift for F13–F24, Esc, Ins, Del, Home, End, page and arrow keys
 • Optional F1–F12 row above the letters
+• Sticky Ctrl, Win and Alt, key combinations such as Ctrl+Alt+End as macros
+
+TYPING AS USUAL
+• Word suggestions and autocorrection from built-in dictionaries, without learning
+• Personal dictionary, with import from Gboard
+• Dictation in the keyboard, emoji panel, clipboard, text editing, one-handed mode
+• Keyboard languages for 40 languages with Latin script; QWERTY, QWERTZ, AZERTY, Nordic and Spanish, accents on long press
+• Snippets from the administrator or your own, called up with typed shortcuts
 
 YOUR OWN KEYS
 • Programmable keys and custom layouts (for example OK / Skip / Damaged) as extra tabs
 • Macros such as {TAB}, {F13}, OK{ENTER} or {SCAN}
-• QWERTY, QWERTZ, AZERTY, Nordic and Spanish, accents on long press
 
 CENTRAL CONFIGURATION
 • Managed configuration from your MDM (for example SOTI MobiControl, Microsoft Intune, Workspace ONE)
 • Configuration file or broadcast intent (StageNow), settings protected by an admin password
+• Export the configuration as a QR code and read it on the next device with the camera
+• Suggestions, dictation, emoji and NFC can be switched off in the configuration
+
+FOR SCREEN READERS
+• Keys, suggestions and dictation are named for TalkBack
 
 PRIVATE BY DESIGN
-• No internet permission, no dictionary, no word prediction: nothing you type is stored or learned
+• No internet permission: the keyboard cannot send anything off the device
+• Nothing you type in other apps is stored or learned
+• Camera pictures are processed on the device and not stored
+• For dictation, the audio goes to the device's speech recognition; if the device does not recognise speech itself, its speech service may process the audio online
 • No account, no ads, no tracking. Industrial Keyboard sends no data to ICT-Baden.
 
 User interface in English, German, Spanish, French and Chinese. Free and open source (MIT licence), made by ICT-Baden. Paid support contracts are available.
