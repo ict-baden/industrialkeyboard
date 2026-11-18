@@ -5,7 +5,7 @@
 <p align="center">
   <a href="https://github.com/ict-baden/industrialkeyboard/releases/tag/latest"><img alt="Download: latest" src="https://img.shields.io/badge/Download-latest-2ea44f?logo=github&amp;logoColor=white"></a>
   <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&amp;logoColor=white" alt="Android 8.0+">
-  <img src="https://img.shields.io/badge/Version-2.1.0-4338CA" alt="Version 2.1.0">
+  <img src="https://img.shields.io/badge/Version-2.2.5-4338CA" alt="Version 2.2.5">
   <img src="https://img.shields.io/badge/Zebra-DataWedge-000000" alt="Zebra DataWedge">
   <img src="https://img.shields.io/badge/Honeywell-Scanner-E4002B" alt="Honeywell">
   <img src="https://img.shields.io/badge/MDM-Managed%20Config-0891B2" alt="Managed configuration">
@@ -74,14 +74,14 @@
 | 🎨 **Looks good** | Light, dark, high contrast or follow the system; custom accent color; smooth animations |
 | ♿ **Screen readers** | Keys, tabs, suggestions and dictation named for TalkBack, with lift-to-type, accents in the actions menu, announced page changes, quiet password keys without headphones, and text that follows the font size ([details](docs/accessibility.md)) |
 | 📡 **Central configuration** | Managed configuration (SOTI, Intune, Workspace ONE …), configuration file (also Zebra `/enterprise/usr`), broadcast intent (StageNow, only with the admin password or on EMM-managed devices), admin password |
-| 🔒 **Private by design** | No internet permission, no dictionary, nothing typed in other apps is stored or learned (only snippets you enter in the app); configuration excluded from backups |
+| 🔒 **Private by design** | No internet permission, nothing typed in other apps is stored or learned (word suggestions come from built-in word lists; only snippets and personal dictionary words you enter in the app are kept); configuration excluded from backups |
 
 ## ⚡ Up and running in 5 minutes
 
 **1. Install the app** – download the APK from the [releases](../../releases/latest) and distribute it with your MDM, or install it over USB:
 
 ```bash
-adb install -r IndustrialKeyboard-2.1.1.apk
+adb install -r IndustrialKeyboard-2.2.5.apk
 ```
 
 **2. Switch it on** – open *Industrial Keyboard* on the device, tap **Enable** and **Select**. Over USB:
@@ -184,7 +184,9 @@ Reference: [Configuration](docs/configuration.md#custom-layouts).
 - **The Honeywell soft trigger is built from the vendor documentation only** and has not been
   tried on a Honeywell device. Reports welcome.
 - Spanish, French and Chinese are machine translations, not yet proofread by native speakers.
-- No word prediction, no dictionary, no swipe typing, no voice input – on purpose.
+- Word suggestions come from fixed built-in word lists and learn nothing; there is no swipe typing.
+  Dictation needs a speech recognizer on the device – without on-device recognition, the device's
+  speech service may process the audio online.
 
 Details: [Limitations](docs/limitations.md).
 
