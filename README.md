@@ -74,7 +74,7 @@
 | 🎨 **Looks good** | Light, dark, high contrast or follow the system; custom accent color; smooth animations |
 | ♿ **Screen readers** | Keys, tabs, suggestions and dictation named for TalkBack, with lift-to-type, accents in the actions menu, announced page changes, quiet password keys without headphones, and text that follows the font size ([details](docs/accessibility.md)) |
 | 📡 **Central configuration** | Managed configuration (SOTI, Intune, Workspace ONE …), configuration file (also Zebra `/enterprise/usr`), broadcast intent (StageNow, only with the admin password or on EMM-managed devices), admin password |
-| 🔒 **Private by design** | No internet permission, no dictionary, nothing typed in other apps is stored or learned (only snippets you enter in the app); configuration excluded from backups |
+| 🔒 **Private by design** | No internet permission, nothing typed in other apps is stored or learned (word suggestions come from built-in word lists; only snippets and personal dictionary words you enter in the app are kept); configuration excluded from backups |
 
 ## ⚡ Up and running in 5 minutes
 
@@ -184,7 +184,9 @@ Reference: [Configuration](docs/configuration.md#custom-layouts).
 - **The Honeywell soft trigger is built from the vendor documentation only** and has not been
   tried on a Honeywell device. Reports welcome.
 - Spanish, French and Chinese are machine translations, not yet proofread by native speakers.
-- No word prediction, no dictionary, no swipe typing, no voice input – on purpose.
+- Word suggestions come from fixed built-in word lists and learn nothing; there is no swipe typing.
+  Dictation needs a speech recognizer on the device – without on-device recognition, the device's
+  speech service may process the audio online.
 
 Details: [Limitations](docs/limitations.md).
 

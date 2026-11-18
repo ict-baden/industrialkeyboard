@@ -9,6 +9,7 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ### Doku
 - **Store-Texte auf den Stand 2.2** (`fastlane/metadata/android/*/full_description.txt`, alle fünf Sprachen): die neuen Funktionen (Kamera-Scan, Texterkennung, NFC, Scan-Daten formatieren, Strg/Win/Alt, Wortvorschläge, persönliches Wörterbuch, Diktat, Emoji, Textbausteine, App-Profile, Konfiguration als QR-Code, TalkBack) stehen jetzt drin. „Kein Wörterbuch, keine Wortvorschläge“ ist seit 2.2.0 falsch und entfällt; der Datenschutz-Abschnitt nennt Kamera und Diktat wie [Daten und Datenschutz](docs/data-and-privacy.md). Bei Google Play gibt es nur den deutschen Eintrag; er ist entsprechend aktualisiert.
+- **README berichtigt:** In der Funktionstabelle („Private by design“) und unter „Limitations“ stand noch „no dictionary“ bzw. „No word prediction, no dictionary, no swipe typing, no voice input“ – seit 2.2.0 falsch. Jetzt: Wortvorschläge aus festen eingebauten Wortlisten ohne Lernen, kein Wischen, Diktat über die Spracherkennung des Geräts.
 
 ## [2.2.5] – 2026-11-13
 
