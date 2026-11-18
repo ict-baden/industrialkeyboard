@@ -2,32 +2,53 @@ Industrial Keyboard ist eine Bildschirmtastatur für robuste Android-Geräte in 
 
 FÜR HANDSCHUHE GEMACHT
 • Tastenhöhe von 70 bis 160 %, großzügige Trefferflächen und eine Vorschau über dem Finger
+• Handschuh-Modus per Schnellschalter: Tasten mindestens 130 % hoch, langes Drücken erst nach 600 ms
 • Helles, dunkles und kontrastreiches Design, eigene Akzentfarbe
 
 DIE RICHTIGEN TASTEN FÜR JEDES FELD
 • Zahlenfelder öffnen den Ziffernblock (Telefon- oder Rechnerreihenfolge, PIN, Datum, Uhrzeit)
 • E-Mail- und Webadressfelder bekommen @, / und .com
 • Die Enter-Taste zeigt die Aktion des Feldes: weiter, suchen, senden, fertig
+• App-Profile legen je App oder Feld Startseite, Ziffernfolge oder Scan-Suffix fest
 
 SCANNER EINGEBAUT
 • Scan-Register mit großer Auslösefläche: tippen zum Scannen, halten für Dauerscan
-• Optionale Scan-Taste, Soft-Trigger für Zebra DataWedge, Honeywell oder jede Scanner-App per Intent
+• Soft-Trigger für Zebra DataWedge, Honeywell oder jede Scanner-App per Intent
+• Ohne Scan-Modul liest die Kamera Barcodes direkt in der Tastatur: Zielrahmen oder Fadenkreuz, Dauerscan, Zoom, Taschenlampe
+• Texterkennung (OCR): Serien- und Chargennummern oder ein Datum mit der Kamera lesen, auf dem Gerät
+• NFC: Kennung oder gespeicherten Text eines Tags ins Feld tippen
+• Scan-Daten formatieren: Präfix, Suffix, Ersetzen, GS1-Felder, Regeln je Barcode-Typ
 
-FUNKTIONSTASTEN
+FUNKTIONSTASTEN UND REMOTEDESKTOP
 • F1–F12, Umschalt für F13–F24, Esc, Einfg, Entf, Pos1, Ende, Bild- und Pfeiltasten
 • Optionale F1–F12-Zeile über den Buchstaben
+• Strg, Win und Alt zum Einrasten, Tastenkombinationen wie Strg+Alt+Ende als Makro
+
+TIPPEN WIE GEWOHNT
+• Wortvorschläge und Autokorrektur aus eingebauten Wörterbüchern, ohne Lernen
+• Persönliches Wörterbuch, auch mit Import aus Gboard
+• Diktat in der Tastatur, Emoji-Auswahl, Zwischenablage, Text bearbeiten, Einhandmodus
+• Tastatursprachen für 40 Sprachen mit lateinischer Schrift; QWERTY, QWERTZ, AZERTY, Nordisch und Spanisch, Akzente per langem Druck
+• Textbausteine vom Administrator oder eigene, abrufbar mit Kürzeln wie „mfg“
 
 EIGENE TASTEN
 • Programmierbare Tasten und eigene Layouts (zum Beispiel OK / Überspringen / Beschädigt) als zusätzliche Register
 • Makros wie {TAB}, {F13}, OK{ENTER} oder {SCAN}
-• QWERTY, QWERTZ, AZERTY, Nordisch und Spanisch, Akzente per langem Druck
 
 ZENTRALE KONFIGURATION
 • Managed Configuration aus Ihrem MDM (zum Beispiel SOTI MobiControl, Microsoft Intune, Workspace ONE)
 • Konfigurationsdatei oder Broadcast-Intent (StageNow), Einstellungen durch ein Admin-Passwort geschützt
+• Konfiguration als QR-Code exportieren und am nächsten Gerät mit der Kamera einlesen
+• Vorschläge, Diktat, Emoji und NFC lassen sich in der Konfiguration abschalten
+
+FÜR SCREENREADER
+• Tasten, Vorschläge und Diktat sind für TalkBack benannt
 
 DATENSCHUTZ VON ANFANG AN
-• Keine Internetberechtigung, kein Wörterbuch, keine Wortvorschläge: Nichts, was Sie tippen, wird gespeichert oder gelernt
+• Keine Internetberechtigung: Die Tastatur kann nichts vom Gerät senden
+• Nichts, was Sie in anderen Apps tippen, wird gespeichert oder gelernt
+• Kamerabilder werden auf dem Gerät ausgewertet und nicht gespeichert
+• Beim Diktat geht die Aufnahme an die Spracherkennung des Geräts; erkennt das Gerät Sprache nicht selbst, kann dessen Sprachdienst sie online verarbeiten
 • Kein Konto, keine Werbung, kein Tracking. Industrial Keyboard sendet keine Daten an ICT-Baden.
 
 Oberfläche auf Englisch, Deutsch, Spanisch, Französisch und Chinesisch. Kostenlos und Open Source (MIT-Lizenz), von ICT-Baden. Supportverträge sind erhältlich.
