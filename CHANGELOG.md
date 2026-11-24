@@ -6,6 +6,7 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ### Geändert
 - **Build: versionCode mit Aufschlag.** Die Laufnummer der CI hat neu bei 1 begonnen; der `versionCode` ist ab jetzt Laufnummer + 100 und bleibt damit über allen früheren Builds (zuletzt 68 bei Google Play). Am Verhalten der App ändert sich nichts.
+- **Release-Builds werden mit R8 verkleinert und verschleiert.** Google Play misst das unter *Android Vitals → Codeoptimierung* und warnt unter 25 %. Intent-API, Konfigurationsformat und Fehlercodes bleiben gleich. Jedes Release enthält jetzt zusätzlich `IndustrialKeyboard-<Version>-mapping.txt`, um Stacktraces zurück auf die Quellnamen zu übersetzen; das App Bundle trägt dasselbe Mapping, die Play Console löst Absturzberichte damit selbst auf.
 
 ### Doku
 - **README verlinkt die Produktseite** auf ict-baden.de (Linkzeile oben, deutscher Hinweis, Fußzeile).
