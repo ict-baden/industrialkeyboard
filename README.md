@@ -26,11 +26,12 @@
   <a href="#-up-and-running-in-5-minutes">Quick start</a> ·
   <a href="docs/configuration.md">Configuration</a> ·
   <a href="docs/deployment.md">Deployment (SOTI, Intune, StageNow)</a> ·
-  <a href="docs/integration.md">Scanner &amp; app integration</a>
+  <a href="docs/integration.md">Scanner &amp; app integration</a> ·
+  <a href="https://ict-baden.de/en/products/industrial-keyboard/">Product page</a>
 </p>
 
 > [!NOTE]
-> **Deutsch:** Industrial Keyboard ist eine Bildschirmtastatur für robuste Android-Geräte (Zebra, Honeywell): große Tasten für Handschuhe, Scan-Taste, F1–F24 für Terminal-Emulation, zentral per MDM konfigurierbar. Kostenlos und Open Source (MIT), ohne Internetzugriff. Download: [IndustrialKeyboard.apk](https://github.com/ict-baden/industrialkeyboard/releases/download/latest/IndustrialKeyboard.apk). Die Oberfläche gibt es auf Englisch und Deutsch, dazu maschinell übersetzt auf Spanisch, Französisch und Chinesisch.
+> **Deutsch:** Industrial Keyboard ist eine Bildschirmtastatur für robuste Android-Geräte (Zebra, Honeywell): große Tasten für Handschuhe, Scan-Taste, F1–F24 für Terminal-Emulation, zentral per MDM konfigurierbar. Kostenlos und Open Source (MIT), ohne Internetzugriff. Download: [IndustrialKeyboard.apk](https://github.com/ict-baden/industrialkeyboard/releases/download/latest/IndustrialKeyboard.apk). Die Oberfläche gibt es auf Englisch und Deutsch, dazu maschinell übersetzt auf Spanisch, Französisch und Chinesisch. Produktseite: [ict-baden.de/produkte/industrial-keyboard](https://ict-baden.de/produkte/industrial-keyboard/).
 
 ---
 
@@ -225,6 +226,7 @@ Licence: <a href="LICENSE">MIT</a> &nbsp;·&nbsp;
 Third-party licences: <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a> &nbsp;·&nbsp;
 Support: free via GitHub, guaranteed with a <a href="SUPPORT.md">support contract</a> &nbsp;·&nbsp;
 <a href="SECURITY.md">Security</a> &nbsp;·&nbsp;
+<a href="https://ict-baden.de/en/products/industrial-keyboard/">Product page</a> &nbsp;·&nbsp;
 <a href="https://ict-baden.de/datenschutz/industrialkeyboard/">Datenschutz</a> &nbsp;·&nbsp;
 <a href="https://ict-baden.de/impressum/">Impressum</a>
 </sub>
