@@ -20,3 +20,9 @@
 -keep class org.vosk.** { *; }
 # JNA refers to desktop Java (AWT) that Android does not have; those paths are never used here.
 -dontwarn java.awt.**
+# Google ML Kit (text recognition) creates its components by reflection from the manifest
+# metadata ("ComponentDiscovery"). R8 full mode removes the unused no-arg constructors, and in a
+# release build OCR then fails at start-up (NoSuchMethodException ...Registrar.<init>, seen on a
+# Zebra HC20 with the R8 build). Keep them; the class names may stay obfuscated.
+-keep,allowobfuscation class * implements com.google.firebase.components.ComponentRegistrar { <init>(); }
+-keepclassmembers class com.google.mlkit.**.*Registrar { <init>(); }
