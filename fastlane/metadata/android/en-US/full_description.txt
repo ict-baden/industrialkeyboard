@@ -45,10 +45,10 @@ FOR SCREEN READERS
 • Keys, suggestions and dictation are named for TalkBack
 
 PRIVATE BY DESIGN
-• No internet permission: the keyboard cannot send anything off the device
+• Network only to download a language pack for offline dictation when you tap it – nothing typed or spoken leaves the device
 • Nothing you type in other apps is stored or learned
 • Camera pictures are processed on the device and not stored
-• For dictation, the audio goes to the device's speech recognition; if the device does not recognise speech itself, its speech service may process the audio online
+• Dictation uses the device's speech recognition (its speech service may work online) or, on devices without Google and if set so, a free offline model on the device
 • No account, no ads, no tracking. Industrial Keyboard sends no data to ICT-Baden.
 
 User interface in English, German, Spanish, French and Chinese. Free and open source (MIT licence), made by ICT-Baden. Paid support contracts are available.

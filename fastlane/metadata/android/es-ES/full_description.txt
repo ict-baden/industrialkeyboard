@@ -45,10 +45,10 @@ PARA LECTORES DE PANTALLA
 • Las teclas, las sugerencias y el dictado tienen nombres para TalkBack
 
 PRIVACIDAD DESDE EL DISEÑO
-• Sin permiso de Internet: el teclado no puede enviar nada fuera del dispositivo
+• Red solo para descargar, al tocar, un paquete de idioma del dictado sin conexión; nada escrito o dicho sale del dispositivo
 • Nada de lo que escribe en otras aplicaciones se guarda ni se aprende
 • Las imágenes de la cámara se procesan en el dispositivo y no se guardan
-• En el dictado, el audio va al reconocimiento de voz del dispositivo; si el dispositivo no reconoce la voz por sí mismo, su servicio de voz puede procesar el audio en línea
+• Dictado con el reconocimiento de voz del dispositivo (su servicio puede funcionar en línea) o, sin Google o si se configura, con un modelo libre sin conexión
 • Sin cuenta, sin publicidad, sin seguimiento. Industrial Keyboard no envía datos a ICT-Baden.
 
 Interfaz en inglés, alemán, español, francés y chino. Gratuito y de código abierto (licencia MIT), de ICT-Baden. Hay contratos de soporte disponibles.

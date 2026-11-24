@@ -115,11 +115,11 @@ Please report results on other devices in the
 ## Not included, on purpose
 
 - Word suggestions and autocorrection use fixed built-in word lists: they do not learn names or words
-  you type often, and there is no swipe typing. Dictation needs a speech recognizer on the device (on-device on Android 12+ phones like Pixel; AOSP devices without Google usually have none – issue #24). Nothing learns or stores what is typed.
+  you type often, and there is no swipe typing. Dictation uses the speech recognizer of the device (on-device on Android 12+ phones like Pixel); AOSP devices without one use the free offline model (Vosk, issue #24), which is less accurate than Google, writes no punctuation and knows German and English only (other keyboard languages dictate English). Nothing learns or stores what is typed.
 - The dictionaries are general (Wikipedia-weighted): technical terms and company words are often missing. A small list lifts everyday words (greetings, weekdays) for German and English.
 - Next-word suggestions come from a small fixed list (German and English); other languages have none yet. Gboard learns from typing, this keyboard does not.
 - The clipboard history lives only in memory: it is empty after the keyboard restarts, and Android lets the keyboard see only what is copied while it is the selected keyboard.
-- No internet permission: the keyboard cannot send anything off the device.
+- The internet permission is there only for the language packs of the free dictation (downloaded on request); nothing else in the app uses the network.
 - Camera scan reads one code per tap and has no batch or multi-code mode; a scan engine is faster
   and works in the dark. The camera picture fills only the keyboard area.
 - Key labels are not translated (they are what the keys type) – except on the text editing panel.

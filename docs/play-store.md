@@ -75,7 +75,7 @@ have no password until one is configured.
 
 **Content rating (IARC questionnaire):** category *Utility, productivity, communication or
 other*. Violence, sexuality, language, controlled substances, gambling: no. User interaction /
-sharing of user content: no. Internet access: no (the app has no internet permission).
+sharing of user content: no. Internet access: only to download a language pack for offline dictation on request (no user content is sent).
 
 **Target audience:** 18 and over; not designed for children.
 
@@ -83,8 +83,10 @@ sharing of user content: no. Internet access: no (the app has no internet permis
 
 **Data safety:**
 
-- *Does the app collect or share user data?* **No.** The app has no internet permission, so it
-  cannot send anything off the device. It stores nothing that is typed in other apps; word
+- *Does the app collect or share user data?* **No.** The only network use is the download of a
+  language pack of the free offline dictation when the user taps *Download* (an https `GET` of a
+  fixed file, no identifiers sent); Google's definition of "collect" (data sent off the device) is
+  not met by it. Audio, typed and recognised text stay on the device. It stores nothing that is typed in other apps; word
   suggestions come from built-in word lists. Only its own configuration, the snippets users enter
   and the words of the personal dictionary are stored on the device
   ([data-and-privacy.md](data-and-privacy.md)).
@@ -101,15 +103,19 @@ keyboards.
 |---|---|
 | `VIBRATE` | Key and scan feedback |
 | `CAMERA` | Scanning barcodes with the camera on devices without a scan engine (`scanner.trigger` `auto` or `camera`). Asked only when the user taps scan (or imports a configuration QR code) the first time. The pictures are decoded on the device and never stored or sent |
-| `RECORD_AUDIO` | Dictation inside the keyboard (`typing.voice`). Only while the dictation panel is open; the audio goes to the device's speech recognition and is neither collected, stored nor sent by the app (no internet permission). Data safety: audio is processed on the device / by the device's speech service, not collected |
+| `RECORD_AUDIO` | Dictation inside the keyboard (`typing.voice`). Only while the dictation panel is open; the audio goes to the device's speech recognition or to the free offline model inside the app (recognised on the device, in memory). It is neither collected, stored nor sent by the app. Data safety: audio is processed on the device / by the device's speech service, not collected ("processed ephemerally") |
+| `INTERNET`, `ACCESS_NETWORK_STATE` | Only to download a language pack of the free offline dictation (Vosk model, 41–46 MB) when the user taps *Download*, and to warn before a download over mobile data. No other network code; ML Kit's usage statistics stay disabled (its `datatransport` upload backend is removed from the manifest, checked by `NetworkManifestTest`). Data safety: nothing collected or shared |
 | `NFC` | Typing NFC tags (UID or stored text) into the focused field (`scanner.nfc`). Only while the keyboard is open in a field |
 
 The input method service is bound with `BIND_INPUT_METHOD` (granted by the system when the user
 enables the keyboard). No sensitive permissions that need a declaration form. Data safety: the
-camera pictures are processed on the device only and not collected (no internet permission). Text recognition (OCR) uses Google ML Kit with the model inside the app;
-it also runs on the device only. ML Kit's usage statistics cannot be sent either, because the
-internet permission it brings is removed from the app (check: the Play Console lists no INTERNET
-permission for the bundle).
+camera pictures are processed on the device only and not collected. Text recognition (OCR) uses Google ML Kit with the model inside the app;
+it also runs on the device only. ML Kit's usage statistics are not sent: the app keeps the internet
+permission only for the language pack download and removes the upload backend of Google's
+`datatransport` library, which ML Kit uses for its statistics (check: the merged manifest has no
+`backend:…CctBackendFactory` meta-data; logcat shows "Unknown backend for cct" instead of uploads).
+**Data safety form:** still "No data collected, no data shared"; the INTERNET permission now
+appears in the Play Console for the bundle.
 
 ## Store listing
 

@@ -31,7 +31,7 @@
 </p>
 
 > [!NOTE]
-> **Deutsch:** Industrial Keyboard ist eine Bildschirmtastatur für robuste Android-Geräte (Zebra, Honeywell): große Tasten für Handschuhe, Scan-Taste, F1–F24 für Terminal-Emulation, zentral per MDM konfigurierbar. Kostenlos und Open Source (MIT), ohne Internetzugriff. Download: [IndustrialKeyboard.apk](https://github.com/ict-baden/industrialkeyboard/releases/download/latest/IndustrialKeyboard.apk). Die Oberfläche gibt es auf Englisch und Deutsch, dazu maschinell übersetzt auf Spanisch, Französisch und Chinesisch. Produktseite: [ict-baden.de/produkte/industrial-keyboard](https://ict-baden.de/produkte/industrial-keyboard/).
+> **Deutsch:** Industrial Keyboard ist eine Bildschirmtastatur für robuste Android-Geräte (Zebra, Honeywell): große Tasten für Handschuhe, Scan-Taste, F1–F24 für Terminal-Emulation, zentral per MDM konfigurierbar. Kostenlos und Open Source (MIT); Netz nur für den Download eines Sprachpakets fürs Offline-Diktat auf Knopfdruck. Download: [IndustrialKeyboard.apk](https://github.com/ict-baden/industrialkeyboard/releases/download/latest/IndustrialKeyboard.apk). Die Oberfläche gibt es auf Englisch und Deutsch, dazu maschinell übersetzt auf Spanisch, Französisch und Chinesisch. Produktseite: [ict-baden.de/produkte/industrial-keyboard](https://ict-baden.de/produkte/industrial-keyboard/).
 
 ---
 
@@ -72,10 +72,11 @@
 | 📝 **Snippets** | Ready-made texts from the administrator and the users' own, in ⊞ or an own bar button; typed shortcuts such as `mfg` offer them in the suggestion strip – with `{TAB}` and `{ENTER}` for forms ([details](docs/configuration.md#snippets--snippets)) |
 | 🌍 **Languages** | Keyboard languages like Gboard (switch with 🌐), letters follow the language, or fixed QWERTY, QWERTZ, AZERTY, Nordic and Spanish; accents on long press, optional number row |
 | 💬 **Suggestions and emoji** | Word suggestions from built-in dictionaries (no learning, nothing stored), optional autocorrection, emoji panel |
+| 🎤 **Dictation** | Speak into the keyboard like with Gboard: the device's speech recognition where there is one, and on devices without Google a free offline model (Vosk, German and English) that runs entirely on the device ([details](docs/configuration.md#free-offline-dictation)) |
 | 🎨 **Looks good** | Light, dark, high contrast or follow the system; custom accent color; smooth animations |
 | ♿ **Screen readers** | Keys, tabs, suggestions and dictation named for TalkBack, with lift-to-type, accents in the actions menu, announced page changes, quiet password keys without headphones, and text that follows the font size ([details](docs/accessibility.md)) |
 | 📡 **Central configuration** | Managed configuration (SOTI, Intune, Workspace ONE …), configuration file (also Zebra `/enterprise/usr`), broadcast intent (StageNow, only with the admin password or on EMM-managed devices), admin password |
-| 🔒 **Private by design** | No internet permission, nothing typed in other apps is stored or learned (word suggestions come from built-in word lists; only snippets and personal dictionary words you enter in the app are kept); configuration excluded from backups |
+| 🔒 **Private by design** | No telemetry; the network is used only to download a language pack for offline dictation when you tap it. Nothing typed in other apps is stored or learned (word suggestions come from built-in word lists; only snippets and personal dictionary words you enter in the app are kept); configuration excluded from backups |
 
 ## ⚡ Up and running in 5 minutes
 
@@ -186,8 +187,9 @@ Reference: [Configuration](docs/configuration.md#custom-layouts).
   tried on a Honeywell device. Reports welcome.
 - Spanish, French and Chinese are machine translations, not yet proofread by native speakers.
 - Word suggestions come from fixed built-in word lists and learn nothing; there is no swipe typing.
-  Dictation needs a speech recognizer on the device – without on-device recognition, the device's
-  speech service may process the audio online.
+  Dictation uses the device's speech recognizer – without on-device recognition, the device's
+  speech service may process the audio online. Devices without one (AOSP) and `typing.voice: "free"`
+  use a free offline model (Vosk); it is less accurate and needs a language pack (46 MB) once.
 
 Details: [Limitations](docs/limitations.md).
 

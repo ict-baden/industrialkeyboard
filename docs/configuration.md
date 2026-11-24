@@ -338,7 +338,9 @@ Phone, date and time fields show fixed keys instead of the numeric ones.
 | `longPressDelay` | 200–1500 (ms) | `300` (like Gboard; `400` up to 2.1) | Time until a long press shows the alternatives; 500–700 avoids accidental accents with gloves |
 | `suggestions` | `true` / `false` | `true` | Three word suggestions above the keys while a word is typed, like Gboard: from a built-in dictionary of the keyboard language, best one in the middle; tap one to replace the word and add a space. In normal text fields and search fields (there without autocorrect) – never in passwords, e-mail and web addresses, numbers, dates or fields that set `textNoSuggestions` (barcode fields usually do). Nothing is learnt or stored |
 | `autocorrect` | `true` / `false` | `true` (like Gboard) | Space replaces an obvious typo (one wrong, missing, extra or swapped letter) by the best suggestion; Backspace right after it brings the typed word back. Only in normal text fields with suggestions – never in fields that switch suggestions off (barcode and article number fields usually do); for pure data entry switch it off |
-| `voice` | `auto`, `offline`, `off` | `auto` | Dictation inside the keyboard, like Gboard: the 🎤 in the tab bar (and at the right of the suggestions) replaces the keys with a listening panel; partial text appears in the field while speaking, the keyboard keeps listening until 🎤 is tapped again, ⌨ is pressed or 30 s pass without speech. Uses Android's speech recognition: `auto` = on-device recognition if the device has it (Android 12+, e.g. Pixel), otherwise the device's speech service, which may work online; `offline` = on-device recognition only (later also our own engine, issue #24); `off` = no microphone. Needs the microphone permission (asked on first use). Not in password fields. The old value `system` is read as `auto` |
+| `voice` | `auto`, `offline`, `free`, `off` | `auto` | Dictation inside the keyboard, like Gboard: the 🎤 in the tab bar (and at the right of the suggestions) replaces the keys with a listening panel; partial text appears in the field while speaking, the keyboard keeps listening until 🎤 is tapped again, ⌨ is pressed or 30 s pass without speech. Which recognizer – the **smart switch** ([details](#free-offline-dictation)): `auto` = the device's speech recognition as before – on-device recognition if the device has it (Android 12+, e.g. Pixel), otherwise the device's speech service, which may work online (Google); only a device **without any** (AOSP, no Google services) uses the **free offline model**; `offline` = on the device only: Android's on-device recognition, and where the device has none the free model (both run on the device, never the online speech service); `free` = always the free offline model, never a recognizer of the device or Google (for sites where nothing may go to Google); `off` = no microphone. Needs the microphone permission (asked on first use). Not in password fields. The old value `system` is read as `auto`. MDM key `voice` |
+| `voiceModelDownload` | `true` / `false` | `true` | The free model may **download its language pack** – only when the user taps *Download language pack* in the dictation panel or in the settings, never on its own. `false`: no download; the pack comes from an import in the settings or from the MDM folder ([below](#free-offline-dictation)), otherwise the microphone is hidden where the free model would be used. MDM key `voice_model_download` |
+| `voiceModelUrl` | `https://…` | not set (GitHub) | **Own server** for the language packs: base address, the file name (`vosk-model-small-de-0.15.zip`, `vosk-model-small-en-us-0.15.zip`) is appended. https only; the size and SHA-256 fixed in the app are checked just the same, so the server must offer exactly these files. MDM key `voice_model_url` (empty = unchanged) |
 | `nextWord` | `true` / `false` | `true` | After a space, three likely next words (`vielen ` → Dank, Grüße; `thank ` → you). From a small fixed list per language (German and English so far, `tools/dictionaries/next/`); the AOSP word lists have no word pairs and nothing is learnt from typing |
 | `clipboardHistory` | `true` / `false` | `false` | Clipboard history for the toolbar's 📋 panel: text copied while the keyboard is shown and what is on the clipboard when the panel opens, newest first, at most 20 entries, unpinned ones for 1 hour, **only in memory** (gone when the keyboard restarts). Never from password fields or clips marked sensitive. Off: the panel offers only what is copied right now |
 | `deleteGesture` | `true` / `false` | `true` | Swipe left from Backspace marks whole words (one more per finger width), lifting the finger deletes them – like Gboard |
@@ -350,6 +352,64 @@ Phone, date and time fields show fixed keys instead of the numeric ones.
 Always on: rollover typing with several fingers, key repeat on Backspace, Del and the arrow
 keys, slide on the space bar to move the cursor, long press on the space bar to switch
 keyboards, double tap on Shift for caps lock, long press on the hide button for the settings.
+
+
+### Free offline dictation
+
+For devices without Google's speech recognition (AOSP, no Google services) and for sites where
+nothing may go to Google, the keyboard has its own recognizer: **Vosk** (open source, Apache-2.0)
+with a small language model per language, running entirely on the device. Audio and text never
+leave the device.
+
+**Smart switch** – when a field starts, the keyboard decides per `typing.voice`:
+
+| `voice` | Android's on-device recognition available | only the device's speech service (e.g. Google) | no recognizer (AOSP) |
+|---|---|---|---|
+| `auto` | on-device recognition | speech service (may be online) | free model |
+| `offline` | on-device recognition | free model | free model |
+| `free` | free model | free model | free model |
+| `off` | – | – | – |
+
+"Free model" needs its language pack, or `voiceModelDownload: true` so it can be fetched; otherwise
+there is no microphone. If Android's on-device recognition lacks the language pack of the keyboard
+language and there is no speech service to fall back to (`offline`, or `auto` without one), an
+installed free model takes over.
+
+**Language:** German for German keyboards (`de`, `de-AT`, `de-CH` …), English for every other
+keyboard language. Spanish, French and Chinese keyboards dictate English until there are packs for
+them.
+
+**Language packs** are not inside the APK (they would add about 90 MB). They come from:
+
+| Pack | File | Size | SHA-256 |
+|---|---|---|---|
+| German | `vosk-model-small-de-0.15.zip` | 46 MB (46,499,967 bytes) | `b7e53c90b1f0a38456f4cd62b366ecd58803cd97cd42b06438e2c131713d5e43` |
+| English | `vosk-model-small-en-us-0.15.zip` | 41 MB (41,205,931 bytes) | `30f26242c4eb449f948e42cb302dd7a686cb29a3423a8367f99ff41780942498` |
+
+1. **Download on request** – the dictation panel offers *Download language pack (46 MB)* the first
+   time, and *Settings → Typing → Language pack German / English* downloads or deletes a pack and
+   shows its size. The file comes from
+   `https://github.com/ict-baden/industrialkeyboard/releases/download/voice-models-1/` or from
+   `voiceModelUrl`. Over mobile data the panel and the settings say so first. The download can be
+   cancelled; it is checked against the size and SHA-256 above **before** anything is unpacked, and
+   a wrong file is deleted (`IK-0216`).
+2. **Import** – *Settings → Typing → Import language pack (ZIP)* takes one of the two ZIPs above or
+   another Vosk model ZIP whose top folder names the language (`vosk-model-de-0.21` …). Works with
+   `voiceModelDownload: false`.
+3. **MDM folder** – an MDM can put an **unpacked** model into
+   `Android/data/de.ictbaden.industrialkeyboard/files/voice-models/<folder>/`, where `<folder>` is
+   `de`, `en` or the Vosk name (`vosk-model-small-de-0.15`); the folder must contain `am/final.mdl`
+   and `conf/`. Such a model is used as it is, wins over a downloaded one and cannot be deleted in
+   the app. (StageNow: FileMgr into that path; remember to unzip first.)
+
+Unpacking is safe: no path may leave the target folder, at most 600 MB and 5000 files, into a
+temporary folder that replaces the old pack in one rename – a cancelled or failed install leaves the
+old pack untouched. Downloaded and imported packs are stored in `files/voice-models/<de|en>/`
+(a little more than the ZIP, unpacked). Loading the model takes a few seconds the first time; it stays
+loaded for one minute after dictation ends.
+
+The free model is less accurate than Google's recognition – fine for short notes, not for long
+texts. It writes lower case words without punctuation, and numbers as words ("drei" instead of 3).
 
 ## `feedback`
 

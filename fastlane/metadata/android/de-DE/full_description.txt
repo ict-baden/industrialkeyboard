@@ -45,10 +45,10 @@ FÜR SCREENREADER
 • Tasten, Vorschläge und Diktat sind für TalkBack benannt
 
 DATENSCHUTZ VON ANFANG AN
-• Keine Internetberechtigung: Die Tastatur kann nichts vom Gerät senden
+• Netz nur, um auf Knopfdruck ein Sprachpaket fürs Offline-Diktat zu laden – nichts Getipptes oder Gesprochenes verlässt das Gerät
 • Nichts, was Sie in anderen Apps tippen, wird gespeichert oder gelernt
 • Kamerabilder werden auf dem Gerät ausgewertet und nicht gespeichert
-• Beim Diktat geht die Aufnahme an die Spracherkennung des Geräts; erkennt das Gerät Sprache nicht selbst, kann dessen Sprachdienst sie online verarbeiten
+• Diktat mit der Spracherkennung des Geräts (deren Sprachdienst arbeitet ggf. online) oder, auf Geräten ohne Google und wenn so eingestellt, mit einem freien Offline-Modell auf dem Gerät
 • Kein Konto, keine Werbung, kein Tracking. Industrial Keyboard sendet keine Daten an ICT-Baden.
 
 Oberfläche auf Englisch, Deutsch, Spanisch, Französisch und Chinesisch. Kostenlos und Open Source (MIT-Lizenz), von ICT-Baden. Supportverträge sind erhältlich.

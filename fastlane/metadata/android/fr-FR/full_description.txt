@@ -45,10 +45,10 @@ POUR LES LECTEURS D’ÉCRAN
 • Touches, suggestions et dictée sont nommées pour TalkBack
 
 CONFIDENTIALITÉ DÈS LA CONCEPTION
-• Pas d’autorisation Internet : le clavier ne peut rien envoyer hors de l’appareil
+• Réseau uniquement pour télécharger, sur demande, un pack de langue de la dictée hors ligne ; rien de tapé ou de dit ne quitte l’appareil
 • Rien de ce que vous tapez dans d’autres applications n’est enregistré ni appris
 • Les images de la caméra sont traitées sur l’appareil et ne sont pas enregistrées
-• Pour la dictée, l’audio est transmis à la reconnaissance vocale de l’appareil ; si l’appareil ne reconnaît pas la parole lui-même, son service vocal peut traiter l’audio en ligne
+• Dictée avec la reconnaissance vocale de l’appareil (son service peut être en ligne) ou, sans Google ou si configuré, avec un modèle libre hors ligne
 • Pas de compte, pas de publicité, pas de suivi. Industrial Keyboard n’envoie aucune donnée à ICT-Baden.
 
 Interface en anglais, allemand, espagnol, français et chinois. Gratuit et open source (licence MIT), par ICT-Baden. Des contrats de support sont disponibles.

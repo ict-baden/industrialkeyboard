@@ -26,11 +26,15 @@ or install it over USB:
 adb install -r IndustrialKeyboard-2.2.5.apk
 ```
 
-The app needs no permissions apart from vibration, NFC and – asked on first use – the camera (camera
-scan on devices without a scan engine) and the microphone (dictation, `typing.voice`). In particular
-**no internet access**. To grant them ahead of time, use your EMM's permission policy (or
+The app needs no permissions apart from vibration, NFC, network (only to download a language pack
+of the free offline dictation on request, see below) and – asked on first use – the camera (camera
+scan on devices without a scan engine) and the microphone (dictation, `typing.voice`). To grant them ahead of time, use your EMM's permission policy (or
 `adb shell pm grant de.ictbaden.industrialkeyboard android.permission.CAMERA` / `android.permission.RECORD_AUDIO`).
-To forbid dictation, set `typing.voice: "off"`.
+To forbid dictation, set `typing.voice: "off"`. For devices that must never connect: set
+`typing.voiceModelDownload: false` (MDM key `voice_model_download`) and provide the language pack
+yourself – unpacked into `Android/data/de.ictbaden.industrialkeyboard/files/voice-models/de/`
+([details](configuration.md#free-offline-dictation)) – or block the app in the firewall; nothing
+else in the app uses the network.
 
 ## Make it the keyboard
 
@@ -96,6 +100,9 @@ The app ships a schema that every EMM with Android Enterprise support shows:
 | `autofill_suggestions` | Bool | Android 11+: chips of the autofill service (e-mail, address, password) above the keys (default on) |
 | `system_dictionary` | Bool | Words and shortcuts of Android's user dictionary in the suggestions (default on) |
 | `personal_dictionary` | Bool | Words of the keyboard's own personal dictionary (added or imported from Gboard by the user) in the suggestions (default on) |
+| `voice` | Choice | Dictation: Automatic, On the device only, Free model only, Off ([`typing.voice`](configuration.md#typing), default Automatic) |
+| `voice_model_download` | Bool | The free offline dictation may download its language packs when the user taps the button (default on); off = only import or the MDM folder ([details](configuration.md#free-offline-dictation)) |
+| `voice_model_url` | String | Own https:// server for the language packs (`typing.voiceModelUrl`); empty = unchanged |
 | `snippets_enabled` | Bool | [Snippets](configuration.md#snippets--snippets) in ⊞, the bar and as shortcut suggestions (default on) |
 | `snippets_shortcuts` | Bool | Typed shortcuts offer their snippet (default on) |
 | `snippets_button` | Bool | Own snippets button in the toolbar or as the last tab (default off) |
