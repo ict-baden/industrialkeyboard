@@ -111,6 +111,11 @@ it also runs on the device only. ML Kit's usage statistics cannot be sent either
 internet permission it brings is removed from the app (check: the Play Console lists no INTERNET
 permission for the bundle).
 
+## Store listing
+
+Published 2026-11-06 (first review pending): [https://play.google.com/store/apps/details?id=de.ictbaden.industrialkeyboard](https://play.google.com/store/apps/details?id=de.ictbaden.industrialkeyboard). Play and the MDM/GitHub APKs
+carry the same signature, so devices can switch between the sources.
+
 ## Publishing a version
 
 The CI uploads to Google Play by itself once the secret `PLAY_SERVICE_ACCOUNT_JSON` exists
