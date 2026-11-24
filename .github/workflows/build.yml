@@ -1,7 +1,7 @@
-# Nach der Vorlage aus ict-baden/richtlinien, für eine Android-App (Gradle statt .NET, APK statt MSI).
+# Nach der gemeinsamen Build-Vorlage von ICT Baden, für eine Android-App (Gradle statt .NET, APK statt MSI).
 name: Build
 
-# Wann wie viel gebaut wird, steht in Richtlinie 04 („Wann die CI baut“). Kurz: Pushs und PRs bauen, testen und prüfen
+# Wann wie viel gebaut wird: Pushs und PRs bauen, testen und prüfen
 # nur (Debug-APK, Unit-Tests, Lint). Signiert und veröffentlicht wird nur im vollen Build: nachts (nur wenn main neu ist),
 # bei Tags, von Hand und mit [voll] in der Commit-Nachricht. Reine Doku startet nichts.
 on:
@@ -56,7 +56,7 @@ jobs:
           LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
           PR: ${{ github.event.pull_request.number }}
           # Geänderte Dateien, bei denen ein PR voll bauen soll. Android baut nur unter Linux, und Signieren und Releases
-          # laufen in PRs ohnehin nie: voll heißt im PR dasselbe wie sonst. Bleibt für Workflow-Änderungen (Richtlinie 04).
+          # laufen in PRs ohnehin nie: voll heißt im PR dasselbe wie sonst. Bleibt für Workflow-Änderungen.
           FULL_PATHS: '^\.github/'
           # Reine Doku, wie paths-ignore oben
           DOC_PATHS: '(\.md$|^docs/|^LICENSE$|^\.github/ISSUE_TEMPLATE/)'
@@ -92,7 +92,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FULL: ${{ needs.gate.outputs.full }}
-      # Signieren nur im vollen Build, mit dem Keystore aus den Secrets (siehe richtlinien/05-signieren.md) und nicht bei
+      # Signieren nur im vollen Build, mit dem Keystore aus den Secrets und nicht bei
       # Pull Requests. Ohne Schlüssel wird gebaut und getestet, aber nichts veröffentlicht: Eine unsignierte APK lässt sich
       # nicht installieren, und eine mit einem anderen Schlüssel signierte ließe sich später nicht mehr aktualisieren.
       SIGN: ${{ secrets.ANDROID_KEYSTORE != '' && github.event_name != 'pull_request' && needs.gate.outputs.full == 'true' }}
@@ -249,7 +249,7 @@ jobs:
           gh release create "$GITHUB_REF_NAME" dist/* --title "$APP $GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md" $pre
 
       - name: "Release 'latest' aktualisieren (main)"
-        # Auch nachts und bei [voll]-Pushs (Richtlinie 04); SIGN gibt es nur im vollen Build
+        # Auch nachts und bei [voll]-Pushs; SIGN gibt es nur im vollen Build
         if: env.SIGN == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}

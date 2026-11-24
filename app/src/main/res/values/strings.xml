@@ -259,7 +259,7 @@
     <string name="import_confirm_message">The current settings will be replaced.</string>
     <string name="config_imported">Configuration imported</string>
 
-    <!-- Settings: info (richtlinien 07) -->
+    <!-- Settings: info -->
     <string name="section_info">Info</string>
     <string name="version">Version</string>
     <string name="status">Status</string>

@@ -19,7 +19,7 @@ android {
         buildConfigField("String", "COMMIT", "\"${System.getenv("GITHUB_SHA")?.take(7) ?: "local"}\"")
     }
 
-    // Release key from the CI secrets (richtlinien/05-signieren.md); without it the release APK stays unsigned.
+    // Release key from the CI secrets; without it the release APK stays unsigned.
     val keystore = System.getenv("ANDROID_KEYSTORE_FILE")
     signingConfigs {
         if (keystore != null) {
@@ -64,7 +64,7 @@ android {
         buildConfig = true
     }
 
-    // The language can be switched in the app and by the MDM (richtlinien/13): an app bundle from
+    // The language can be switched in the app and by the MDM: an app bundle from
     // Play must therefore contain every language, not only the one of the device.
     bundle {
         language {
@@ -146,7 +146,7 @@ dependencies {
     testImplementation("androidx.test.ext:junit-ktx:1.3.0")
 }
 
-// Licence texts for the Info section (richtlinien/07): the repo-root files, added to the APK assets.
+// Licence texts for the Info section: the repo-root files, added to the APK assets.
 // AGP 9 only accepts generated asset folders through the variant API.
 abstract class CopyNotices : DefaultTask() {
     @get:InputFiles

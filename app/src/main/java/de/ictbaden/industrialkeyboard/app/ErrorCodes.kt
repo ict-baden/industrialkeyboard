@@ -2,7 +2,7 @@ package de.ictbaden.industrialkeyboard.app
 
 /**
  * Error codes shown next to translated error messages, so support can identify a message in any
- * language (richtlinien/13-sprachen.md). Listed in docs/error-codes.md – never reuse a number.
+ * language. Listed in docs/error-codes.md – never reuse a number.
  */
 object ErrorCodes {
     const val PROVISIONING = "IK-0100"

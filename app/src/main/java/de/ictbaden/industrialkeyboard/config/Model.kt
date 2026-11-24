@@ -453,7 +453,7 @@ data class KeyboardConfig(
     val scanner: ScannerSettings = ScannerSettings(),
     val customLayouts: List<CustomLayout> = emptyList(),
     val adminPasswordHash: String? = null,
-    /** `auto` (device language) or one of [Languages.SUPPORTED] (richtlinien/13-sprachen.md). */
+    /** `auto` (device language) or one of [Languages.SUPPORTED]. */
     val language: String = Languages.AUTO,
     // New sections go here, after `language`, in this agreed order: snippets, appProfiles,
     // quickToggles, accessibility – so that positional calls keep working (ConfigJson uses names).

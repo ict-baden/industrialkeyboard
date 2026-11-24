@@ -67,7 +67,10 @@ object Macro {
         "SHIFT" to KeyEvent.META_SHIFT_ON,
     )
 
-    /** F13–F24 are Shift + F1–F12 (Android has no higher key codes; 5250 emulators map them this way). */
+    /**
+     * Android has key codes for F13–F24 only from Android 16 on, so F13–F24 are sent as Shift + F1…F12 on
+     * every Android version – the mapping 5250 terminal emulators use.
+     */
     private val SHIFTED_F_KEYS: Map<String, Int> = (13..24).associate { "F$it" to KeyEvent.KEYCODE_F1 + it - 13 }
 
     private val TEXT: Map<String, String> = mapOf(

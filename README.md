@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ict-baden/industrialkeyboard/releases/tag/latest"><img alt="Download: latest" src="https://img.shields.io/badge/Download-latest-2ea44f?logo=github&amp;logoColor=white"></a>
+  <a href="https://github.com/ict-baden/industrialkeyboard/releases/latest"><img alt="Download: latest release" src="https://img.shields.io/badge/Download-latest%20release-2ea44f?logo=github&amp;logoColor=white"></a>
   <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&amp;logoColor=white" alt="Android 8.0+">
   <img src="https://img.shields.io/badge/Version-2.2.5-4338CA" alt="Version 2.2.5">
   <img src="https://img.shields.io/badge/Zebra-DataWedge-000000" alt="Zebra DataWedge">
@@ -31,7 +31,7 @@
 </p>
 
 > [!NOTE]
-> **Deutsch:** Industrial Keyboard ist eine Bildschirmtastatur für robuste Android-Geräte (Zebra, Honeywell): große Tasten für Handschuhe, Scan-Taste, F1–F24 für Terminal-Emulation, zentral per MDM konfigurierbar. Kostenlos und Open Source (MIT); Netz nur für den Download eines Sprachpakets fürs Offline-Diktat auf Knopfdruck. Download: [IndustrialKeyboard.apk](https://github.com/ict-baden/industrialkeyboard/releases/download/latest/IndustrialKeyboard.apk). Die Oberfläche gibt es auf Englisch und Deutsch, dazu maschinell übersetzt auf Spanisch, Französisch und Chinesisch. Produktseite: [ict-baden.de/produkte/industrial-keyboard](https://ict-baden.de/produkte/industrial-keyboard/).
+> **Deutsch:** Industrial Keyboard ist eine Bildschirmtastatur für robuste Android-Geräte (Zebra, Honeywell): große Tasten für Handschuhe, Scan-Taste, F1–F24 für Terminal-Emulation, zentral per MDM konfigurierbar. Kostenlos und Open Source (MIT); Netz nur für den Download eines Sprachpakets fürs Offline-Diktat auf Knopfdruck. Download: bei [Google Play](https://play.google.com/store/apps/details?id=de.ictbaden.industrialkeyboard) oder als APK im [neuesten Release](https://github.com/ict-baden/industrialkeyboard/releases/latest). Die Oberfläche gibt es auf Englisch und Deutsch, dazu maschinell übersetzt auf Spanisch, Französisch und Chinesisch. Produktseite: [ict-baden.de/produkte/industrial-keyboard](https://ict-baden.de/produkte/industrial-keyboard/).
 
 ---
 
@@ -133,8 +133,8 @@ All options, including step by step for **SOTI MobiControl**: [Deployment](docs/
 
 The **Fn** tab holds F1–F12, Esc, Ins, Del, Home, End, PgUp, PgDn and the arrow keys. **Shift**
 turns the top rows into **F13–F24** for one key (double tap: until you tap Shift again).
-Android has no key codes above F12, so F13–F24 are sent as Shift + F1…F12 – the mapping 5250
-terminal emulators use. Prefer the keys always in
+Android has key codes for F13–F24 only from Android 16 on, so F13–F24 are sent as Shift + F1…F12 on every
+Android version – the mapping 5250 terminal emulators use. Prefer the keys always in
 view? Switch on the **function key row** above the letters (`appearance.functionRow`). Every
 key is also available as a macro: `{F1}` … `{F24}`, `{ESC}`, `{PGDN}`, …
 
