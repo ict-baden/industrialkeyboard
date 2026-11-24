@@ -1,6 +1,7 @@
 package de.ictbaden.industrialkeyboard.config
 
 import de.ictbaden.industrialkeyboard.layout.Macro
+import de.ictbaden.industrialkeyboard.voice.VoiceModelCatalog
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -109,6 +110,8 @@ object ConfigJson {
             put("suggestions", config.typing.suggestions)
             put("autocorrect", config.typing.autocorrect)
             put("voice", config.typing.voice.key)
+            put("voiceModelDownload", config.typing.voiceModelDownload)
+            putOpt("voiceModelUrl", config.typing.voiceModelUrl)
             put("deleteGesture", config.typing.deleteGesture)
             put("nextWord", config.typing.nextWord)
             put("clipboardHistory", config.typing.clipboardHistory)
@@ -538,8 +541,16 @@ object ConfigJson {
             suggestions = json.optBoolean("suggestions", d.suggestions),
             autocorrect = json.optBoolean("autocorrect", d.autocorrect),
             voice = json.optNonBlank("voice")?.let { raw ->
-                VoiceInput.parse(raw) ?: throw ConfigException("typing.voice: unknown value \"$raw\" (auto, offline, off)")
+                VoiceInput.parse(raw) ?: throw ConfigException("typing.voice: unknown value \"$raw\" (auto, offline, free, off)")
             } ?: d.voice,
+            voiceModelDownload = json.optBoolean("voiceModelDownload", d.voiceModelDownload),
+            voiceModelUrl = if (json.has("voiceModelUrl")) {
+                json.optNonBlank("voiceModelUrl")?.let { url ->
+                    VoiceModelCatalog.normalizeBaseUrl(url) ?: throw ConfigException("typing.voiceModelUrl: must be an https:// address, not \"$url\"")
+                }
+            } else {
+                d.voiceModelUrl
+            },
             deleteGesture = json.optBoolean("deleteGesture", d.deleteGesture),
             nextWord = json.optBoolean("nextWord", d.nextWord),
             clipboardHistory = json.optBoolean("clipboardHistory", d.clipboardHistory),

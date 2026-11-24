@@ -435,7 +435,7 @@
     <string name="delete_gesture">滑动删除</string>
     <string name="delete_gesture_summary">从退格键向左滑动可删除整个单词</string>
     <string name="mc_voice_title">语音输入</string>
-    <string name="mc_voice_description">麦克风按钮：在键盘中使用设备的语音识别进行听写。auto = 尽量在设备上识别，否则使用语音服务（可能联网）；offline = 仅在设备上；off = 关闭。</string>
+    <string name="mc_voice_description">麦克风按钮：在键盘中听写。auto = 设备的语音识别（尽量在设备上，否则使用语音服务，可能联网），没有语音识别的设备使用免费离线模型；offline = 仅在设备上（没有设备端识别时使用免费模型）；free = 始终使用免费离线模型，不向 Google 发送任何内容；off = 关闭。</string>
     <string name="mc_symbol_hints_title">长按输入符号</string>
     <string name="mc_symbol_hints_description">字母键上长按即可输入的符号。</string>
     <string name="mc_key_borders_title">按键边框</string>
@@ -445,6 +445,7 @@
     <string-array name="mc_voice_entries">
         <item>自动</item>
         <item>仅在设备上</item>
+        <item>仅免费模型</item>
         <item>关闭</item>
     </string-array>
     <string name="key_none">无（不显示按键）</string>
@@ -722,4 +723,42 @@
     </plurals>
     <string name="settings_preview">键盘预览</string>
     <string name="settings_preview_summary">在这些设置顶部显示键盘</string>
+    <string name="voice_free">免费模型（离线）</string>
+    <string name="voice_engine_free">此处使用：设备上的免费离线模型（Vosk）</string>
+    <string name="mc_voice_model_download_title">听写：下载语言包</string>
+    <string name="mc_voice_model_download_description">用户点按按钮时，免费离线听写可以下载其语言包（德语 46 MB，英语 41 MB）。关闭：只能从文件或应用文件夹导入。</string>
+    <string name="mc_voice_model_url_title">听写：语言包服务器</string>
+    <string name="mc_voice_model_url_description">下载语言包的自有 https:// 地址（会附加文件名）。留空：GitHub。始终校验应用中固定的校验和。</string>
+    <string name="dictation_loading">正在加载语言包…</string>
+    <string name="dictation_error_model">无法加载语言包。请在设置中删除并重新加载。</string>
+    <string name="dictation_model_missing">设备上的听写需要一次性下载语言包 %1$s。</string>
+    <string name="dictation_model_missing_metered">设备上的听写需要一次性下载语言包 %1$s。当前为移动数据，建议使用 Wi-Fi。</string>
+    <string name="dictation_model_not_provided">没有 %1$s 的语言包。请在设置中导入或联系管理员。</string>
+    <string name="voice_model_download_size">下载语言包（%1$d MB）</string>
+    <string name="voice_model_downloading">正在加载语言包… %1$d %%</string>
+    <string name="voice_model_installing">正在安装语言包…</string>
+    <string name="voice_model_retry">重试</string>
+    <string name="voice_model_error_network">无法下载语言包。请检查网络连接。</string>
+    <string name="voice_model_error_checksum">下载的语言包不是预期的文件，已删除。</string>
+    <string name="voice_model_error_invalid">该文件不是有效的语言包。</string>
+    <string name="voice_model_error_storage">无法保存语言包。请释放存储空间。</string>
+    <string name="voice_model_title">语言包 %1$s</string>
+    <string name="voice_model_installed">已安装 · %1$s · 点按删除</string>
+    <string name="voice_model_managed">由管理员提供 · %1$s</string>
+    <string name="voice_model_not_installed">未安装 · 点按下载（%1$d MB）</string>
+    <string name="voice_model_not_installed_no_download">未安装 · 下载已关闭，请导入文件</string>
+    <string name="voice_model_running">正在加载… %1$d %% · 点按取消</string>
+    <string name="voice_model_running_unknown">正在安装… · 点按取消</string>
+    <string name="voice_model_import">导入语言包（ZIP）</string>
+    <string name="voice_model_import_summary">来自文件的 Vosk 模型，例如从自己的服务器复制</string>
+    <string name="voice_model_delete_title">删除语言包？</string>
+    <string name="voice_model_delete_message">删除语言包 %1$s 可释放 %2$s。免费听写以后还需要它。</string>
+    <string name="voice_model_download_title">下载语言包？</string>
+    <string name="voice_model_download_message">语言包 %1$s，%2$d MB，来自 %3$s。只下载此文件；您说的和输入的内容绝不会离开设备。</string>
+    <string name="voice_model_download_metered">设备当前使用移动数据。%1$d MB 建议使用 Wi-Fi。</string>
+    <string name="button_download">下载</string>
+    <string name="button_delete_pack">删除</string>
+    <string name="voice_model_imported">语言包 %1$s 已安装</string>
+    <string name="voice_model_busy">已在加载一个语言包</string>
+    <string name="voice_model_folder">MDM 文件夹：%1$s</string>
 </resources>

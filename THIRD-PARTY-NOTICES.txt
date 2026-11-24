@@ -4,10 +4,12 @@ THIRD-PARTY NOTICES
 Industrial Keyboard contains the following third-party software. Each part keeps its own licence; the licence text follows below.
 Industrial Keyboard enthält die folgende Software Dritter. Jeder Teil behält seine eigene Lizenz; der Lizenztext folgt unten.
 
-All parts are compiled into the APK (classes.dex, resources and, for zxing-cpp and ML Kit, native libraries in lib/
-and model files in assets/). Parts 12 and 13 are not open source (see there); everything else is.
-Alle Teile sind in die APK einkompiliert (classes.dex, Ressourcen und bei zxing-cpp und ML Kit native Bibliotheken in
-lib/ und Modelldateien in assets/). Teil 12 und 13 sind nicht quelloffen (siehe dort); alles andere ist es.
+All parts are compiled into the APK (classes.dex, resources and, for zxing-cpp, ML Kit, Vosk and JNA, native libraries
+in lib/ and model files in assets/). Parts 12 and 13 are not open source (see there); everything else is. The speech
+models of part 20 are not in the APK; they are downloaded on request.
+Alle Teile sind in die APK einkompiliert (classes.dex, Ressourcen und bei zxing-cpp, ML Kit, Vosk und JNA native
+Bibliotheken in lib/ und Modelldateien in assets/). Teil 12 und 13 sind nicht quelloffen (siehe dort); alles andere
+ist es. Die Sprachmodelle aus Teil 20 sind nicht in der APK; sie werden auf Anforderung geladen.
 
 1. AndroidX libraries - Android support libraries (UI, compatibility, lifecycle)
    Source: https://developer.android.com/jetpack/androidx (https://android.googlesource.com/platform/frameworks/support)
@@ -94,7 +96,7 @@ lib/ und Modelldateien in assets/). Teil 12 und 13 sind nicht quelloffen (siehe 
    Copyright Google LLC
    Licence: NOT open source. Used under the ML Kit Terms of Service, https://developers.google.com/ml-kit/terms
    (which refer to the Google APIs Terms of Service, https://developers.google.com/terms). The keyboard removes
-   the internet permission, so ML Kit cannot send usage data from the device.
+   the upload backend of Android Data Transport (part 14), so ML Kit cannot send usage data from the device.
 
 13. Google Play services libraries - used by ML Kit
    Components: com.google.android.gms:play-services-base 18.5.0, play-services-basement 18.4.0,
@@ -104,8 +106,8 @@ lib/ und Modelldateien in assets/). Teil 12 und 13 sind nicht quelloffen (siehe 
    Licence: NOT open source. Android Software Development Kit License,
    https://developer.android.com/studio/terms
 
-14. Firebase components and Android Data Transport - used by ML Kit for its usage statistics (inactive here,
-   no internet permission)
+14. Firebase components and Android Data Transport - used by ML Kit for its usage statistics (inactive here:
+   the "cct" upload backend is removed from the manifest)
    Components: com.google.firebase:firebase-annotations 16.0.0, firebase-components 16.1.0,
    firebase-encoders 16.1.0, firebase-encoders-json 17.1.0; com.google.android.datatransport:transport-api 2.2.1,
    transport-backend-cct 2.3.3, transport-runtime 2.2.6
@@ -128,6 +130,41 @@ lib/ und Modelldateien in assets/). Teil 12 und 13 sind nicht quelloffen (siehe 
    kb_glove.xml, kb_contrast.xml and kb_scan_toggle.xml are our own drawings in the same style
    Source: https://github.com/google/material-design-icons
    Copyright Google LLC
+   Licence: Apache-2.0 (section A)
+
+18. Vosk 0.3.75 (com.alphacephei:vosk-android) - free offline dictation (issue #24)
+   Files: lib/*/libvosk.so (native library with Kaldi and OpenFst compiled in), org.vosk classes in classes.dex
+   Source: https://github.com/alphacep/vosk-api (Kaldi: https://github.com/kaldi-asr/kaldi,
+   OpenFst: https://www.openfst.org)
+   Copyright 2019-2025 Alpha Cephei Inc.; Kaldi: Copyright 2009-2025 Johns Hopkins University and the Kaldi authors;
+   OpenFst: Copyright Google Inc. and the OpenFst authors
+   Licence: Apache-2.0 (section A)
+
+   libvosk.so also contains, compiled in:
+
+   a) OpenBLAS - linear algebra
+      Source: https://github.com/OpenMathLib/OpenBLAS
+      Copyright (c) 2011-2025, The OpenBLAS Project; based on GotoBLAS2, Copyright 2009, 2010 The University of
+      Texas at Austin
+      Licence: BSD 3-Clause (section B)
+
+   b) CLAPACK (LAPACK translated to C, as built for Kaldi)
+      Source: https://www.netlib.org/clapack/
+      Copyright (c) 1992-2011 The University of Tennessee and The University of Tennessee Research Foundation,
+      The University of California Berkeley, The University of Colorado Denver
+      Licence: BSD 3-Clause (section B)
+
+19. Java Native Access (JNA) 5.18.1 (net.java.dev.jna:jna, Android AAR) - used by Vosk to call its native library
+   Files: lib/*/libjnidispatch.so, com.sun.jna classes in classes.dex
+   Source: https://github.com/java-native-access/jna
+   Copyright (c) 2007-2025 Timothy Wall, Wayne Meissner and the JNA contributors
+   Licence: dual-licensed LGPL-2.1-or-later or Apache-2.0; used here under Apache-2.0 (section A)
+
+20. Vosk speech models (NOT in the APK) - language packs of the free dictation, downloaded on request or imported:
+   vosk-model-small-de-0.15, vosk-model-small-en-us-0.15
+   Source: https://alphacephei.com/vosk/models, mirrored unchanged at
+   https://github.com/ict-baden/industrialkeyboard/releases/tag/voice-models-1
+   Copyright Alpha Cephei Inc. and the model authors
    Licence: Apache-2.0 (section A)
 
 -------------------------------------------------------------------------------

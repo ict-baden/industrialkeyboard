@@ -85,6 +85,10 @@ import de.ictbaden.industrialkeyboard.ui.KeyboardRootView
 import de.ictbaden.industrialkeyboard.ui.KeyboardView
 import de.ictbaden.industrialkeyboard.ui.Palette
 import de.ictbaden.industrialkeyboard.ui.ShiftState
+import de.ictbaden.industrialkeyboard.voice.ModelException
+import de.ictbaden.industrialkeyboard.voice.VoiceModel
+import de.ictbaden.industrialkeyboard.voice.VoiceModelCatalog
+import de.ictbaden.industrialkeyboard.voice.VoiceModels
 import java.util.Locale
 
 /** All keyboard options with a live preview at the top. Protected by the admin password if one is set. */
@@ -113,6 +117,16 @@ class SettingsActivity : AppCompatActivity() {
 
     private val importFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(::readText)?.let(::confirmImport)
+    }
+
+    /** Language packs of the free dictation (issue #24): download, import, delete. */
+    private val voiceModels by lazy { VoiceModels.get(this) }
+    private val voiceModelRows = mutableMapOf<String, TextView>()
+    private val voiceModelListener: (VoiceModels.Job) -> Unit = { job -> showVoiceModelJob(job) }
+
+    private val importVoiceModel = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri ?: return@registerForActivityResult
+        if (!voiceModels.import(uri)) dialogs.toast(getString(R.string.voice_model_busy))
     }
 
     private val importBarcode = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -180,6 +194,7 @@ class SettingsActivity : AppCompatActivity() {
         toolbar.navigationIcon?.setTint(ui.color(com.google.android.material.R.attr.colorOnSurface))
         store.addListener(listener)
         toggles.addListener(togglesListener)
+        voiceModels.addListener(voiceModelListener)
         // Only a successful unlock survives a rotation; a recreated activity must not skip the password.
         unlocked = savedInstanceState?.getBoolean(KEY_UNLOCKED) == true
         val hash = store.config.adminPasswordHash
@@ -209,6 +224,7 @@ class SettingsActivity : AppCompatActivity() {
     override fun onDestroy() {
         store.removeListener(listener)
         toggles.removeListener(togglesListener)
+        voiceModels.removeListener(voiceModelListener)
         super.onDestroy()
     }
 
@@ -520,6 +536,7 @@ class SettingsActivity : AppCompatActivity() {
                         listOf(
                             VoiceInput.AUTO to getString(R.string.automatic),
                             VoiceInput.OFFLINE to getString(R.string.voice_offline),
+                            VoiceInput.FREE to getString(R.string.voice_free),
                             VoiceInput.OFF to getString(R.string.scan_trigger_off),
                         ),
                         c.typing.voice,
@@ -528,14 +545,16 @@ class SettingsActivity : AppCompatActivity() {
                         R.drawable.ic_mic,
                         getString(R.string.voice_input),
                         getString(
-                            when (DictationController(this, NoDictation).engineFor(c.typing.voice)) {
+                            when (DictationController(this, NoDictation).engineFor(c.typing.voice, Alphabet.keyboardLocale(), c.typing.voiceModelDownload)) {
                                 Dictation.Engine.ON_DEVICE -> R.string.voice_engine_on_device
                                 Dictation.Engine.SERVICE -> R.string.voice_engine_service
+                                Dictation.Engine.FREE -> R.string.voice_engine_free
                                 Dictation.Engine.NONE -> R.string.voice_engine_none
                             },
                         ),
                         onClick = null,
                     ),
+                ) + voiceModelRows(c) + listOf(
                     ui.switchRow(R.drawable.ic_keyboard, getString(R.string.delete_gesture), getString(R.string.delete_gesture_summary), c.typing.deleteGesture) { on ->
                         update { it.copy(typing = it.typing.copy(deleteGesture = on)) }
                     },
@@ -751,6 +770,105 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /** Snippets: the switches and the administrator's list (users edit their own from the keyboard or the setup screen). */
+    /** One row per language pack of the free dictation, plus import; not with `typing.voice: off`. */
+    private fun voiceModelRows(c: KeyboardConfig): List<View> {
+        voiceModelRows.clear()
+        if (c.typing.voice == VoiceInput.OFF) return emptyList()
+        val rows = VoiceModelCatalog.ALL.map { model ->
+            ui.row(R.drawable.ic_mic, getString(R.string.voice_model_title, languageOf(model)), voiceModelSummary(model, c)) { voiceModelTapped(model) }
+                .also { row -> subtitleOf(row)?.let { voiceModelRows[model.language] = it } }
+                .apply { setTag(R.id.settings_search_keywords, "Vosk Sprachpaket language pack offline Diktat dictation") }
+        }
+        val folder = voiceModels.managedDir?.path?.substringAfter("/Android/", "")?.let { "Android/$it" }
+        val import = ui.row(
+            R.drawable.ic_mic,
+            getString(R.string.voice_model_import),
+            listOfNotNull(getString(R.string.voice_model_import_summary), folder?.let { getString(R.string.voice_model_folder, it) }).joinToString("\n"),
+        ) {
+            if (voiceModels.busy) dialogs.toast(getString(R.string.voice_model_busy))
+            else importVoiceModel.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream"))
+        }.apply { setTag(R.id.settings_search_keywords, "Vosk Sprachpaket language pack import ZIP") }
+        return rows + import
+    }
+
+    private fun subtitleOf(row: View): TextView? = ((row as? ViewGroup)?.getChildAt(1) as? ViewGroup)?.getChildAt(1) as? TextView
+
+    private fun languageOf(model: VoiceModel): String {
+        val ui = resources.configuration.locales[0]
+        return Locale.forLanguageTag(model.language).getDisplayLanguage(ui).replaceFirstChar { it.titlecase(ui) }
+    }
+
+    private fun voiceModelSummary(model: VoiceModel, c: KeyboardConfig): String {
+        val job = voiceModels.job
+        if (job is VoiceModels.Job.Running && (job.language == model.language || job.language == null)) {
+            return if (job.percent in 0..99) getString(R.string.voice_model_running, job.percent) else getString(R.string.voice_model_running_unknown)
+        }
+        if (job is VoiceModels.Job.Failed && job.language == model.language && voiceModels.installed(model.language) == null) {
+            return voiceModelError(job.reason)
+        }
+        val size = { android.text.format.Formatter.formatShortFileSize(this, voiceModels.sizeOf(model.language)) }
+        return when {
+            voiceModels.isManaged(model.language) -> getString(R.string.voice_model_managed, size())
+            voiceModels.installed(model.language) != null -> getString(R.string.voice_model_installed, size())
+            c.typing.voiceModelDownload -> getString(R.string.voice_model_not_installed, model.megabytes)
+            else -> getString(R.string.voice_model_not_installed_no_download)
+        }
+    }
+
+    private fun voiceModelError(reason: ModelException.Reason): String = when (reason) {
+        ModelException.Reason.NETWORK -> dialogs.withCode(getString(R.string.voice_model_error_network), ErrorCodes.VOICE_MODEL_DOWNLOAD)
+        ModelException.Reason.CHECKSUM -> dialogs.withCode(getString(R.string.voice_model_error_checksum), ErrorCodes.VOICE_MODEL_CHECKSUM)
+        ModelException.Reason.INVALID, ModelException.Reason.TOO_LARGE -> dialogs.withCode(getString(R.string.voice_model_error_invalid), ErrorCodes.VOICE_MODEL_INVALID)
+        ModelException.Reason.STORAGE, ModelException.Reason.CANCELLED -> dialogs.withCode(getString(R.string.voice_model_error_storage), ErrorCodes.VOICE_MODEL_STORAGE)
+    }
+
+    private fun voiceModelTapped(model: VoiceModel) {
+        val c = store.config
+        when {
+            voiceModels.busy -> voiceModels.cancel()
+            voiceModels.isManaged(model.language) -> Unit
+            voiceModels.installed(model.language) != null -> dialogs.confirm(
+                getString(R.string.voice_model_delete_title),
+                getString(R.string.voice_model_delete_message, languageOf(model), android.text.format.Formatter.formatShortFileSize(this, voiceModels.sizeOf(model.language))),
+                getString(R.string.button_delete_pack),
+            ) {
+                voiceModels.delete(model.language)
+                render()
+            }
+            c.typing.voiceModelDownload -> {
+                val url = VoiceModelCatalog.url(model, c.typing.voiceModelUrl)
+                val host = runCatching { java.net.URI(url).host }.getOrNull() ?: url
+                val message = listOfNotNull(
+                    getString(R.string.voice_model_download_message, languageOf(model), model.megabytes, host),
+                    if (voiceModels.metered()) getString(R.string.voice_model_download_metered, model.megabytes) else null,
+                ).joinToString("\n\n")
+                dialogs.confirm(getString(R.string.voice_model_download_title), message, getString(R.string.button_download)) {
+                    if (!voiceModels.download(model, store.config.typing.voiceModelUrl)) dialogs.toast(getString(R.string.voice_model_busy))
+                }
+            }
+            else -> importVoiceModel.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream"))
+        }
+    }
+
+    /** Progress in the rows without rebuilding the screen; the end redraws it. */
+    private fun showVoiceModelJob(job: VoiceModels.Job) {
+        when (job) {
+            is VoiceModels.Job.Running -> {
+                val c = store.config
+                VoiceModelCatalog.ALL.forEach { model -> voiceModelRows[model.language]?.text = voiceModelSummary(model, c) }
+            }
+            is VoiceModels.Job.Done -> {
+                VoiceModelCatalog.forLanguage(job.language)?.let { dialogs.toast(getString(R.string.voice_model_imported, languageOf(it))) }
+                render()
+            }
+            is VoiceModels.Job.Failed -> {
+                if (job.language == null) dialogs.toast(voiceModelError(job.reason))
+                render()
+            }
+            VoiceModels.Job.Idle -> render()
+        }
+    }
+
     private fun renderSnippets(c: KeyboardConfig) {
         fun set(transform: (SnippetSettings) -> SnippetSettings) = update { it.copy(snippets = transform(it.snippets)) }
         val s = c.snippets

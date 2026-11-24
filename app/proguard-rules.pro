@@ -10,3 +10,13 @@
 
 # Configuration is parsed with org.json by hand and enums are looked up by their own key fields:
 # nothing in the app relies on class, method or field names at run time, so no further keep rules.
+
+# Free offline dictation (issue #24): Vosk binds its native library through JNA. JNA finds the
+# native methods of org.vosk.LibVosk by name (Native.register) and reads fields and structures by
+# reflection, and its own native part calls back into com.sun.jna classes by name. Neither may be
+# renamed or removed.
+-keep class com.sun.jna.** { *; }
+-keepclassmembers class * extends com.sun.jna.** { public *; }
+-keep class org.vosk.** { *; }
+# JNA refers to desktop Java (AWT) that Android does not have; those paths are never used here.
+-dontwarn java.awt.**

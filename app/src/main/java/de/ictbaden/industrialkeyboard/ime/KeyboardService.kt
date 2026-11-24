@@ -59,6 +59,9 @@ import de.ictbaden.industrialkeyboard.config.Symbology
 import de.ictbaden.industrialkeyboard.config.Tabs
 import de.ictbaden.industrialkeyboard.config.UserSnippets
 import de.ictbaden.industrialkeyboard.config.VoiceInput
+import de.ictbaden.industrialkeyboard.voice.ModelException
+import de.ictbaden.industrialkeyboard.voice.VoiceModelCatalog
+import de.ictbaden.industrialkeyboard.voice.VoiceModels
 import de.ictbaden.industrialkeyboard.layout.EditAction
 import de.ictbaden.industrialkeyboard.layout.Key
 import de.ictbaden.industrialkeyboard.layout.KeyChords
@@ -312,7 +315,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         HardwareScanner.removeListener(engineListener)
         camera?.destroy()
         camera = null
-        if (voiceOpen) dictation.stop()
+        VoiceModels.get(this).removeListener(modelListener)
+        if (dictationCreated) dictation.destroy()
         dictionaries.close()
         tone?.release()
         tone = null
@@ -488,7 +492,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
 
     // region dictation (issue #23): Android's speech recognition inside the keyboard, like Gboard
 
-    private val dictation by lazy { DictationController(this, dictationListener) }
+    private var dictationCreated = false
+    private val dictation by lazy { dictationCreated = true; DictationController(this, dictationListener) }
 
     /** Engine for the current field; asked when a field starts, not per key. */
     private var voiceEngine = Dictation.Engine.NONE
@@ -500,7 +505,7 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private fun findVoiceInput(info: EditorInfo?) {
         voiceEngine = Dictation.Engine.NONE
         if (config.typing.voice == VoiceInput.OFF || FieldPolicy.isPassword(info?.inputType ?: InputType.TYPE_NULL)) return
-        voiceEngine = dictation.engineFor(config.typing.voice)
+        voiceEngine = dictation.engineFor(config.typing.voice, Alphabet.keyboardLocale(), config.typing.voiceModelDownload)
     }
 
     private fun startVoice() {
@@ -518,6 +523,8 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         panel.onMic = { if (dictation.isActive) dictation.pause() else dictation.start(voiceEngine, Alphabet.keyboardLocale()) }
         panel.onKeyboard = { closeVoice() }
         panel.onBackspace = { voiceBackspace() }
+        panel.action = null
+        panel.progress = -1f
         panel.status = voiceText(R.string.dictation_speak)
         panel.listening = true
         panel.visibility = View.VISIBLE
@@ -531,9 +538,16 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
         if (!voiceOpen) return
         voiceOpen = false
         dictation.stop()
+        // A running download goes on (the settings show it); the panel only stops watching.
+        VoiceModels.get(this).removeListener(modelListener)
         currentInputConnection?.finishComposingText()
         voiceBefore = null
-        root?.voicePanel?.visibility = View.GONE
+        root?.voicePanel?.apply {
+            action = null
+            onAction = null
+            progress = -1f
+            visibility = View.GONE
+        }
         render()
     }
 
@@ -545,6 +559,85 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     }
 
     private fun voiceText(id: Int, vararg args: Any) = AppLanguage.localized(this).getString(id, *args)
+
+    // Free model (issue #24): the language pack is downloaded from the panel, on a tap only.
+
+    private val modelListener: (VoiceModels.Job) -> Unit = { showModelJob(it) }
+
+    /** The pack the free model needs for the keyboard language. */
+    private fun neededModel() = VoiceModelCatalog.forLanguage(VoiceModelCatalog.languageFor(Alphabet.keyboardLocale())) ?: VoiceModelCatalog.ENGLISH
+
+    private fun modelLanguageName(): String {
+        val ui = AppLanguage.localized(this).resources.configuration.locales[0]
+        return Locale.forLanguageTag(neededModel().language).getDisplayLanguage(ui).replaceFirstChar { it.titlecase(ui) }
+    }
+
+    /** No pack for the free model yet: offer the download (or say who provides it). */
+    private fun offerModel() {
+        val panel = root?.voicePanel ?: return
+        val models = VoiceModels.get(this)
+        models.removeListener(modelListener)
+        models.addListener(modelListener)
+        val job = models.job
+        if (job is VoiceModels.Job.Running) {
+            showModelJob(job)
+            return
+        }
+        panel.listening = false
+        panel.progress = -1f
+        if (!config.typing.voiceModelDownload) {
+            panel.status = "${voiceText(R.string.dictation_model_not_provided, modelLanguageName())} (${ErrorCodes.VOICE_MODEL_MISSING})"
+            panel.action = null
+            panel.onAction = null
+            return
+        }
+        val model = neededModel()
+        panel.status = voiceText(if (models.metered()) R.string.dictation_model_missing_metered else R.string.dictation_model_missing, modelLanguageName())
+        panel.action = voiceText(R.string.voice_model_download_size, model.megabytes)
+        panel.onAction = { models.download(model, config.typing.voiceModelUrl) }
+    }
+
+    private fun showModelJob(job: VoiceModels.Job) {
+        val panel = root?.voicePanel ?: return
+        if (!voiceOpen) return
+        val models = VoiceModels.get(this)
+        when (job) {
+            is VoiceModels.Job.Running -> {
+                panel.listening = false
+                panel.progress = if (job.percent >= 0) job.percent / 100f else 0f
+                panel.status = if (job.percent in 0..99) voiceText(R.string.voice_model_downloading, job.percent) else voiceText(R.string.voice_model_installing)
+                panel.action = voiceText(R.string.button_cancel)
+                panel.onAction = { models.cancel() }
+            }
+            is VoiceModels.Job.Done -> {
+                panel.progress = -1f
+                panel.action = null
+                panel.onAction = null
+                // Straight on with dictation, as if the microphone had been tapped.
+                if (dictation.freePack(Alphabet.keyboardLocale()) != null) {
+                    voiceEngine = Dictation.Engine.FREE
+                    dictation.start(Dictation.Engine.FREE, Alphabet.keyboardLocale())
+                } else {
+                    offerModel()
+                }
+            }
+            is VoiceModels.Job.Failed -> {
+                panel.progress = -1f
+                panel.listening = false
+                panel.status = modelError(job.reason)
+                panel.action = voiceText(R.string.voice_model_retry)
+                panel.onAction = { models.download(neededModel(), config.typing.voiceModelUrl) }
+            }
+            VoiceModels.Job.Idle -> offerModel()
+        }
+    }
+
+    private fun modelError(reason: ModelException.Reason): String = when (reason) {
+        ModelException.Reason.NETWORK -> "${voiceText(R.string.voice_model_error_network)} (${ErrorCodes.VOICE_MODEL_DOWNLOAD})"
+        ModelException.Reason.CHECKSUM -> "${voiceText(R.string.voice_model_error_checksum)} (${ErrorCodes.VOICE_MODEL_CHECKSUM})"
+        ModelException.Reason.INVALID, ModelException.Reason.TOO_LARGE -> "${voiceText(R.string.voice_model_error_invalid)} (${ErrorCodes.VOICE_MODEL_INVALID})"
+        ModelException.Reason.STORAGE, ModelException.Reason.CANCELLED -> "${voiceText(R.string.voice_model_error_storage)} (${ErrorCodes.VOICE_MODEL_STORAGE})"
+    }
 
     private fun preparedVoice(text: String, before: CharSequence?) =
         Dictation.prepare(text, before, config.typing.autoCapitalize && sentenceField(), Alphabet.keyboardLocale())
@@ -563,8 +656,18 @@ class KeyboardService : InputMethodService(), KeyboardView.Listener, ScanPadView
     private val dictationListener = object : DictationController.Listener {
         override fun onDictationState(state: DictationController.State) {
             val panel = root?.voicePanel ?: return
+            if (state == DictationController.State.NEEDS_MODEL) {
+                offerModel()
+                return
+            }
+            panel.action = null
+            panel.onAction = null
+            panel.progress = -1f
             panel.listening = state == DictationController.State.LISTENING || state == DictationController.State.PROCESSING
             panel.status = when (state) {
+                DictationController.State.NEEDS_MODEL -> ""
+                DictationController.State.LOADING -> voiceText(R.string.dictation_loading)
+                DictationController.State.ERROR_MODEL -> "${voiceText(R.string.dictation_error_model)} (${ErrorCodes.VOICE_MODEL_BROKEN})"
                 DictationController.State.LISTENING -> voiceText(R.string.dictation_speak)
                 DictationController.State.PROCESSING -> voiceText(R.string.dictation_processing)
                 DictationController.State.PAUSED -> voiceText(R.string.dictation_paused)

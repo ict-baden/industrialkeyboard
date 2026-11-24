@@ -163,6 +163,18 @@
         android:title="@string/mc_voice_title" />
     <restriction
         android:defaultValue="true"
+        android:description="@string/mc_voice_model_download_description"
+        android:key="voice_model_download"
+        android:restrictionType="bool"
+        android:title="@string/mc_voice_model_download_title" />
+    <restriction
+        android:defaultValue=""
+        android:description="@string/mc_voice_model_url_description"
+        android:key="voice_model_url"
+        android:restrictionType="string"
+        android:title="@string/mc_voice_model_url_title" />
+    <restriction
+        android:defaultValue="true"
         android:description="@string/mc_symbol_hints_description"
         android:key="symbol_hints"
         android:restrictionType="bool"

@@ -100,8 +100,14 @@ enum class VoiceInput(override val key: String) : Keyed {
     /** On-device recognition if the device has it, otherwise the device's speech service (may be online). */
     AUTO("auto"),
 
-    /** Only on-device recognition (nothing leaves the device); later also our own engine (issue #24). */
+    /**
+     * Only recognition on the device (nothing leaves it): Android's on-device recognition, and where
+     * the device has none, the free model ([FREE]).
+     */
     OFFLINE("offline"),
+
+    /** Always the free offline model (Vosk, issue #24), never a recognizer of the device or Google. */
+    FREE("free"),
     OFF("off"),
     ;
 
@@ -239,6 +245,10 @@ data class TypingSettings(
     val autocorrect: Boolean = true,
     /** Microphone button for dictation. */
     val voice: VoiceInput = VoiceInput.AUTO,
+    /** The free model's language packs may be downloaded (on request only); off = import from a file or the MDM folder only. */
+    val voiceModelDownload: Boolean = true,
+    /** Own https server for the language packs (base URL, the file name is appended); `null` = ICT-Baden's GitHub release. */
+    val voiceModelUrl: String? = null,
     /** Swipe left from Backspace deletes word by word, like Gboard. */
     val deleteGesture: Boolean = true,
     /** After a space, three likely next words (built-in list, nothing learnt). */

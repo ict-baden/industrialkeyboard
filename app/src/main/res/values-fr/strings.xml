@@ -437,7 +437,7 @@
     <string name="delete_gesture">Balayer pour supprimer</string>
     <string name="delete_gesture_summary">Balayer vers la gauche depuis Retour arrière supprime des mots entiers</string>
     <string name="mc_voice_title">Dictée</string>
-    <string name="mc_voice_description">Bouton micro : dictée dans le clavier avec la reconnaissance vocale de l’appareil. auto = sur l’appareil si possible, sinon le service vocal (éventuellement en ligne) ; offline = uniquement sur l’appareil ; off = désactivé.</string>
+    <string name="mc_voice_description">Bouton micro : dictée dans le clavier. auto = reconnaissance vocale de l’appareil (sur l’appareil si possible, sinon le service vocal, éventuellement en ligne), sur les appareils sans reconnaissance le modèle libre hors ligne ; offline = uniquement sur l’appareil (sans reconnaissance sur l’appareil, le modèle libre) ; free = toujours le modèle libre hors ligne, rien vers Google ; off = désactivé.</string>
     <string name="mc_symbol_hints_title">Symboles par appui long</string>
     <string name="mc_symbol_hints_description">Symboles sur les touches de lettres qu’un appui long tape.</string>
     <string name="mc_key_borders_title">Bordures des touches</string>
@@ -447,6 +447,7 @@
     <string-array name="mc_voice_entries">
         <item>Automatique</item>
         <item>Uniquement sur l’appareil</item>
+        <item>Modèle libre uniquement</item>
         <item>Désactivé</item>
     </string-array>
     <string name="key_none">aucune (pas de touche)</string>
@@ -738,4 +739,42 @@
     </plurals>
     <string name="settings_preview">Aperçu du clavier</string>
     <string name="settings_preview_summary">Affiche le clavier en haut de ces paramètres</string>
+    <string name="voice_free">Modèle libre (hors ligne)</string>
+    <string name="voice_engine_free">Utilisé ici : modèle libre hors ligne (Vosk) sur l’appareil</string>
+    <string name="mc_voice_model_download_title">Dictée : télécharger les packs de langue</string>
+    <string name="mc_voice_model_download_description">La dictée libre hors ligne peut télécharger ses packs de langue (allemand 46 Mo, anglais 41 Mo) quand l’utilisateur touche le bouton. Désactivé : uniquement l’import d’un fichier ou du dossier de l’app.</string>
+    <string name="mc_voice_model_url_title">Dictée : serveur des packs de langue</string>
+    <string name="mc_voice_model_url_description">Adresse https:// propre d’où les packs de langue sont téléchargés (le nom du fichier est ajouté). Vide : GitHub. La somme de contrôle fixée dans l’app est toujours vérifiée.</string>
+    <string name="dictation_loading">Chargement du pack de langue …</string>
+    <string name="dictation_error_model">Le pack de langue ne peut pas être chargé. Supprimez-le dans les paramètres et chargez-le à nouveau.</string>
+    <string name="dictation_model_missing">La dictée sur l’appareil a besoin une fois du pack de langue %1$s.</string>
+    <string name="dictation_model_missing_metered">La dictée sur l’appareil a besoin une fois du pack de langue %1$s. Données mobiles : le Wi-Fi est préférable.</string>
+    <string name="dictation_model_not_provided">Aucun pack de langue pour %1$s. Importez-le dans les paramètres ou demandez à votre administrateur.</string>
+    <string name="voice_model_download_size">Télécharger le pack de langue (%1$d Mo)</string>
+    <string name="voice_model_downloading">Chargement du pack de langue … %1$d %%</string>
+    <string name="voice_model_installing">Installation du pack de langue …</string>
+    <string name="voice_model_retry">Réessayer</string>
+    <string name="voice_model_error_network">Le pack de langue n’a pas pu être téléchargé. Vérifiez la connexion.</string>
+    <string name="voice_model_error_checksum">Le pack de langue téléchargé n’est pas celui attendu et a été supprimé.</string>
+    <string name="voice_model_error_invalid">Le fichier n’est pas un pack de langue valide.</string>
+    <string name="voice_model_error_storage">Le pack de langue n’a pas pu être enregistré. Libérez de l’espace.</string>
+    <string name="voice_model_title">Pack de langue %1$s</string>
+    <string name="voice_model_installed">Installé · %1$s · toucher pour supprimer</string>
+    <string name="voice_model_managed">Fourni par l’administrateur · %1$s</string>
+    <string name="voice_model_not_installed">Non installé · toucher pour télécharger (%1$d Mo)</string>
+    <string name="voice_model_not_installed_no_download">Non installé · téléchargement désactivé, importez un fichier</string>
+    <string name="voice_model_running">Chargement … %1$d %% · toucher pour annuler</string>
+    <string name="voice_model_running_unknown">Installation … · toucher pour annuler</string>
+    <string name="voice_model_import">Importer un pack de langue (ZIP)</string>
+    <string name="voice_model_import_summary">Un modèle Vosk depuis un fichier, p. ex. copié de votre propre serveur</string>
+    <string name="voice_model_delete_title">Supprimer le pack de langue ?</string>
+    <string name="voice_model_delete_message">Le pack de langue %1$s libère %2$s. La dictée libre en aura de nouveau besoin.</string>
+    <string name="voice_model_download_title">Télécharger le pack de langue ?</string>
+    <string name="voice_model_download_message">Pack de langue %1$s, %2$d Mo, depuis %3$s. Seul ce fichier est chargé ; ce que vous dites et tapez ne quitte jamais l’appareil.</string>
+    <string name="voice_model_download_metered">L’appareil utilise actuellement les données mobiles. Pour %1$d Mo, le Wi-Fi est préférable.</string>
+    <string name="button_download">Télécharger</string>
+    <string name="button_delete_pack">Supprimer</string>
+    <string name="voice_model_imported">Pack de langue %1$s installé</string>
+    <string name="voice_model_busy">Un pack de langue est déjà en cours de chargement</string>
+    <string name="voice_model_folder">Dossier pour le MDM : %1$s</string>
 </resources>

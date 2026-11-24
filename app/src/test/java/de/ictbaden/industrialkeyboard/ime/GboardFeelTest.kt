@@ -25,15 +25,15 @@ class GboardFeelTest {
     }
 
     @Test
-    fun `dictation engine from the setting and what the device offers`() {
+    fun `dictation engine from the setting and what the device offers (without the free model, see DictationEngineTest)`() {
         // auto: on the device first, else the speech service.
-        assertEquals(Dictation.Engine.ON_DEVICE, Dictation.engine(VoiceInput.AUTO, onDeviceAvailable = true, serviceAvailable = true))
-        assertEquals(Dictation.Engine.SERVICE, Dictation.engine(VoiceInput.AUTO, onDeviceAvailable = false, serviceAvailable = true))
-        assertEquals(Dictation.Engine.NONE, Dictation.engine(VoiceInput.AUTO, onDeviceAvailable = false, serviceAvailable = false))
+        assertEquals(Dictation.Engine.ON_DEVICE, Dictation.engine(VoiceInput.AUTO, onDeviceAvailable = true, serviceAvailable = true, freeAvailable = false))
+        assertEquals(Dictation.Engine.SERVICE, Dictation.engine(VoiceInput.AUTO, onDeviceAvailable = false, serviceAvailable = true, freeAvailable = false))
+        assertEquals(Dictation.Engine.NONE, Dictation.engine(VoiceInput.AUTO, onDeviceAvailable = false, serviceAvailable = false, freeAvailable = false))
         // offline never falls back to a service that may work online.
-        assertEquals(Dictation.Engine.ON_DEVICE, Dictation.engine(VoiceInput.OFFLINE, onDeviceAvailable = true, serviceAvailable = true))
-        assertEquals(Dictation.Engine.NONE, Dictation.engine(VoiceInput.OFFLINE, onDeviceAvailable = false, serviceAvailable = true))
-        assertEquals(Dictation.Engine.NONE, Dictation.engine(VoiceInput.OFF, onDeviceAvailable = true, serviceAvailable = true))
+        assertEquals(Dictation.Engine.ON_DEVICE, Dictation.engine(VoiceInput.OFFLINE, onDeviceAvailable = true, serviceAvailable = true, freeAvailable = false))
+        assertEquals(Dictation.Engine.NONE, Dictation.engine(VoiceInput.OFFLINE, onDeviceAvailable = false, serviceAvailable = true, freeAvailable = false))
+        assertEquals(Dictation.Engine.NONE, Dictation.engine(VoiceInput.OFF, onDeviceAvailable = true, serviceAvailable = true, freeAvailable = false))
     }
 
     @Test

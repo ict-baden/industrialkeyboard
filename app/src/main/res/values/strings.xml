@@ -497,7 +497,7 @@
     <string name="delete_gesture">Swipe to delete</string>
     <string name="delete_gesture_summary">Swipe left from Backspace to delete whole words</string>
     <string name="mc_voice_title">Dictation</string>
-    <string name="mc_voice_description">Microphone button: dictation inside the keyboard with the device\'s speech recognition. auto = on the device if possible, otherwise the speech service (may be online); offline = on the device only; off.</string>
+    <string name="mc_voice_description">Microphone button: dictation inside the keyboard. auto = the device\'s speech recognition (on the device if possible, otherwise the speech service, may be online), on devices without one the free offline model; offline = on the device only (without on-device recognition the free model); free = always the free offline model, nothing to Google; off.</string>
     <string name="mc_symbol_hints_title">Symbols on long press</string>
     <string name="mc_symbol_hints_description">Symbols on the letter keys that a long press types.</string>
     <string name="mc_key_borders_title">Key borders</string>
@@ -507,11 +507,13 @@
     <string-array name="mc_voice_entries">
         <item>Automatic</item>
         <item>On the device only</item>
+        <item>Free model only</item>
         <item>Off</item>
     </string-array>
     <string-array name="mc_voice_values" translatable="false">
         <item>auto</item>
         <item>offline</item>
+        <item>free</item>
         <item>off</item>
     </string-array>
     <string name="key_none">none (no key)</string>
@@ -812,4 +814,42 @@
     </plurals>
     <string name="settings_preview">Keyboard preview</string>
     <string name="settings_preview_summary">Shows the keyboard at the top of these settings</string>
+    <string name="voice_free">Free model (offline)</string>
+    <string name="voice_engine_free">Used here: free offline model (Vosk) on the device</string>
+    <string name="mc_voice_model_download_title">Dictation: download language packs</string>
+    <string name="mc_voice_model_download_description">The free offline dictation may download its language packs (German 46 MB, English 41 MB) when the user taps the button. Off: only import from a file or the app folder.</string>
+    <string name="mc_voice_model_url_title">Dictation: server for language packs</string>
+    <string name="mc_voice_model_url_description">Own https:// address the language packs are downloaded from (the file name is appended). Empty: GitHub. The checksum fixed in the app is always checked.</string>
+    <string name="dictation_loading">Loading language pack …</string>
+    <string name="dictation_error_model">The language pack cannot be loaded. Delete it in the settings and load it again.</string>
+    <string name="dictation_model_missing">Dictation on the device needs the language pack %1$s once.</string>
+    <string name="dictation_model_missing_metered">Dictation on the device needs the language pack %1$s once. Mobile data – Wi-Fi is better.</string>
+    <string name="dictation_model_not_provided">No language pack for %1$s. Import it in the settings or ask your administrator.</string>
+    <string name="voice_model_download_size">Download language pack (%1$d MB)</string>
+    <string name="voice_model_downloading">Loading language pack … %1$d %%</string>
+    <string name="voice_model_installing">Installing language pack …</string>
+    <string name="voice_model_retry">Try again</string>
+    <string name="voice_model_error_network">The language pack could not be downloaded. Check the connection.</string>
+    <string name="voice_model_error_checksum">The downloaded language pack is not the expected one and was deleted.</string>
+    <string name="voice_model_error_invalid">The file is not a valid language pack.</string>
+    <string name="voice_model_error_storage">The language pack could not be stored. Free some storage.</string>
+    <string name="voice_model_title">Language pack %1$s</string>
+    <string name="voice_model_installed">Installed · %1$s · tap to delete</string>
+    <string name="voice_model_managed">Provided by the administrator · %1$s</string>
+    <string name="voice_model_not_installed">Not installed · tap to download (%1$d MB)</string>
+    <string name="voice_model_not_installed_no_download">Not installed · download is switched off, import a file</string>
+    <string name="voice_model_running">Loading … %1$d %% · tap to cancel</string>
+    <string name="voice_model_running_unknown">Installing … · tap to cancel</string>
+    <string name="voice_model_import">Import language pack (ZIP)</string>
+    <string name="voice_model_import_summary">A Vosk model from a file, e.g. copied from your own server</string>
+    <string name="voice_model_delete_title">Delete language pack?</string>
+    <string name="voice_model_delete_message">The language pack %1$s frees %2$s. The free dictation needs it again later.</string>
+    <string name="voice_model_download_title">Download language pack?</string>
+    <string name="voice_model_download_message">Language pack %1$s, %2$d MB, from %3$s. Only this file is loaded; what you say and type never leaves the device.</string>
+    <string name="voice_model_download_metered">The device uses mobile data now. Wi-Fi is better for %1$d MB.</string>
+    <string name="button_download">Download</string>
+    <string name="button_delete_pack">Delete</string>
+    <string name="voice_model_imported">Language pack %1$s installed</string>
+    <string name="voice_model_busy">A language pack is being loaded already</string>
+    <string name="voice_model_folder">Folder for the MDM: %1$s</string>
 </resources>

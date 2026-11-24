@@ -132,6 +132,11 @@ dependencies {
     // Not open source (ML Kit terms); a deliberate decision. Its usage statistics cannot leave the
     // device: the manifest removes the internet permission ML Kit brings.
     implementation("com.google.mlkit:text-recognition:16.0.1")
+    // Free offline dictation (issue #24) on devices without a speech recognizer (AOSP): Vosk (Kaldi)
+    // with JNA, Apache-2.0. Native libraries for every ABI; the language models are not in the APK
+    // but downloaded on request (VoiceModels). At least 0.3.75 (JNA 5.18.1): older builds have 4 KB
+    // aligned 64-bit libraries, which Google Play rejects for 16 KB page sizes (targetSdk 35+).
+    implementation("com.alphacephei:vosk-android:0.3.75")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20260814")

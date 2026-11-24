@@ -14,19 +14,48 @@ object Dictation {
         /** The device's speech recognition service; it may work online (e.g. Google). */
         SERVICE,
 
+        /** The free offline model inside the app (Vosk, issue #24): nothing leaves the device. */
+        FREE,
+
         /** No dictation: switched off or nothing available – the microphone is hidden. */
         NONE,
     }
 
-    fun engine(mode: VoiceInput, onDeviceAvailable: Boolean, serviceAvailable: Boolean): Engine = when (mode) {
+    /**
+     * The smart switch (issue #24): which engine the microphone uses for [mode].
+     *
+     * - `auto`: the device's own recognition as before (on the device first, then its speech
+     *   service, e.g. Google); only a device without any (AOSP) takes the free model.
+     * - `offline`: Android's on-device recognition; without it the free model, which runs on the
+     *   device as well, so nothing leaves it either way.
+     * - `free`: always the free model, never a recognizer of the device or Google.
+     * - `off`: none.
+     *
+     * [freeAvailable]: the free model can be used – its language pack is installed, or it may be
+     * downloaded (see [freeUsable]).
+     */
+    fun engine(mode: VoiceInput, onDeviceAvailable: Boolean, serviceAvailable: Boolean, freeAvailable: Boolean): Engine = when (mode) {
         VoiceInput.OFF -> Engine.NONE
-        VoiceInput.OFFLINE -> if (onDeviceAvailable) Engine.ON_DEVICE else Engine.NONE
+        VoiceInput.FREE -> if (freeAvailable) Engine.FREE else Engine.NONE
+        VoiceInput.OFFLINE -> when {
+            onDeviceAvailable -> Engine.ON_DEVICE
+            freeAvailable -> Engine.FREE
+            else -> Engine.NONE
+        }
         VoiceInput.AUTO -> when {
             onDeviceAvailable -> Engine.ON_DEVICE
             serviceAvailable -> Engine.SERVICE
+            freeAvailable -> Engine.FREE
             else -> Engine.NONE
         }
     }
+
+    /**
+     * The free model counts as available with its language pack installed, or when the user may
+     * download it (`typing.voiceModelDownload`); otherwise the microphone is hidden, since nothing in
+     * the keyboard could make it work (import is in the settings).
+     */
+    fun freeUsable(packInstalled: Boolean, downloadAllowed: Boolean): Boolean = packInstalled || downloadAllowed
 
     /**
      * Recognised [spoken] text as it is entered after [before] (the text left of the cursor): a

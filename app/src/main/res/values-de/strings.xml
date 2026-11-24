@@ -436,7 +436,7 @@
     <string name="delete_gesture">Wischen zum Löschen</string>
     <string name="delete_gesture_summary">Von der Rücktaste nach links wischen löscht ganze Wörter</string>
     <string name="mc_voice_title">Diktat</string>
-    <string name="mc_voice_description">Mikrofon-Knopf: Diktat in der Tastatur mit der Spracherkennung des Geräts. auto = auf dem Gerät, wenn möglich, sonst der Sprachdienst (ggf. online); offline = nur auf dem Gerät; off = aus.</string>
+    <string name="mc_voice_description">Mikrofon-Knopf: Diktat in der Tastatur. auto = Spracherkennung des Geräts (auf dem Gerät, wenn möglich, sonst der Sprachdienst, ggf. online), auf Geräten ohne eine das freie Offline-Modell; offline = nur auf dem Gerät (ohne Erkennung auf dem Gerät das freie Modell); free = immer das freie Offline-Modell, nichts zu Google; off = aus.</string>
     <string name="mc_symbol_hints_title">Symbole bei langem Drücken</string>
     <string name="mc_symbol_hints_description">Symbole auf den Buchstabentasten, die langes Drücken tippt.</string>
     <string name="mc_key_borders_title">Tastenränder</string>
@@ -446,6 +446,7 @@
     <string-array name="mc_voice_entries">
         <item>Automatisch</item>
         <item>Nur auf dem Gerät</item>
+        <item>Nur freies Modell</item>
         <item>Aus</item>
     </string-array>
     <string name="key_none">keine (keine Taste)</string>
@@ -730,4 +731,42 @@
     </plurals>
     <string name="settings_preview">Tastatur-Vorschau</string>
     <string name="settings_preview_summary">Zeigt die Tastatur oben in diesen Einstellungen</string>
+    <string name="voice_free">Freies Modell (offline)</string>
+    <string name="voice_engine_free">Hier genutzt: freies Offline-Modell (Vosk) auf dem Gerät</string>
+    <string name="mc_voice_model_download_title">Diktat: Sprachpakete herunterladen</string>
+    <string name="mc_voice_model_download_description">Das freie Offline-Diktat darf seine Sprachpakete (Deutsch 46 MB, Englisch 41 MB) laden, wenn der Benutzer den Knopf antippt. Aus: nur Import aus einer Datei oder dem App-Ordner.</string>
+    <string name="mc_voice_model_url_title">Diktat: Server für Sprachpakete</string>
+    <string name="mc_voice_model_url_description">Eigene https://-Adresse, von der die Sprachpakete geladen werden (der Dateiname wird angehängt). Leer: GitHub. Die in der App feste Prüfsumme wird immer geprüft.</string>
+    <string name="dictation_loading">Sprachpaket wird geladen …</string>
+    <string name="dictation_error_model">Das Sprachpaket lässt sich nicht laden. In den Einstellungen löschen und neu laden.</string>
+    <string name="dictation_model_missing">Für das Diktat auf dem Gerät wird einmal das Sprachpaket %1$s gebraucht.</string>
+    <string name="dictation_model_missing_metered">Für das Diktat auf dem Gerät wird einmal das Sprachpaket %1$s gebraucht. Mobile Daten – besser im WLAN.</string>
+    <string name="dictation_model_not_provided">Kein Sprachpaket für %1$s. In den Einstellungen importieren oder beim Administrator nachfragen.</string>
+    <string name="voice_model_download_size">Sprachpaket herunterladen (%1$d MB)</string>
+    <string name="voice_model_downloading">Sprachpaket wird geladen … %1$d %%</string>
+    <string name="voice_model_installing">Sprachpaket wird installiert …</string>
+    <string name="voice_model_retry">Erneut versuchen</string>
+    <string name="voice_model_error_network">Das Sprachpaket konnte nicht geladen werden. Verbindung prüfen.</string>
+    <string name="voice_model_error_checksum">Das geladene Sprachpaket ist nicht das erwartete und wurde gelöscht.</string>
+    <string name="voice_model_error_invalid">Die Datei ist kein gültiges Sprachpaket.</string>
+    <string name="voice_model_error_storage">Das Sprachpaket konnte nicht gespeichert werden. Speicher freigeben.</string>
+    <string name="voice_model_title">Sprachpaket %1$s</string>
+    <string name="voice_model_installed">Installiert · %1$s · antippen zum Löschen</string>
+    <string name="voice_model_managed">Vom Administrator bereitgestellt · %1$s</string>
+    <string name="voice_model_not_installed">Nicht installiert · antippen zum Herunterladen (%1$d MB)</string>
+    <string name="voice_model_not_installed_no_download">Nicht installiert · Herunterladen ist abgeschaltet, Datei importieren</string>
+    <string name="voice_model_running">Wird geladen … %1$d %% · antippen zum Abbrechen</string>
+    <string name="voice_model_running_unknown">Wird installiert … · antippen zum Abbrechen</string>
+    <string name="voice_model_import">Sprachpaket importieren (ZIP)</string>
+    <string name="voice_model_import_summary">Ein Vosk-Modell aus einer Datei, z. B. vom eigenen Server kopiert</string>
+    <string name="voice_model_delete_title">Sprachpaket löschen?</string>
+    <string name="voice_model_delete_message">Das Sprachpaket %1$s gibt %2$s frei. Das freie Diktat braucht es später wieder.</string>
+    <string name="voice_model_download_title">Sprachpaket herunterladen?</string>
+    <string name="voice_model_download_message">Sprachpaket %1$s, %2$d MB, von %3$s. Nur diese Datei wird geladen; was Sie sprechen und tippen, verlässt das Gerät nie.</string>
+    <string name="voice_model_download_metered">Das Gerät nutzt gerade mobile Daten. Für %1$d MB ist WLAN besser.</string>
+    <string name="button_download">Herunterladen</string>
+    <string name="button_delete_pack">Löschen</string>
+    <string name="voice_model_imported">Sprachpaket %1$s installiert</string>
+    <string name="voice_model_busy">Es wird schon ein Sprachpaket geladen</string>
+    <string name="voice_model_folder">Ordner für das MDM: %1$s</string>
 </resources>

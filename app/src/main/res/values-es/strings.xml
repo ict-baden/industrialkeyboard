@@ -437,7 +437,7 @@
     <string name="delete_gesture">Deslizar para borrar</string>
     <string name="delete_gesture_summary">Deslizar a la izquierda desde Retroceso borra palabras enteras</string>
     <string name="mc_voice_title">Dictado</string>
-    <string name="mc_voice_description">Botón de micrófono: dictado en el teclado con el reconocimiento de voz del dispositivo. auto = en el dispositivo si es posible, si no el servicio de voz (puede ser en línea); offline = solo en el dispositivo; off = desactivado.</string>
+    <string name="mc_voice_description">Botón de micrófono: dictado en el teclado. auto = reconocimiento de voz del dispositivo (en el dispositivo si es posible, si no el servicio de voz, puede ser en línea), en dispositivos sin él el modelo libre sin conexión; offline = solo en el dispositivo (sin reconocimiento en el dispositivo, el modelo libre); free = siempre el modelo libre sin conexión, nada a Google; off = desactivado.</string>
     <string name="mc_symbol_hints_title">Símbolos con pulsación larga</string>
     <string name="mc_symbol_hints_description">Símbolos en las teclas de letras que escribe una pulsación larga.</string>
     <string name="mc_key_borders_title">Bordes de teclas</string>
@@ -447,6 +447,7 @@
     <string-array name="mc_voice_entries">
         <item>Automático</item>
         <item>Solo en el dispositivo</item>
+        <item>Solo modelo libre</item>
         <item>Desactivado</item>
     </string-array>
     <string name="key_none">ninguna (sin tecla)</string>
@@ -738,4 +739,42 @@
     </plurals>
     <string name="settings_preview">Vista previa del teclado</string>
     <string name="settings_preview_summary">Muestra el teclado arriba en estos ajustes</string>
+    <string name="voice_free">Modelo libre (sin conexión)</string>
+    <string name="voice_engine_free">Se usa aquí: modelo libre sin conexión (Vosk) en el dispositivo</string>
+    <string name="mc_voice_model_download_title">Dictado: descargar paquetes de idioma</string>
+    <string name="mc_voice_model_download_description">El dictado libre sin conexión puede descargar sus paquetes de idioma (alemán 46 MB, inglés 41 MB) cuando el usuario toca el botón. Desactivado: solo importar desde un archivo o la carpeta de la app.</string>
+    <string name="mc_voice_model_url_title">Dictado: servidor de paquetes de idioma</string>
+    <string name="mc_voice_model_url_description">Dirección https:// propia desde la que se descargan los paquetes de idioma (se añade el nombre del archivo). Vacío: GitHub. Siempre se comprueba la suma de verificación fijada en la app.</string>
+    <string name="dictation_loading">Cargando el paquete de idioma …</string>
+    <string name="dictation_error_model">No se puede cargar el paquete de idioma. Bórrelo en los ajustes y vuelva a cargarlo.</string>
+    <string name="dictation_model_missing">El dictado en el dispositivo necesita una vez el paquete de idioma %1$s.</string>
+    <string name="dictation_model_missing_metered">El dictado en el dispositivo necesita una vez el paquete de idioma %1$s. Datos móviles: mejor con wifi.</string>
+    <string name="dictation_model_not_provided">No hay paquete de idioma para %1$s. Impórtelo en los ajustes o consulte al administrador.</string>
+    <string name="voice_model_download_size">Descargar paquete de idioma (%1$d MB)</string>
+    <string name="voice_model_downloading">Cargando el paquete de idioma … %1$d %%</string>
+    <string name="voice_model_installing">Instalando el paquete de idioma …</string>
+    <string name="voice_model_retry">Reintentar</string>
+    <string name="voice_model_error_network">No se pudo descargar el paquete de idioma. Compruebe la conexión.</string>
+    <string name="voice_model_error_checksum">El paquete de idioma descargado no es el esperado y se ha borrado.</string>
+    <string name="voice_model_error_invalid">El archivo no es un paquete de idioma válido.</string>
+    <string name="voice_model_error_storage">No se pudo guardar el paquete de idioma. Libere espacio.</string>
+    <string name="voice_model_title">Paquete de idioma %1$s</string>
+    <string name="voice_model_installed">Instalado · %1$s · toque para borrar</string>
+    <string name="voice_model_managed">Proporcionado por el administrador · %1$s</string>
+    <string name="voice_model_not_installed">No instalado · toque para descargar (%1$d MB)</string>
+    <string name="voice_model_not_installed_no_download">No instalado · la descarga está desactivada, importe un archivo</string>
+    <string name="voice_model_running">Cargando … %1$d %% · toque para cancelar</string>
+    <string name="voice_model_running_unknown">Instalando … · toque para cancelar</string>
+    <string name="voice_model_import">Importar paquete de idioma (ZIP)</string>
+    <string name="voice_model_import_summary">Un modelo Vosk desde un archivo, p. ej. copiado de su propio servidor</string>
+    <string name="voice_model_delete_title">¿Borrar el paquete de idioma?</string>
+    <string name="voice_model_delete_message">El paquete de idioma %1$s libera %2$s. El dictado libre lo volverá a necesitar.</string>
+    <string name="voice_model_download_title">¿Descargar el paquete de idioma?</string>
+    <string name="voice_model_download_message">Paquete de idioma %1$s, %2$d MB, desde %3$s. Solo se descarga este archivo; lo que dice y escribe nunca sale del dispositivo.</string>
+    <string name="voice_model_download_metered">El dispositivo usa ahora datos móviles. Para %1$d MB es mejor el wifi.</string>
+    <string name="button_download">Descargar</string>
+    <string name="button_delete_pack">Borrar</string>
+    <string name="voice_model_imported">Paquete de idioma %1$s instalado</string>
+    <string name="voice_model_busy">Ya se está cargando un paquete de idioma</string>
+    <string name="voice_model_folder">Carpeta para el MDM: %1$s</string>
 </resources>

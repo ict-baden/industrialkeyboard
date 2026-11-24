@@ -11,10 +11,16 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
 import de.ictbaden.industrialkeyboard.config.VoiceInput
+import de.ictbaden.industrialkeyboard.voice.OfflineSpeechEngine
+import de.ictbaden.industrialkeyboard.voice.VoiceModelCatalog
+import de.ictbaden.industrialkeyboard.voice.VoiceModels
+import de.ictbaden.industrialkeyboard.voice.VoskEngine
+import java.io.File
 import java.util.Locale
 
 /**
- * Dictation inside the keyboard with Android's [SpeechRecognizer] (issue #23). Keeps listening
+ * Dictation inside the keyboard with Android's [SpeechRecognizer] (issue #23) or the free offline
+ * model ([OfflineSpeechEngine], issue #24) where the device has none. Keeps listening
  * utterance by utterance while [isActive], like Gboard, until [stop] or [Dictation.SILENCE_TIMEOUT_MS]
  * without speech. All calls on the main thread.
  */
@@ -27,10 +33,36 @@ class DictationController(private val context: Context, private val listener: Li
         fun onLevel(level: Float)
     }
 
-    enum class State { LISTENING, PROCESSING, PAUSED, ERROR_PERMISSION, ERROR_NETWORK, ERROR_UNAVAILABLE, ERROR_NO_MATCH, ERROR_LANGUAGE_PACK }
+    enum class State {
+        /** The free model is being loaded (a few seconds the first time). */
+        LOADING,
+        LISTENING,
+        PROCESSING,
+        PAUSED,
+        ERROR_PERMISSION,
+        ERROR_NETWORK,
+        ERROR_UNAVAILABLE,
+        ERROR_NO_MATCH,
+        ERROR_LANGUAGE_PACK,
+
+        /** Free model: its language pack is not installed yet – the panel offers the download. */
+        NEEDS_MODEL,
+
+        /** Free model: the language pack could not be loaded (damaged). */
+        ERROR_MODEL,
+    }
 
     /** `typing.voice: auto`: a missing on-device language pack falls back to the speech service. */
     var fallbackToService = true
+
+    private val models by lazy { VoiceModels.get(context) }
+
+    /** Created on first use of the free model; holds the loaded model until [stop] plus [MODEL_KEEP_MS]. */
+    private var free: OfflineSpeechEngine? = null
+    private val freeModel = Runnable {
+        free?.release()
+        free = null
+    }
 
     private val main = Handler(Looper.getMainLooper())
     private var recognizer: SpeechRecognizer? = null
@@ -43,16 +75,30 @@ class DictationController(private val context: Context, private val listener: Li
 
     private val silenceTimeout = Runnable { pause() }
 
-    /** Which engine this device offers for [mode]; asked when a field starts, not per key. */
-    fun engineFor(mode: VoiceInput): Dictation.Engine {
-        val onDevice = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+    /**
+     * Which engine this device offers for [mode] and the keyboard [locale] (the smart switch,
+     * [Dictation.engine]); asked when a field starts, not per key. [downloadAllowed]: `typing.voiceModelDownload`.
+     */
+    fun engineFor(mode: VoiceInput, locale: Locale, downloadAllowed: Boolean): Dictation.Engine {
+        if (mode == VoiceInput.OFF) return Dictation.Engine.NONE
+        val onDevice = mode != VoiceInput.FREE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
             runCatching { SpeechRecognizer.isOnDeviceRecognitionAvailable(context) }.getOrDefault(false)
-        val service = runCatching { SpeechRecognizer.isRecognitionAvailable(context) }.getOrDefault(false)
-        return Dictation.engine(mode, onDevice, service)
+        val service = mode == VoiceInput.AUTO && runCatching { SpeechRecognizer.isRecognitionAvailable(context) }.getOrDefault(false)
+        val freeOk = Dictation.freeUsable(freePack(locale) != null, downloadAllowed)
+        return Dictation.engine(mode, onDevice, service, freeOk)
     }
+
+    /** The installed language pack of the free model for [locale] (German for de*, otherwise English). */
+    fun freePack(locale: Locale): File? = models.installed(VoiceModelCatalog.languageFor(locale))
 
     fun start(engine: Dictation.Engine, locale: Locale) {
         if (engine == Dictation.Engine.NONE) return
+        if (engine == Dictation.Engine.FREE) {
+            startFree(locale)
+            return
+        }
+        pausing = false
+        free?.stop()
         if (recognizer == null || this.engine != engine) {
             release()
             recognizer = create(engine) ?: run {
@@ -74,14 +120,85 @@ class DictationController(private val context: Context, private val listener: Li
         isActive = false
         main.removeCallbacks(silenceTimeout)
         runCatching { recognizer?.stopListening() }
+        if (engine == Dictation.Engine.FREE && free != null) {
+            // PAUSED once the last words are typed (onResult), so they are not entered twice.
+            pausing = true
+            free?.stop()
+            return
+        }
         listener.onDictationState(State.PAUSED)
     }
+
+    /** Free model: [pause] waits for the result of the last utterance. */
+    private var pausing = false
 
     /** Stops and frees the recognizer (panel closed, field changed, keyboard hidden). */
     fun stop() {
         isActive = false
         main.removeCallbacks(silenceTimeout)
         release()
+        free?.stop()
+        // Loading takes a few seconds: kept for a moment, in case dictation goes on in the next field.
+        main.removeCallbacks(freeModel)
+        main.postDelayed(freeModel, MODEL_KEEP_MS)
+    }
+
+    /** Frees everything at once, the free model included (keyboard destroyed). */
+    fun destroy() {
+        stop()
+        main.removeCallbacks(freeModel)
+        freeModel.run()
+    }
+
+    private fun startFree(locale: Locale) {
+        release()
+        pausing = false
+        engine = Dictation.Engine.FREE
+        this.locale = locale
+        val pack = freePack(locale) ?: run {
+            isActive = false
+            listener.onDictationState(State.NEEDS_MODEL)
+            return
+        }
+        isActive = true
+        main.removeCallbacks(freeModel)
+        main.removeCallbacks(silenceTimeout)
+        main.postDelayed(silenceTimeout, Dictation.SILENCE_TIMEOUT_MS)
+        listener.onDictationState(State.LOADING)
+        val engine = free ?: VoskEngine().also { free = it }
+        engine.start(pack, freeCallbacks)
+    }
+
+    private val freeCallbacks = object : OfflineSpeechEngine.Callback {
+        override fun onReady() {
+            if (isActive) listener.onDictationState(State.LISTENING)
+        }
+
+        override fun onPartial(text: String) {
+            if (text.isEmpty()) return
+            // Speech heard: the silence timeout starts again.
+            main.removeCallbacks(silenceTimeout)
+            if (isActive) main.postDelayed(silenceTimeout, Dictation.SILENCE_TIMEOUT_MS)
+            listener.onPartial(text)
+        }
+
+        override fun onResult(text: String) {
+            if (text.isNotBlank()) listener.onFinal(text)
+            if (pausing) {
+                pausing = false
+                listener.onDictationState(State.PAUSED)
+            }
+        }
+
+        override fun onLevel(level: Float) {
+            if (isActive) listener.onLevel(level)
+        }
+
+        override fun onError(error: OfflineSpeechEngine.Error) {
+            Log.i(TAG, "Free dictation error $error")
+            pausing = false
+            fail(if (error == OfflineSpeechEngine.Error.AUDIO) State.ERROR_PERMISSION else State.ERROR_MODEL)
+        }
     }
 
     private fun release() {
@@ -170,6 +287,12 @@ class DictationController(private val context: Context, private val listener: Li
      */
     private fun languagePackMissing() {
         val service = runCatching { SpeechRecognizer.isRecognitionAvailable(context) }.getOrDefault(false)
+        // Without the speech service (or with `offline`): the free model, if its pack is there (issue #24).
+        if (!(fallbackToService && service) && freePack(locale) != null) {
+            Log.i(TAG, "No on-device language pack for ${locale.toLanguageTag()}: using the free model")
+            if (isActive) startFree(locale) else release()
+            return
+        }
         // Only for "on the device only": the download opens a system dialog over the app, which would
         // interrupt dictation that can go on with the speech service anyway (seen on a Pixel 9 Pro).
         if (!(fallbackToService && service) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -200,6 +323,9 @@ class DictationController(private val context: Context, private val listener: Li
     private companion object {
         const val TAG = "Dictation"
         const val BUSY_RETRY_MS = 300L
+
+        /** How long the free model stays loaded after dictation ends. */
+        const val MODEL_KEEP_MS = 60_000L
 
         // SpeechRecognizer.ERROR_LANGUAGE_NOT_SUPPORTED / _UNAVAILABLE (API 31), as numbers for older SDK stubs.
         const val ERROR_LANGUAGE_NOT_SUPPORTED = 12

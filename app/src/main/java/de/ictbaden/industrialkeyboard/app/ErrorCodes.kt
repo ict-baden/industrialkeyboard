@@ -33,4 +33,22 @@ object ErrorCodes {
     const val DICTATION_UNAVAILABLE = "IK-0211"
     const val DICTATION_NETWORK = "IK-0212"
     const val DICTATION_NOT_UNDERSTOOD = "IK-0213"
+
+    /** Free dictation (issue #24): no language pack and `typing.voiceModelDownload` off – import or MDM folder. */
+    const val VOICE_MODEL_MISSING = "IK-0214"
+
+    /** The language pack could not be downloaded (no connection, server error, timeout). */
+    const val VOICE_MODEL_DOWNLOAD = "IK-0215"
+
+    /** Downloaded language pack has the wrong size or SHA-256: not unpacked, deleted. */
+    const val VOICE_MODEL_CHECKSUM = "IK-0216"
+
+    /** File is no Vosk language pack (no ZIP, unsafe paths, too large, language unknown). */
+    const val VOICE_MODEL_INVALID = "IK-0217"
+
+    /** Language pack could not be stored (storage full). */
+    const val VOICE_MODEL_STORAGE = "IK-0218"
+
+    /** Installed language pack cannot be loaded (damaged): delete it and load it again. */
+    const val VOICE_MODEL_BROKEN = "IK-0219"
 }

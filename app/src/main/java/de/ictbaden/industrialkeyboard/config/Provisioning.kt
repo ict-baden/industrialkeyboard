@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import de.ictbaden.industrialkeyboard.layout.Macro
+import de.ictbaden.industrialkeyboard.voice.VoiceModelCatalog
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -129,6 +130,11 @@ object Provisioning {
                 suggestions = bool("suggestions", config.typing.suggestions),
                 autocorrect = bool("autocorrect", config.typing.autocorrect),
                 voice = values.getString("voice")?.let(VoiceInput::parse) ?: config.typing.voice,
+                voiceModelDownload = bool("voice_model_download", config.typing.voiceModelDownload),
+                // Empty = unchanged (EMMs send every key); an address that is not https is rejected.
+                voiceModelUrl = values.getString("voice_model_url")?.takeIf { it.isNotBlank() }?.let { url ->
+                    VoiceModelCatalog.normalizeBaseUrl(url) ?: throw ConfigException("voice_model_url: must be an https:// address")
+                } ?: config.typing.voiceModelUrl,
                 deleteGesture = bool("delete_gesture", config.typing.deleteGesture),
                 nextWord = bool("next_word", config.typing.nextWord),
                 clipboardHistory = bool("clipboard_history", config.typing.clipboardHistory),

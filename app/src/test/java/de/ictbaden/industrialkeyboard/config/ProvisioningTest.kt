@@ -460,4 +460,26 @@ class ProvisioningTest {
         assertEquals(listOf("Org"), store.config.snippets.items.map { it.label })
         assertTrue(Provisioning.snippetsManaged(context))
     }
+
+    @Test
+    fun `managed free dictation and its language packs`() {
+        restrict("voice" to "free", "voice_model_download" to false, "voice_model_url" to "https://mdm.example.com/voice")
+        Provisioning.applyAll(context)
+        assertEquals(VoiceInput.FREE, store.config.typing.voice)
+        assertFalse(store.config.typing.voiceModelDownload)
+        assertEquals("https://mdm.example.com/voice/", store.config.typing.voiceModelUrl)
+        // Empty = unchanged (EMMs send every key with its default).
+        restrict("voice_model_url" to "", "voice_model_download" to true)
+        Provisioning.applyAll(context)
+        assertEquals("https://mdm.example.com/voice/", store.config.typing.voiceModelUrl)
+        assertTrue(store.config.typing.voiceModelDownload)
+    }
+
+    @Test
+    fun `managed language pack server must be https`() {
+        restrict("voice_model_url" to "http://mdm.example.com/voice/")
+        Provisioning.applyAll(context)
+        assertEquals(null, store.config.typing.voiceModelUrl)
+        assertTrue(Provisioning.lastError(context).orEmpty().contains("voice_model_url"))
+    }
 }
