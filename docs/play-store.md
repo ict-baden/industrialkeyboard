@@ -30,11 +30,11 @@ Captions are in `PLAY_SCREENS` at the end of `compose.py`.
 
 Done once, by a person with access to the company accounts:
 
-1. **Developer account** as an organisation (ICT-Baden GmbH, needs a D-U-N-S number). An
+1. **Developer account** as an organisation (ICT Baden GmbH, needs a D-U-N-S number). An
    organisation account does not need the 14-day closed test with 12 testers that new personal
    accounts need.
 2. **Package name** is final once the app exists in Play: `de.ictbaden.industrialkeyboard`.
-   The domain `ict-baden.de` belongs to ICT-Baden.
+   The domain `ict-baden.de` belongs to ICT Baden.
 3. **Privacy policy URL:** `https://ict-baden.de/datenschutz/industrialkeyboard/` (German and
    English, matching [Data and privacy](data-and-privacy.md)). It must be online before the app
    is submitted.
@@ -161,7 +161,7 @@ refuses an App Bundle whose `versionCode` was uploaded already – use a new tag
 
 Done once, by a person with admin access to the Play Console:
 
-1. [Google Cloud Console](https://console.cloud.google.com/) → a project for ICT-Baden → enable the
+1. [Google Cloud Console](https://console.cloud.google.com/) → a project for ICT Baden → enable the
    *Google Play Android Developer API*.
 2. *IAM & Admin → Service accounts* → create one (e.g. `play-upload`) → *Keys → Add key → JSON*.
 3. Play Console → *Users and permissions* → invite the service account's e-mail address, access

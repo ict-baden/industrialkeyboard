@@ -223,7 +223,7 @@ the real keyboard code – see [tools/screenshots](tools/screenshots/README.md).
 ---
 
 <sub>
-Industrial Keyboard is free and open source software by <b>ICT-Baden</b>. &nbsp;·&nbsp;
+Industrial Keyboard is free and open source software by <b>ICT Baden</b>. &nbsp;·&nbsp;
 Licence: <a href="LICENSE">MIT</a> &nbsp;·&nbsp;
 Third-party licences: <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a> &nbsp;·&nbsp;
 Support: free via GitHub, guaranteed with a <a href="SUPPORT.md">support contract</a> &nbsp;·&nbsp;

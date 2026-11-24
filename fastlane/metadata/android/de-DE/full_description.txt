@@ -28,7 +28,7 @@ TIPPEN WIE GEWOHNT
 • Wortvorschläge und Autokorrektur aus eingebauten Wörterbüchern, ohne Lernen
 • Persönliches Wörterbuch, auch mit Import aus Gboard
 • Diktat in der Tastatur, Emoji-Auswahl, Zwischenablage, Text bearbeiten, Einhandmodus
-• Tastatursprachen für 40 Sprachen mit lateinischer Schrift; QWERTY, QWERTZ, AZERTY, Nordisch und Spanisch, Akzente per langem Druck
+• Tastatursprachen für 33 Sprachen mit lateinischer Schrift; QWERTY, QWERTZ, AZERTY, Nordisch und Spanisch, Akzente per langem Druck
 • Textbausteine vom Administrator oder eigene, abrufbar mit Kürzeln wie „mfg“
 
 EIGENE TASTEN
@@ -49,6 +49,6 @@ DATENSCHUTZ VON ANFANG AN
 • Nichts, was Sie in anderen Apps tippen, wird gespeichert oder gelernt
 • Kamerabilder werden auf dem Gerät ausgewertet und nicht gespeichert
 • Diktat mit der Spracherkennung des Geräts (deren Sprachdienst arbeitet ggf. online) oder, auf Geräten ohne Google und wenn so eingestellt, mit einem freien Offline-Modell auf dem Gerät
-• Kein Konto, keine Werbung, kein Tracking. Industrial Keyboard sendet keine Daten an ICT-Baden.
+• Kein Konto, keine Werbung, kein Tracking. Industrial Keyboard sendet keine Daten an ICT Baden.
 
-Oberfläche auf Englisch, Deutsch, Spanisch, Französisch und Chinesisch. Kostenlos und Open Source (MIT-Lizenz), von ICT-Baden. Supportverträge sind erhältlich.
+Oberfläche auf Englisch, Deutsch, Spanisch, Französisch und Chinesisch. Kostenlos und Open Source (MIT-Lizenz), von ICT Baden. Supportverträge sind erhältlich.

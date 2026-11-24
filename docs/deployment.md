@@ -165,7 +165,7 @@ Android+). The flow:
 ## Microsoft Intune
 
 1. On Android Enterprise devices the app has to come through **managed Google Play**. Use
-   the [listing of ICT-Baden](https://play.google.com/store/apps/details?id=de.ictbaden.industrialkeyboard) (approve it for your organisation in managed Google Play).
+   the [listing of ICT Baden](https://play.google.com/store/apps/details?id=de.ictbaden.industrialkeyboard) (approve it for your organisation in managed Google Play).
    **Do not upload the APK as your own private app:** package names are unique in all of Google
    Play, so your upload would take `de.ictbaden.industrialkeyboard` for your developer account,
    and the official app could not use it any more.
@@ -285,7 +285,7 @@ settings under **Configuration → Last provisioning error**.
 ## Updates and signing
 
 Android only installs an update if the new APK is signed with the same key as the installed
-one. Releases from 2.0.0 on are signed with ICT-Baden's release key, so they update each other in
+one. Releases from 2.0.0 on are signed with ICT Baden's release key, so they update each other in
 place, keeping the configuration. The App Bundle for Google Play is signed with the same key
 ([details](play-store.md#app-signing)). Check a downloaded APK with `SHA256SUMS.txt` from the
 same release (`sha256sum -c --ignore-missing SHA256SUMS.txt`).

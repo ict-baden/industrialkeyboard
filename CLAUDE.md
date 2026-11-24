@@ -2,7 +2,7 @@
 
 Industrial Keyboard: Bildschirmtastatur (Android-Eingabemethode) für robuste Geräte von Zebra und Honeywell – große Tasten für Handschuhe, Scan-Trigger, F1–F24 für Terminal-Emulation, Konfiguration per MDM.
 
-Projekt von ICT-Baden. Es gelten die Richtlinien in [`ict-baden/richtlinien`](https://github.com/ict-baden/richtlinien). Stand und Zuständigkeit stehen in `ict-baden/ict-baden-projekte` (`projekte.json`, `in-arbeit.md`).
+Projekt von ICT Baden. Es gelten die internen Richtlinien von ICT Baden (im Text als „Richtlinie NN“ genannt); was für Beiträge von außen gilt, steht in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Bauen und testen
 
@@ -42,6 +42,5 @@ JDK 17–21, Android SDK mit Compile-SDK 37. Unter Windows `sdk.dir` in `local.p
 ## Regeln
 
 - Commit-Nachrichten auf Deutsch.
-- Nach Arbeit an diesem Projekt: Logbuch in `ict-baden-projekte` ergänzen.
 - Vor jedem Release: Abschnitt „Unveröffentlicht“ im `CHANGELOG.md` pflegen und in die Version umbenennen, `versionName` in `app/build.gradle.kts` anheben.
 - Release: annotierter Tag, dessen Nachricht der CHANGELOG-Abschnitt auf Englisch ist (`git tag -a vX.Y.Z -F notes.md --cleanup=verbatim`); die CI setzt ihn als Release-Text vor die Dateiliste. Danach `versionName` auf main gleich auf die nächste Patch-Version heben, damit CI-Builds nicht älter heißen als das Release.

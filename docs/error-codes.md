@@ -11,7 +11,7 @@ any of the five languages. Source: [`ErrorCodes.kt`](../app/src/main/java/de/ict
 | `IK-0101` | Import failed | Invalid configuration in the import file or the scanned QR code (also a damaged `ICTZ1:` text) |
 | `IK-0102` | Could not read the file | Import file not readable |
 | `IK-0103` | Export failed | Target not writable |
-| `IK-0104` | Invalid color | Accent color is not `#RRGGBB` |
+| `IK-0104` | Invalid colour | Accent colour is not `#RRGGBB` |
 | `IK-0105` | Invalid (macro) | Unknown token in a programmable key, e.g. `{TABB}` |
 | `IK-0200` | Without camera permission the keyboard cannot scan with the camera | The camera permission was denied. Allow it in the Android app settings (Permissions → Camera) or with the EMM |
 | `IK-0201` | The camera could not be started | Another app uses the camera, or the device has none. Close the other app and tap scan again |
