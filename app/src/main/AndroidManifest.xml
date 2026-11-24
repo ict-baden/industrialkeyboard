@@ -5,19 +5,20 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- Camera scan when the device has no scan engine (scanner.trigger auto/camera). -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <!-- Dictation inside the keyboard (typing.voice); the audio goes to the device's speech recognition. -->
+    <!-- Dictation inside the keyboard (typing.voice); the audio goes to the device's speech recognition
+         or to the free model inside the app (issue #24), never to the network. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- NFC tags into the focused field (scanner.nfc). -->
     <uses-permission android:name="android.permission.NFC" />
 
-    <!-- No network, on purpose: nothing typed or recognised can leave the device. ML Kit (OCR)
-         brings these through its usage statistics (datatransport); they are removed here. -->
-    <uses-permission
-        android:name="android.permission.INTERNET"
-        tools:node="remove" />
-    <uses-permission
-        android:name="android.permission.ACCESS_NETWORK_STATE"
-        tools:node="remove" />
+    <!-- Network ONLY for the language packs of the free dictation (issue #24): downloaded over https
+         when the user taps "Download" (or never, with typing.voiceModelDownload: false). The
+         only network code is voice/ModelDownloader.kt; audio, typed and recognised text never leave
+         the device. ACCESS_NETWORK_STATE: the hint before a download over mobile data.
+         ML Kit (OCR) would use these for its usage statistics (datatransport): its upload backend is
+         removed below, so its statistics are discarded on the device. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- Camera and microphone are optional features: without these lines the CAMERA and RECORD_AUDIO
          permissions make Play require a rear camera and a microphone (2.2.4 lost 455 devices). -->
@@ -63,6 +64,19 @@
         <meta-data
             android:name="android.content.APP_RESTRICTIONS"
             android:resource="@xml/app_restrictions" />
+
+        <!-- No usage statistics of ML Kit (and of anything else using Google's datatransport): without
+             the "cct" backend registered here, datatransport finds no way to send its events and
+             deletes them ("Unknown backend for cct, deleting event batch"). Needed since the app has
+             the internet permission for the language packs. Checked by ManifestTest. -->
+        <service
+            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+                tools:node="remove" />
+        </service>
 
         <service
             android:name=".ime.KeyboardService"
