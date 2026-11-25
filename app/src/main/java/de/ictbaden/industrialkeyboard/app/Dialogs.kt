@@ -300,7 +300,7 @@ class Dialogs(private val activity: Activity, private val ui: Ui) {
 
     fun toast(text: String) = Toast.makeText(activity, text, Toast.LENGTH_SHORT).show()
 
-    /** Translated message plus a language-independent code for support (richtlinien/13-sprachen.md). */
+    /** Translated message plus a language-independent code for support. */
     fun withCode(message: String, code: String): String = activity.getString(R.string.message_with_code, message, code)
 
     private fun s(id: Int): String = activity.getString(id)

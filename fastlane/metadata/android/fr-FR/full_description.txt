@@ -28,7 +28,7 @@ SAISIR COMME D’HABITUDE
 • Suggestions de mots et correction automatique à partir de dictionnaires intégrés, sans apprentissage
 • Dictionnaire personnel, avec import depuis Gboard
 • Dictée dans le clavier, sélecteur d’emoji, presse-papiers, édition de texte, mode une main
-• Langues de clavier pour 40 langues à alphabet latin ; QWERTY, QWERTZ, AZERTY, nordique et espagnol, accents par appui long
+• Langues de clavier pour 33 langues à alphabet latin ; QWERTY, QWERTZ, AZERTY, nordique et espagnol, accents par appui long
 • Blocs de texte de l’administrateur ou personnels, insérés par des raccourcis
 
 VOS PROPRES TOUCHES
@@ -49,6 +49,6 @@ CONFIDENTIALITÉ DÈS LA CONCEPTION
 • Rien de ce que vous tapez dans d’autres applications n’est enregistré ni appris
 • Les images de la caméra sont traitées sur l’appareil et ne sont pas enregistrées
 • Dictée avec la reconnaissance vocale de l’appareil (son service peut être en ligne) ou, sans Google ou si configuré, avec un modèle libre hors ligne
-• Pas de compte, pas de publicité, pas de suivi. Industrial Keyboard n’envoie aucune donnée à ICT-Baden.
+• Pas de compte, pas de publicité, pas de suivi. Industrial Keyboard n’envoie aucune donnée à ICT Baden.
 
-Interface en anglais, allemand, espagnol, français et chinois. Gratuit et open source (licence MIT), par ICT-Baden. Des contrats de support sont disponibles.
+Interface en anglais, allemand, espagnol, français et chinois. Gratuit et open source (licence MIT), par ICT Baden. Des contrats de support sont disponibles.

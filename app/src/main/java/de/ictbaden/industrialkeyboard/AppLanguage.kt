@@ -10,7 +10,7 @@ import androidx.core.os.LocaleListCompat
 import de.ictbaden.industrialkeyboard.config.Languages
 
 /**
- * Applies the configured `language` (richtlinien/13-sprachen.md): `auto` follows the device,
+ * Applies the configured `language`: `auto` follows the device,
  * otherwise the configured language. The configuration is the source of truth, so it is applied on
  * every start and on every change.
  */

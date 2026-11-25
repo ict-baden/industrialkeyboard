@@ -12,6 +12,8 @@ Please open an issue first and describe your plan.
 - Ein Thema pro Pull Request, mit Tests.
 - `./gradlew testDebugUnitTest lintDebug` muss grün sein.
 - Keine neuen Abhängigkeiten ohne Rücksprache. Nur freizügige Lizenzen (MIT, BSD, Apache-2.0, ISC), keine GPL/AGPL.
+- Ausnahme: Die Texterkennung (OCR) nutzt Google ML Kit mit den Google-Play-Dienste-Bibliotheken, die es braucht. Beides ist nicht quelloffen (Lizenzen in `THIRD-PARTY-NOTICES.txt`, Teil 12 und 13); die Erkennung läuft auf dem Gerät.
+  Exception: text recognition (OCR) uses Google ML Kit with the Google Play services libraries it needs. Neither is open source (licences in `THIRD-PARTY-NOTICES.txt`, parts 12 and 13); recognition runs on the device.
 - Keine Passwörter, internen Hostnamen oder Kundendaten in Code, Tests oder Screenshots.
 
 ## Developer Certificate of Origin (DCO)

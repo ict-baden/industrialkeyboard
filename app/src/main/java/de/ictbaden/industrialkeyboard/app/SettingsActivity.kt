@@ -739,7 +739,7 @@ class SettingsActivity : AppCompatActivity() {
                             },
                         ),
                     ) { imm?.showInputMethodPicker() },
-                    // About block required by ict-baden/richtlinien 07.
+                    // About block: privacy, licence, third-party licences, source code, support, website, legal notice.
                     ui.row(R.drawable.ic_lock, getString(R.string.about_privacy), getString(R.string.about_privacy_summary)) {
                         openLink(PRIVACY)
                     },
@@ -1028,7 +1028,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun languageName(language: String): String {
         val name = AppLanguage.NAMES[language] ?: return getString(R.string.language_system)
-        // Not yet proofread by native speakers (richtlinien/13-sprachen.md).
+        // Not yet proofread by native speakers.
         return if (language in AppLanguage.MACHINE_TRANSLATED) getString(R.string.language_machine_translated, name) else name
     }
 

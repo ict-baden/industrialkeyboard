@@ -30,7 +30,7 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_contrast">High contrast</string>
-    <string name="accent_color">Accent color</string>
+    <string name="accent_color">Accent colour</string>
     <string name="theme_default">Theme default</string>
     <string name="key_height">Key height</string>
     <string name="keyboard_width">Keyboard width</string>
@@ -78,7 +78,7 @@
 
     <!-- Settings: typing and feedback -->
     <string name="section_typing">Typing</string>
-    <string name="auto_capitalization">Auto-capitalization</string>
+    <string name="auto_capitalization">Auto-capitalisation</string>
     <string name="auto_capitalization_summary">Capital letter at the start of a sentence (if the field asks for it)</string>
     <string name="double_space_period">Double-space period</string>
     <string name="double_space_period_summary">Two spaces insert a period</string>
@@ -259,7 +259,7 @@
     <string name="import_confirm_message">The current settings will be replaced.</string>
     <string name="config_imported">Configuration imported</string>
 
-    <!-- Settings: info (richtlinien 07) -->
+    <!-- Settings: info -->
     <string name="section_info">Info</string>
     <string name="version">Version</string>
     <string name="status">Status</string>
@@ -267,9 +267,9 @@
     <string name="status_enabled">Enabled, not selected</string>
     <string name="status_not_enabled">Not enabled</string>
     <string name="about_privacy">Data and privacy</string>
-    <string name="about_privacy_summary">This software sends no data to ICT-Baden. It has no internet permission.</string>
+    <string name="about_privacy_summary">This software sends no data to ICT Baden. It has no internet permission.</string>
     <string name="about_licence">Licence</string>
-    <string name="about_licence_summary" translatable="false">MIT · © 2026 ICT-Baden</string>
+    <string name="about_licence_summary" translatable="false">MIT · © 2026 ICT Baden GmbH</string>
     <string name="about_third_party">Third-party licences</string>
     <string name="about_third_party_summary" translatable="false">AndroidX, Material Components, Kotlin</string>
     <string name="about_source">Source code</string>
@@ -277,7 +277,7 @@
     <string name="about_support_summary">Free via GitHub, guaranteed with a support contract</string>
     <string name="about_website">Website</string>
     <string name="about_impressum">Legal notice</string>
-    <string name="about_impressum_summary">Legal notice of ICT-Baden</string>
+    <string name="about_impressum_summary">Legal notice of ICT Baden</string>
     <string name="no_browser">No browser available</string>
 
     <!-- Dialogs -->
@@ -291,10 +291,10 @@
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="password_saved">Admin password saved</string>
     <string name="password_removed">Admin password removed</string>
-    <string name="color_hint">Color (#RRGGBB)</string>
+    <string name="color_hint">Colour (#RRGGBB)</string>
     <string name="color_helper">Empty = theme default</string>
     <string name="use_theme_default">Use theme default</string>
-    <string name="invalid_color">Invalid color: %1$s</string>
+    <string name="invalid_color">Invalid colour: %1$s</string>
 
     <!-- Setup screen -->
     <string name="setup_tagline">Fast data entry with scanner, gloves and forms</string>
@@ -345,7 +345,7 @@
     <string name="mc_language_title">Language</string>
     <string name="mc_language_description">Language of the settings screens. Automatic follows the device.</string>
     <string name="mc_theme_title">Theme</string>
-    <string name="mc_theme_description">Colors of the keyboard.</string>
+    <string name="mc_theme_description">Colours of the keyboard.</string>
     <string name="mc_alphabet_title">Letter layout</string>
     <string name="mc_alphabet_description">Arrangement of the letter keys.</string>
     <string name="mc_numeric_order_title">Numeric keypad</string>

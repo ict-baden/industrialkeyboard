@@ -10,7 +10,7 @@
 
 ## Summary
 
-Industrial Keyboard **sends no data to ICT-Baden or anyone else**. There is no telemetry, no
+Industrial Keyboard **sends no data to ICT Baden or anyone else**. There is no telemetry, no
 crash reporting, no update check and no account. The app has the internet permission for **one
 purpose only**: to download a language pack of the [free offline dictation](configuration.md#free-offline-dictation)
 when the user taps *Download* (or never, with `typing.voiceModelDownload: false`). That is the
@@ -73,7 +73,7 @@ is stored or logged by the keyboard. In password fields the character keys are s
 to know that, the keyboard asks Android which audio outputs are connected (device types only).
 
 The operator of the devices (your company) is responsible for the data typed with the keyboard;
-ICT-Baden processes none of it.
+ICT Baden processes none of it.
 
 **Dictation:** the microphone records only while the dictation panel is open. Where the audio goes depends on [`typing.voice`](configuration.md#typing) and the device (the smart switch, [details](configuration.md#free-offline-dictation)):
 

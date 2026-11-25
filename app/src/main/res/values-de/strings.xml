@@ -253,7 +253,7 @@
     <string name="status_enabled">Aktiviert, nicht ausgewählt</string>
     <string name="status_not_enabled">Nicht aktiviert</string>
     <string name="about_privacy">Daten und Datenschutz</string>
-    <string name="about_privacy_summary">Diese Software sendet keine Daten an ICT-Baden. Sie hat keine Internet-Berechtigung.</string>
+    <string name="about_privacy_summary">Diese Software sendet keine Daten an ICT Baden. Sie hat keine Internet-Berechtigung.</string>
     <string name="about_licence">Lizenz</string>
     <string name="about_third_party">Drittanbieter-Lizenzen</string>
     <string name="about_source">Quellcode</string>
@@ -261,7 +261,7 @@
     <string name="about_support_summary">Kostenlos über GitHub, verbindlich mit Supportvertrag</string>
     <string name="about_website">Webseite</string>
     <string name="about_impressum">Impressum</string>
-    <string name="about_impressum_summary">Impressum von ICT-Baden</string>
+    <string name="about_impressum_summary">Impressum von ICT Baden</string>
     <string name="no_browser">Kein Browser verfügbar</string>
 
     <string name="settings_protected">Einstellungen sind geschützt</string>
@@ -695,7 +695,7 @@
         <item quantity="other">%1$d weitere Wörter – Suche eingrenzen</item>
     </plurals>
     <string name="personal_dictionary_section_words">Wörter</string>
-    <string name="personal_dictionary_note">Nur Wörter, die du hinzufügst oder importierst – die Tastatur lernt nichts beim Tippen. Nur auf diesem Gerät gespeichert, nicht im Backup.</string>
+    <string name="personal_dictionary_note">Nur Wörter, die Sie hinzufügen oder importieren – die Tastatur lernt nichts beim Tippen. Nur auf diesem Gerät gespeichert, nicht im Backup.</string>
     <string name="personal_dictionary_edit_title">Wort</string>
     <string name="personal_dictionary_word_hint">Wort oder Wortgruppe</string>
     <string name="personal_dictionary_word_helper">Bis zu 64 Zeichen</string>

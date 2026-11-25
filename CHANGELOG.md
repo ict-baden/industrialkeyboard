@@ -4,6 +4,9 @@ Alle wichtigen Änderungen an Industrial Keyboard. Format nach [Keep a Changelog
 
 ## [Unveröffentlicht]
 
+### Doku
+- Firmierung „ICT Baden“ bzw. „ICT Baden GmbH“ (`LICENSE`, README, Doku, Store-Texte, Info-Bereich der App); `SECURITY.md` nennt security@ict-baden.de und die Sicherheitsupdates für die vorherige Hauptversion, `SUPPORT.md` den Kontakt support@ict-baden.de; `CONTRIBUTING.md` nennt Google ML Kit als nicht quelloffene Ausnahme; Store-Texte: 33 statt 40 Tastatursprachen; englische Texte der App einheitlich britisch („colour“).
+
 ## [2.3.0] – 2026-11-24
 
 ### Neu

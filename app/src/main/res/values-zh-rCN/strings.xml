@@ -253,7 +253,7 @@
     <string name="status_enabled">已启用，未选择</string>
     <string name="status_not_enabled">未启用</string>
     <string name="about_privacy">数据与隐私</string>
-    <string name="about_privacy_summary">本软件不会向 ICT-Baden 发送任何数据。它没有联网权限。</string>
+    <string name="about_privacy_summary">本软件不会向 ICT Baden 发送任何数据。它没有联网权限。</string>
     <string name="about_licence">许可证</string>
     <string name="about_third_party">第三方许可证</string>
     <string name="about_source">源代码</string>
@@ -261,7 +261,7 @@
     <string name="about_support_summary">通过 GitHub 免费获取，签订支持合同可获得保障</string>
     <string name="about_website">网站</string>
     <string name="about_impressum">法律声明</string>
-    <string name="about_impressum_summary">ICT-Baden 的法律声明</string>
+    <string name="about_impressum_summary">ICT Baden 的法律声明</string>
     <string name="no_browser">没有可用的浏览器</string>
 
     <string name="settings_protected">设置受保护</string>

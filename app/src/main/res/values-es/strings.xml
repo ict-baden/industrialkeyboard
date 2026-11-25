@@ -253,7 +253,7 @@
     <string name="status_enabled">Habilitado, no seleccionado</string>
     <string name="status_not_enabled">No habilitado</string>
     <string name="about_privacy">Datos y privacidad</string>
-    <string name="about_privacy_summary">Este software no envía datos a ICT-Baden. No tiene permiso de acceso a Internet.</string>
+    <string name="about_privacy_summary">Este software no envía datos a ICT Baden. No tiene permiso de acceso a Internet.</string>
     <string name="about_licence">Licencia</string>
     <string name="about_third_party">Licencias de terceros</string>
     <string name="about_source">Código fuente</string>
@@ -261,7 +261,7 @@
     <string name="about_support_summary">Gratis a través de GitHub, garantizado con un contrato de soporte</string>
     <string name="about_website">Sitio web</string>
     <string name="about_impressum">Aviso legal</string>
-    <string name="about_impressum_summary">Aviso legal de ICT-Baden</string>
+    <string name="about_impressum_summary">Aviso legal de ICT Baden</string>
     <string name="no_browser">No hay ningún navegador disponible</string>
 
     <string name="settings_protected">La configuración está protegida</string>

@@ -3,7 +3,7 @@ Industrial Keyboard is an on-screen keyboard for rugged Android devices in wareh
 MADE FOR GLOVES
 • Key height from 70 to 160 %, forgiving touch targets and a preview above the finger
 • Glove mode as a quick toggle: keys at least 130 % high, long press only after 600 ms
-• Light, dark and high-contrast themes, custom accent color
+• Light, dark and high-contrast themes, custom accent colour
 
 THE RIGHT KEYS FOR EVERY FIELD
 • Number fields open the numeric pad (phone or calculator order, PIN, date, time)
@@ -28,7 +28,7 @@ TYPING AS USUAL
 • Word suggestions and autocorrection from built-in dictionaries, without learning
 • Personal dictionary, with import from Gboard
 • Dictation in the keyboard, emoji panel, clipboard, text editing, one-handed mode
-• Keyboard languages for 40 languages with Latin script; QWERTY, QWERTZ, AZERTY, Nordic and Spanish, accents on long press
+• Keyboard languages for 33 languages with Latin script; QWERTY, QWERTZ, AZERTY, Nordic and Spanish, accents on long press
 • Snippets from the administrator or your own, called up with typed shortcuts
 
 YOUR OWN KEYS
@@ -49,6 +49,6 @@ PRIVATE BY DESIGN
 • Nothing you type in other apps is stored or learned
 • Camera pictures are processed on the device and not stored
 • Dictation uses the device's speech recognition (its speech service may work online) or, on devices without Google and if set so, a free offline model on the device
-• No account, no ads, no tracking. Industrial Keyboard sends no data to ICT-Baden.
+• No account, no ads, no tracking. Industrial Keyboard sends no data to ICT Baden.
 
-User interface in English, German, Spanish, French and Chinese. Free and open source (MIT licence), made by ICT-Baden. Paid support contracts are available.
+User interface in English, German, Spanish, French and Chinese. Free and open source (MIT licence), made by ICT Baden. Paid support contracts are available.

@@ -12,7 +12,7 @@ We read everything but cannot promise response times. Everything there is public
 
 ## Verbindlich: Supportvertrag / Guaranteed: support contract
 
-Mit einem Supportvertrag von ICT-Baden bekommen Sie:
+Mit einem Supportvertrag von ICT Baden bekommen Sie:
 
 - zugesicherte Reaktionszeiten
 - Hilfe bei Einrichtung, Verteilung und Betrieb in Ihrer Umgebung, per E-Mail, Telefon oder Fernsitzung
@@ -20,9 +20,10 @@ Mit einem Supportvertrag von ICT-Baden bekommen Sie:
 - Vorrang bei Fehlerbehebungen und Sicherheitsinformationen vorab
 - Anpassungen und Schulungen nach Absprache
 
-Kontakt: [Impressum](https://ict-baden.de/impressum/)
+Kontakt: [support@ict-baden.de](mailto:support@ict-baden.de) · Preise und Bedingungen: https://ict-baden.de/support/
+Contact: [support@ict-baden.de](mailto:support@ict-baden.de) · prices and terms: https://ict-baden.de/en/support/
 
 ## Konfiguration mitschicken / Send your configuration
 
-*Einstellungen → Configuration → Export to file* speichert die Konfiguration als JSON (ohne Klartext-Passwort, nur der Hash). Das beschleunigt jede Anfrage.
+*Einstellungen → Konfiguration → In Datei exportieren* speichert die Konfiguration als JSON (ohne Klartext-Passwort, nur der Hash). Das beschleunigt jede Anfrage.
 *Settings → Configuration → Export to file* saves the configuration as JSON (no plain-text password).

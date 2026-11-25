@@ -28,7 +28,7 @@ ESCRIBIR COMO SIEMPRE
 • Sugerencias de palabras y autocorrección a partir de diccionarios integrados, sin aprendizaje
 • Diccionario personal, también con importación desde Gboard
 • Dictado en el teclado, selector de emojis, portapapeles, edición de texto, modo a una mano
-• Idiomas de teclado para 40 idiomas con alfabeto latino; QWERTY, QWERTZ, AZERTY, nórdico y español, acentos con pulsación larga
+• Idiomas de teclado para 33 idiomas con alfabeto latino; QWERTY, QWERTZ, AZERTY, nórdico y español, acentos con pulsación larga
 • Fragmentos de texto del administrador o propios, que se insertan con atajos
 
 SUS PROPIAS TECLAS
@@ -49,6 +49,6 @@ PRIVACIDAD DESDE EL DISEÑO
 • Nada de lo que escribe en otras aplicaciones se guarda ni se aprende
 • Las imágenes de la cámara se procesan en el dispositivo y no se guardan
 • Dictado con el reconocimiento de voz del dispositivo (su servicio puede funcionar en línea) o, sin Google o si se configura, con un modelo libre sin conexión
-• Sin cuenta, sin publicidad, sin seguimiento. Industrial Keyboard no envía datos a ICT-Baden.
+• Sin cuenta, sin publicidad, sin seguimiento. Industrial Keyboard no envía datos a ICT Baden.
 
-Interfaz en inglés, alemán, español, francés y chino. Gratuito y de código abierto (licencia MIT), de ICT-Baden. Hay contratos de soporte disponibles.
+Interfaz en inglés, alemán, español, francés y chino. Gratuito y de código abierto (licencia MIT), de ICT Baden. Hay contratos de soporte disponibles.
